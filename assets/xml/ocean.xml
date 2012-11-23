@@ -1,0 +1,44 @@
+<magazine name="Океан" version="1.0" serial="1">
+    <issue
+        name="Выпуск № 4, 2011"
+        date="Декабрь, 2011"
+        price="Бесплатно"
+        url="http://ocean-magazin.ru/archives/OCEAN_4_All_v2.pdf" 
+        cover="http://ocean-magazin.ru/archives/4_obl.jpg"/>
+    <issue
+        name="Выпуск № 3, 2012"
+        date="Май, 2012"
+        price="Бесплатно"
+        url="http://ocean-magazin.ru/archives/3-namber.pdf" 
+        cover="http://ocean-magazin.ru/issues_of_magazines/images_namber_3/Ocean_3.jpg"/>
+    <issue
+        name="Выпуск № 2, 2012"
+        date="Февраль, 2012"
+        price="Бесплатно"
+        url="http://ocean-magazin.ru/archives/namber_2.pdf" 
+        cover="http://ocean-magazin.ru/Ocean-_2_Obl_v1.jpg"/>
+    <issue
+        name="Выпуск № 1, 2012, часть 1"
+        date="Январь, 2012"
+        price="Бесплатно"
+        url="http://ocean-tv.su/pdf_ocean/OCEAN-1-v2-2-17.pdf" 
+        cover="http://ocean-magazin.ru/l_OCEAN-1OBL.jpg"/>
+    <issue
+        name="Выпуск № 1, 2012, часть 2"
+        date="Январь, 2012"
+        price="Бесплатно"
+        url="http://ocean-tv.su/pdf_ocean/OCEAN-1-v2-18-33.pdf"  
+        cover="http://ocean-magazin.ru/l_OCEAN-1OBL.jpg"/>
+    <issue
+        name="Выпуск № 1, 2012, часть 3"
+        date="Январь, 2012"
+        price="Бесплатно"
+        url="http://ocean-tv.su/pdf_ocean/OCEAN-TV-46-59.pdf"  
+        cover="http://ocean-magazin.ru/l_OCEAN-1OBL.jpg"/>
+    <issue
+        name="Выпуск № 1, 2012, часть 4"
+        date="Январь, 2012"
+        price="Бесплатно"
+        url="http://ocean-tv.su/pdf_ocean/OCEAN-TV-62-79.pdf"  
+        cover="http://ocean-magazin.ru/l_OCEAN-1OBL.jpg"/>
+</magazine>
