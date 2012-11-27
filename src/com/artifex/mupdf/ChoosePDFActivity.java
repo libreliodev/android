@@ -5,8 +5,6 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.librelio.wind.R;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -18,6 +16,8 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.niveales.wind.R;
 
 public class ChoosePDFActivity extends ListActivity {
 	private File    mDirectory;

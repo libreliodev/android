@@ -1,2 +1,5 @@
 /tmp
 /proguard
+/gen
+/bin
+/project.properties
