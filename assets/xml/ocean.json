@@ -7,28 +7,20 @@
     "issue": [
     {
     	"name": "Wind",
-        "date": "Июнь, 2012",
+        "date": "Juin, 2012",
         "price": "Бесплатно",
-        "url": "http://ocean-magazin.ru/archives/OCEAN_Expo_smotrelka_5.pdf",
-        "cover": "http://ocean-magazin.ru/archives/expo_5.jpg",
+        "url": "http://librelio-europe.s3.amazonaws.com/niveales/wind/wind_370/wind_370.pdf",
+        "cover": "http://librelio-europe.s3.amazonaws.com/niveales/wind/wind_370/wind_370.png",
         "sku": "ocn_05e2012"
     },
     {
-    	"name": "Выпуск № 5, 2012",
-        "date": "Май, 2012",
+    	"name": "Wind",
+        "date": "Juin, 2012",
         "price": "Бесплатно",
-        "url": "http://ocean-magazin.ru/archives/Ocean_5_Smotrelka.pdf",
-        "cover": "http://ocean-magazin.ru/issues_of_magazines/images_namber_5/Ocean_5_mini.jpg",
-        "sku": "ocn_052012"
+        "url": "http://librelio-europe.s3.amazonaws.com/niveales/wind/wind_369/wind_369.pdf",
+        "cover": "http://librelio-europe.s3.amazonaws.com/niveales/wind/wind_369/wind_369.png",
+        "sku": "ocn_05e2011"
     },
-      {
-        "name": "Выпуск № 4, 2011",
-        "date": "Декабрь, 2012",
-        "price": "Бесплатно",
-        "url": "http://ocean-magazin.ru/archives/OCEAN_4_All_v2.pdf",
-        "cover": "http://ocean-magazin.ru/archives/4_obl.jpg",
-        "sku": "ocn_042011"
-      },
       {
         "name": "Выпуск № 3, 2011",
         "date": "Май, 2012",
