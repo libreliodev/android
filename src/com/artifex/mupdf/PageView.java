@@ -1,6 +1,7 @@
 package com.artifex.mupdf;
 
-import com.niveales.wind.R;
+
+import com.librelio.wind.R;
 
 import android.content.Context;
 import android.graphics.Bitmap;

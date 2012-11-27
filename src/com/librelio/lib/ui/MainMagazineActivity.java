@@ -69,7 +69,7 @@ import com.librelio.lib.utils.cloud.Magazine;
 import com.librelio.lib.utils.cloud.CloudHelper.CloudEventListener;
 import com.librelio.lib.utils.db.Ocean;
 import com.librelio.lib.utils.db.PurchaseDatabase;
-import com.niveales.wind.R;
+import com.librelio.wind.R;
 
 /**
  * A sample application that demonstrates in-app billing.
