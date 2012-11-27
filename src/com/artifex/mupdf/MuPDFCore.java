@@ -11,10 +11,11 @@ public class MuPDFCore
 	}
 
 	/* Readable members */
-	private int pageNum  = -1;;
+	private int pageNum  = -1;
 	private int numPages = -1;
 	public  float pageWidth;
 	public  float pageHeight;
+	public int pageNumToDraw = 1;
 
 	/* The native functions */
 	private static native int openFile(String filename);
@@ -85,7 +86,12 @@ public class MuPDFCore
 			int patchX, int patchY,
 			int patchW, int patchH) {
 		gotoPage(page);
-		drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
+		if(this.getPageNumToDraw() == 1) {
+			drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
+		} else {
+			// overlay two bitmaps
+			int halfW = pageW/2;
+		}
 	}
 
 	public synchronized int hitLinkPage(int page, float x, float y) {
@@ -119,5 +125,13 @@ public class MuPDFCore
 
 	public synchronized boolean authenticatePassword(String password) {
 		return authenticatePasswordInternal(password);
+	}
+	
+	public void setPageNumToDraw(int num) {
+		pageNumToDraw = num;
+	}
+	
+	public int getPageNumToDraw() {
+		return pageNumToDraw;
 	}
 }

@@ -425,6 +425,7 @@ public class MuPDFActivity extends Activity
 */
 
 		if (core.hasOutline()) {
+			// TODO: change to outline popover
 			mOutlineButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					OutlineItem outline[] = core.getOutline();
