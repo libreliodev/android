@@ -27,16 +27,19 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/search_document"
-                android:src="@drawable/ic_magnifying_glass" />
+                android:src="@drawable/ic_magnifying_glass"
+                android:visibility="gone" />
 
             <ImageButton
                 android:id="@+id/outlineButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/searchButton"
                 android:contentDescription="@string/search_document"
                 android:src="@drawable/ic_list" />
+
 <!--
             <ImageButton
                 android:id="@+id/linkButton"
@@ -53,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/searchButton"
+                android:layout_toLeftOf="@+id/outlineButton"
                 android:paddingLeft="15dp"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -117,24 +120,16 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" >
 
-        <SeekBar
-            android:id="@+id/pageSlider"
+        <FrameLayout
+            android:id="@+id/PreviewBarHolder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="140dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_margin="0dp"
-            android:background="@drawable/slider" />
+            android:background="@color/bar" >
 
-        <TextView
-            android:id="@+id/pageNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/pageSlider"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/page_num"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+
     </RelativeLayout>
 
 </RelativeLayout>

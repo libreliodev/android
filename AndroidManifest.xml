@@ -37,13 +37,12 @@
         </receiver>
 
         <activity android:name="com.librelio.lib.ui.MainMagazineActivity" >
-            <intent-filter>
+        </activity>
+        <activity android:name="com.artifex.mupdf.MuPDFActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"><intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name="com.artifex.mupdf.MuPDFActivity" >
         </activity>
     </application>
 

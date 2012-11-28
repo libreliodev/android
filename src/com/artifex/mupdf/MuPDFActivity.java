@@ -1,5 +1,6 @@
 package com.artifex.mupdf;
 
+import java.io.File;
 
 import com.librelio.wind.R;
 
@@ -15,6 +16,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
@@ -28,7 +30,12 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -86,9 +93,10 @@ public class MuPDFActivity extends Activity
 	private boolean      mButtonsVisible;
 	private EditText     mPasswordView;
 	private TextView     mFilenameView;
-	private SeekBar      mPageSlider;
+//	private SeekBar      mPageSlider;
+	private ViewPager	mPreviewBar;
 	private int          mPageSliderRes;
-	private TextView     mPageNumberView;
+//	private TextView     mPageNumberView;
 	private ImageButton  mSearchButton;
 	private ImageButton  mCancelButton;
 	private ImageButton  mOutlineButton;
@@ -103,6 +111,8 @@ public class MuPDFActivity extends Activity
 	private AlertDialog.Builder mAlertBuilder;
 	private LinkState    mLinkState = LinkState.DEFAULT;
 	private final Handler mHandler = new Handler();
+	private FrameLayout mPreviewBarHolder;
+	private Gallery mPreview;
 
 	private MuPDFCore openFile(String path)
 	{
@@ -153,7 +163,13 @@ public class MuPDFActivity extends Activity
 						uri = Uri.parse(cursor.getString(0));
 					}
 				}
+
 				core = openFile(Uri.decode(uri.getEncodedPath()));
+				SearchTaskResult.set(null);
+			} else {
+				String filePath="/mnt/sdcard/wind_355.pdf";
+
+				core = openFile(filePath);
 				SearchTaskResult.set(null);
 			}
 			if (core != null && core.needsPassword()) {
@@ -164,6 +180,7 @@ public class MuPDFActivity extends Activity
 		if (core == null)
 		{
 			AlertDialog alert = mAlertBuilder.create();
+			
 			alert.setTitle(R.string.open_failed);
 			alert.setButton(AlertDialog.BUTTON_POSITIVE, "Dismiss",
 					new DialogInterface.OnClickListener() {
@@ -235,7 +252,9 @@ public class MuPDFActivity extends Activity
 						mDocView.setDisplayedViewIndex(linkPage);
 					} else if (linkString != null) {
 						// start intent with url as linkString
-						openExternalLink(linkString);
+						Log.d("URI", linkString);
+						Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(linkString));
+						startActivity(intent);
 					} else {
 						if (!mButtonsVisible) {
 							showButtons();
@@ -281,9 +300,9 @@ public class MuPDFActivity extends Activity
 			protected void onMoveToChild(int i) {
 				if (core == null)
 					return;
-				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
-				mPageSlider.setMax((core.countPages()-1) * mPageSliderRes);
-				mPageSlider.setProgress(i * mPageSliderRes);
+//				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
+//				mPageSlider.setMax((core.countPages()-1) * mPageSliderRes);
+//				mPageSlider.setProgress(i * mPageSliderRes);
 				if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber != i) {
 					SearchTaskResult.set(null);
 					mDocView.resetupChildren();
@@ -321,18 +340,18 @@ public class MuPDFActivity extends Activity
 		mFilenameView.setText(mFileName);
 
 		// Activate the seekbar
-		mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				mDocView.setDisplayedViewIndex((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
-			}
-
-			public void onStartTrackingTouch(SeekBar seekBar) {}
-
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				updatePageNumView((progress+mPageSliderRes/2)/mPageSliderRes);
-			}
-		});
+//		mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//			public void onStopTrackingTouch(SeekBar seekBar) {
+//				mDocView.setDisplayedViewIndex((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
+//			}
+//
+//			public void onStartTrackingTouch(SeekBar seekBar) {}
+//
+//			public void onProgressChanged(SeekBar seekBar, int progress,
+//					boolean fromUser) {
+//				updatePageNumView((progress+mPageSliderRes/2)/mPageSliderRes);
+//			}
+//		});
 
 		// Activate the search-preparing button
 		mSearchButton.setOnClickListener(new View.OnClickListener() {
@@ -426,7 +445,6 @@ public class MuPDFActivity extends Activity
 */
 
 		if (core.hasOutline()) {
-			// TODO: change to outline popover
 			mOutlineButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					OutlineItem outline[] = core.getOutline();
@@ -528,8 +546,8 @@ public class MuPDFActivity extends Activity
 			// Update page number text and slider
 			int index = mDocView.getDisplayedViewIndex();
 			updatePageNumView(index);
-			mPageSlider.setMax((core.countPages()-1)*mPageSliderRes);
-			mPageSlider.setProgress(index*mPageSliderRes);
+//			mPageSlider.setMax((core.countPages()-1)*mPageSliderRes);
+//			mPageSlider.setProgress(index*mPageSliderRes);
 			if (mTopBarIsSearch) {
 				mSearchText.requestFocus();
 				showKeyboard();
@@ -545,19 +563,19 @@ public class MuPDFActivity extends Activity
 				public void onAnimationEnd(Animation animation) {}
 			});
 			mTopBarSwitcher.startAnimation(anim);
-
-			anim = new TranslateAnimation(0, 0, mPageSlider.getHeight(), 0);
+			// Update listView position
+			mPreview.setSelection(mDocView.getDisplayedViewIndex());
+			anim = new TranslateAnimation(0, 0, mPreviewBarHolder.getHeight(), 0);
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation animation) {
-					mPageSlider.setVisibility(View.VISIBLE);
+					mPreviewBarHolder.setVisibility(View.VISIBLE);
 				}
 				public void onAnimationRepeat(Animation animation) {}
 				public void onAnimationEnd(Animation animation) {
-					mPageNumberView.setVisibility(View.VISIBLE);
 				}
 			});
-			mPageSlider.startAnimation(anim);
+			mPreviewBarHolder.startAnimation(anim);
 		}
 	}
 
@@ -576,19 +594,18 @@ public class MuPDFActivity extends Activity
 				}
 			});
 			mTopBarSwitcher.startAnimation(anim);
-
-			anim = new TranslateAnimation(0, 0, 0, mPageSlider.getHeight());
+			
+			anim = new TranslateAnimation(0, 0, 0, this.mPreviewBarHolder.getHeight());
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation animation) {
-					mPageNumberView.setVisibility(View.INVISIBLE);
+					mPreviewBarHolder.setVisibility(View.INVISIBLE);
 				}
 				public void onAnimationRepeat(Animation animation) {}
 				public void onAnimationEnd(Animation animation) {
-					mPageSlider.setVisibility(View.INVISIBLE);
 				}
 			});
-			mPageSlider.startAnimation(anim);
+			mPreviewBarHolder.startAnimation(anim);
 		}
 	}
 
@@ -617,14 +634,34 @@ public class MuPDFActivity extends Activity
 	void updatePageNumView(int index) {
 		if (core == null)
 			return;
-		mPageNumberView.setText(String.format("%d/%d", index+1, core.countPages()));
+//		mPageNumberView.setText(String.format("%d/%d", index+1, core.countPages()));
 	}
 
 	void makeButtonsView() {
 		mButtonsView = getLayoutInflater().inflate(R.layout.buttons,null);
 		mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);
-		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
-		mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
+//		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
+		mPreviewBarHolder = (FrameLayout) mButtonsView.findViewById(R.id.PreviewBarHolder);
+		mPreview = new Gallery(this);
+		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -1);
+		mPreview.setLayoutParams(lp);
+		mPreview.setAdapter(new PDFPreviewPagerAdapter(this, core));
+		mPreview.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> pArg0, View pArg1,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				hideButtons();
+				mDocView.setDisplayedViewIndex(position);
+			}
+
+		});
+		mPreviewBarHolder.addView(mPreview);
+//		Gallery mGallery = (Gallery) mButtonsView.findViewById(R.id.PreviewGallery);
+//		mGallery.setAdapter(new PDFPreviewPagerAdapter(this, core));
+
+//		mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
 		mSearchButton = (ImageButton)mButtonsView.findViewById(R.id.searchButton);
 		mCancelButton = (ImageButton)mButtonsView.findViewById(R.id.cancel);
 		mOutlineButton = (ImageButton)mButtonsView.findViewById(R.id.outlineButton);
@@ -634,8 +671,9 @@ public class MuPDFActivity extends Activity
 		mSearchText = (EditText)mButtonsView.findViewById(R.id.searchText);
 // XXX		mLinkButton = (ImageButton)mButtonsView.findViewById(R.id.linkButton);
 		mTopBarSwitcher.setVisibility(View.INVISIBLE);
-		mPageNumberView.setVisibility(View.INVISIBLE);
-		mPageSlider.setVisibility(View.INVISIBLE);
+//		mPageNumberView.setVisibility(View.INVISIBLE);
+//		mPageSlider.setVisibility(View.INVISIBLE);
+		mPreviewBarHolder.setVisibility(View.INVISIBLE);
 	}
 
 	void showKeyboard() {
@@ -762,16 +800,5 @@ public class MuPDFActivity extends Activity
 			searchModeOff();
 		}
 		return super.onPrepareOptionsMenu(menu);
-	}
-
-	/**
-	 * 
-	 * React on PDF embedded link. Open external link in a new Intent
-	 * @param linkString - URL to open
-	 */
-	private void openExternalLink(String linkString) {
-		Log.d("URI", linkString);
-		Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(linkString));
-		startActivity(intent);
 	}
 }

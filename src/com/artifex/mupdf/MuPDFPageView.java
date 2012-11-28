@@ -13,12 +13,6 @@ public class MuPDFPageView extends PageView {
 		super(c, parentSize);
 		mCore = core;
 	}
-	
-	public MuPDFPageView(Context c, MuPDFCore core, Point parentSize, int pagesW) {
-		super(c, parentSize);
-		mCore = core;
-		mPagesW = pagesW;
-	}
 
 	public int hitLinkPage(float x, float y) {
 		// Since link highlighting was implemented, the super class

@@ -3,6 +3,7 @@ package com.artifex.mupdf;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.PointF;
 
 public class MuPDFScreenView extends PageView {
 	private final MuPDFCore mCore;
@@ -60,7 +61,7 @@ public class MuPDFScreenView extends PageView {
 				leftPageLinkInfo[i].right /= mPagesW;
 			}
 			
-			if(isLastPageInScreen()) {
+			if(isLastPageInScreen(mPageNumber)) {
 				LinkInfo [] rightPageLinkInfo = mCore.getPageLinks(mPageNumber+1);
 				for(int i = 0; i < leftPageLinkInfo.length; i++) {
 					rightPageLinkInfo[i].left /= mPagesW;
@@ -83,19 +84,27 @@ public class MuPDFScreenView extends PageView {
 	/**
 	 * @return
 	 */
-	private boolean isLastPageInScreen() {
-		return mPageNumber + 1 < mCore.countPages();
+	private boolean isLastPageInScreen(int pPosition) {
+		return pPosition + 1 >= mCore.countPages();
 	}
 
 	protected boolean isLandscape() {
 		return mLandscape;
 	}
 	
-	protected void setOrientation(boolean pLandscape) {
-		mLandscape = pLandscape;
-		if(mLandscape) {
-			mPagesW = 2;
-		} else 
-			mPagesW = 1;
+	/**
+	 * @param pPosition
+	 * @param pPageSize
+	 * @param pMPageWidth
+	 */
+	public void setPage(int pPosition, PointF pPageSize, int pMPageWidth) {
+		// TODO Auto-generated method stub
+		pPageSize.x = pPageSize.x/pMPageWidth;
+
+		if(isLastPageInScreen(pPosition)){
+			setPage(pPosition, pPageSize);
+		} else {
+			
+		}
 	}
 }
