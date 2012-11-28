@@ -2,7 +2,7 @@ package com.artifex.mupdf;
 
 import java.io.File;
 
-import com.librelio.wind.R;
+import com.niveales.wind.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -252,9 +252,7 @@ public class MuPDFActivity extends Activity
 						mDocView.setDisplayedViewIndex(linkPage);
 					} else if (linkString != null) {
 						// start intent with url as linkString
-						Log.d("URI", linkString);
-						Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(linkString));
-						startActivity(intent);
+						openLink(linkString);
 					} else {
 						if (!mButtonsVisible) {
 							showButtons();
@@ -800,5 +798,14 @@ public class MuPDFActivity extends Activity
 			searchModeOff();
 		}
 		return super.onPrepareOptionsMenu(menu);
+	}
+
+	/**
+	 * @param linkString - url to open
+	 */
+	private void openLink(String linkString) {
+		Log.d("URI", linkString);
+		Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(linkString));
+		startActivity(intent);
 	}
 }

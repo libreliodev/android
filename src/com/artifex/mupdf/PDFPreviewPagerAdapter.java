@@ -3,7 +3,7 @@
  */
 package com.artifex.mupdf;
 
-import com.librelio.wind.R;
+import com.niveales.wind.R;
 
 import android.content.Context;
 import android.database.DataSetObserver;

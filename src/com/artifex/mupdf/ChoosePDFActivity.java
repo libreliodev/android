@@ -5,7 +5,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.librelio.wind.R;
+import com.niveales.wind.R;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
