@@ -85,7 +85,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	 */
 	private static final String DB_INITIALIZED = "db_initialized";
 
-	private OceanPurchaseObserver mOceanPurchaseObserver;
+	private LibrelioPurchaseObserver mLibrelioPurchaseObserver;
 	private Handler mHandler;
 
 	private BillingService mBillingService;
@@ -121,8 +121,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	 * A {@link PurchaseObserver} is used to get callbacks when Android Market
 	 * sends messages to this application so that we can update the UI.
 	 */
-	private class OceanPurchaseObserver extends PurchaseObserver {
-		public OceanPurchaseObserver(Handler handler) {
+	private class LibrelioPurchaseObserver extends PurchaseObserver {
+		public LibrelioPurchaseObserver(Handler handler) {
 			super(MainMagazineActivity.this, handler);
 		}
 
@@ -304,7 +304,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 
 //		mCatalogAdapter = new CatalogAdapter(this, CATALOG);
 		mHandler = new Handler();
-		mOceanPurchaseObserver = new OceanPurchaseObserver(mHandler);
+		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
 		mBillingService = new BillingService();
 		mBillingService.setContext(this);
 
@@ -317,7 +317,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		setupWidgets();
 
 		// Check if billing is supported.
-		ResponseHandler.register(mOceanPurchaseObserver);
+		ResponseHandler.register(mLibrelioPurchaseObserver);
 		if (!mBillingService.checkBillingSupported()) {
 			showDialog(DIALOG_CANNOT_CONNECT_ID);
 		}
@@ -334,7 +334,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	@Override
 	protected void onStart() {
 		super.onStart();
-		ResponseHandler.register(mOceanPurchaseObserver);
+		ResponseHandler.register(mLibrelioPurchaseObserver);
 		initializeOwnedItems();
 	}
 
@@ -344,7 +344,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	@Override
 	protected void onStop() {
 		super.onStop();
-		ResponseHandler.unregister(mOceanPurchaseObserver);
+		ResponseHandler.unregister(mLibrelioPurchaseObserver);
 	}
 
 	@Override
