@@ -295,7 +295,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		super.onCreate(savedInstanceState);
 		tracker = GoogleAnalyticsTracker.getInstance();
 
-		tracker.startNewSession("UA-33659842-1", 300, this);
+		tracker.startNewSession(getResources().getString(R.string.GoogleAnalyticsCode), 300, this);
 		tracker.trackPageView("/mainScreen/");
 		
 		cloud = new CloudHelper(this, this);
