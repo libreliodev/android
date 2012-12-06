@@ -40,6 +40,7 @@ public class PDFParser {
 	 * 
 	 * @return all available URLs from pdf
 	 */
+	@Deprecated
 	public SparseArray<ArrayList<String>> getAllUrlsFromPDF() {
 		return mLinkUrls;
 	}
@@ -50,6 +51,7 @@ public class PDFParser {
 	 * @param page - page of the document (starting from 0)
 	 * @return - ArrayList of String with urls on the page or null if no urls on the page exists. 
 	 */
+	@Deprecated
 	public ArrayList<String> getUrlsByPage(int page) {
 		return mLinkUrls.get(page);
 	}
@@ -73,5 +75,13 @@ public class PDFParser {
 		}
 	}
 	
+	/**
+	 * get all URI links from PDF document
+	 * @return SparseArray with all URLs by page. Each item in the array has LinkInfo[] array with links or null
+	 * @see LinkInfo
+	 */
+	public SparseArray<LinkInfo []> getLinkInfo() {
+		return mLinkInfo;
+	}
 	
 }
