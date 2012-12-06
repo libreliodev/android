@@ -6,7 +6,7 @@
     "sku": "test_year",
     "issue": [
     {
-    	"name": "Wind",
+    	"name": "Wind 370",
         "date": "Juin, 2012",
         "price": "Бесплатно",
         "url": "http://librelio-europe.s3.amazonaws.com/niveales/wind/wind_370/wind_370.pdf",
@@ -14,7 +14,7 @@
         "sku": "ocn_05e2012"
     },
     {
-    	"name": "Wind",
+    	"name": "Wind 369",
         "date": "Juin, 2012",
         "price": "Бесплатно",
         "url": "http://librelio-europe.s3.amazonaws.com/niveales/wind/wind_369/wind_369.pdf",

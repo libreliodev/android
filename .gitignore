@@ -2,4 +2,5 @@
 /proguard
 /gen
 /bin
-/project.properties
+/*.properties
+*.directory
