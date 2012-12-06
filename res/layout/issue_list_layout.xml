@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/magazines_background"
     android:orientation="vertical" >
-
+
     <GridView
         android:id="@+id/issue_list_grid_view"
         android:layout_width="match_parent"
