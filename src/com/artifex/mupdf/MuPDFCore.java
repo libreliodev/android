@@ -11,11 +11,10 @@ public class MuPDFCore
 	}
 
 	/* Readable members */
-	private int pageNum  = -1;
+	private int pageNum  = -1;;
 	private int numPages = -1;
 	public  float pageWidth;
 	public  float pageHeight;
-	public int pageNumToDraw = 1;
 
 	/* The native functions */
 	private static native int openFile(String filename);
@@ -30,7 +29,9 @@ public class MuPDFCore
 	public static native RectF[] searchPage(String text);
 	public static native int getPageLink(int page, float x, float y);
 	public static native String getUriLink(int page, float x, float y);
+
 	public static native LinkInfo [] getPageLinksInternal(int page);
+	public static native LinkInfo [] getPageURIsInternal(int page);
 	public static native OutlineItem [] getOutlineInternal();
 	public static native boolean hasOutlineInternal();
 	public static native boolean needsPasswordInternal();
@@ -86,24 +87,23 @@ public class MuPDFCore
 			int patchX, int patchY,
 			int patchW, int patchH) {
 		gotoPage(page);
-		if(this.getPageNumToDraw() == 1) {
-			drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
-		} else {
-			// overlay two bitmaps
-			int halfW = pageW/2;
-		}
+		drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
 	}
 
 	public synchronized int hitLinkPage(int page, float x, float y) {
 		return getPageLink(page, x, y);
 	}
-	
-	public synchronized String hitUriPage(int page, float x, float y) {
+
+	public synchronized String hitLinkUri(int page, float x, float y) {
 		return getUriLink(page, x, y);
 	}
-
+	
 	public synchronized LinkInfo [] getPageLinks(int page) {
 		return getPageLinksInternal(page);
+	}
+	
+	public synchronized LinkInfo [] getPageURIs(int page) {
+		return getPageURIsInternal(page);
 	}
 
 	public synchronized RectF [] searchPage(int page, String text) {
@@ -125,13 +125,5 @@ public class MuPDFCore
 
 	public synchronized boolean authenticatePassword(String password) {
 		return authenticatePasswordInternal(password);
-	}
-	
-	public void setPageNumToDraw(int num) {
-		pageNumToDraw = num;
-	}
-	
-	public int getPageNumToDraw() {
-		return pageNumToDraw;
 	}
 }

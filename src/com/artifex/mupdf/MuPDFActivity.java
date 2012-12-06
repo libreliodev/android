@@ -2,6 +2,7 @@ package com.artifex.mupdf;
 
 import java.io.File;
 
+import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
 import android.app.Activity;
@@ -168,7 +169,10 @@ public class MuPDFActivity extends Activity
 				SearchTaskResult.set(null);
 			} else {
 				String filePath="/mnt/sdcard/wind_355.pdf";
-
+				
+				PDFParser p = new PDFParser(filePath);
+				p.getAllUrlsFromPDF();
+				
 				core = openFile(filePath);
 				SearchTaskResult.set(null);
 			}

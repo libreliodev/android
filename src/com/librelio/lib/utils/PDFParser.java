@@ -22,7 +22,7 @@ public class PDFParser {
 	/**
 	 * 
 	 * @param pathToPDF - path within filesystem to PDF file
-	 * @throws IllegalStateException 
+	 * @throws IllegalStateException - if some error occurs
 	 */
 	public PDFParser(String pathToPDF) throws IllegalStateException {
 		try {
@@ -34,22 +34,6 @@ public class PDFParser {
 		}
 	}
 	
-	private void parseLinkInfo() {
-		for(int page = 0; page < mCore.countPages(); page++) {
-			LinkInfo [] mPageLinkInfo = mCore.getPageLinks(page);
-			mLinkInfo.put(page, mPageLinkInfo);
-			ArrayList<String> mPageUrlList = new ArrayList<String>();
-			String url;
-			for(int j = 0; j < mPageLinkInfo.length; j++) {
-				LinkInfo l = mPageLinkInfo[j];
-				if((url = mCore.getUriLink(j, (l.left + l.right)/2, (l.top + l.bottom)/2)) != null) {
-					mPageUrlList.add(url);
-				}
-			}
-			if(mPageUrlList.size() > 0)
-				mLinkUrls.put(page, mPageUrlList);
-		}
-	}
 	
 	
 	/**
@@ -69,5 +53,25 @@ public class PDFParser {
 	public ArrayList<String> getUrlsByPage(int page) {
 		return mLinkUrls.get(page);
 	}
+	
+	private void parseLinkInfo() {
+		for(int page = 0; page < mCore.countPages(); page++) {
+			LinkInfo [] mPageLinkInfo = mCore.getPageURIs(page);
+			if(mPageLinkInfo.length > 0) {
+				mLinkInfo.put(page, mPageLinkInfo);
+				ArrayList<String> mPageUrlList = new ArrayList<String>();
+				String url;
+				for(int j = 0; j < mPageLinkInfo.length; j++) {
+					LinkInfo l = mPageLinkInfo[j];
+					if((url = mCore.getUriLink(j, (l.left + l.right)/2, (l.top + l.bottom)/2)) != null) {
+						mPageUrlList.add(url);
+					}
+				}
+				if(mPageUrlList.size() > 0)
+					mLinkUrls.put(page, mPageUrlList);
+			}
+		}
+	}
+	
 	
 }

@@ -6,8 +6,6 @@ import android.graphics.Point;
 
 public class MuPDFPageView extends PageView {
 	private final MuPDFCore mCore;
-	private int mPagesW; // number of pages in width
-	private int mPagesH; // number of pages in height
 
 	public MuPDFPageView(Context c, MuPDFCore core, Point parentSize) {
 		super(c, parentSize);
@@ -31,7 +29,7 @@ public class MuPDFPageView extends PageView {
 		float docRelX = (x - getLeft())/scale;
 		float docRelY = (y - getTop())/scale;
 
-		return mCore.hitUriPage(mPageNumber, docRelX, docRelY);
+		return mCore.hitLinkUri(mPageNumber, docRelX, docRelY);
 	}
 
 	@Override
