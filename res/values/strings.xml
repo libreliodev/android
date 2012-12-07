@@ -46,4 +46,6 @@
     <string name="delete">Delete</string>
     <string name="subscribe_year">Subscribe year</string>
     <string name="no_further_occurences_found">No more found</string>
+    <string name="client_name">niveales</string>
+    <string name="magazine_name">wind</string>
 </resources>
