@@ -7,7 +7,7 @@
         android:id="@+id/sturtup_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         android:src="@drawable/startup_background" />
 
 </FrameLayout>

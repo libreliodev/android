@@ -35,6 +35,8 @@ public class ReaderView extends AdapterView<Adapter>
 
 	private Adapter           mAdapter;
 	private int               mCurrent;    // Adapter's index for the current view
+	
+
 	private boolean           mResetLayout;
 	private final SparseArray<View>
 				  mChildViews = new SparseArray<View>(3);
@@ -570,5 +572,9 @@ public class ReaderView extends AdapterView<Adapter>
 		case MOVING_DOWN:       return bounds.bottom >= 0;
 		default: throw new NoSuchElementException();
 		}
+	}
+	
+	public int getCurrentPage() {
+		return mCurrent;
 	}
 }

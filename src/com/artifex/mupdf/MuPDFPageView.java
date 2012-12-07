@@ -2,7 +2,10 @@ package com.artifex.mupdf;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.widget.FrameLayout;
+import android.widget.Gallery;
 
 public class MuPDFPageView extends PageView {
 	private final MuPDFCore mCore;
@@ -29,7 +32,34 @@ public class MuPDFPageView extends PageView {
 		float docRelX = (x - getLeft())/scale;
 		float docRelY = (y - getTop())/scale;
 
-		return mCore.hitLinkUri(mPageNumber, docRelX, docRelY);
+		String uri = mCore.hitLinkUri(mPageNumber, docRelX, docRelY);
+		if(uri == null)
+			return null;
+		if(uri.startsWith("http://localhost")) {
+			LinkInfo[] links = mCore.getPageLinks(mPageNumber);
+			LinkInfo currentLink = null;
+			for(int i = 0; i < links.length; i++) {
+				if(links[i].uri.equals(uri)) {
+					currentLink = links[i];
+					break;
+				}
+			}
+			FrameLayout fl = new FrameLayout(getContext());
+			fl.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			fl.setBackgroundColor(Color.BLACK);
+			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+			lp.setMargins((int)(currentLink.left*scale), (int)(currentLink.top*scale),
+					(int)(currentLink.right*scale), (int)(currentLink.bottom*scale));
+			Gallery gallery = new Gallery(getContext());
+			gallery.setAdapter(new PDFPreviewPagerAdapter(getContext(), mCore));
+			gallery.setLayoutParams(lp);
+			fl.addView(gallery);
+			addView(fl);
+			invalidate();
+		}
+		
+		
+		return uri;
 	}
 
 	@Override
@@ -41,5 +71,9 @@ public class MuPDFPageView extends PageView {
 	@Override
 	protected LinkInfo[] getLinkInfo() {
 		return mCore.getPageLinks(mPageNumber);
+	}
+	
+	protected LinkInfo[] getExternalLinkInfo() {
+		return mCore.getPageURIs(mPageNumber);
 	}
 }

@@ -65,6 +65,7 @@ public abstract class PageView extends ViewGroup {
 	private       SafeAsyncTask<PatchInfo,Void,PatchInfo> mDrawPatch;
 	private       RectF     mSearchBoxes[];
 	private       LinkInfo  mLinks[];
+	private       LinkInfo  mUrls[];
 	private       View      mSearchView;
 	private       boolean   mIsBlank;
 	private       boolean   mUsingHardwareAcceleration;

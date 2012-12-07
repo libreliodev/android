@@ -53,6 +53,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.librelio.lib.ui.IssueListAdapter.IssueListEventListener;
 import com.librelio.lib.utils.BillingService;
@@ -693,6 +694,11 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		case R.id.options_menu_subscribe:
 			subscribeYear();
 			return true;
+		case R.id.options_menu_test: {
+			Intent intent = new Intent(this, MuPDFActivity.class);
+			startActivity(intent);
+			return true;
+		}
 		default:
 			return super.onOptionsItemSelected(item);
 		}

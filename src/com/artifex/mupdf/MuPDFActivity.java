@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
@@ -114,6 +116,7 @@ public class MuPDFActivity extends Activity
 	private final Handler mHandler = new Handler();
 	private FrameLayout mPreviewBarHolder;
 	private Gallery mPreview;
+	private MuPDFPageAdapter mDocViewAdapter;
 
 	private MuPDFCore openFile(String path)
 	{
@@ -328,7 +331,8 @@ public class MuPDFActivity extends Activity
 				((PageView)v).releaseResources();
 			}
 		};
-		mDocView.setAdapter(new MuPDFPageAdapter(this, core));
+		mDocViewAdapter = new MuPDFPageAdapter(this, core);
+		mDocView.setAdapter(mDocViewAdapter);
 
 		// Make the buttons overlay, and store all its
 		// controls in variables
@@ -809,7 +813,35 @@ public class MuPDFActivity extends Activity
 	 */
 	private void openLink(String linkString) {
 		Log.d("URI", linkString);
-		Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(linkString));
-		startActivity(intent);
+		Uri uri = Uri.parse(linkString);
+		String warect = uri.getQueryParameter("warect");
+		Boolean isFullScreen = warect != null && warect.equals("full");
+		if(linkString.startsWith("http://localhost/")) {
+			// display local content
+			
+			// get the current page view
+			String path = uri.getPath();
+			Log.d("PATH", path);
+			int page = mDocView.getCurrentPage();
+			LinkInfo[] links = core.getPageLinks(page);
+			LinkInfo currentLink = null;
+			for(int i = 0; i < links.length; i++) {
+				if(links[i].uri.equals(linkString)) {
+					currentLink = links[i];
+					break;
+				}
+			}
+			View v = mDocViewAdapter.getView(page, null, mDocView);
+			FrameLayout fl = new FrameLayout(this);
+			fl.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			fl.setBackgroundColor(Color.BLACK);
+			mDocView.addView(fl);
+			Log.d("", "");
+		} else {
+			//TODO: replace with custom activity
+			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
+		}
+		
 	}
 }

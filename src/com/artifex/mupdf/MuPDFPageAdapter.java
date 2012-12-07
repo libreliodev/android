@@ -28,7 +28,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
 	}
 
 	public long getItemId(int position) {
-		return 0;
+		return position;
 	}
 
 	public View getView(final int position, View convertView, ViewGroup parent) {
