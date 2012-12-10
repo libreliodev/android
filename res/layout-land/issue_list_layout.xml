@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"           
         android:verticalSpacing="15dp"
-        android:numColumns="1">
+        android:numColumns="2">
 
     </GridView>
 

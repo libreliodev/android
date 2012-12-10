@@ -8,43 +8,47 @@
         android:id="@+id/item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
         android:gravity="center_horizontal"
-         />
+        android:lines="1"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/item_subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
         android:gravity="center_horizontal"
-        />
-	<LinearLayout 
-	    android:layout_width="@dimen/preview_image_width"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical"
-	    android:layout_gravity="center_horizontal">
-    <ImageView
-        android:id="@+id/item_thumbnail"
+        android:lines="1"
+        android:textColor="@android:color/white" />
+
+    <LinearLayout
         android:layout_width="@dimen/preview_image_width"
-        android:layout_height="@dimen/preview_image_height" />
-
-    <Button
-        android:id="@+id/item_read_button"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/read" />
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/item_download_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/download" />
+        <ImageView
+            android:id="@+id/item_thumbnail"
+            android:layout_width="@dimen/preview_image_width"
+            android:layout_height="@dimen/preview_image_height" />
 
-    <Button
-        android:id="@+id/item_delete_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/delete" />
-	</LinearLayout>
+        <Button
+            android:id="@+id/item_button_one"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/magazines_view_button_selector"
+            android:text="@string/read"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/preview_button_text_size" />
+
+        <Button
+            android:id="@+id/item_button_two"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/magazines_view_button_selector"
+            android:text="@string/download"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/preview_button_text_size" />
+    </LinearLayout>
+
 </LinearLayout>

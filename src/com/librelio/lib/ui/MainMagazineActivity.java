@@ -58,6 +58,7 @@ import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.librelio.lib.adapter.MagazineAdapter;
 import com.librelio.lib.model.MagazineModel;
+import com.librelio.lib.service.DownloadMagazineListService;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.ui.IssueListAdapter.IssueListEventListener;
@@ -298,6 +299,26 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 
 	
 	private GridView grid;
+	private ArrayList<MagazineModel> magazine;
+	public static final String BROADCAST_ACTION_IVALIDATE = "com.librelio.lib.service.broadcast.invalidate";
+	private MagazineAdapter adapter;
+	
+	private void loadMagazineData(ArrayList<MagazineModel> magazine){
+		DataBaseHelper dbhelp = new DataBaseHelper(this);
+		SQLiteDatabase db = dbhelp.getReadableDatabase();
+		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
+		if(c.getCount()>0){
+			c.moveToFirst();
+			do{
+				MagazineModel buf = new MagazineModel(c, this);
+				magazine.add(buf);
+			} while(c.moveToNext());
+		}
+		c.close();
+		db.close();
+	}
+	
+	private BroadcastReceiver br; 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -311,24 +332,25 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		
 		setContentView(R.layout.issue_list_layout);
 		
-		DataBaseHelper dbhelp = new DataBaseHelper(this);
-		SQLiteDatabase db = dbhelp.getReadableDatabase();
-		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
-		ArrayList<MagazineModel> magazine = new ArrayList<MagazineModel>();
-		if(c.getCount()>0){
-			c.moveToFirst();
-			do{
-				MagazineModel buf = new MagazineModel(c, this);
-				magazine.add(buf);
-			} while(c.moveToNext());
-		}
-		c.close();
-		db.close();
+		magazine = new ArrayList<MagazineModel>();
+		loadMagazineData(magazine);
 		//
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
-		MagazineAdapter adapter = new MagazineAdapter(magazine, this);
+		adapter = new MagazineAdapter(magazine, this);
 		grid.setAdapter(adapter);
 		
+		br = new BroadcastReceiver() {			
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if(grid!=null){
+					Log.d(TAG, "onReceive: grid was invalidate");
+					grid.invalidate();
+					grid.invalidateViews();
+				}
+			}
+		};
+		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
+		registerReceiver(br, filter);
 
 		/*mHandler = new Handler();
 		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
@@ -385,6 +407,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 				.remove(mDownloadRequestsIterator.next()))
 			;
 		cloud.recycle();*/
+		unregisterReceiver(br);
 		super.onDestroy();
 	}
 
@@ -712,7 +735,11 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.options_menu_reload:
-			onReloadIssues();
+			//onReloadIssues();
+			Intent intent = new Intent(this, DownloadMagazineListService.class);
+			startService(intent);
+			loadMagazineData(magazine);
+			
 			return true;
 		case R.id.options_menu_restore:
 			restorePurchises();
@@ -721,8 +748,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 			subscribeYear();
 			return true;
 		case R.id.options_menu_test: {
-			Intent intent = new Intent(this, MuPDFActivity.class);
-			startActivity(intent);
+			Intent testIntent = new Intent(this, MuPDFActivity.class);
+			startActivity(testIntent);
 			return true;
 		}
 		default:

@@ -1,11 +1,13 @@
 package com.librelio.lib.model;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.view.View;
 
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.storage.DataBaseHelper;
@@ -16,11 +18,15 @@ public class MagazineModel {
 	private String title;
 	private String subtitle;
 	private String fileName;
-	private String pdfName;
-	private String pngName;
+	private String pdfPath;
+	private String pngPath;
+	private String samplePath;
 	private String pdfUrl;
 	private String pngUrl;
+	private String sampleUrl;
 	private boolean isPaid;
+	private boolean isDowloaded;
+	private boolean isSampleDowloaded = false;
 	private ArrayList<String> assets_references;
 	private String downloadDate;
 
@@ -67,20 +73,35 @@ public class MagazineModel {
 		isPaid = fileName.contains("_.");
 		int startIndex = fileName.indexOf("/")+1;
 		pdfUrl = LibrelioApplication.BASE_URL + fileName;
-		pdfName = LibrelioApplication.appDirectory+fileName.substring(startIndex, fileName.length());
+		pdfPath = LibrelioApplication.appDirectory+fileName.substring(startIndex, fileName.length());
 		if(isPaid){
 			pngUrl = pdfUrl.replace("_.pdf", ".png");
-			pngName = pdfName.replace("_.pdf", ".png");
+			pngPath = pdfPath.replace("_.pdf", ".png");
+			sampleUrl = pdfUrl.replace("_.", ".");
+			samplePath = pdfPath.replace("_.", ".");
+			File sample = new File(getSamplePath());
+			isSampleDowloaded = sample.exists();
 		} else {
 			pngUrl = pdfUrl.replace(".pdf", ".png");
-			pngName = pdfName.replace(".pdf", ".png");
+			pngPath = pdfPath.replace(".pdf", ".png");
 		}
+		File pdf = new File(getPdfPath());
+		isDowloaded = pdf.exists();
+		
+		
 	}
 
 	public boolean isPaid() {
 		return this.isPaid;
 	}
 
+	public boolean isDownloaded(){
+		return this.isDowloaded;
+	}
+	public boolean isSampleDownloaded(){
+		return this.isSampleDowloaded;
+	}
+	
 	public String getTitle() {
 		return title;
 	}
@@ -105,20 +126,36 @@ public class MagazineModel {
 		this.fileName = fileName;
 	}
 
-	public String getPdfName() {
-		return pdfName;
+	public String getSamplePath() {
+		return samplePath;
 	}
 
-	public void setPdfName(String pdfName) {
-		this.pdfName = pdfName;
+	public void setSamplePath(String samplePath) {
+		this.samplePath = samplePath;
 	}
 
-	public String getPngName() {
-		return pngName;
+	public String getSampleUrl() {
+		return sampleUrl;
 	}
 
-	public void setPngName(String pngName) {
-		this.pngName = pngName;
+	public void setSampleUrl(String sampleUrl) {
+		this.sampleUrl = sampleUrl;
+	}
+
+	public String getPdfPath() {
+		return pdfPath;
+	}
+
+	public void setPdfPath(String pdfName) {
+		this.pdfPath = pdfName;
+	}
+
+	public String getPngPath() {
+		return pngPath;
+	}
+
+	public void setPngPath(String pngName) {
+		this.pngPath = pngName;
 	}
 
 	public String getPdfUrl() {
