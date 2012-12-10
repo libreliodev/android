@@ -5,9 +5,12 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 
 public class MuPDFPageAdapter extends BaseAdapter {
 	private final Context mContext;
@@ -35,8 +38,8 @@ public class MuPDFPageAdapter extends BaseAdapter {
 		final MuPDFPageView pageView;
 		if (convertView == null) {
 			pageView = new MuPDFPageView(mContext, mCore, new Point(parent.getWidth(), parent.getHeight()));
-		} else {
-			pageView = (MuPDFPageView) convertView;
+		} else {			
+			pageView = (MuPDFPageView)convertView;
 		}
 
 		PointF pageSize = mPageSizes.get(position);

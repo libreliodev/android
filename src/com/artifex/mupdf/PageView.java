@@ -6,16 +6,20 @@ import com.niveales.wind.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -44,7 +48,7 @@ class OpaqueImageView extends ImageView {
 	}
 }
 
-public abstract class PageView extends ViewGroup {
+public abstract class PageView extends FrameLayout {
 	private static final int HIGHLIGHT_COLOR = 0x805555FF;
 	private static final int LINK_COLOR = 0x80FFCC88;
 	private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
@@ -73,6 +77,7 @@ public abstract class PageView extends ViewGroup {
 
 	private       ProgressBar mBusyIndicator;
 	private final Handler   mHandler = new Handler();
+	private FrameLayout mLinksView;
 
 	public PageView(Context c, Point parentSize) {
 		super(c);
@@ -103,11 +108,24 @@ public abstract class PageView extends ViewGroup {
 		if (mSize == null)
 			mSize = mParentSize;
 
-		if (mEntire != null)
+		if (mEntire != null) {
+			Drawable d = mEntire.getDrawable();
+			if(d instanceof BitmapDrawable) {
+				Bitmap b = ((BitmapDrawable)d).getBitmap();
+				if(b!= null)
+					b.recycle();
+			}
 			mEntire.setImageBitmap(null);
+		}
 
-		if (mPatch != null)
+		if (mPatch != null) {
+			Drawable d = mPatch.getDrawable();
+			if(d instanceof BitmapDrawable) {
+				((BitmapDrawable)d).getBitmap().recycle();
+			}
 			mPatch.setImageBitmap(null);
+			
+		}
 
 		if (mBusyIndicator != null) {
 			removeView(mBusyIndicator);
@@ -250,6 +268,11 @@ public abstract class PageView extends ViewGroup {
 
 			addView(mSearchView);
 		}
+		
+		if(mLinksView == null ) {
+			mLinksView = new FrameLayout(mContext);
+			addView(mLinksView);
+		}
 		requestLayout();
 	}
 
@@ -289,6 +312,7 @@ public abstract class PageView extends ViewGroup {
 			int limit = Math.min(mParentSize.x, mParentSize.y)/2;
 			mBusyIndicator.measure(View.MeasureSpec.AT_MOST | limit, View.MeasureSpec.AT_MOST | limit);
 		}
+		
 	}
 
 	@Override
@@ -302,6 +326,10 @@ public abstract class PageView extends ViewGroup {
 
 		if (mSearchView != null) {
 			mSearchView.layout(0, 0, w, h);
+		}
+		
+		if (mLinksView != null) {
+			mLinksView.layout(0, 0, w, h);
 		}
 
 		if (mPatchViewSize != null) {
@@ -322,6 +350,7 @@ public abstract class PageView extends ViewGroup {
 
 			mBusyIndicator.layout((w-bw)/2, (h-bh)/2, (w+bw)/2, (h+bh)/2);
 		}
+//		super.onLayout(changed, left, top, right, bottom);
 	}
 
 	public void addHq() {
@@ -404,4 +433,9 @@ public abstract class PageView extends ViewGroup {
 	public boolean isOpaque() {
 		return true;
 	}
+	
+	public FrameLayout getLinksView() {
+		return mLinksView;
+	}
+	
 }

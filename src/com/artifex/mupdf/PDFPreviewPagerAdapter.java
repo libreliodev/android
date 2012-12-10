@@ -40,40 +40,6 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	public PDFPreviewPagerAdapter(Context context, MuPDFCore core){
 		mContext = context;
 		mCore = core;
-		SafeAsyncTask<Void, Void, Void> loadBitmaps = new SafeAsyncTask<Void, Void, Void>() {
-
-			@Override
-			protected void onPreExecute() {
-				isBitmapsLoading = true;
-			}
-			@Override
-			protected Void doInBackground(Void... pParams) {
-				if(mPreviewSize == null) {
-					mPreviewSize = new Point();
-					int padding = mContext.getResources().getDimensionPixelSize(R.dimen.page_preview_size);
-					PointF mPageSize = mCore.getPageSize(1);
-					float scale = mPageSize.y/ mPageSize.x;
-					mPreviewSize.x = (int) ((float)padding/scale);
-					mPreviewSize.y = padding;
-				}
-				for(int i = 0; i < mCore.countPages(); i++) {
-					if(mBitmapCache.get(i) == null){ 
-						Bitmap lq = Bitmap.createBitmap(mPreviewSize.x, mPreviewSize.y, Bitmap.Config.ARGB_8888);
-						mBitmapCache.put(i, lq);
-						mCore.drawPage(i, lq, mPreviewSize.x, mPreviewSize.y, 0, 0, mPreviewSize.x, mPreviewSize.y);
-						
-					}
-				}
-				return null;	
-			}
-			
-			@Override
-			protected void onPostExecute(Void result) {
-				isBitmapsLoading = false;
-				isBitmapsLoaded = true;
-			}
-		};
-//		loadBitmaps.safeExecute((Void) null);
 	}
 	/* (non-Javadoc)
 	 * @see android.support.v4.view.PagerAdapter#getCount()
@@ -102,43 +68,12 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		return pPosition;
 	}
-	/* (non-Javadoc)
-	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
-	 */
-//	@Override
-//	public View getView(final int position, View pConvertView, ViewGroup pParent) {
-//
-//		final MuPDFPageView pageView = new MuPDFPageView(mContext, mCore, mPreviewSize);
-//		SafeAsyncTask<Void,Void,PointF> sizingTask = new SafeAsyncTask<Void,Void,PointF>() {
-//			@Override
-//			protected PointF doInBackground(Void... arg0) {
-//				return mCore.getPageSize(position);
-//			}
-//
-//			@Override
-//			protected void onPostExecute(PointF result) {
-//				super.onPostExecute(result);
-//				// We now know the page size
-//				mPageSizes.put(position, result);
-//				// Check that this view hasn't been reused for
-//				// another page since we started
-//				if (pageView.getPage() == position)
-//					pageView.setPage(position, result);
-//			}
-//		};
-//
-//		sizingTask.safeExecute((Void)null);
-//		return pageView;
-//	}
+
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		final View pageView;
 		if (convertView == null) {
 			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			pageView = inflater.inflate(R.layout.preview_pager_item_layout, parent, false);
-//			pageView = new MuPDFPageView(mContext, mCore, this.mPreviewSize);
-//			LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(mPreviewSize.x, mPreviewSize.y);
-//			p.setMargins(0, 0, 0, 0);
-//			pageView.setLayoutParams(p);
 		} else {
 			pageView = (View) convertView;
 		}
@@ -174,7 +109,6 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 			protected void onPostExecute(Bitmap result) {
 				
 				v.setImageBitmap(result);
-//				v.setScaleType(ImageView.ScaleType.FIT_XY);
 		        v.setLayoutParams(new LinearLayout.LayoutParams(mPreviewSize.x, mPreviewSize.y));
 		        v.setPadding(10, 0, 10, 0);
 		        v.requestLayout();

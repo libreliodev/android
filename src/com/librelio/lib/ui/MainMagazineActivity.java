@@ -37,6 +37,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,6 +56,10 @@ import android.widget.Toast;
 
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+import com.librelio.lib.adapter.MagazineAdapter;
+import com.librelio.lib.model.MagazineModel;
+import com.librelio.lib.storage.DataBaseHelper;
+import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.ui.IssueListAdapter.IssueListEventListener;
 import com.librelio.lib.utils.BillingService;
 import com.librelio.lib.utils.Consts;
@@ -78,6 +83,7 @@ import com.niveales.wind.R;
 public class MainMagazineActivity extends Activity implements IssueListEventListener,
 		CloudEventListener {
 	private static final String TAG = "OceanActivity";
+	
 
 	/**
 	 * The SharedPreferences key for recording whether we initialized the
@@ -290,6 +296,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		// handle magazine purchise
 	}
 
+	
+	private GridView grid;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -299,12 +307,30 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		tracker.startNewSession(getResources().getString(R.string.GoogleAnalyticsCode), 300, this);
 		tracker.trackPageView("/mainScreen/");
 		
-		cloud = new CloudHelper(this, this);
+		//cloud = new CloudHelper(this, this);
 		
 		setContentView(R.layout.issue_list_layout);
+		
+		DataBaseHelper dbhelp = new DataBaseHelper(this);
+		SQLiteDatabase db = dbhelp.getReadableDatabase();
+		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
+		ArrayList<MagazineModel> magazine = new ArrayList<MagazineModel>();
+		if(c.getCount()>0){
+			c.moveToFirst();
+			do{
+				MagazineModel buf = new MagazineModel(c, this);
+				magazine.add(buf);
+			} while(c.moveToNext());
+		}
+		c.close();
+		db.close();
+		//
+		grid = (GridView)findViewById(R.id.issue_list_grid_view);
+		MagazineAdapter adapter = new MagazineAdapter(magazine, this);
+		grid.setAdapter(adapter);
+		
 
-//		mCatalogAdapter = new CatalogAdapter(this, CATALOG);
-		mHandler = new Handler();
+		/*mHandler = new Handler();
 		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
 		mBillingService = new BillingService();
 		mBillingService.setContext(this);
@@ -326,7 +352,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		if (!mBillingService
 				.checkBillingSupported(Consts.ITEM_TYPE_SUBSCRIPTION)) {
 			showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-		}
+		}*/
 	}
 
 	/**
@@ -335,8 +361,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	@Override
 	protected void onStart() {
 		super.onStart();
-		ResponseHandler.register(mLibrelioPurchaseObserver);
-		initializeOwnedItems();
+		//ResponseHandler.register(mLibrelioPurchaseObserver);
+		//initializeOwnedItems();
 	}
 
 	/**
@@ -345,12 +371,12 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	@Override
 	protected void onStop() {
 		super.onStop();
-		ResponseHandler.unregister(mLibrelioPurchaseObserver);
+		//ResponseHandler.unregister(mLibrelioPurchaseObserver);
 	}
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
+		/*super.onDestroy();
 		mPurchaseDatabase.close();
 		mBillingService.unbind();
 		this.unregisterReceiver(mDownloadBroadcasReciever);
@@ -358,7 +384,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 				.keySet().iterator(); mDownloadRequestsIterator.hasNext(); mDownloadManager
 				.remove(mDownloadRequestsIterator.next()))
 			;
-		cloud.recycle();
+		cloud.recycle();*/
 		super.onDestroy();
 	}
 
@@ -716,7 +742,6 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	}
 
 	private void restorePurchises() {
-
 	}
 
 	public void onReloadIssues() {

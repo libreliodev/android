@@ -2,6 +2,8 @@ package com.artifex.mupdf;
 
 import java.io.File;
 
+import com.librelio.lib.LibrelioApplication;
+import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
@@ -293,14 +295,14 @@ public class MuPDFActivity extends Activity
 				return super.onTouchEvent(event);
 			}
 
-			protected void onChildSetup(int i, View v) {
-				if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber == i)
-					((PageView)v).setSearchBoxes(SearchTaskResult.get().searchBoxes);
-				else
-					((PageView)v).setSearchBoxes(null);
-
-				((PageView)v).setLinkHighlighting(mLinkState == LinkState.HIGHLIGHT);
-			}
+//			protected void onChildSetup(int i, View v) {
+//				if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber == i)
+//					((PageView)v).setSearchBoxes(SearchTaskResult.get().searchBoxes);
+//				else
+//					((PageView)v).setSearchBoxes(null);
+//
+//				((PageView)v).setLinkHighlighting(mLinkState == LinkState.HIGHLIGHT);
+//			}
 
 			protected void onMoveToChild(int i) {
 				if (core == null)
@@ -317,18 +319,24 @@ public class MuPDFActivity extends Activity
 			protected void onSettle(View v) {
 				// When the layout has settled ask the page to render
 				// in HQ
-				((PageView)v).addHq();
+				PageView pv = (PageView) v.findViewById(342);
+				if(pv != null)
+					pv.addHq();
 			}
 
 			protected void onUnsettle(View v) {
 				// When something changes making the previous settled view
 				// no longer appropriate, tell the page to remove HQ
-				((PageView)v).removeHq();
+				PageView pv = (PageView) v.findViewById(342);
+				if(pv != null)
+					pv.removeHq();
 			}
 
 			@Override
 			protected void onNotInUse(View v) {
-				((PageView)v).releaseResources();
+				PageView pv = (PageView) v.findViewById(342);
+				if(pv != null)
+					pv.releaseResources();
 			}
 		};
 		mDocViewAdapter = new MuPDFPageAdapter(this, core);
@@ -822,21 +830,22 @@ public class MuPDFActivity extends Activity
 			// get the current page view
 			String path = uri.getPath();
 			Log.d("PATH", path);
-			int page = mDocView.getCurrentPage();
-			LinkInfo[] links = core.getPageLinks(page);
-			LinkInfo currentLink = null;
-			for(int i = 0; i < links.length; i++) {
-				if(links[i].uri.equals(linkString)) {
-					currentLink = links[i];
-					break;
-				}
+			if(path == null)
+				return;
+			
+			if(path.endsWith("jpg") || path.endsWith("png") || path.endsWith("bmp")) {
+				// start image slideshow
+				Intent intent = new Intent(this, SlideShowActivity.class);
+				intent.putExtra("path", path);
+				intent.putExtra("uri", linkString);
+//				startActivity(intent);
 			}
-			View v = mDocViewAdapter.getView(page, null, mDocView);
-			FrameLayout fl = new FrameLayout(this);
-			fl.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-			fl.setBackgroundColor(Color.BLACK);
-			mDocView.addView(fl);
-			Log.d("", "");
+			if(path.endsWith("mp4") && isFullScreen) {
+				// start a video player
+				Uri videoUri = Uri.parse("file://" + LibrelioApplication.appDirectory + "/wind_355" + path);
+				Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
+				startActivity(intent);
+			}
 		} else {
 			//TODO: replace with custom activity
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
