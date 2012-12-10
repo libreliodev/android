@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/magazines_view_button_selector"
             android:text="@string/read"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/preview_button_text_size" />
 
         <Button
@@ -46,6 +47,7 @@
             android:layout_marginTop="5dp"
             android:background="@drawable/magazines_view_button_selector"
             android:text="@string/download"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/preview_button_text_size" />
     </LinearLayout>
 
