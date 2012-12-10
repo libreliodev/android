@@ -27,6 +27,7 @@ import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
+import com.librelio.lib.ui.MainMagazineActivity;
 import com.librelio.lib.ui.StartupActivity;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -85,13 +86,15 @@ public class DownloadMagazineListService extends Service{
 					MagazineModel magazine = new MagazineModel(fileName, title,
 							subtitle, downloadDate, getApplicationContext());
 					//saving png
-					downloadFromUrl(magazine.getPngUrl(),magazine.getPngName());
+					downloadFromUrl(magazine.getPngUrl(),magazine.getPngPath());
 					magazine.saveInBase();
 				}
 				Log.d(TAG,"Downloading is finished");
 				//
 				Intent intent = new Intent(StartupActivity.BROADCAST_ACTION);
 				sendBroadcast(intent);
+				Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
+				sendBroadcast(intentInvalidate);
 				//
 				stopSelf();
 				return null;
@@ -106,7 +109,7 @@ public class DownloadMagazineListService extends Service{
 	}
 	
 	
-	private void downloadFromUrl(String sUrl, String filePath){
+	public static void downloadFromUrl(String sUrl, String filePath){
 		try{
 			URL url = new URL(sUrl);
 			File file = new File(filePath);

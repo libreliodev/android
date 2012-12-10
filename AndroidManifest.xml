@@ -51,6 +51,7 @@
         </activity>
 		<activity android:name="com.librelio.lib.ui.MainMagazineActivity" ></activity>
         <activity android:name="com.librelio.wind.test.TestPDFPageActivity"></activity>
+        <activity android:name="com.librelio.lib.ui.DownloadActivity"></activity>
     </application>
 
 </manifest>

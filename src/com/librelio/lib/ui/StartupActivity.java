@@ -24,6 +24,7 @@ import com.niveales.wind.R;
 
 public class StartupActivity extends Activity {
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
+	private BroadcastReceiver br;
 	
 	private static final String TAG = "StartupActivity";
 	@Override
@@ -48,7 +49,7 @@ public class StartupActivity extends Activity {
 			Intent intent = new Intent(this, DownloadMagazineListService.class);
 			startService(intent);
 			
-			BroadcastReceiver br = new BroadcastReceiver() {			
+			br = new BroadcastReceiver() {			
 				@Override
 				public void onReceive(Context context, Intent intent) {
 					Intent intent1 = new Intent(getApplicationContext(),
@@ -60,6 +61,8 @@ public class StartupActivity extends Activity {
 			IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
 			registerReceiver(br, filter);
 		}
+		c.close();
+		db.close();
 	}
 
 
@@ -87,5 +90,13 @@ public class StartupActivity extends Activity {
 			return "";
 		}
 		return fileData.toString();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		if(br!=null){
+			unregisterReceiver(br);
+		}
+		super.onDestroy();
 	}
 }
