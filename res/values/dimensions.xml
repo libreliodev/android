@@ -2,5 +2,6 @@
 
     <dimen name="preview_image_width">160dp</dimen>
     <dimen name="preview_image_height">240dp</dimen>
+    <dimen name="preview_button_text_size">20sp</dimen>
 
 </resources>
