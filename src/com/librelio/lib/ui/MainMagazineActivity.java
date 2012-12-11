@@ -44,6 +44,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,6 +55,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.librelio.lib.adapter.MagazineAdapter;
@@ -64,6 +66,7 @@ import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.ui.IssueListAdapter.IssueListEventListener;
 import com.librelio.lib.utils.BillingService;
 import com.librelio.lib.utils.Consts;
+import com.librelio.lib.utils.PDFParser;
 import com.librelio.lib.utils.PurchaseObserver;
 import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.lib.utils.BillingService.RequestPurchase;
@@ -303,7 +306,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	public static final String BROADCAST_ACTION_IVALIDATE = "com.librelio.lib.service.broadcast.invalidate";
 	private MagazineAdapter adapter;
 	
-	private void loadMagazineData(ArrayList<MagazineModel> magazine){
+	private void reloadMagazineData(ArrayList<MagazineModel> magazine){
+		magazine.clear();
 		DataBaseHelper dbhelp = new DataBaseHelper(this);
 		SQLiteDatabase db = dbhelp.getReadableDatabase();
 		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
@@ -333,7 +337,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		setContentView(R.layout.issue_list_layout);
 		
 		magazine = new ArrayList<MagazineModel>();
-		loadMagazineData(magazine);
+		reloadMagazineData(magazine);
 		//
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
 		adapter = new MagazineAdapter(magazine, this);
@@ -344,6 +348,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 			public void onReceive(Context context, Intent intent) {
 				if(grid!=null){
 					Log.d(TAG, "onReceive: grid was invalidate");
+					reloadMagazineData(magazine);
 					grid.invalidate();
 					grid.invalidateViews();
 				}
@@ -352,6 +357,18 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
 		registerReceiver(br, filter);
 
+		//
+		
+		/*PDFParser linkGetter = new PDFParser("mnt/sdcard/librelio/wind_355.pdf");
+		SparseArray<LinkInfo[]> links = linkGetter.getLinkInfo();
+		for(int i=0;i<links.size();i++){
+			Log.d(TAG,"--- i = "+i);
+			if(links.get(i)!=null){
+				for(int j=0;j<links.get(i).length;j++){
+					Log.d(TAG,"link[" + j + "] = "+links.get(i)[j].uri );
+				}
+			}
+		}*/
 		/*mHandler = new Handler();
 		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
 		mBillingService = new BillingService();
@@ -738,7 +755,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 			//onReloadIssues();
 			Intent intent = new Intent(this, DownloadMagazineListService.class);
 			startService(intent);
-			loadMagazineData(magazine);
+			reloadMagazineData(magazine);
 			
 			return true;
 		case R.id.options_menu_restore:
