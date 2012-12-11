@@ -4,8 +4,8 @@
 package com.artifex.mupdf;
 
 import com.librelio.lib.LibrelioApplication;
+import com.librelio.lib.adapter.SlideshowAdapter;
 import com.librelio.lib.ui.SlideShowActivity;
-import com.librelio.lib.utils.SlideshowAdapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,11 +28,13 @@ import android.widget.FrameLayout.LayoutParams;
 public class LinkHolder extends FrameLayout {
 
 	private LinkInfo mLinkInfo;
-	private Gallery mGallery;
-	private WebView mWebVew;
+	private Gallery mGallery = null;
+	private WebView mWebVew = null;
 	private float scale = 1.0f;
 	private int mAutoplayDelay;
 	private Handler mAutoplayHandler;
+	private WebView mWebView;
+	private String uriString;
 	
 	/**
 	 * @param pContext
@@ -40,7 +42,7 @@ public class LinkHolder extends FrameLayout {
 	public LinkHolder(Context pContext, LinkInfo link) {
 		super(pContext);
 		mLinkInfo = link;
-		String uriString = link.uri;
+		uriString = link.uri;
 		if(uriString == null)
 			return;
 		if(Uri.parse(uriString).getQueryParameter("warect") != null && Uri.parse(uriString).getQueryParameter("warect").equals("full")) {
@@ -89,6 +91,9 @@ public class LinkHolder extends FrameLayout {
 						getContext().startActivity(intent);
 					}
 				});
+				if(Uri.parse(uriString).getQueryParameter("watransition") != null && Uri.parse(uriString).getQueryParameter("watransition").equals("none")) {
+					mGallery.setAnimation(null);
+				}
 				if(autoPlay) {
 					mAutoplayHandler = new Handler();
 					mAutoplayHandler.postDelayed(new Runnable() {
@@ -107,9 +112,22 @@ public class LinkHolder extends FrameLayout {
 				}
 				addView(mGallery);
 //				requestLayout();
-			}
-			if (path.endsWith("mp4")) {
+			} else if (path.endsWith("mp4")) {
 				
+			} 
+			
+		} else {
+			mWebView = new WebView(getContext());
+			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+			lp.gravity = Gravity.CENTER;
+			mWebView.setLayoutParams(lp);
+			addView(mWebView);
+			if(autoPlay) {
+				mWebView.loadUrl(uriString);
+				setVisibility(View.VISIBLE);
+			} else {
+				setVisibility(View.GONE);
 			}
 		}
 		
@@ -120,7 +138,10 @@ public class LinkHolder extends FrameLayout {
 	public void hitLinkUri(String uri) {
 		if(mLinkInfo.uri.equals(uri)) {
 			// TODO: start playing link
-			this.setVisibility(View.VISIBLE);
+			setVisibility(View.VISIBLE);
+			if(mWebView != null) {
+				mWebView.loadUrl(uriString);
+			}
 		}
 	}
 	

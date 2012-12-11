@@ -319,24 +319,18 @@ public class MuPDFActivity extends Activity
 			protected void onSettle(View v) {
 				// When the layout has settled ask the page to render
 				// in HQ
-				PageView pv = (PageView) v.findViewById(342);
-				if(pv != null)
-					pv.addHq();
+				((PageView)v).addHq();
 			}
 
 			protected void onUnsettle(View v) {
 				// When something changes making the previous settled view
 				// no longer appropriate, tell the page to remove HQ
-				PageView pv = (PageView) v.findViewById(342);
-				if(pv != null)
-					pv.removeHq();
+				((PageView)v).removeHq();
 			}
 
 			@Override
 			protected void onNotInUse(View v) {
-				PageView pv = (PageView) v.findViewById(342);
-				if(pv != null)
-					pv.releaseResources();
+				((PageView)v).releaseResources();
 			}
 		};
 		mDocViewAdapter = new MuPDFPageAdapter(this, core);

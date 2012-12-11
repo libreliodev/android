@@ -3,10 +3,10 @@ package com.artifex.mupdf;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.ui.SlideShowActivity;
-import com.librelio.lib.utils.SlideshowAdapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -106,6 +106,29 @@ public class MuPDFPageView extends PageView {
 					(int) (currentLink.top * scale),
 					(int) (currentLink.right * scale),
 					(int) (currentLink.bottom * scale));
+		}
+	}
+	
+	@Override
+	public void blank(int page) {
+		super.blank(page);
+		Iterator<Entry<String, FrameLayout>> i = mediaHolders.entrySet().iterator();
+		while(i.hasNext()) {
+			Entry<String, FrameLayout> entry = i.next();
+			LinkHolder mLinkHolder = (LinkHolder) entry.getValue();
+			i.remove();
+			removeView(mLinkHolder);
+			mLinkHolder = null;
+		}
+	}
+	
+	@Override
+	public void addHq() {
+		super.addHq();
+		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
+			LinkHolder mLinkHolder = (LinkHolder) entry.getValue();
+			
+			mLinkHolder.bringToFront();
 		}
 	}
 

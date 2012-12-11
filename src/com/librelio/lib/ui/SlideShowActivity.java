@@ -4,7 +4,7 @@
 package com.librelio.lib.ui;
 
 import com.librelio.lib.LibrelioApplication;
-import com.librelio.lib.utils.SlideshowAdapter;
+import com.librelio.lib.adapter.SlideshowAdapter;
 import com.niveales.wind.R;
 
 import android.os.Bundle;

@@ -48,7 +48,7 @@ class OpaqueImageView extends ImageView {
 	}
 }
 
-public abstract class PageView extends FrameLayout {
+public abstract class PageView extends ViewGroup {
 	private static final int HIGHLIGHT_COLOR = 0x805555FF;
 	private static final int LINK_COLOR = 0x80FFCC88;
 	private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
