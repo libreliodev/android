@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Log;
 
 import com.artifex.mupdf.MuPDFActivity;
 import com.niveales.wind.R;
 
 public class LibrelioApplication extends Application {
+	private static final String TAG = "LibrelioApplication";
 	public static String BASE_URL;
 	public static String appDirectory = Environment.getExternalStorageDirectory()+"/librelio/";
 	
@@ -23,10 +25,15 @@ public class LibrelioApplication extends Application {
 	}
 	
 	public static void startPDFActivity(Context context,String filePath){
-		Uri uri = Uri.parse(filePath);
-		Intent intent = new Intent(context,MuPDFActivity.class);
-		intent.setAction(Intent.ACTION_VIEW);
-		intent.setData(uri);
-		context.startActivity(intent);
+		try{
+			Uri uri = Uri.parse(filePath);
+			Intent intent = new Intent(context,MuPDFActivity.class);
+			intent.setAction(Intent.ACTION_VIEW);
+			intent.setData(uri);
+			context.startActivity(intent);
+		} catch (Exception e) {
+			Log.e(TAG,"Problem with starting PDG-activity, path: "+filePath,e);
+		}
+
 	}
 }

@@ -67,65 +67,89 @@ public class MagazineAdapter extends BaseAdapter{
 		String imagePath = currentMagazine.getPngPath();
 		thumbnail.setImageBitmap(BitmapFactory.decodeFile(imagePath));
 		/**
-		 * but1 - this button can be "Download button" or "Read button"
+		 * downloadOrReadButton - this button can be "Download button" or "Read button"
 		 */
-		Button but1 = (Button)res.findViewById(R.id.item_button_one);
+		Button downloadOrReadButton = (Button)res.findViewById(R.id.item_button_one);
 		/**
-		 * but2 - this button can be "Delete button" or "Sample button"
+		 * sampleOrDeleteButton - this button can be "Delete button" or "Sample button"
 		 */
-		Button but2 = (Button)res.findViewById(R.id.item_button_two);
+		Button sampleOrDeleteButton = (Button)res.findViewById(R.id.item_button_two);
 
-		if(currentMagazine.isDownloaded()){
-			//Read case
-			but1.setText(context.getResources().getString(R.string.read));
-			but1.setOnClickListener(new OnClickListener() {
+		if (currentMagazine.isDownloaded()) {
+			// Read case
+			downloadOrReadButton.setText(context.getResources().getString(
+					R.string.read));
+			downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					LibrelioApplication.startPDFActivity(context,currentMagazine.getPdfPath());
+					LibrelioApplication.startPDFActivity(context,
+							currentMagazine.getPdfPath());
+					/*Intent intent = new Intent(context,
+							DownloadActivity.class);
+					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+					intent.putExtra(DownloadActivity.FILE_URL_KEY,currentMagazine.getPdfUrl());
+					intent.putExtra(DownloadActivity.FILE_PATH_KEY,currentMagazine.getPdfPath());
+					intent.putExtra(DownloadActivity.PNG_PATH_KEY,currentMagazine.getPngPath());
+					context.startActivity(intent);*/
 				}
 			});
 		} else {
-			//download case
-			but1.setText(context.getResources().getString(R.string.download));
-			but1.setOnClickListener(new OnClickListener() {
+			// download case
+			downloadOrReadButton.setText(context.getResources().getString(
+					R.string.download));
+			downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					
+					Intent intent = new Intent(context,
+							DownloadActivity.class);
+					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+					intent.putExtra(DownloadActivity.FILE_URL_KEY,currentMagazine.getPdfUrl());
+					intent.putExtra(DownloadActivity.FILE_PATH_KEY,currentMagazine.getPdfPath());
+					intent.putExtra(DownloadActivity.PNG_PATH_KEY,currentMagazine.getPngPath());
+					intent.putExtra(DownloadActivity.ORIENTATION_KEY,
+							context.getResources().getConfiguration().orientation);
+					context.startActivity(intent);
 				}
-			});			
+			});
 		}
 		//
-		if((!currentMagazine.isPaid())||currentMagazine.isDownloaded()){
-			//delete case
-			but2.setText(context.getResources().getString(R.string.delete));
-			but2.setOnClickListener(new OnClickListener() {
+		if ((!currentMagazine.isPaid()) || currentMagazine.isDownloaded()) {
+			// delete case
+			sampleOrDeleteButton.setText(context.getResources().getString(
+					R.string.delete));
+			sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					
+					currentMagazine.delete();
 				}
-			});	
+			});
 		} else {
-			//Sample case
-			but2.setText(context.getResources().getString(R.string.sample));
-			but2.setOnClickListener(new OnClickListener() {
+			// Sample case
+			sampleOrDeleteButton.setText(context.getResources().getString(
+					R.string.sample));
+			sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					File sample = new File(currentMagazine.getSamplePath());
-					Log.d(TAG, "test: "+sample.exists()+" "+currentMagazine.isSampleDownloaded());
-					if(currentMagazine.isSampleDownloaded()){
-						LibrelioApplication.startPDFActivity(context,currentMagazine.getSamplePath());
+					Log.d(TAG, "test: " + sample.exists() + " "
+							+ currentMagazine.isSampleDownloaded());
+					if (currentMagazine.isSampleDownloaded()) {
+						LibrelioApplication.startPDFActivity(context,
+								currentMagazine.getSamplePath());
 					} else {
-						Intent intent = new Intent(context, DownloadActivity.class);
-						intent.putExtra(DownloadActivity.FILE_URL_KEY, currentMagazine.getSampleUrl());
-						intent.putExtra(DownloadActivity.FILE_PATH_KEY, currentMagazine.getSamplePath());
-						intent.putExtra(DownloadActivity.PNG_PATH_KEY, currentMagazine.getPngPath());
+						Intent intent = new Intent(context,
+								DownloadActivity.class);
+						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+						intent.putExtra(DownloadActivity.FILE_URL_KEY,currentMagazine.getSampleUrl());
+						intent.putExtra(DownloadActivity.FILE_PATH_KEY,currentMagazine.getSamplePath());
+						intent.putExtra(DownloadActivity.PNG_PATH_KEY,currentMagazine.getPngPath());
 						context.startActivity(intent);
 					}
 				}
 			});
 		}
-		
+
 		return res;
 	}
-	
+
 }
