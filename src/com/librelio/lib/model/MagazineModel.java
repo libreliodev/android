@@ -1,19 +1,24 @@
 package com.librelio.lib.model;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.view.View;
+import android.util.Log;
 
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
+import com.librelio.lib.ui.MainMagazineActivity;
 
 public class MagazineModel {
+	private static final String TAG = "MagazineModel";
+	
 	private Context context;
 	private String title;
 	private String subtitle;
@@ -27,7 +32,7 @@ public class MagazineModel {
 	private boolean isPaid;
 	private boolean isDowloaded;
 	private boolean isSampleDowloaded = false;
-	private ArrayList<String> assets_references;
+	private String assetsDir;
 	private String downloadDate;
 
 	public MagazineModel(String fileName, String title, String subtitle,
@@ -55,7 +60,49 @@ public class MagazineModel {
 
 		valuesInit(fileName);
 	}
+	
+	public static String getAssetsDir(String fileName){
+		int startNameIndex = fileName.indexOf("/")+1;
+		int finishNameIndex = fileName.indexOf(".");
+		return LibrelioApplication.appDirectory
+					+fileName.substring(startNameIndex,finishNameIndex)+"/";
+	}
+	
+	public static String getAssetsBaseURL(String fileName){
+		int finishNameIndex = fileName.indexOf("/");
+		return LibrelioApplication.BASE_URL+fileName.substring(0,finishNameIndex)+"/";
+	}
 
+	public static void makeAssetsDir(String fileName){
+		File assets = new File(getAssetsDir(fileName));
+		if(!assets.exists()){
+			assets.mkdirs();
+		}
+	}
+	
+	public void delete(){
+		Log.d(TAG,"Deleting magazine has been initiated");
+		ArrayList<File> files = new ArrayList<File>();
+		files.add( new File(pdfPath));
+		files.add( new File(getAssetsDir(fileName)));
+		if(samplePath!=null){
+			files.add( new File(samplePath));
+		}
+		for (File file : files) {
+			if (file.exists()) {
+				if (file.isDirectory()) {
+					for (File c : file.listFiles()) c.delete();
+				} else {
+					file.delete();
+				}
+			}
+		}
+
+		Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
+		context.sendBroadcast(intentInvalidate);
+	}
+	
+	
 	public synchronized void saveInBase() {
 		SQLiteDatabase db;
 		DataBaseHelper dbhelp = new DataBaseHelper(context);
@@ -71,9 +118,9 @@ public class MagazineModel {
 
 	private void valuesInit(String fileName) {
 		isPaid = fileName.contains("_.");
-		int startIndex = fileName.indexOf("/")+1;
+		int startNameIndex = fileName.indexOf("/")+1;
 		pdfUrl = LibrelioApplication.BASE_URL + fileName;
-		pdfPath = LibrelioApplication.appDirectory+fileName.substring(startIndex, fileName.length());
+		pdfPath = LibrelioApplication.appDirectory+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
 			pngUrl = pdfUrl.replace("_.pdf", ".png");
 			pngPath = pdfPath.replace("_.pdf", ".png");
@@ -88,9 +135,13 @@ public class MagazineModel {
 		File pdf = new File(getPdfPath());
 		isDowloaded = pdf.exists();
 		
-		
+		assetsDir = getAssetsDir(fileName);
 	}
 
+	public String getAssetsDir(){
+		return this.assetsDir;
+	}
+	
 	public boolean isPaid() {
 		return this.isPaid;
 	}

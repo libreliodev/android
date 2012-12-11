@@ -34,7 +34,7 @@
         <Button
             android:id="@+id/item_button_one"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/preview_button_height"
             android:background="@drawable/magazines_view_button_selector"
             android:text="@string/read"
             android:textColor="@android:color/white"
@@ -43,7 +43,7 @@
         <Button
             android:id="@+id/item_button_two"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/preview_button_height"
             android:layout_marginTop="5dp"
             android:background="@drawable/magazines_view_button_selector"
             android:text="@string/download"

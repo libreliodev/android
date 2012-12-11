@@ -8,18 +8,16 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.apache.http.util.ByteArrayBuffer;
-
 import android.app.Service;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -110,7 +108,33 @@ public class DownloadMagazineListService extends Service{
 	
 	
 	public static void downloadFromUrl(String sUrl, String filePath){
+		int count;
 		try{
+		URL url = new URL(sUrl);
+		URLConnection conexion = url.openConnection();
+		conexion.connect();
+
+		int lenghtOfFile = conexion.getContentLength();
+		Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
+
+		InputStream input = new BufferedInputStream(url.openStream());
+		OutputStream output = new FileOutputStream(filePath);
+
+		byte data[] = new byte[1024];
+
+		long total = 0;
+
+			while ((count = input.read(data)) != -1) {
+				total += count;
+				output.write(data, 0, count);
+			}
+			output.flush();
+			output.close();
+			input.close();
+		} catch (Exception e) {
+			Log.e(TAG, "Problem with download: "+filePath,e);
+		}
+		/*try{
 			URL url = new URL(sUrl);
 			File file = new File(filePath);
 			
@@ -126,7 +150,7 @@ public class DownloadMagazineListService extends Service{
             }
 
             /* Convert the Bytes read to a String. */
-            FileOutputStream fos = new FileOutputStream(file);
+           /* FileOutputStream fos = new FileOutputStream(file);
             fos.write(baf.toByteArray());
             Log.d(TAG,"File was download: "+filePath);
             fos.close();
@@ -135,7 +159,7 @@ public class DownloadMagazineListService extends Service{
         	Log.e(TAG,"File not found: "+filePath,e);
 		} catch (IOException e) {
 			Log.e(TAG,"IOException",e);
-		} 
+		} */
 	}
 	
 	public static String getStringFromFile(String path){
