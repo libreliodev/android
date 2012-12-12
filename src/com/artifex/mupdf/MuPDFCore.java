@@ -1,4 +1,6 @@
 package com.artifex.mupdf;
+import java.io.File;
+
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -15,6 +17,7 @@ public class MuPDFCore
 	private int numPages = -1;
 	public  float pageWidth;
 	public  float pageHeight;
+	private String mFileName;
 
 	/* The native functions */
 	private static native int openFile(String filename);
@@ -40,12 +43,22 @@ public class MuPDFCore
 
 	public MuPDFCore(String filename) throws Exception
 	{
+		mFileName = filename;
 		if (openFile(filename) <= 0)
 		{
 			throw new Exception("Failed to open "+filename);
 		}
 	}
+	
 
+	public String getFileName() {
+		return mFileName;
+	}
+	
+	public String getFileDirectory() {
+		return (new File(getFileName())).getParent();
+	}
+	
 	public  int countPages()
 	{
 		if (numPages < 0)

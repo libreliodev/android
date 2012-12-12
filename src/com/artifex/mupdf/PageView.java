@@ -121,7 +121,9 @@ public abstract class PageView extends ViewGroup {
 		if (mPatch != null) {
 			Drawable d = mPatch.getDrawable();
 			if(d instanceof BitmapDrawable) {
-				((BitmapDrawable)d).getBitmap().recycle();
+				
+				Bitmap bm = ((BitmapDrawable)d).getBitmap();
+				if(bm != null) bm.recycle();
 			}
 			mPatch.setImageBitmap(null);
 			
