@@ -21,9 +21,10 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -44,7 +45,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,7 +55,6 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.librelio.lib.adapter.MagazineAdapter;
@@ -65,18 +64,16 @@ import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.ui.IssueListAdapter.IssueListEventListener;
 import com.librelio.lib.utils.BillingService;
-import com.librelio.lib.utils.Consts;
-import com.librelio.lib.utils.PDFParser;
-import com.librelio.lib.utils.PurchaseObserver;
-import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.lib.utils.BillingService.RequestPurchase;
 import com.librelio.lib.utils.BillingService.RestoreTransactions;
+import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.Consts.PurchaseState;
 import com.librelio.lib.utils.Consts.ResponseCode;
+import com.librelio.lib.utils.PurchaseObserver;
 import com.librelio.lib.utils.cloud.CloudHelper;
+import com.librelio.lib.utils.cloud.CloudHelper.CloudEventListener;
 import com.librelio.lib.utils.cloud.Issue;
 import com.librelio.lib.utils.cloud.Magazine;
-import com.librelio.lib.utils.cloud.CloudHelper.CloudEventListener;
 import com.librelio.lib.utils.db.Ocean;
 import com.librelio.lib.utils.db.PurchaseDatabase;
 import com.niveales.wind.R;
@@ -316,13 +313,15 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 			do{
 				MagazineModel buf = new MagazineModel(c, this);
 				magazine.add(buf);
-			} while(c.moveToNext());
+			}  while(c.moveToNext());
 		}
 		c.close();
 		db.close();
 	}
 	
-	private BroadcastReceiver br; 
+	private BroadcastReceiver br;
+	private Timer update;
+	private Intent intent;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -356,7 +355,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		};
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
 		registerReceiver(br, filter);
-
+		
+		startRegularUpdate();
 		//
 		
 		/*PDFParser linkGetter = new PDFParser("mnt/sdcard/librelio/wind_355.pdf");
@@ -394,6 +394,22 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		}*/
 	}
 
+	private void startRegularUpdate(){
+		long period = 1800000;
+		update = new Timer();
+		intent = new Intent(this, DownloadMagazineListService.class);
+		TimerTask updateTask = new TimerTask() {
+			@Override
+			public void run() {
+				startService(intent);
+			}
+		};
+		update.schedule(updateTask, period, period);
+	}
+	
+	private void stopRegularUpdate(){
+		update.cancel();
+	}
 	/**
 	 * Called when this activity becomes visible.
 	 */
@@ -424,6 +440,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 				.remove(mDownloadRequestsIterator.next()))
 			;
 		cloud.recycle();*/
+		stopRegularUpdate();
 		unregisterReceiver(br);
 		super.onDestroy();
 	}
@@ -756,7 +773,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 			Intent intent = new Intent(this, DownloadMagazineListService.class);
 			startService(intent);
 			reloadMagazineData(magazine);
-			
+			stopRegularUpdate();
+			startRegularUpdate();
 			return true;
 		case R.id.options_menu_restore:
 			restorePurchises();
