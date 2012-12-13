@@ -74,7 +74,7 @@ public class LinkHolder extends FrameLayout {
 				mGallery = new Gallery(getContext());
 
 				mGallery.setAdapter(new SlideshowAdapter(getContext(),
-						LibrelioApplication.appDirectory + "/wind_355/"
+						LibrelioApplication.APP_DIRECTORY + "/wind_355/"
 								+ Uri.parse(uriString).getPath()));
 				mGallery.setLayoutParams(lp);
 				mGallery.setBackgroundColor(bgColor);
