@@ -45,6 +45,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,6 +56,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.librelio.lib.adapter.MagazineAdapter;
@@ -69,7 +71,9 @@ import com.librelio.lib.utils.BillingService.RestoreTransactions;
 import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.Consts.PurchaseState;
 import com.librelio.lib.utils.Consts.ResponseCode;
+import com.librelio.lib.utils.PDFParser;
 import com.librelio.lib.utils.PurchaseObserver;
+import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.lib.utils.cloud.CloudHelper;
 import com.librelio.lib.utils.cloud.CloudHelper.CloudEventListener;
 import com.librelio.lib.utils.cloud.Issue;
@@ -368,8 +372,8 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 					Log.d(TAG,"link[" + j + "] = "+links.get(i)[j].uri );
 				}
 			}
-		}*/
-		/*mHandler = new Handler();
+		}
+		mHandler = new Handler();
 		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
 		mBillingService = new BillingService();
 		mBillingService.setContext(this);

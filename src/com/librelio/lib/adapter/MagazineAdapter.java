@@ -103,9 +103,9 @@ public class MagazineAdapter extends BaseAdapter{
 					Intent intent = new Intent(context,
 							DownloadActivity.class);
 					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
-					intent.putExtra(DownloadActivity.FILE_URL_KEY,currentMagazine.getPdfUrl());
-					intent.putExtra(DownloadActivity.FILE_PATH_KEY,currentMagazine.getPdfPath());
-					intent.putExtra(DownloadActivity.PNG_PATH_KEY,currentMagazine.getPngPath());
+					intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
+					intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
+					intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,false);
 					intent.putExtra(DownloadActivity.ORIENTATION_KEY,
 							context.getResources().getConfiguration().orientation);
 					context.startActivity(intent);
@@ -140,9 +140,11 @@ public class MagazineAdapter extends BaseAdapter{
 						Intent intent = new Intent(context,
 								DownloadActivity.class);
 						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
-						intent.putExtra(DownloadActivity.FILE_URL_KEY,currentMagazine.getSampleUrl());
-						intent.putExtra(DownloadActivity.FILE_PATH_KEY,currentMagazine.getSamplePath());
-						intent.putExtra(DownloadActivity.PNG_PATH_KEY,currentMagazine.getPngPath());
+						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
+						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
+						intent.putExtra(DownloadActivity.ORIENTATION_KEY,
+								context.getResources().getConfiguration().orientation);
+						intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,true);
 						context.startActivity(intent);
 					}
 				}

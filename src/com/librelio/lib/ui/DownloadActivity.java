@@ -10,11 +10,17 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,22 +41,23 @@ public class DownloadActivity extends Activity {
 	private static final String STOP = "stop_modificator";
 	
 	public static final String FILE_NAME_KEY = "file_name_key";
-	public static final String FILE_URL_KEY = "file_url_key";
-	public static final String FILE_PATH_KEY = "file_path_key";
-	public static final String PNG_PATH_KEY = "png_path_key";
+	public static final String TITLE_KEY = "title_key";
+	public static final String SUBTITLE_KEY = "subtitle_key";
 	public static final String ORIENTATION_KEY = "orientation";
+	public static final String IS_SAMPLE_KEY = "issample";
 	
 	private String fileName;
 	private String fileUrl;
 	private String filePath;
+	private boolean isSample;
 	private ImageView preview;
 	private TextView text;
 	private ProgressBar progress;
 	private DownloadTask download;
 	private DownloadLinksTask downloadLinks;
+	private MagazineModel magazine;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(TAG,getIntent().getExtras().getInt(ORIENTATION_KEY)+"");
 		switch (getIntent().getExtras().getInt(ORIENTATION_KEY)) {
 		case Configuration.ORIENTATION_PORTRAIT:
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -63,35 +70,68 @@ public class DownloadActivity extends Activity {
 			break;
 		}
 		super.onCreate(savedInstanceState);
-
+		String title = getIntent().getExtras().getString(TITLE_KEY);
+		String subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
+		fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
+		magazine = new MagazineModel(fileName, title, subtitle, "", this);
+		
 		setContentView(R.layout.download);
 		preview = (ImageView)findViewById(R.id.download_preview_image);
 		text = (TextView)findViewById(R.id.download_progress_text);
 		progress = (ProgressBar)findViewById(R.id.download_progress);
 		progress.setProgress(0);
-		fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
-		fileUrl = getIntent().getExtras().getString(FILE_URL_KEY);
-		filePath = getIntent().getExtras().getString(FILE_PATH_KEY);
+		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
+		fileUrl = magazine.getPdfUrl();
+		filePath = magazine.getPdfPath();
+		if(isSample){
+			fileUrl = magazine.getSampleUrl();
+			filePath = magazine.getSamplePath();
+		}
 		//
-		String imagePath = getIntent().getExtras().getString(PNG_PATH_KEY);
+		//
+		String imagePath = magazine.getPngPath();
 		preview.setImageBitmap(BitmapFactory.decodeFile(imagePath));
 		text.setText("Downloading");
-		
-		Log.d(TAG, "fileUrl: "+fileUrl+"\nfilePath: "+filePath);
-		download = new DownloadTask();
-		try{
-			download.execute();
-		} catch (Exception e) {
-			Log.e(TAG,"File download failed ("+fileUrl+")",e);
-			download.cancel(true);
-			finish();
+		//
+		if(!thereIsConnection()){
+			showDialog(CONNECTION_ALERT);
+		} else {
+		//
+			Log.d(TAG, "isSample: "+isSample+"\nfileUrl: "+fileUrl+"\nfilePath: "+filePath);
+			download = new DownloadTask();
+			try{
+				download.execute();
+			} catch (Exception e) {
+				Log.e(TAG,"File download failed ("+fileUrl+")",e);
+				download.cancel(true);
+				finish();
+			}
 		}
+	}
+	private boolean thereIsConnection(){
+		ConnectivityManager conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo i = conMgr.getActiveNetworkInfo();
+		  if (i == null){
+			  return false;
+		  }
+		  if (!i.isConnected()){
+		    return false;
+		  }
+		  if (!i.isAvailable()){
+		    return false;
+		  }
+		  return true;
 	}
 	
 	private InputStream input;
 	private OutputStream output;
 	class DownloadTask extends AsyncTask<String, String, String>{
-
+		@Override
+		protected void onPreExecute() {
+			MagazineModel.makeMagazineDir(fileName);
+			MagazineModel.clearMagazineDir(fileName); 
+			super.onPreExecute();
+		}
 		@Override
 		protected String doInBackground(String... params) {
 			int count;
@@ -140,6 +180,7 @@ public class DownloadActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			if(result.equals(STOP)){
+				closeDownloadScreen();
 				return;
 			}
 			downloadLinks = new DownloadLinksTask();
@@ -153,7 +194,7 @@ public class DownloadActivity extends Activity {
 		private ArrayList<String> assetsNames;
 		@Override
 		protected void onPreExecute() {
-			MagazineModel.makeAssetsDir(fileName);
+			MagazineModel.makeMagazineDir(fileName);
 			text.setText("Getting assets...");
 			Log.d(TAG,"Start DownloadLinksTask");
 			links = new ArrayList<String>();
@@ -197,8 +238,12 @@ public class DownloadActivity extends Activity {
 		protected String doInBackground(String... params) {
 			count = 0;
 			for(int i=0;i<links.size();i++){
+				if(isCancelled()){
+					Log.d(TAG, "DownloadLinkTask was stop");
+					return STOP;
+				}
 				String assetUrl = links.get(i);
-				String assetPath = MagazineModel.getAssetsDir(fileName)+assetsNames.get(i);
+				String assetPath = MagazineModel.getMagazineDir(fileName)+assetsNames.get(i);
 				DownloadMagazineListService.downloadFromUrl(assetUrl, assetPath);
 				publishProgress("");
 			}
@@ -214,6 +259,12 @@ public class DownloadActivity extends Activity {
 		}
 		@Override
 		protected void onPostExecute(String result) {
+			if(result.equals(STOP)){
+				return;
+			}
+			//
+			magazine.makeCompleteFile(isSample);
+			//
 			Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 			sendBroadcast(intentInvalidate);
 			LibrelioApplication.startPDFActivity(getContext(),filePath);
@@ -224,7 +275,14 @@ public class DownloadActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
-		download.cancel(true);
+		Log.d(TAG, "onBack");
+		if(download!=null){
+			download.cancel(true);
+		}
+		if(downloadLinks!=null){
+			downloadLinks.cancel(true);
+		}
+		MagazineModel.clearMagazineDir(fileName);
 		finish();
 		super.onBackPressed();
 	}
@@ -237,4 +295,22 @@ public class DownloadActivity extends Activity {
 		return this;
 	}
 
+	
+	private static final int CONNECTION_ALERT = 1;
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case CONNECTION_ALERT:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			String message = getResources().getString(R.string.connection_failed);
+			builder.setMessage(message).setPositiveButton("OK", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
+			return builder.create();
+		}
+		return super.onCreateDialog(id);
+	}
 }

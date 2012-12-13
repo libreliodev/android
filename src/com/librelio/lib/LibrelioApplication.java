@@ -13,7 +13,7 @@ import com.niveales.wind.R;
 public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
 	public static String BASE_URL;
-	public static String appDirectory = Environment.getExternalStorageDirectory()+"/librelio/";
+	public static String APP_DIRECTORY = Environment.getExternalStorageDirectory()+"/librelio/";
 	
 	@Override
 	public void onCreate() {

@@ -28,7 +28,7 @@ public class SlideShowActivity extends FragmentActivity {
 		mSlideshowGallery = (Gallery) findViewById(R.id.SlideshowGallery);
 		String path = getIntent().getExtras().getString("path");
 		SlideshowAdapter adapter = new SlideshowAdapter(this, 
-				((LibrelioApplication)getApplication()).appDirectory+"/wind_355/"+path);
+				((LibrelioApplication)getApplication()).APP_DIRECTORY+"/wind_355/"+path);
 //		SlideshowAdapter adapter = new SlideshowAdapter(this, 
 //				((LibrelioApplication)getApplication()).appDirectory+"/wind_355/PWAVIETNAM_4.jpg");
 		

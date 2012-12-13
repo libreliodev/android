@@ -49,4 +49,5 @@
     <string name="client_name">niveales</string>
     <string name="magazine_name">wind</string>
     <string name="sample">Sample</string>
+    <string name="connection_failed">Connection failed!</string>
 </resources>
