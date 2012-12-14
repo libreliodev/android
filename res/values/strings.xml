@@ -4,7 +4,6 @@
     <string name="no_media_warning">No media</string>
     <string name="no_media_hint">Disconnect from PC</string>
     <string name="open_failed">Cant open PDF. Please put file wind_355.pdf on SD card for testing &#8230;</string>
-    <string name="cancel">Cancel</string>
     <string name="search_backwards">Search back</string>
     <string name="search_forwards">Search forward</string>
     <string name="search_document">Search in document</string>
@@ -14,8 +13,6 @@
     <string name="text_not_found">Not found</string><string name="items_you_own">Items you own</string><string name="recent_transactions">Recent activity</string><string name="edit_payload">Edit Payload</string><string name="items_for_sale">Items for sale</string>
     <string name="searching_">Searching&#8230;</string>
     <string name="link_control">Link highlight</string>
-    <string name="download">Download</string>
-    <string name="read">Read</string>
     <string name="exit">Exit</string>
     <string name="reload">Reload</string>
     <string name="not_connected">Not connected to Internet&#8230;</string>
@@ -46,8 +43,50 @@
     <string name="delete">Delete</string>
     <string name="subscribe_year">Subscribe year</string>
     <string name="no_further_occurences_found">No more found</string>
+    
     <string name="client_name">niveales</string>
     <string name="magazine_name">wind</string>
-    <string name="sample">Sample</string>
     <string name="connection_failed">Connection failed!</string>
+
+    <string name="abonnement_wind">Abonnement Wind</string>
+    
+    <string name="server_error">Bad responce from server.</string>
+    <string name="connecting">Connecting...</string>
+    <string name="download_failed_please_check_your_connection">Download failed, please check your connection</string>
+    <string name="please_check_your_connection">Please check your connection</string>
+    <string name="download_in_progress">Download in progress</string>
+    <string name="caching_operation_in_progress">Caching operation in progress</string>
+    <string name="what_do_you_want_to_buy">What do you want to buy?</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="the_order_failed">The order failed</string>
+    <string name="buy_and_download">Buy and download</string>
+    <string name="try_again">Try again</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="free_Download">Free Download</string>
+    <string name="download">Download ...</string>
+    <string name="free_sample">Free sample</string>
+    <string name="sample">Sample</string>
+    <string name="read">Read</string>
+    <string name="magazines">Magazines</string>
+    <string name="do_you_really_want_to_quit_this_app">Do you really want to quit this app?</string>
+    <string name="yes">Yes</string>
+    <string name="i_have_a_subscriber_code">I have a subscriber code</string>
+    <string name="i_have_a_promo_code">I have a promo code</string>
+    <string name="restore_my_purchases">Restore my purchases</string>
+    <string name="restore_completed">Restore completed</string>
+    <string name="free_subscription">Free subscription</string>
+    <string name="subscriber_code">Subscriber Code</string>
+    <string name="please_enter_your_code">Please enter your code</string>
+    <string name="invalid_code">Invalid Code</string>
+    <string name="share_on_facebook">Share on Facebook</string>
+    <string name="share_on_twitter">Share on Twitter</string>
+    <string name="share_by_mail">Share by Mail</string>
+    <string name="languages">Languages</string>  
+    <string name="ios_6_required">iOS 6 required</string>
+    <string name="month">month</string>
+    <string name="year">year</string>
+    <string name="week">week</string>
+    
 </resources>

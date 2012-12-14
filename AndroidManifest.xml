@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.niveales.wind"
-    android:versionCode="4"
-    android:versionName="1.0.4" >
+    android:versionCode="5"
+    android:versionName="1.0.5" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -52,6 +52,8 @@
         <activity android:name="com.librelio.wind.test.TestPDFPageActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity android:theme="@style/Theme.NoBackground.NoTitle" android:name="com.librelio.lib.ui.SlideShowActivity"></activity>
         <activity android:name="com.librelio.lib.ui.DownloadActivity"></activity>
+        <activity android:name="com.librelio.lib.ui.BillingActivity"
+            	  android:theme="@style/Theme.Billing"></activity>
     </application>
 
 </manifest>

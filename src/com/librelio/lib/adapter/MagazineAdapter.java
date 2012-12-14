@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
+import com.librelio.lib.ui.BillingActivity;
 import com.librelio.lib.ui.DownloadActivity;
 import com.niveales.wind.R;
 
@@ -25,12 +26,44 @@ public class MagazineAdapter extends BaseAdapter{
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
 	private ArrayList<MagazineModel> magazine;
+
 	
 	public MagazineAdapter(ArrayList<MagazineModel> magazine,Context context){
 		this.context = context;
 		this.magazine = magazine;
 	}
 	
+	/*private class MagazineObserver extends PurchaseObserver{
+
+		public MagazineObserver(Activity activity, Handler handler) {
+			super(activity, handler);
+		}
+
+		@Override
+		public void onBillingSupported(boolean supported, String type) {
+			Log.d(TAG,"onBillingSupported");
+		}
+
+		@Override
+		public void onPurchaseStateChange(PurchaseState purchaseState,
+				String itemId, int quantity, long purchaseTime,
+				String developerPayload) {
+			Log.d(TAG,"onPurchaseStateChange");
+		}
+
+		@Override
+		public void onRequestPurchaseResponse(RequestPurchase request,
+				ResponseCode responseCode) {
+			Log.d(TAG,"onRequestPurchaseResponse");
+		}
+
+		@Override
+		public void onRestoreTransactionsResponse(RestoreTransactions request,
+				ResponseCode responseCode) {
+			Log.d(TAG,"onRestoreTransactionsResponse");
+		}
+		
+	}*/
 	
 	@Override
 	public int getCount() {
@@ -57,6 +90,7 @@ public class MagazineAdapter extends BaseAdapter{
 		} else {
 			res = convertView;
 		}
+		//TODO: @Mike please can you add ViewHolder pattern
 		TextView title = (TextView)res.findViewById(R.id.item_title);
 		TextView subtitle = (TextView)res.findViewById(R.id.item_subtitle);
 		ImageView thumbnail = (ImageView)res.findViewById(R.id.item_thumbnail);
@@ -84,6 +118,7 @@ public class MagazineAdapter extends BaseAdapter{
 				public void onClick(View v) {
 					LibrelioApplication.startPDFActivity(context,
 							currentMagazine.getPdfPath());
+					//TODO: @Mike Please clean below code
 					/*Intent intent = new Intent(context,
 							DownloadActivity.class);
 					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
@@ -100,24 +135,34 @@ public class MagazineAdapter extends BaseAdapter{
 			downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(context,
-							DownloadActivity.class);
-					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
-					intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
-					intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
-					intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,false);
-					intent.putExtra(DownloadActivity.ORIENTATION_KEY,
-							context.getResources().getConfiguration().orientation);
-					context.startActivity(intent);
+					if(currentMagazine.isPaid()){
+						//Intent intent = new Intent("123");
+						//context.sendBroadcast(intent);
+						Intent intent = new Intent(context,BillingActivity.class);
+						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
+						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
+						context.startActivity(intent);
+					} else {
+						Intent intent = new Intent(context,
+								DownloadActivity.class);
+						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
+						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
+						intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,false);
+						intent.putExtra(DownloadActivity.ORIENTATION_KEY,
+								context.getResources().getConfiguration().orientation);
+						context.startActivity(intent);
+					}
 				}
 			});
 		}
 		//
+		sampleOrDeleteButton.setVisibility(View.VISIBLE);
 		if (!currentMagazine.isPaid() && !currentMagazine.isDownloaded()) {
 			sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 		} else if (currentMagazine.isDownloaded()) {
 				// delete case
-				sampleOrDeleteButton.setVisibility(View.VISIBLE);
 				sampleOrDeleteButton.setText(context.getResources().getString(
 						R.string.delete));
 				sampleOrDeleteButton.setOnClickListener(new OnClickListener() {

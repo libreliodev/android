@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -19,8 +18,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,13 +27,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artifex.mupdf.LinkInfo;
+import com.librelio.activity.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.service.DownloadMagazineListService;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
-public class DownloadActivity extends Activity {
+public class DownloadActivity extends BaseActivity {
 	private static final String TAG = "DownloadActivity";
 	private static final String STOP = "stop_modificator";
 	private static final int INTERRUPT = -1;
@@ -47,11 +45,14 @@ public class DownloadActivity extends Activity {
 	public static final String SUBTITLE_KEY = "subtitle_key";
 	public static final String ORIENTATION_KEY = "orientation";
 	public static final String IS_SAMPLE_KEY = "issample";
+	public static final String IS_TEMP_KEY = "istemp";
+	public static final String TEMP_URL_KEY = "tempurl";
 	
 	private String fileName;
 	private String fileUrl;
 	private String filePath;
 	private boolean isSample;
+	private boolean isTemp;
 	private ImageView preview;
 	private TextView text;
 	private ProgressBar progress;
@@ -84,19 +85,23 @@ public class DownloadActivity extends Activity {
 		progress = (ProgressBar)findViewById(R.id.download_progress);
 		progress.setProgress(0);
 		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
+		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
 		fileUrl = magazine.getPdfUrl();
 		filePath = magazine.getPdfPath();
 		if(isSample){
 			fileUrl = magazine.getSampleUrl();
 			filePath = magazine.getSamplePath();
+		} else if (isTemp){
+			fileUrl = getIntent().getExtras().getString(TEMP_URL_KEY);
 		}
+		
 		//
 		//
 		String imagePath = magazine.getPngPath();
 		preview.setImageBitmap(BitmapFactory.decodeFile(imagePath));
 		text.setText("Downloading");
 		//
-		if(!thereIsConnection()){
+		if(!LibrelioApplication.thereIsConnection(this)){
 			showDialog(CONNECTION_ALERT);
 		} else {
 		//
@@ -111,20 +116,7 @@ public class DownloadActivity extends Activity {
 			}
 		}
 	}
-	private boolean thereIsConnection(){
-		ConnectivityManager conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo i = conMgr.getActiveNetworkInfo();
-		  if (i == null){
-			  return false;
-		  }
-		  if (!i.isConnected()){
-		    return false;
-		  }
-		  if (!i.isAvailable()){
-		    return false;
-		  }
-		  return true;
-	}
+
 	
 	private InputStream input;
 	private OutputStream output;

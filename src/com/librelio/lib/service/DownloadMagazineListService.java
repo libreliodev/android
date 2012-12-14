@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -55,14 +56,12 @@ public class DownloadMagazineListService extends Service{
 				//
 				plistUrl = LibrelioApplication.BASE_URL+"Magazines.plist";
 				Log.d(TAG,"onCreate path:"+LibrelioApplication.APP_DIRECTORY);
-				File f = new File(LibrelioApplication.APP_DIRECTORY);
-				if(!f.exists()){
-					Log.d(TAG,"onCreate directory was create");
-					f.mkdirs();
-				}
+				
 				
 				// Plist downloading
-				downloadFromUrl(plistUrl,LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);
+				if(LibrelioApplication.thereIsConnection(getContext())){
+					downloadFromUrl(plistUrl,LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);					
+				}
 				//Convert plist to String for parsing
 				pList = getStringFromFile(LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);
 				//Parsing
@@ -84,7 +83,9 @@ public class DownloadMagazineListService extends Service{
 					//saving png
 					File png = new File(magazine.getPngPath());
 					if(!png.exists()){
-						downloadFromUrl(magazine.getPngUrl(),magazine.getPngPath());
+						if(LibrelioApplication.thereIsConnection(getContext())){
+							downloadFromUrl(magazine.getPngUrl(),magazine.getPngPath());
+						}
 						Log.d(TAG,"Image download: "+magazine.getPngPath());
 					} else {
 						Log.d(TAG,magazine.getPngPath()+" already exist");
@@ -205,5 +206,9 @@ public class DownloadMagazineListService extends Service{
 		db.execSQL("DELETE FROM "+Magazines.TABLE_NAME+" WHERE 1");
 		db.close();
 		Log.d(TAG, "at cleanMagazinesListInBase: "+Magazines.TABLE_NAME+" table was clean");
+	}
+	
+	private Context getContext(){
+		return this;
 	}
 }

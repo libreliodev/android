@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>FileName</key>
+		<string>wind_358/wind_358_.pdf</string>
+		<key>Subtitle</key>
+		<string>Juillet 2011</string>
+		<key>Title</key>
+		<string>Wind 358</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>wind_357/wind_357_.pdf</string>
+		<key>Subtitle</key>
+		<string>Juin 2011</string>
+		<key>Title</key>
+		<string>Wind 357</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>wind_356/wind_356_.pdf</string>
+		<key>Subtitle</key>
+		<string>Mai 2011</string>
+		<key>Title</key>
+		<string>Wind 356</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>wind_355/wind_355.pdf</string>
+		<key>Subtitle</key>
+		<string>Avril 2011</string>
+		<key>Title</key>
+		<string>Wind 355</string>
+	</dict>
+</array>
+</plist>
