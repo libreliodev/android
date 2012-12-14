@@ -26,26 +26,35 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender.SendIntentException;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,9 +65,10 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.artifex.mupdf.LinkInfo;
+import com.android.vending.billing.IInAppBillingService;
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.adapter.MagazineAdapter;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.service.DownloadMagazineListService;
@@ -71,7 +81,6 @@ import com.librelio.lib.utils.BillingService.RestoreTransactions;
 import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.Consts.PurchaseState;
 import com.librelio.lib.utils.Consts.ResponseCode;
-import com.librelio.lib.utils.PDFParser;
 import com.librelio.lib.utils.PurchaseObserver;
 import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.lib.utils.cloud.CloudHelper;
@@ -88,6 +97,7 @@ import com.niveales.wind.R;
 public class MainMagazineActivity extends Activity implements IssueListEventListener,
 		CloudEventListener {
 	private static final String TAG = "OceanActivity";
+	public static final String REQUEST_SUBS = "request_subs";
 	
 
 	/**
@@ -133,7 +143,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	 * A {@link PurchaseObserver} is used to get callbacks when Android Market
 	 * sends messages to this application so that we can update the UI.
 	 */
-	private class LibrelioPurchaseObserver extends PurchaseObserver {
+	public class LibrelioPurchaseObserver extends PurchaseObserver {
 		public LibrelioPurchaseObserver(Handler handler) {
 			super(MainMagazineActivity.this, handler);
 		}
@@ -324,19 +334,47 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	}
 	
 	private BroadcastReceiver br;
+	private BroadcastReceiver requestSubsAPIv2;
 	private Timer update;
 	private Intent intent;
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
+		   if (requestCode == 1001) {    	
+		      int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+		      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+		      String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+		        
+		      if (resultCode == RESULT_OK&purchaseData!=null) {
+		         try {
+		            JSONObject jo = new JSONObject(purchaseData);
+		            String sku = jo.getString("productId");
+		            Log.d(TAG,"You have bought the " + sku + ". Excellent choice,adventurer!");
+		          }
+		          catch (JSONException e) {
+		             Log.d(TAG,"Failed to parse purchase data.");
+		             e.printStackTrace();
+		          }
+		      }
+		   }
+		}
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"),
+		//		mServiceConn, Context.BIND_AUTO_CREATE);
+		
+		
+		
+		/*
 		tracker = GoogleAnalyticsTracker.getInstance();
 
 		tracker.startNewSession(getResources().getString(R.string.GoogleAnalyticsCode), 300, this);
 		tracker.trackPageView("/mainScreen/");
 		
-		//cloud = new CloudHelper(this, this);
-		
+		cloud = new CloudHelper(this, this);
+		*/
 		setContentView(R.layout.issue_list_layout);
 		
 		magazine = new ArrayList<MagazineModel>();
@@ -360,35 +398,39 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
 		registerReceiver(br, filter);
 		
+		requestSubsAPIv2 = new BroadcastReceiver() {			
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.d(TAG,"onReceive");
+				
+				if (!mBillingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
+	                // Note: mManagedType == Managed.SUBSCRIPTION
+	                //showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
+				}
+			}
+		};
+		IntentFilter subsFilter = new IntentFilter(REQUEST_SUBS);
+		registerReceiver(requestSubsAPIv2, subsFilter);
+		
 		startRegularUpdate();
 		//
 		
-		/*PDFParser linkGetter = new PDFParser("mnt/sdcard/librelio/wind_355.pdf");
-		SparseArray<LinkInfo[]> links = linkGetter.getLinkInfo();
-		for(int i=0;i<links.size();i++){
-			Log.d(TAG,"--- i = "+i);
-			if(links.get(i)!=null){
-				for(int j=0;j<links.get(i).length;j++){
-					Log.d(TAG,"link[" + j + "] = "+links.get(i)[j].uri );
-				}
-			}
-		}
+	
 		mHandler = new Handler();
 		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
 		mBillingService = new BillingService();
 		mBillingService.setContext(this);
-
 		
-		CATALOG = initCatalog(this);
+		/*CATALOG = initCatalog(this);
 		mDownloadManager = (DownloadManager) this
 				.getSystemService(Activity.DOWNLOAD_SERVICE);
 
 		mPurchaseDatabase = new PurchaseDatabase(this);
-		setupWidgets();
+		setupWidgets();*/
 
 		// Check if billing is supported.
 		ResponseHandler.register(mLibrelioPurchaseObserver);
-		if (!mBillingService.checkBillingSupported()) {
+		/*if (!mBillingService.checkBillingSupported()) {
 			showDialog(DIALOG_CANNOT_CONNECT_ID);
 		}
 
@@ -420,7 +462,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	@Override
 	protected void onStart() {
 		super.onStart();
-		//ResponseHandler.register(mLibrelioPurchaseObserver);
+		ResponseHandler.register(mLibrelioPurchaseObserver);
 		//initializeOwnedItems();
 	}
 
@@ -430,7 +472,7 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 	@Override
 	protected void onStop() {
 		super.onStop();
-		//ResponseHandler.unregister(mLibrelioPurchaseObserver);
+		ResponseHandler.unregister(mLibrelioPurchaseObserver);
 	}
 
 	@Override
@@ -444,8 +486,12 @@ public class MainMagazineActivity extends Activity implements IssueListEventList
 				.remove(mDownloadRequestsIterator.next()))
 			;
 		cloud.recycle();*/
+		/*if (mServiceConn != null) {
+		      unbindService(mServiceConn);
+		   }*/
 		stopRegularUpdate();
 		unregisterReceiver(br);
+		unregisterReceiver(requestSubsAPIv2);
 		super.onDestroy();
 	}
 

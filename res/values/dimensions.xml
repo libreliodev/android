@@ -4,5 +4,6 @@
     <dimen name="preview_image_height">240dp</dimen>
     <dimen name="preview_button_text_size">20sp</dimen>
     <dimen name="preview_button_height">30sp</dimen>
-
+	<dimen name="billing_window_width">250dp</dimen>
+	
 </resources>

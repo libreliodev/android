@@ -47,11 +47,14 @@ public class DownloadActivity extends Activity {
 	public static final String SUBTITLE_KEY = "subtitle_key";
 	public static final String ORIENTATION_KEY = "orientation";
 	public static final String IS_SAMPLE_KEY = "issample";
+	public static final String IS_TEMP_KEY = "istemp";
+	public static final String TEMP_URL_KEY = "tempurl";
 	
 	private String fileName;
 	private String fileUrl;
 	private String filePath;
 	private boolean isSample;
+	private boolean isTemp;
 	private ImageView preview;
 	private TextView text;
 	private ProgressBar progress;
@@ -84,19 +87,23 @@ public class DownloadActivity extends Activity {
 		progress = (ProgressBar)findViewById(R.id.download_progress);
 		progress.setProgress(0);
 		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
+		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
 		fileUrl = magazine.getPdfUrl();
 		filePath = magazine.getPdfPath();
 		if(isSample){
 			fileUrl = magazine.getSampleUrl();
 			filePath = magazine.getSamplePath();
+		} else if (isTemp){
+			fileUrl = getIntent().getExtras().getString(TEMP_URL_KEY);
 		}
+		
 		//
 		//
 		String imagePath = magazine.getPngPath();
 		preview.setImageBitmap(BitmapFactory.decodeFile(imagePath));
 		text.setText("Downloading");
 		//
-		if(!thereIsConnection()){
+		if(!LibrelioApplication.thereIsConnection(this)){
 			showDialog(CONNECTION_ALERT);
 		} else {
 		//
@@ -111,20 +118,7 @@ public class DownloadActivity extends Activity {
 			}
 		}
 	}
-	private boolean thereIsConnection(){
-		ConnectivityManager conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo i = conMgr.getActiveNetworkInfo();
-		  if (i == null){
-			  return false;
-		  }
-		  if (!i.isConnected()){
-		    return false;
-		  }
-		  if (!i.isAvailable()){
-		    return false;
-		  }
-		  return true;
-	}
+
 	
 	private InputStream input;
 	private OutputStream output;

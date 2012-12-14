@@ -52,6 +52,8 @@
         <activity android:name="com.librelio.wind.test.TestPDFPageActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity android:theme="@style/Theme.NoBackground.NoTitle" android:name="com.librelio.lib.ui.SlideShowActivity"></activity>
         <activity android:name="com.librelio.lib.ui.DownloadActivity"></activity>
+        <activity android:name="com.librelio.lib.ui.BillingActivity"
+            	  android:theme="@style/Theme.Billing"></activity>
     </application>
 
 </manifest>

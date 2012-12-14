@@ -1,11 +1,15 @@
 package com.librelio.lib.adapter;
 
 import java.io.File;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,19 +22,59 @@ import android.widget.TextView;
 
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
+import com.librelio.lib.ui.BillingActivity;
 import com.librelio.lib.ui.DownloadActivity;
+import com.librelio.lib.ui.MainMagazineActivity;
+import com.librelio.lib.utils.BillingService;
+import com.librelio.lib.utils.BillingService.RequestPurchase;
+import com.librelio.lib.utils.BillingService.RestoreTransactions;
+import com.librelio.lib.utils.Consts.PurchaseState;
+import com.librelio.lib.utils.Consts.ResponseCode;
+import com.librelio.lib.utils.PurchaseObserver;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
 	private ArrayList<MagazineModel> magazine;
+
 	
 	public MagazineAdapter(ArrayList<MagazineModel> magazine,Context context){
 		this.context = context;
 		this.magazine = magazine;
 	}
 	
+	/*private class MagazineObserver extends PurchaseObserver{
+
+		public MagazineObserver(Activity activity, Handler handler) {
+			super(activity, handler);
+		}
+
+		@Override
+		public void onBillingSupported(boolean supported, String type) {
+			Log.d(TAG,"onBillingSupported");
+		}
+
+		@Override
+		public void onPurchaseStateChange(PurchaseState purchaseState,
+				String itemId, int quantity, long purchaseTime,
+				String developerPayload) {
+			Log.d(TAG,"onPurchaseStateChange");
+		}
+
+		@Override
+		public void onRequestPurchaseResponse(RequestPurchase request,
+				ResponseCode responseCode) {
+			Log.d(TAG,"onRequestPurchaseResponse");
+		}
+
+		@Override
+		public void onRestoreTransactionsResponse(RestoreTransactions request,
+				ResponseCode responseCode) {
+			Log.d(TAG,"onRestoreTransactionsResponse");
+		}
+		
+	}*/
 	
 	@Override
 	public int getCount() {
@@ -100,15 +144,25 @@ public class MagazineAdapter extends BaseAdapter{
 			downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(context,
-							DownloadActivity.class);
-					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
-					intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
-					intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
-					intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,false);
-					intent.putExtra(DownloadActivity.ORIENTATION_KEY,
-							context.getResources().getConfiguration().orientation);
-					context.startActivity(intent);
+					if(currentMagazine.isPaid()){
+						//Intent intent = new Intent("123");
+						//context.sendBroadcast(intent);
+						Intent intent = new Intent(context,BillingActivity.class);
+						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
+						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
+						context.startActivity(intent);
+					} else {
+						Intent intent = new Intent(context,
+								DownloadActivity.class);
+						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
+						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
+						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
+						intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,false);
+						intent.putExtra(DownloadActivity.ORIENTATION_KEY,
+								context.getResources().getConfiguration().orientation);
+						context.startActivity(intent);
+					}
 				}
 			});
 		}

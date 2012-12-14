@@ -3,7 +3,10 @@ package com.librelio.lib;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 import com.artifex.mupdf.MuPDFActivity;
@@ -13,6 +16,7 @@ public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
 	public static String BASE_URL;
 	public static String APP_DIRECTORY = "/data/data/com.niveales.wind/librelio/";
+	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	
 	@Override
 	public void onCreate() {
@@ -23,7 +27,7 @@ public class LibrelioApplication extends Application {
 		super.onCreate();
 	}
 	
-	public static void startPDFActivity(Context context, String filePath){
+	public static void startPDFActivity(Context context,String filePath){
 		try{
 			Uri uri = Uri.parse(filePath);
 			Intent intent = new Intent(context,MuPDFActivity.class);
@@ -35,4 +39,20 @@ public class LibrelioApplication extends Application {
 		}
 
 	}
+	
+	public static boolean thereIsConnection(Context context){
+		ConnectivityManager conMgr =  (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo i = conMgr.getActiveNetworkInfo();
+		  if (i == null){
+			  return false;
+		  }
+		  if (!i.isConnected()){
+		    return false;
+		  }
+		  if (!i.isAvailable()){
+		    return false;
+		  }
+		  return true;
+	}
+	
 }
