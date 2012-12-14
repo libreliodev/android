@@ -42,8 +42,6 @@ public class DownloadMagazineListService extends Service{
 	
 	
 	private String plistUrl;
-	private String clientName;
-	private String magazineName;
 	private String pList;
 	
 	@Override
@@ -56,17 +54,17 @@ public class DownloadMagazineListService extends Service{
 				cleanMagazinesListInBase();
 				//
 				plistUrl = LibrelioApplication.BASE_URL+"Magazines.plist";
-				Log.d(TAG,"onCreate path:"+LibrelioApplication.appDirectory);
-				File f = new File(LibrelioApplication.appDirectory);
+				Log.d(TAG,"onCreate path:"+LibrelioApplication.APP_DIRECTORY);
+				File f = new File(LibrelioApplication.APP_DIRECTORY);
 				if(!f.exists()){
 					Log.d(TAG,"onCreate directory was create");
 					f.mkdirs();
 				}
 				
 				// Plist downloading
-				downloadFromUrl(plistUrl,LibrelioApplication.appDirectory+PLIST_FILE_NAME);
+				downloadFromUrl(plistUrl,LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);
 				//Convert plist to String for parsing
-				pList = getStringFromFile(LibrelioApplication.appDirectory+PLIST_FILE_NAME);
+				pList = getStringFromFile(LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);
 				//Parsing
 				PListXMLHandler handler = new PListXMLHandler();
 				PListXMLParser parser = new PListXMLParser();
@@ -84,7 +82,13 @@ public class DownloadMagazineListService extends Service{
 					MagazineModel magazine = new MagazineModel(fileName, title,
 							subtitle, downloadDate, getApplicationContext());
 					//saving png
-					downloadFromUrl(magazine.getPngUrl(),magazine.getPngPath());
+					File png = new File(magazine.getPngPath());
+					if(!png.exists()){
+						downloadFromUrl(magazine.getPngUrl(),magazine.getPngPath());
+						Log.d(TAG,"Image download: "+magazine.getPngPath());
+					} else {
+						Log.d(TAG,magazine.getPngPath()+" already exist");
+					}
 					magazine.saveInBase();
 				}
 				Log.d(TAG,"Downloading is finished");
@@ -110,19 +114,19 @@ public class DownloadMagazineListService extends Service{
 	public static void downloadFromUrl(String sUrl, String filePath){
 		int count;
 		try{
-		URL url = new URL(sUrl);
-		URLConnection conexion = url.openConnection();
-		conexion.connect();
-
-		int lenghtOfFile = conexion.getContentLength();
-		Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
-
-		InputStream input = new BufferedInputStream(url.openStream());
-		OutputStream output = new FileOutputStream(filePath);
-
-		byte data[] = new byte[1024];
-
-		long total = 0;
+			URL url = new URL(sUrl);
+			URLConnection conexion = url.openConnection();
+			conexion.connect();
+	
+			int lenghtOfFile = conexion.getContentLength();
+			Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
+	
+			InputStream input = new BufferedInputStream(url.openStream());
+			OutputStream output = new FileOutputStream(filePath);
+	
+			byte data[] = new byte[1024];
+	
+			long total = 0;
 
 			while ((count = input.read(data)) != -1) {
 				total += count;

@@ -1,8 +1,7 @@
 package com.librelio.lib.model;
 
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
+import java.io.IOException;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,6 +17,8 @@ import com.librelio.lib.ui.MainMagazineActivity;
 
 public class MagazineModel {
 	private static final String TAG = "MagazineModel";
+	private static final String COMPLETE_FILE = ".complete";
+	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
 	
 	private Context context;
 	private String title;
@@ -61,11 +62,10 @@ public class MagazineModel {
 		valuesInit(fileName);
 	}
 	
-	public static String getAssetsDir(String fileName){
-		int startNameIndex = fileName.indexOf("/")+1;
-		int finishNameIndex = fileName.indexOf(".");
-		return LibrelioApplication.appDirectory
-					+fileName.substring(startNameIndex,finishNameIndex)+"/";
+	public static String getMagazineDir(String fileName){
+		int finishNameIndex = fileName.indexOf("/");
+		return LibrelioApplication.APP_DIRECTORY
+					+fileName.substring(0,finishNameIndex)+"/";
 	}
 	
 	public static String getAssetsBaseURL(String fileName){
@@ -73,35 +73,32 @@ public class MagazineModel {
 		return LibrelioApplication.BASE_URL+fileName.substring(0,finishNameIndex)+"/";
 	}
 
-	public static void makeAssetsDir(String fileName){
-		File assets = new File(getAssetsDir(fileName));
+	public static void makeMagazineDir(String fileName){
+		File assets = new File(getMagazineDir(fileName));
 		if(!assets.exists()){
 			assets.mkdirs();
 		}
 	}
 	
-	public void delete(){
-		Log.d(TAG,"Deleting magazine has been initiated");
-		ArrayList<File> files = new ArrayList<File>();
-		files.add( new File(pdfPath));
-		files.add( new File(getAssetsDir(fileName)));
-		if(samplePath!=null){
-			files.add( new File(samplePath));
-		}
-		for (File file : files) {
-			if (file.exists()) {
-				if (file.isDirectory()) {
-					for (File c : file.listFiles()) c.delete();
-				} else {
-					file.delete();
-				}
+	public static void clearMagazineDir(String fileName){
+		File dir = new File(getMagazineDir(fileName));
+		if (dir.exists()) {
+			if (dir.isDirectory()) {
+				for (File c : dir.listFiles()) c.delete();
+			} else {
+				dir.delete();
 			}
 		}
-
+	}
+	
+	public void delete(){
+		Log.d(TAG,"Deleting magazine has been initiated");
+		clearMagazineDir(fileName);
+		new File(getMagazineDir(fileName)).delete();
+		
 		Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 		context.sendBroadcast(intentInvalidate);
 	}
-	
 	
 	public synchronized void saveInBase() {
 		SQLiteDatabase db;
@@ -119,25 +116,40 @@ public class MagazineModel {
 	private void valuesInit(String fileName) {
 		isPaid = fileName.contains("_.");
 		int startNameIndex = fileName.indexOf("/")+1;
+		String png = LibrelioApplication.APP_DIRECTORY+fileName.substring(startNameIndex, fileName.length()); 
 		pdfUrl = LibrelioApplication.BASE_URL + fileName;
-		pdfPath = LibrelioApplication.appDirectory+fileName.substring(startNameIndex, fileName.length());
+		pdfPath = getMagazineDir(fileName)+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
 			pngUrl = pdfUrl.replace("_.pdf", ".png");
-			pngPath = pdfPath.replace("_.pdf", ".png");
+			pngPath = png.replace("_.pdf", ".png");
 			sampleUrl = pdfUrl.replace("_.", ".");
 			samplePath = pdfPath.replace("_.", ".");
-			File sample = new File(getSamplePath());
+			File sample = new File(getMagazineDir(fileName)+COMPLETE_SAMPLE_FILE);
 			isSampleDowloaded = sample.exists();
 		} else {
 			pngUrl = pdfUrl.replace(".pdf", ".png");
-			pngPath = pdfPath.replace(".pdf", ".png");
+			pngPath = png.replace(".pdf", ".png");
 		}
-		File pdf = new File(getPdfPath());
-		isDowloaded = pdf.exists();
+		File complete = new File(getMagazineDir(fileName)+COMPLETE_FILE);
+		isDowloaded = complete.exists();
 		
-		assetsDir = getAssetsDir(fileName);
+		assetsDir = getMagazineDir(fileName);
 	}
 
+	public void makeCompleteFile(boolean isSample){
+		String completeModificator = COMPLETE_FILE;
+		if(isSample){
+			completeModificator = COMPLETE_SAMPLE_FILE;
+		}
+		File file = new File(getMagazineDir(fileName)+completeModificator);
+		boolean create = false;
+		try {
+			create = file.createNewFile();
+		} catch (IOException e) {
+			Log.d(TAG,"Problem with create .complete, createNewFile() return "+create,e);
+		}
+	}
+	
 	public String getAssetsDir(){
 		return this.assetsDir;
 	}

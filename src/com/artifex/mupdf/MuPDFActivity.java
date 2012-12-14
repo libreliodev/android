@@ -836,7 +836,7 @@ public class MuPDFActivity extends Activity
 			}
 			if(path.endsWith("mp4") && isFullScreen) {
 				// start a video player
-				Uri videoUri = Uri.parse("file://" + LibrelioApplication.appDirectory + "/wind_355" + path);
+				Uri videoUri = Uri.parse("file://" + LibrelioApplication.APP_DIRECTORY + "/wind_355" + path);
 				Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
 				startActivity(intent);
 			}

@@ -41,7 +41,7 @@ public class MediaHolder extends FrameLayout {
 	/**
 	 * @param pContext
 	 */
-	public MediaHolder(Context pContext, LinkInfo link) {
+	public MediaHolder(Context pContext, LinkInfo link, String basePath) {
 		super(pContext);
 		mLinkInfo = link;
 		uriString = link.uri;
@@ -76,7 +76,7 @@ public class MediaHolder extends FrameLayout {
 				mGallery = new SimpleGallery(getContext());
 
 				mGallery.setAdapter(new SlideshowAdapter(getContext(),
-						LibrelioApplication.appDirectory + "/wind_355/"
+						basePath
 								+ Uri.parse(uriString).getPath()));
 				mGallery.setLayoutParams(lp);
 				mGallery.setBackgroundColor(bgColor);

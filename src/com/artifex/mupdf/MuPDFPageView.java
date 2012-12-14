@@ -69,7 +69,8 @@ public class MuPDFPageView extends PageView {
 			final Uri uri = Uri.parse(uriString);
 			boolean fullScreen = uri.getQueryParameter("warect") != null && uri.getQueryParameter("warect").equals("full");
 			if(!fullScreen) {
-				MediaHolder h = new MediaHolder(getContext(), mLink);
+				String basePath = mCore.getFileDirectory();
+				MediaHolder h = new MediaHolder(getContext(), mLink, basePath);
 				h.setOnClickListener(new OnClickListener() {
 
 					@Override

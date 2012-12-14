@@ -30,11 +30,11 @@ public class SlideShowActivity extends Activity {
 		mSlideshowGallery = (SimpleGallery) findViewById(R.id.SlideshowGallery);
 
 		String path = getIntent().getExtras().getString("path");
-		SlideshowAdapter adapter = new SlideshowAdapter(this,
-				((LibrelioApplication) getApplication()).appDirectory
-						+ "/wind_355/" + path);
-		// SlideshowAdapter adapter = new SlideshowAdapter(this,
-		// ((LibrelioApplication)getApplication()).appDirectory+"/wind_355/PWAVIETNAM_4.jpg");
+
+		SlideshowAdapter adapter = new SlideshowAdapter(this, 
+				((LibrelioApplication)getApplication()).APP_DIRECTORY+"/wind_355/"+path);
+//		SlideshowAdapter adapter = new SlideshowAdapter(this, 
+//				((LibrelioApplication)getApplication()).appDirectory+"/wind_355/PWAVIETNAM_4.jpg");
 
 		mSlideshowGallery.setAdapter(adapter);
 		mSlideshowGallery.setOnItemClickListener(new OnItemClickListener() {

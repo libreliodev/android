@@ -53,17 +53,18 @@ public class VideoPlayerActivity extends Activity {
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		setContentView(R.layout.video_player_layout);
-		mVideoView = (VideoView) findViewById(R.id.surface_view);
+        //FIXME: @dvaletin Please can you add necessary resources for this activity?
+		//setContentView(R.layout.video_player_layout);
+		//mVideoView = (VideoView) findViewById(R.id.surface_view);
 		
 		if(getIntent().hasExtra("path")) {
-			videoPath = LibrelioApplication.appDirectory + "/wind_355/" + getIntent().getExtras().getString("path");
+			videoPath = LibrelioApplication.APP_DIRECTORY + "/wind_355/" + getIntent().getExtras().getString("path");
 		}
 		
-		mPlay = (ImageButton) findViewById(R.id.play);
-		mPause = (ImageButton) findViewById(R.id.pause);
-		mReset = (ImageButton) findViewById(R.id.reset);
-		mStop = (ImageButton) findViewById(R.id.stop);
+		//mPlay = (ImageButton) findViewById(R.id.play);
+		//mPause = (ImageButton) findViewById(R.id.pause);
+		//mReset = (ImageButton) findViewById(R.id.reset);
+		//mStop = (ImageButton) findViewById(R.id.stop);
 
 		mPlay.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {

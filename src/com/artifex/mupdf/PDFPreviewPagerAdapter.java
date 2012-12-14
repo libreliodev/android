@@ -49,8 +49,8 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	public PDFPreviewPagerAdapter(Context context, MuPDFCore core) {
 		mContext = context;
 		mCore = core;
-		mPath = core.getFileDirectory();
-		File mCacheDirectory = (new File(mPath)).getParentFile();
+		mPath = core.getFileDirectory() + "/previewcache/";
+		File mCacheDirectory = new File(mPath);
 		if (!mCacheDirectory.exists())
 			mCacheDirectory.mkdirs();
 	}
@@ -148,7 +148,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	}
 
 	private Bitmap getCachedBitmap(int position) {
-		String mCachedBitmapFilePath = mPath + "/previewcache/" + position
+		String mCachedBitmapFilePath = mPath  + position
 				+ ".jpg";
 		File mCachedBitmapFile = new File(mCachedBitmapFilePath);
 		Bitmap lq = null;
