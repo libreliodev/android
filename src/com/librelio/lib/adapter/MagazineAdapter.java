@@ -167,11 +167,11 @@ public class MagazineAdapter extends BaseAdapter{
 			});
 		}
 		//
+		sampleOrDeleteButton.setVisibility(View.VISIBLE);
 		if (!currentMagazine.isPaid() && !currentMagazine.isDownloaded()) {
 			sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 		} else if (currentMagazine.isDownloaded()) {
 				// delete case
-				sampleOrDeleteButton.setVisibility(View.VISIBLE);
 				sampleOrDeleteButton.setText(context.getResources().getString(
 						R.string.delete));
 				sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
