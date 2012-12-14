@@ -113,16 +113,19 @@ public class MagazineAdapter extends BaseAdapter{
 			});
 		}
 		//
-		if ((!currentMagazine.isPaid()) || currentMagazine.isDownloaded()) {
-			// delete case
-			sampleOrDeleteButton.setText(context.getResources().getString(
-					R.string.delete));
-			sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					currentMagazine.delete();
-				}
-			});
+		if (!currentMagazine.isPaid() && !currentMagazine.isDownloaded()) {
+			sampleOrDeleteButton.setVisibility(View.INVISIBLE);
+		} else if (currentMagazine.isDownloaded()) {
+				// delete case
+				sampleOrDeleteButton.setVisibility(View.VISIBLE);
+				sampleOrDeleteButton.setText(context.getResources().getString(
+						R.string.delete));
+				sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						currentMagazine.delete();
+					}
+				});
 		} else {
 			// Sample case
 			sampleOrDeleteButton.setText(context.getResources().getString(

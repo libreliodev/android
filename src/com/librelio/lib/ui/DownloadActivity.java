@@ -58,6 +58,7 @@ public class DownloadActivity extends Activity {
 	private DownloadTask download;
 	private DownloadLinksTask downloadLinks;
 	private MagazineModel magazine;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		switch (getIntent().getExtras().getInt(ORIENTATION_KEY)) {
