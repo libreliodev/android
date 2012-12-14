@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -25,21 +26,22 @@ import android.widget.FrameLayout.LayoutParams;
  * @author Dmitry Valetin
  *
  */
-public class LinkHolder extends FrameLayout {
+public class MediaHolder extends FrameLayout {
 
 	private LinkInfo mLinkInfo;
-	private Gallery mGallery = null;
+	private SimpleGallery mGallery = null;
 	private WebView mWebVew = null;
 	private float scale = 1.0f;
 	private int mAutoplayDelay;
 	private Handler mAutoplayHandler;
 	private WebView mWebView;
 	private String uriString;
+	private OnClickListener listener = null;
 	
 	/**
 	 * @param pContext
 	 */
-	public LinkHolder(Context pContext, LinkInfo link) {
+	public MediaHolder(Context pContext, LinkInfo link) {
 		super(pContext);
 		mLinkInfo = link;
 		uriString = link.uri;
@@ -71,7 +73,7 @@ public class LinkHolder extends FrameLayout {
 				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				lp.gravity = Gravity.CENTER;
-				mGallery = new Gallery(getContext());
+				mGallery = new SimpleGallery(getContext());
 
 				mGallery.setAdapter(new SlideshowAdapter(getContext(),
 						LibrelioApplication.appDirectory + "/wind_355/"
@@ -81,14 +83,18 @@ public class LinkHolder extends FrameLayout {
 
 				mGallery.setOnItemClickListener(new OnItemClickListener() {
 
+					public void onClick(View pV) {
+						if(listener != null) {
+							listener.onClick(MediaHolder.this);
+						}
+					}
+
 					@Override
 					public void onItemClick(AdapterView<?> pParent, View pView,
 							int pPosition, long pId) {
-						setVisibility(View.GONE);
-						Intent intent = new Intent(getContext(), SlideShowActivity.class);
-						intent.putExtra("path", path);
-						intent.putExtra("uri", mLinkInfo.uri);
-						getContext().startActivity(intent);
+						if(listener != null) {
+							listener.onClick(MediaHolder.this);
+						}
 					}
 				});
 				if(Uri.parse(uriString).getQueryParameter("watransition") != null && Uri.parse(uriString).getQueryParameter("watransition").equals("none")) {
@@ -148,4 +154,21 @@ public class LinkHolder extends FrameLayout {
 	public LinkInfo getLinkInfo() {
 		return mLinkInfo;
 	}
+
+	public void setOnClickListener(OnClickListener l) {
+		listener = l;
+	}
+
+
+	/**
+	 * 
+	 */
+	public void clearResources() {
+		// TODO Auto-generated method stub
+		if(mGallery != null) {
+//			mGallery.setAdapter(null);
+			mGallery = null;
+		}
+	}
+
 }

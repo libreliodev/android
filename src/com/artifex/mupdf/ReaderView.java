@@ -481,7 +481,7 @@ public class ReaderView extends AdapterView<Adapter>
 		measureView(v);
 	}
 
-	private void measureView(View v) {
+	protected void measureView(View v) {
 		// See what size the view wants to be
 		v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 		// Work out a scale that will fit it to this view

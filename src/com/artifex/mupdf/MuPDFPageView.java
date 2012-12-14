@@ -16,6 +16,7 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
@@ -38,6 +39,7 @@ public class MuPDFPageView extends PageView {
 		float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
+		
 
 		return mCore.hitLinkPage(mPageNumber, docRelX, docRelY);
 	}
@@ -49,9 +51,40 @@ public class MuPDFPageView extends PageView {
 
 		final String uriString = mCore
 				.hitLinkUri(mPageNumber, docRelX, docRelY);
-		LinkHolder holder = (LinkHolder) mediaHolders.get(uriString);
-		if(holder != null) {
-			holder.setVisibility(View.VISIBLE);
+
+		if(uriString == null)
+			return null;
+		
+		LinkInfo[] links = mCore.getPageLinks(getPage());
+		if (links == null)
+			return null;
+		LinkInfo mLink = null;
+		for (int i = 0; i < links.length; i++) {
+			if(links[i].uri != null && links[i].uri.equals(uriString)) {
+				mLink = links[i];
+				break;
+			}
+		}
+		if (uriString.startsWith("http")) {
+			final Uri uri = Uri.parse(uriString);
+			boolean fullScreen = uri.getQueryParameter("warect") != null && uri.getQueryParameter("warect").equals("full");
+			if(!fullScreen) {
+				MediaHolder h = new MediaHolder(getContext(), mLink);
+				h.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View pV) {
+						MediaHolder mh = (MediaHolder) pV;
+						removeView(mh);
+						mh.clearResources();
+						Intent intent = new Intent(getContext(), SlideShowActivity.class);
+						intent.putExtra("path", uri.getPath());
+						getContext().startActivity(intent);
+					}});
+				this.mediaHolders.put(uriString, h);
+				addView(h);
+				h.setVisibility(View.VISIBLE);
+			}
 		}
 		return uriString;
 	}
@@ -59,27 +92,14 @@ public class MuPDFPageView extends PageView {
 	@Override
 	public void setPage(int page, PointF size) {
 		super.setPage(page, size);
-		LinkInfo[] links = mCore.getPageLinks(page);
-		if (links == null)
-			return;
-		for (int i = 0; i < links.length; i++) {
-			if (links[i].uri != null && links[i].uri.startsWith("http")) {
-				Uri uri = Uri.parse(links[i].uri);
-				boolean fullScreen = uri.getQueryParameter("warect") != null && uri.getQueryParameter("warect").equals("full");
-				if(!fullScreen) {
-					LinkHolder h = new LinkHolder(getContext(), links[i]);
-					this.mediaHolders.put(links[i].uri, h);
-					addView(h);
-				}
-			}
-		}
+		
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
-			LinkHolder mLinkHolder = (LinkHolder) entry.getValue();
+			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 			LinkInfo currentLink = mLinkHolder.getLinkInfo();
 			float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 
@@ -100,7 +120,7 @@ public class MuPDFPageView extends PageView {
 		float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
-			LinkHolder mLinkHolder = (LinkHolder) entry.getValue();
+			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 			LinkInfo currentLink = mLinkHolder.getLinkInfo();
 			mLinkHolder.layout((int) (currentLink.left * scale),
 					(int) (currentLink.top * scale),
@@ -115,7 +135,20 @@ public class MuPDFPageView extends PageView {
 		Iterator<Entry<String, FrameLayout>> i = mediaHolders.entrySet().iterator();
 		while(i.hasNext()) {
 			Entry<String, FrameLayout> entry = i.next();
-			LinkHolder mLinkHolder = (LinkHolder) entry.getValue();
+			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
+			i.remove();
+			removeView(mLinkHolder);
+			mLinkHolder = null;
+		}
+	}
+	
+	@Override
+	public void removeHq() {
+		super.removeHq();
+		Iterator<Entry<String, FrameLayout>> i = mediaHolders.entrySet().iterator();
+		while(i.hasNext()) {
+			Entry<String, FrameLayout> entry = i.next();
+			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 			i.remove();
 			removeView(mLinkHolder);
 			mLinkHolder = null;
@@ -126,7 +159,7 @@ public class MuPDFPageView extends PageView {
 	public void addHq() {
 		super.addHq();
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
-			LinkHolder mLinkHolder = (LinkHolder) entry.getValue();
+			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 			
 			mLinkHolder.bringToFront();
 		}
