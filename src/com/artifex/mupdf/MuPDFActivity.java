@@ -40,7 +40,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -117,7 +116,7 @@ public class MuPDFActivity extends Activity
 	private LinkState    mLinkState = LinkState.DEFAULT;
 	private final Handler mHandler = new Handler();
 	private FrameLayout mPreviewBarHolder;
-	private Gallery mPreview;
+	private HorizontalListView mPreview;
 	private MuPDFPageAdapter mDocViewAdapter;
 
 	private MuPDFCore openFile(String path)
@@ -650,7 +649,7 @@ public class MuPDFActivity extends Activity
 		mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);
 //		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
 		mPreviewBarHolder = (FrameLayout) mButtonsView.findViewById(R.id.PreviewBarHolder);
-		mPreview = new Gallery(this);
+		mPreview = new HorizontalListView(this);
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -1);
 		mPreview.setLayoutParams(lp);
 		mPreview.setAdapter(new PDFPreviewPagerAdapter(this, core));
