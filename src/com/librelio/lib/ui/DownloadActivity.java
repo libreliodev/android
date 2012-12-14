@@ -39,6 +39,8 @@ import com.niveales.wind.R;
 public class DownloadActivity extends Activity {
 	private static final String TAG = "DownloadActivity";
 	private static final String STOP = "stop_modificator";
+	private static final int INTERRUPT = -1;
+	private static final int FINISH = 0;
 	
 	public static final String FILE_NAME_KEY = "file_name_key";
 	public static final String TITLE_KEY = "title_key";
@@ -188,8 +190,8 @@ public class DownloadActivity extends Activity {
 			super.onPostExecute(result);
 		}
 	}
-	
-	class DownloadLinksTask extends AsyncTask<String, String, String>{
+
+	class DownloadLinksTask extends AsyncTask<String, String, Integer>{
 		private ArrayList<String> links;
 		private ArrayList<String> assetsNames;
 		@Override
@@ -235,21 +237,21 @@ public class DownloadActivity extends Activity {
 		}
 		private int count = 0;
 		@Override
-		protected String doInBackground(String... params) {
+		protected Integer doInBackground(String... params) {
 			count = 0;
 			for(int i=0;i<links.size();i++){
 				if(isCancelled()){
 					Log.d(TAG, "DownloadLinkTask was stop");
-					return STOP;
+					return INTERRUPT;
 				}
 				String assetUrl = links.get(i);
 				String assetPath = MagazineModel.getMagazineDir(fileName)+assetsNames.get(i);
 				DownloadMagazineListService.downloadFromUrl(assetUrl, assetPath);
 				publishProgress("");
 			}
-			return null;
+			return FINISH;
 		}
-		
+
 		@Override
 		protected void onProgressUpdate(String... values) {
 			count++;
@@ -257,9 +259,10 @@ public class DownloadActivity extends Activity {
 			progress.setProgress(count);
 			super.onProgressUpdate(values);
 		}
+
 		@Override
-		protected void onPostExecute(String result) {
-			if(result.equals(STOP)){
+		protected void onPostExecute(Integer result) {
+			if(result == INTERRUPT){
 				return;
 			}
 			//
@@ -272,7 +275,7 @@ public class DownloadActivity extends Activity {
 			super.onPostExecute(result);
 		}
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		Log.d(TAG, "onBack");
