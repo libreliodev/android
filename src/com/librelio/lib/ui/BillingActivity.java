@@ -2,26 +2,18 @@ package com.librelio.lib.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -41,15 +33,15 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.android.vending.billing.IInAppBillingService;
+import com.librelio.activity.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.niveales.wind.R;
 
-public class BillingActivity extends Activity{
+public class BillingActivity extends BaseActivity {
 	private static final String TAG = "BillingActivity";
 	private static final int CALLBACK_CODE = 101;
 	
 	private static final String serverURL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
-	//private static final String serverURL = "http://10.168.1.125/samples/verify.php";
 	private String fileName;
 	private String title;
 	private String subtitle;
@@ -69,7 +61,7 @@ public class BillingActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wait_bar);
-		if(!LibrelioApplication.thereIsConnection(this)){
+		if(!isNetworkConnected()){
 			showDialog(CONNECTION_ALERT);
 		} else {
 			bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"),
@@ -258,7 +250,9 @@ public class BillingActivity extends Activity{
 	
 	@Override
 	protected void onDestroy() {
-		unbindService(mServiceConn);
+		if (isNetworkConnected()) {
+			unbindService(mServiceConn);
+		}
 		super.onDestroy();
 	}
 	
@@ -272,6 +266,11 @@ public class BillingActivity extends Activity{
 			}
 		};
 	}
+
+	private boolean isNetworkConnected() {
+		return LibrelioApplication.thereIsConnection(this);
+	}
+
 	class DownloadFromTempURLTask extends AsyncTask<Void, Void, Void>{
 		HttpResponse res = null;
 		@Override
@@ -280,7 +279,7 @@ public class BillingActivity extends Activity{
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpGet httpget = new HttpGet(serverURL+"?product_id="+productId+"&code=HFGKEBNMVUKKEBFPOLJOIMKN34");
 			HttpParams params1 = httpclient.getParams();
-			HttpClientParams.setRedirecting(params1, false);			
+			HttpClientParams.setRedirecting(params1, false);
 			try {
 				res = httpclient.execute(httpget);
 			} catch (ClientProtocolException e) {

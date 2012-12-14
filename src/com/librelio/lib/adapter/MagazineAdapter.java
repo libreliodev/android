@@ -1,15 +1,11 @@
 package com.librelio.lib.adapter;
 
 import java.io.File;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +20,6 @@ import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.ui.BillingActivity;
 import com.librelio.lib.ui.DownloadActivity;
-import com.librelio.lib.ui.MainMagazineActivity;
-import com.librelio.lib.utils.BillingService;
-import com.librelio.lib.utils.BillingService.RequestPurchase;
-import com.librelio.lib.utils.BillingService.RestoreTransactions;
-import com.librelio.lib.utils.Consts.PurchaseState;
-import com.librelio.lib.utils.Consts.ResponseCode;
-import com.librelio.lib.utils.PurchaseObserver;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{
@@ -101,6 +90,7 @@ public class MagazineAdapter extends BaseAdapter{
 		} else {
 			res = convertView;
 		}
+		//TODO: @Mike please can you add ViewHolder pattern
 		TextView title = (TextView)res.findViewById(R.id.item_title);
 		TextView subtitle = (TextView)res.findViewById(R.id.item_subtitle);
 		ImageView thumbnail = (ImageView)res.findViewById(R.id.item_thumbnail);
@@ -128,6 +118,7 @@ public class MagazineAdapter extends BaseAdapter{
 				public void onClick(View v) {
 					LibrelioApplication.startPDFActivity(context,
 							currentMagazine.getPdfPath());
+					//TODO: @Mike Please clean below code
 					/*Intent intent = new Intent(context,
 							DownloadActivity.class);
 					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());

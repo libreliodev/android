@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 
 import com.artifex.mupdf.MuPDFActivity;
@@ -39,20 +38,20 @@ public class LibrelioApplication extends Application {
 		}
 
 	}
-	
-	public static boolean thereIsConnection(Context context){
-		ConnectivityManager conMgr =  (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+	public static boolean thereIsConnection(Context context) {
+		ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo i = conMgr.getActiveNetworkInfo();
-		  if (i == null){
-			  return false;
-		  }
-		  if (!i.isConnected()){
-		    return false;
-		  }
-		  if (!i.isAvailable()){
-		    return false;
-		  }
-		  return true;
+		if (i == null) {
+			return false;
+		}
+		if (!i.isConnected()) {
+			return false;
+		}
+		if (!i.isAvailable()) {
+			return false;
+		}
+		return true;
 	}
-	
+
 }

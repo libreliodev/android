@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -19,8 +18,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,13 +27,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artifex.mupdf.LinkInfo;
+import com.librelio.activity.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.service.DownloadMagazineListService;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
-public class DownloadActivity extends Activity {
+public class DownloadActivity extends BaseActivity {
 	private static final String TAG = "DownloadActivity";
 	private static final String STOP = "stop_modificator";
 	private static final int INTERRUPT = -1;

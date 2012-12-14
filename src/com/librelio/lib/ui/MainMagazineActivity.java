@@ -68,6 +68,7 @@ import android.widget.Toast;
 import com.android.vending.billing.IInAppBillingService;
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+import com.librelio.activity.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.adapter.MagazineAdapter;
 import com.librelio.lib.model.MagazineModel;
@@ -94,7 +95,7 @@ import com.niveales.wind.R;
 /**
  * A sample application that demonstrates in-app billing.
  */
-public class MainMagazineActivity extends Activity implements IssueListEventListener,
+public class MainMagazineActivity extends BaseActivity implements IssueListEventListener,
 		CloudEventListener {
 	private static final String TAG = "OceanActivity";
 	public static final String REQUEST_SUBS = "request_subs";
