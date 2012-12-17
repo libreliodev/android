@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.base.BaseActivity;
@@ -71,6 +72,7 @@ public class BillingActivity extends BaseActivity {
 			subtitle = getIntent().getExtras().getString(DownloadActivity.SUBTITLE_KEY);
 			int finId = fileName.indexOf("/");
 			productId = fileName.substring(0,finId);
+			
 			
 		}
 	}	
@@ -158,14 +160,19 @@ public class BillingActivity extends BaseActivity {
 			}.execute();
 	   }
 	};
-		
+	private static final int BILLING_RESPONSE_RESULT_OK = 0;	
+	private static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
+	private static final int BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3;
+	private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
+	private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
+	
 	class PurchaseTask extends AsyncTask<String, String, String>{
 		Bundle buyIntentBundle = null;
 		@Override
 		protected String doInBackground(String... params) {
 			try {
 				buyIntentBundle = mService.getBuyIntent(3, getPackageName(),
-						   productId, "inapp", null);
+						   "android.test.canceled", "inapp", null);
 			} catch (RemoteException e1) {
 				Log.e(TAG,"Problem with getBuyIntent",e1);
 			}
@@ -174,14 +181,31 @@ public class BillingActivity extends BaseActivity {
 		protected void onPostExecute(String result) {
 			int response = buyIntentBundle.getInt("RESPONSE_CODE");
 			Log.d(TAG,"response = "+response);
-			Log.d(TAG,"response: "+response);
-			PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-			try {
-				startIntentSenderForResult(pendingIntent.getIntentSender(),
-						CALLBACK_CODE, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
-						   Integer.valueOf(0));
-			} catch (SendIntentException e) {
-				Log.e(TAG,"Problem with startIntentSenderForResult",e);
+			switch (response) {
+			case BILLING_RESPONSE_RESULT_USER_CANCELED:
+			case BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE:
+			case BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE:
+				Toast.makeText(getContext(), "Error!", Toast.LENGTH_LONG).show();
+				return;
+			}
+			//
+			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
+				DownloadFromTempURLTask download = new DownloadFromTempURLTask();
+	            download.execute();
+	            return;
+			} else if(response == BILLING_RESPONSE_RESULT_OK){
+				PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+				if(pendingIntent==null){
+					Toast.makeText(getContext(), "Error!", Toast.LENGTH_LONG).show();
+					return;
+				}
+				try {
+					startIntentSenderForResult(pendingIntent.getIntentSender(),
+							CALLBACK_CODE, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
+							Integer.valueOf(0));
+				} catch (SendIntentException e) {
+					Log.e(TAG,"Problem with startIntentSenderForResult",e);
+				}
 			}
 			super.onPostExecute(result);
 		}
@@ -190,8 +214,7 @@ public class BillingActivity extends BaseActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
-		DownloadFromTempURLTask download = new DownloadFromTempURLTask();
-        download.execute();
+		Log.d(TAG,requestCode+" "+resultCode);
 	   if (requestCode == CALLBACK_CODE) {    	
 	      int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
 	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
@@ -199,12 +222,12 @@ public class BillingActivity extends BaseActivity {
 	        
 	      if (resultCode == RESULT_OK&purchaseData!=null) {
 	         try {
+	        	 Log.d(TAG,"Succes!!!");
 	            JSONObject jo = new JSONObject(purchaseData);
 	            String sku = jo.getString("productId");
 	            Log.d(TAG,"You have bought the " + sku + ". Excellent choice,adventurer!");
-	            //
-	            //DownloadFromTempURLTask download = new DownloadFromTempURLTask();
-	            //download.execute();
+	            /*DownloadFromTempURLTask download = new DownloadFromTempURLTask();
+	            download.execute();*/
 	          }
 	          catch (JSONException e) {
 	             Log.d(TAG,"Failed to parse purchase data.");

@@ -100,6 +100,8 @@ public class DownloadMagazineListService extends BaseService{
 				sendBroadcast(intent);
 				Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 				sendBroadcast(intentInvalidate);
+				Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
+				sendBroadcast(updateProgressStop);
 				//
 				stopSelf();
 				return null;
@@ -212,5 +214,11 @@ public class DownloadMagazineListService extends BaseService{
 	
 	private Context getContext(){
 		return this;
+	}
+	
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
 	}
 }

@@ -52,6 +52,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -90,6 +91,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		CloudEventListener {
 	private static final String TAG = "OceanActivity";
 	public static final String REQUEST_SUBS = "request_subs";
+	public static final String UPDATE_PROGRESS_STOP = "updeta_pregress_stop";
 	
 
 	/**
@@ -142,7 +144,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 
 		@Override
 		public void onBillingSupported(boolean supported, String type) {
-			if (Consts.DEBUG) {
+			/*if (Consts.DEBUG) {
 				Log.i(TAG, "supported: " + supported);
 			}
 			if (type == null || type.equals(Consts.ITEM_TYPE_INAPP)) {
@@ -155,14 +157,14 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				}
 			} else if (!type.equals(Consts.ITEM_TYPE_SUBSCRIPTION)) {
 				showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-			}
+			}*/
 		}
 
 		@Override
 		public void onPurchaseStateChange(PurchaseState purchaseState,
 				String itemId, int quantity, long purchaseTime,
 				String developerPayload) {
-			if (Consts.DEBUG) {
+			/*if (Consts.DEBUG) {
 				Log.i(TAG, "onPurchaseStateChange() itemId: " + itemId + " "
 						+ purchaseState);
 			}
@@ -184,13 +186,13 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 //			mCatalogAdapter.setOwnedItems(mOwnedItems);
 			cloud.setIssuePurchiseState(mOwnedItems);
 			mOwnedItemsCursor.requery();
-			mIssueListGrid.invalidateViews();
+			mIssueListGrid.invalidateViews();*/
 		}
 
 		@Override
 		public void onRequestPurchaseResponse(RequestPurchase request,
 				ResponseCode responseCode) {
-			if (Consts.DEBUG) {
+			/*if (Consts.DEBUG) {
 				Log.d(TAG, request.mProductId + ": " + responseCode);
 			}
 			if (responseCode == ResponseCode.RESULT_OK) {
@@ -205,13 +207,13 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				if (Consts.DEBUG) {
 					Log.i(TAG, "purchase failed");
 				}
-			}
+			}*/
 		}
 
 		@Override
 		public void onRestoreTransactionsResponse(RestoreTransactions request,
 				ResponseCode responseCode) {
-			if (responseCode == ResponseCode.RESULT_OK) {
+			/*if (responseCode == ResponseCode.RESULT_OK) {
 				if (Consts.DEBUG) {
 					Log.d(TAG, "completed RestoreTransactions request");
 				}
@@ -225,7 +227,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				if (Consts.DEBUG) {
 					Log.d(TAG, "RestoreTransactions error: " + responseCode);
 				}
-			}
+			}*/
 		}
 	}
 
@@ -327,6 +329,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	
 	private BroadcastReceiver br;
 	private BroadcastReceiver requestSubsAPIv2;
+	private BroadcastReceiver updateProgressStop;
 	private Timer update;
 	private Intent intent;
 	
@@ -354,6 +357,8 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
 		//bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"),
 		//		mServiceConn, Context.BIND_AUTO_CREATE);
 		
@@ -456,6 +461,14 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		super.onStart();
 		ResponseHandler.register(mLibrelioPurchaseObserver);
 		//initializeOwnedItems();
+		updateProgressStop = new BroadcastReceiver() {			
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				setProgressBarIndeterminateVisibility(false);
+			}
+		};
+		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
+		registerReceiver(updateProgressStop, filter);
 	}
 
 	/**
@@ -466,7 +479,6 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		super.onStop();
 		ResponseHandler.unregister(mLibrelioPurchaseObserver);
 	}
-
 	@Override
 	protected void onDestroy() {
 		/*super.onDestroy();
@@ -483,6 +495,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		   }*/
 		stopRegularUpdate();
 		unregisterReceiver(br);
+		unregisterReceiver(updateProgressStop);
 		unregisterReceiver(requestSubsAPIv2);
 		super.onDestroy();
 	}
@@ -811,13 +824,14 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.options_menu_reload:
-			//onReloadIssues();
 			if(LibrelioApplication.thereIsConnection(this)){
 				Intent intent = new Intent(this, DownloadMagazineListService.class);
 				startService(intent);
+				setProgressBarIndeterminateVisibility(true);
 				reloadMagazineData(magazine);
 				stopRegularUpdate();
 				startRegularUpdate();
+				
 			} else {
 				Toast.makeText(this, getResources().getString(R.string.connection_failed),
 						Toast.LENGTH_LONG).show();
