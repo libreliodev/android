@@ -26,7 +26,7 @@ public class ReaderView extends AdapterView<Adapter>
 	private static final int  MOVING_UP         = 3;
 	private static final int  MOVING_DOWN       = 4;
 
-	private static final int  FLING_MARGIN      = 100;
+	private static final int  FLING_MARGIN      = 20;
 	private static final int  GAP               = 20;
 	private static final int  SCROLL_SPEED      = 2;
 

@@ -88,7 +88,7 @@ public class MuPDFActivity extends Activity
 {
 	/* The core rendering instance */
 	private enum LinkState {DEFAULT, HIGHLIGHT, INHIBIT};
-	private final int    TAP_PAGE_MARGIN = 5;
+	private final int    TAP_PAGE_MARGIN = 70;
 	private static final int    SEARCH_PROGRESS_DELAY = 200;
 	private MuPDFCore    core;
 	private String       mFileName;
@@ -174,9 +174,7 @@ public class MuPDFActivity extends Activity
 			} else {
 				String filePath="/mnt/sdcard/wind_355.pdf";
 				
-				PDFParser p = new PDFParser(filePath);
-				p.getAllUrlsFromPDF();
-				
+				PDFParser p = new PDFParser(filePath);				
 				core = openFile(filePath);
 				SearchTaskResult.set(null);
 			}
@@ -241,9 +239,9 @@ public class MuPDFActivity extends Activity
 			private boolean showButtonsDisabled;
 
 			public boolean onSingleTapUp(MotionEvent e) {
-				if (e.getX() < super.getWidth()/TAP_PAGE_MARGIN) {
+				if (e.getX() < TAP_PAGE_MARGIN) {
 					super.moveToPrevious();
-				} else if (e.getX() > super.getWidth()*(TAP_PAGE_MARGIN-1)/TAP_PAGE_MARGIN) {
+				} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
 					super.moveToNext();
 				} else if (!showButtonsDisabled) {
 					int linkPage = -1;

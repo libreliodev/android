@@ -387,6 +387,7 @@ public abstract class PageView extends ViewGroup {
 				mSearchView.bringToFront();
 			}
 
+			try {
 			Bitmap bm = Bitmap.createBitmap(patchArea.width(), patchArea.height(), Bitmap.Config.ARGB_8888);
 
 			mDrawPatch = new SafeAsyncTask<PatchInfo,Void,PatchInfo>() {
@@ -410,6 +411,10 @@ public abstract class PageView extends ViewGroup {
 			};
 
 			mDrawPatch.safeExecute(new PatchInfo(bm, patchViewSize, patchArea));
+			} catch(OutOfMemoryError e) {
+				e.printStackTrace();
+				System.gc();
+			}
 		}
 	}
 
