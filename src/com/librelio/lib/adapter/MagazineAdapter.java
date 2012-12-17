@@ -3,6 +3,7 @@ package com.librelio.lib.adapter;
 import java.io.File;
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -118,14 +119,6 @@ public class MagazineAdapter extends BaseAdapter{
 				public void onClick(View v) {
 					LibrelioApplication.startPDFActivity(context,
 							currentMagazine.getPdfPath());
-					//TODO: @Mike Please clean below code
-					/*Intent intent = new Intent(context,
-							DownloadActivity.class);
-					intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
-					intent.putExtra(DownloadActivity.FILE_URL_KEY,currentMagazine.getPdfUrl());
-					intent.putExtra(DownloadActivity.FILE_PATH_KEY,currentMagazine.getPdfPath());
-					intent.putExtra(DownloadActivity.PNG_PATH_KEY,currentMagazine.getPngPath());
-					context.startActivity(intent);*/
 				}
 			});
 		} else {
@@ -136,22 +129,17 @@ public class MagazineAdapter extends BaseAdapter{
 				@Override
 				public void onClick(View v) {
 					if(currentMagazine.isPaid()){
-						//Intent intent = new Intent("123");
-						//context.sendBroadcast(intent);
 						Intent intent = new Intent(context,BillingActivity.class);
 						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
 						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
 						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
 						context.startActivity(intent);
 					} else {
-						Intent intent = new Intent(context,
-								DownloadActivity.class);
+						Intent intent = new Intent(context,DownloadActivity.class);
 						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
 						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
 						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
 						intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,false);
-						intent.putExtra(DownloadActivity.ORIENTATION_KEY,
-								context.getResources().getConfiguration().orientation);
 						context.startActivity(intent);
 					}
 				}
@@ -190,8 +178,6 @@ public class MagazineAdapter extends BaseAdapter{
 						intent.putExtra(DownloadActivity.FILE_NAME_KEY,currentMagazine.getFileName());
 						intent.putExtra(DownloadActivity.TITLE_KEY,currentMagazine.getTitle());
 						intent.putExtra(DownloadActivity.SUBTITLE_KEY,currentMagazine.getSubtitle());
-						intent.putExtra(DownloadActivity.ORIENTATION_KEY,
-								context.getResources().getConfiguration().orientation);
 						intent.putExtra(DownloadActivity.IS_SAMPLE_KEY,true);
 						context.startActivity(intent);
 					}

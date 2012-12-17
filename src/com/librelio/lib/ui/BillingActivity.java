@@ -33,7 +33,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.librelio.activity.BaseActivity;
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.niveales.wind.R;
 
@@ -135,16 +135,15 @@ public class BillingActivity extends BaseActivity {
 					});
 					//
 					if(productPrice == null){
-						buy.setText(title);
+						buy.setVisibility(View.GONE);
 					} else {
 						buy.setText(title+": "+productPrice);
-
+						buy.setOnClickListener(getBuyOnClick());
 					}						
-					buy.setOnClickListener(getBuyOnClick());
 					//
 					String abonnement = getResources().getString(R.string.abonnement_wind);
 					String year = getResources().getString(R.string.year);
-					subs.setText(abonnement+" 1 "+year+": "+"20.00€");
+					subs.setText("   "+abonnement+" 1 "+year+"   ");
 					subs.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View v) {

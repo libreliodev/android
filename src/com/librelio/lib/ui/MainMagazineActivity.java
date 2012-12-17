@@ -29,30 +29,22 @@ import java.util.TimerTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender.SendIntentException;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
@@ -65,10 +57,9 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.vending.billing.IInAppBillingService;
 import com.artifex.mupdf.MuPDFActivity;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-import com.librelio.activity.BaseActivity;
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.adapter.MagazineAdapter;
 import com.librelio.lib.model.MagazineModel;
@@ -821,11 +812,16 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		switch (item.getItemId()) {
 		case R.id.options_menu_reload:
 			//onReloadIssues();
-			Intent intent = new Intent(this, DownloadMagazineListService.class);
-			startService(intent);
-			reloadMagazineData(magazine);
-			stopRegularUpdate();
-			startRegularUpdate();
+			if(LibrelioApplication.thereIsConnection(this)){
+				Intent intent = new Intent(this, DownloadMagazineListService.class);
+				startService(intent);
+				reloadMagazineData(magazine);
+				stopRegularUpdate();
+				startRegularUpdate();
+			} else {
+				Toast.makeText(this, getResources().getString(R.string.connection_failed),
+						Toast.LENGTH_LONG).show();
+			}
 			return true;
 		case R.id.options_menu_restore:
 			restorePurchises();

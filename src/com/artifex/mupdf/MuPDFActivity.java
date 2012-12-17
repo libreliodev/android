@@ -1,13 +1,5 @@
 package com.artifex.mupdf;
 
-import java.io.File;
-
-import com.librelio.lib.LibrelioApplication;
-import com.librelio.lib.ui.SlideShowActivity;
-import com.librelio.lib.utils.PDFParser;
-import com.niveales.wind.R;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,21 +21,23 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
+
+import com.librelio.base.BaseActivity;
+import com.librelio.lib.ui.SlideShowActivity;
+import com.librelio.lib.utils.PDFParser;
+import com.niveales.wind.R;
 
 class SearchTaskResult {
 	public final String txt;
@@ -84,7 +77,7 @@ class ProgressDialogX extends ProgressDialog {
 		super.cancel();
 	}
 }
-public class MuPDFActivity extends Activity
+public class MuPDFActivity extends BaseActivity
 {
 	/* The core rendering instance */
 	private enum LinkState {DEFAULT, HIGHLIGHT, INHIBIT};
@@ -833,7 +826,7 @@ public class MuPDFActivity extends Activity
 			}
 			if(path.endsWith("mp4") && isFullScreen) {
 				// start a video player
-				Uri videoUri = Uri.parse("file://" + LibrelioApplication.APP_DIRECTORY + "/wind_355" + path);
+				Uri videoUri = Uri.parse("file://" + getStoragePath() + "/wind_355" + path);
 				Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
 				startActivity(intent);
 			}

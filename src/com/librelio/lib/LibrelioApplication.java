@@ -3,6 +3,9 @@ package com.librelio.lib;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -13,14 +16,16 @@ import com.niveales.wind.R;
 
 public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
+	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
+	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
 	public static String BASE_URL;
 	public static String APP_DIRECTORY = "/data/data/com.niveales.wind/librelio/";
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	
 	@Override
 	public void onCreate() {
-		String clientName = getResources().getString(R.string.client_name);
-		String magazineName = getResources().getString(R.string.magazine_name);
+		String clientName = getClientName(this);
+		String magazineName = getMagazineName(this);
 		BASE_URL = "http://librelio-europe.s3.amazonaws.com/" + 
 				clientName + "/" + magazineName + "/";
 		super.onCreate();
@@ -54,4 +59,23 @@ public class LibrelioApplication extends Application {
 		return true;
 	}
 
+	public static String getClientName(Context context){
+		ApplicationInfo ai = null;
+		try {
+			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
+		} catch (NameNotFoundException e) {
+			Log.e(TAG,"Get mata-data error!!!",e);
+		}
+	    return (String)ai.metaData.get(META_DATA_CLIENT_NAME_KEY);
+	}
+	
+	public static String getMagazineName(Context context){
+		ApplicationInfo ai = null;
+		try {
+			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
+		} catch (NameNotFoundException e) {
+			Log.e(TAG,"Get mata-data error!!!",e);
+		}
+	    return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
+	}
 }

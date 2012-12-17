@@ -24,21 +24,18 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import com.librelio.lib.LibrelioApplication;
-import com.niveales.wind.R;
-
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.URLUtil;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-public class VideoPlayerActivity extends Activity {
+import com.librelio.base.BaseActivity;
+
+public class VideoPlayerActivity extends BaseActivity {
 	private static final String TAG = VideoPlayerActivity.class.getSimpleName();
 
 	private VideoView mVideoView;
@@ -58,7 +55,7 @@ public class VideoPlayerActivity extends Activity {
 		//mVideoView = (VideoView) findViewById(R.id.surface_view);
 		
 		if(getIntent().hasExtra("path")) {
-			videoPath = LibrelioApplication.APP_DIRECTORY + "/wind_355/" + getIntent().getExtras().getString("path");
+			videoPath = getStoragePath() + "/wind_355/" + getIntent().getExtras().getString("path");
 		}
 		
 		//mPlay = (ImageButton) findViewById(R.id.play);

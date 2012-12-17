@@ -20,14 +20,16 @@ import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Surface;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artifex.mupdf.LinkInfo;
-import com.librelio.activity.BaseActivity;
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.service.DownloadMagazineListService;
@@ -43,7 +45,6 @@ public class DownloadActivity extends BaseActivity {
 	public static final String FILE_NAME_KEY = "file_name_key";
 	public static final String TITLE_KEY = "title_key";
 	public static final String SUBTITLE_KEY = "subtitle_key";
-	public static final String ORIENTATION_KEY = "orientation";
 	public static final String IS_SAMPLE_KEY = "issample";
 	public static final String IS_TEMP_KEY = "istemp";
 	public static final String TEMP_URL_KEY = "tempurl";
@@ -59,20 +60,8 @@ public class DownloadActivity extends BaseActivity {
 	private DownloadTask download;
 	private DownloadLinksTask downloadLinks;
 	private MagazineModel magazine;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		switch (getIntent().getExtras().getInt(ORIENTATION_KEY)) {
-		case Configuration.ORIENTATION_PORTRAIT:
-			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			break;
-		case Configuration.ORIENTATION_LANDSCAPE:
-			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-			break;
-		default:
-			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			break;
-		}
 		super.onCreate(savedInstanceState);
 		String title = getIntent().getExtras().getString(TITLE_KEY);
 		String subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
@@ -123,8 +112,8 @@ public class DownloadActivity extends BaseActivity {
 	class DownloadTask extends AsyncTask<String, String, String>{
 		@Override
 		protected void onPreExecute() {
-			MagazineModel.makeMagazineDir(fileName);
-			MagazineModel.clearMagazineDir(fileName); 
+			magazine.clearMagazineDir(); 
+			magazine.makeMagazineDir();
 			super.onPreExecute();
 		}
 		@Override
@@ -189,7 +178,7 @@ public class DownloadActivity extends BaseActivity {
 		private ArrayList<String> assetsNames;
 		@Override
 		protected void onPreExecute() {
-			MagazineModel.makeMagazineDir(fileName);
+			magazine.makeMagazineDir();
 			text.setText("Getting assets...");
 			Log.d(TAG,"Start DownloadLinksTask");
 			links = new ArrayList<String>();
@@ -235,10 +224,11 @@ public class DownloadActivity extends BaseActivity {
 			for(int i=0;i<links.size();i++){
 				if(isCancelled()){
 					Log.d(TAG, "DownloadLinkTask was stop");
+					magazine.clearMagazineDir();
 					return INTERRUPT;
 				}
 				String assetUrl = links.get(i);
-				String assetPath = MagazineModel.getMagazineDir(fileName)+assetsNames.get(i);
+				String assetPath = magazine.getMagazineDir()+assetsNames.get(i);
 				DownloadMagazineListService.downloadFromUrl(assetUrl, assetPath);
 				publishProgress("");
 			}
@@ -278,7 +268,7 @@ public class DownloadActivity extends BaseActivity {
 		if(downloadLinks!=null){
 			downloadLinks.cancel(true);
 		}
-		MagazineModel.clearMagazineDir(fileName);
+		magazine.clearMagazineDir();
 		finish();
 		super.onBackPressed();
 	}
@@ -309,4 +299,12 @@ public class DownloadActivity extends BaseActivity {
 		}
 		return super.onCreateDialog(id);
 	}
+	
+	/**
+	 * Done empty for lock the activity orientation change.
+	 */
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+	}
+
 }

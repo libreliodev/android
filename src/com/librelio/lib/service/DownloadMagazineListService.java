@@ -14,14 +14,16 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.librelio.base.BaseService;
+import com.librelio.base.iBaseContext;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.storage.DataBaseHelper;
@@ -34,7 +36,7 @@ import com.longevitysoft.android.xml.plist.domain.Array;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
 
-public class DownloadMagazineListService extends Service{
+public class DownloadMagazineListService extends BaseService{
 	private static final String TAG = "DownloadPlistService";
 	private static final String PLIST_FILE_NAME = "magazines.plist";
 	private static final String FILE_NAME_KEY = "FileName";
@@ -55,15 +57,15 @@ public class DownloadMagazineListService extends Service{
 				cleanMagazinesListInBase();
 				//
 				plistUrl = LibrelioApplication.BASE_URL+"Magazines.plist";
-				Log.d(TAG,"onCreate path:"+LibrelioApplication.APP_DIRECTORY);
+				Log.d(TAG,"onCreate path:"+((iBaseContext)getContext()).getStoragePath());
 				
 				
 				// Plist downloading
 				if(LibrelioApplication.thereIsConnection(getContext())){
-					downloadFromUrl(plistUrl,LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);					
+					downloadFromUrl(plistUrl,((iBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);					
 				}
 				//Convert plist to String for parsing
-				pList = getStringFromFile(LibrelioApplication.APP_DIRECTORY+PLIST_FILE_NAME);
+				pList = getStringFromFile(((iBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
 				//Parsing
 				PListXMLHandler handler = new PListXMLHandler();
 				PListXMLParser parser = new PListXMLParser();
@@ -79,7 +81,7 @@ public class DownloadMagazineListService extends Service{
 					String downloadDate = getCurrentDate();
 					
 					MagazineModel magazine = new MagazineModel(fileName, title,
-							subtitle, downloadDate, getApplicationContext());
+							subtitle, downloadDate, getContext());
 					//saving png
 					File png = new File(magazine.getPngPath());
 					if(!png.exists()){

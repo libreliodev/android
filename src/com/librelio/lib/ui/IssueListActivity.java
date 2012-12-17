@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.ui.IssueListAdapter.IssueListEventListener;
 import com.librelio.lib.utils.cloud.CloudHelper;
 import com.librelio.lib.utils.cloud.Issue;
@@ -32,7 +33,7 @@ import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.Toast;
 
-public class IssueListActivity extends Activity implements IssueListEventListener, CloudEventListener {
+public class IssueListActivity extends BaseActivity implements IssueListEventListener, CloudEventListener {
 	@SuppressWarnings("unused")
 	private static final String TAG = IssueListActivity.class.getSimpleName();
 

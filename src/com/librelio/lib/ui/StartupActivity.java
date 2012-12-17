@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,20 +20,21 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.service.DownloadMagazineListService;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
 import com.niveales.wind.R;
 
-public class StartupActivity extends Activity {
+public class StartupActivity extends BaseActivity {
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
 	private BroadcastReceiver br;
 	
 	private static final String TAG = "StartupActivity";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		File f = new File(LibrelioApplication.APP_DIRECTORY);
+		File f = new File(getStoragePath());
 		if(!f.exists()){
 			Log.d(TAG,"onCreate directory was create");
 			f.mkdirs();
@@ -65,51 +65,35 @@ public class StartupActivity extends Activity {
 			IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
 			registerReceiver(br, filter);
 		} else {
-			Log.d(TAG,"qwe");
-			//File plist = new File("file:///android_asset/magazines.plist");
-			
-			//plist.renameTo(new File(LibrelioApplication.APP_DIRECTORY+"magazines.plist"));
-			
+			String[] assetsList = null;
 			try {
-				int count;
-				InputStream input = getAssets().open("magazines.plist");
-				OutputStream output = new FileOutputStream(LibrelioApplication.APP_DIRECTORY+"magazines.plist");
-				byte data[] = new byte[1024];
-				
-				long total = 0;
-
-				while ((count = input.read(data)) != -1) {
-					total += count;
-					output.write(data, 0, count);
-				}
-				output.flush();
-				output.close();
-				input.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				assetsList = getResources().getAssets().list("");
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
-			for(int i=5;i<9;i++){
-				try {
-					int count;
-					InputStream input = getAssets().open("wind_35"+i+".png");
-					OutputStream output = new FileOutputStream(LibrelioApplication.APP_DIRECTORY+"wind_35"+i+".png");
-					byte data[] = new byte[1024];
-					
-					long total = 0;
+			for(String file : assetsList){
+				if(file.contains(".plist")||file.contains(".png")){
+					try {
+						int count;
+						InputStream input = getAssets().open(file);
+						OutputStream output = new FileOutputStream(getStoragePath()+file);
+						byte data[] = new byte[1024];
+						
+						long total = 0;
 
-					while ((count = input.read(data)) != -1) {
-						total += count;
-						output.write(data, 0, count);
+						while ((count = input.read(data)) != -1) {
+							total += count;
+							output.write(data, 0, count);
+						}
+						output.flush();
+						output.close();
+						input.close();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-					output.flush();
-					output.close();
-					input.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
+			
 			Intent intent = new Intent(this, DownloadMagazineListService.class);
 			startService(intent);
 			
