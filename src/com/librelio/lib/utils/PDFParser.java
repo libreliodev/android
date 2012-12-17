@@ -5,6 +5,7 @@ package com.librelio.lib.utils;
 
 import java.util.ArrayList;
 
+import android.net.Uri;
 import android.util.SparseArray;
 
 import com.artifex.mupdf.LinkInfo;
@@ -34,43 +35,35 @@ public class PDFParser {
 		}
 	}
 	
-	
-	
-	/**
-	 * 
-	 * @return all available URLs from pdf
-	 */
-	@Deprecated
-	public SparseArray<ArrayList<String>> getAllUrlsFromPDF() {
-		return mLinkUrls;
-	}
-	
-	
-	/**
-	 * 
-	 * @param page - page of the document (starting from 0)
-	 * @return - ArrayList of String with urls on the page or null if no urls on the page exists. 
-	 */
-	@Deprecated
-	public ArrayList<String> getUrlsByPage(int page) {
-		return mLinkUrls.get(page);
-	}
-	
 	private void parseLinkInfo() {
 		for(int page = 0; page < mCore.countPages(); page++) {
 			LinkInfo [] mPageLinkInfo = mCore.getPageURIs(page);
-			if(mPageLinkInfo.length > 0) {
-				mLinkInfo.put(page, mPageLinkInfo);
-				ArrayList<String> mPageUrlList = new ArrayList<String>();
-				String url;
-				for(int j = 0; j < mPageLinkInfo.length; j++) {
-					LinkInfo l = mPageLinkInfo[j];
-					if((url = mCore.getUriLink(j, (l.left + l.right)/2, (l.top + l.bottom)/2)) != null) {
-						mPageUrlList.add(url);
+			if(mPageLinkInfo != null && mPageLinkInfo.length > 0) {
+				ArrayList<LinkInfo> fixedLinkInfo = new ArrayList<LinkInfo>();
+				LinkInfo current;
+				for(int i = 0; i < mPageLinkInfo.length; i++) {
+					current = mPageLinkInfo[i];
+					if(current.uri != null && current.uri.startsWith("http://localhost")) {
+						String path = Uri.parse(current.uri).getPath();
+						if(path.contains("_") && ( path.contains("jpg") || path.contains("png"))) {
+							// ops... we have a slideshow here
+							int mSlideshowCount = Integer
+									.valueOf(path.split("_")[1].split("\\.")[0]);
+							String mSlideshowPreffix = path.split("_")[0];
+							String mSlideshowSuffix = path.split("_")[1].split("\\.")[1];
+							for(int j = 1; j <= mSlideshowCount; j ++) {
+								LinkInfo newLink = new LinkInfo(current.left, current.top, current.right, current.bottom, "http://localhost"+mSlideshowPreffix+"_"+String.valueOf(j)+"."+mSlideshowSuffix);
+								fixedLinkInfo.add(newLink);
+							}
+						} else {
+							fixedLinkInfo.add(current);
+						}
+					}else {
+						fixedLinkInfo.add(current);
 					}
 				}
-				if(mPageUrlList.size() > 0)
-					mLinkUrls.put(page, mPageUrlList);
+				
+				mLinkInfo.put(page, fixedLinkInfo.toArray(new LinkInfo[fixedLinkInfo.size()]));
 			}
 		}
 	}

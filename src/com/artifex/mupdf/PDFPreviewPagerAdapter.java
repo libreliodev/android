@@ -135,8 +135,9 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 				v.setImageBitmap(result);
 				v.setLayoutParams(new LinearLayout.LayoutParams(mPreviewSize.x,
 						mPreviewSize.y));
-				v.setPadding(10, 0, 10, 0);
-				v.requestLayout();
+//				if(v.getPaddingLeft() != 10 || v.getPaddingRight() != 10)
+//					v.setPadding(10, 0, 10, 0);
+//				v.requestLayout();
 			}
 
 		};
