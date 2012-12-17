@@ -3,15 +3,13 @@
  */
 package com.librelio.lib.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Gallery;
 
 import com.artifex.mupdf.SimpleGallery;
-import com.librelio.lib.LibrelioApplication;
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.adapter.SlideshowAdapter;
 import com.niveales.wind.R;
 
@@ -19,7 +17,7 @@ import com.niveales.wind.R;
  * @author Dmitry Valetin
  * 
  */
-public class SlideShowActivity extends Activity {
+public class SlideShowActivity extends BaseActivity {
 	private SimpleGallery mSlideshowGallery;
 
 	
@@ -31,8 +29,7 @@ public class SlideShowActivity extends Activity {
 
 		String path = getIntent().getExtras().getString("path");
 
-		SlideshowAdapter adapter = new SlideshowAdapter(this, 
-				((LibrelioApplication)getApplication()).APP_DIRECTORY+"/wind_355/"+path);
+		SlideshowAdapter adapter = new SlideshowAdapter(this,getStoragePath()+"/wind_355/"+path);
 //		SlideshowAdapter adapter = new SlideshowAdapter(this, 
 //				((LibrelioApplication)getApplication()).appDirectory+"/wind_355/PWAVIETNAM_4.jpg");
 

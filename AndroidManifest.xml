@@ -17,6 +17,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
+        <meta-data android:name="ClientName" android:value="niveales"/>
+        <meta-data android:name="MagazineName" android:value="wind"/>
+        
         <activity
             android:name="IssueListActivity"
             android:label="@string/app_name" >
@@ -51,7 +55,8 @@
 		<activity android:name="com.librelio.lib.ui.MainMagazineActivity" ></activity>
         <activity android:name="com.librelio.wind.test.TestPDFPageActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity android:theme="@style/Theme.NoBackground.NoTitle" android:name="com.librelio.lib.ui.SlideShowActivity"></activity>
-        <activity android:name="com.librelio.lib.ui.DownloadActivity"></activity>
+        <activity android:name="com.librelio.lib.ui.DownloadActivity"
+            		android:configChanges="orientation"></activity>
         <activity android:name="com.librelio.lib.ui.BillingActivity"
             	  android:theme="@style/Theme.Billing"></activity>
     </application>
