@@ -172,7 +172,7 @@ public class BillingActivity extends BaseActivity {
 		protected String doInBackground(String... params) {
 			try {
 				buyIntentBundle = mService.getBuyIntent(3, getPackageName(),
-						   "android.test.canceled", "inapp", null);
+						   productId, "inapp", null);
 			} catch (RemoteException e1) {
 				Log.e(TAG,"Problem with getBuyIntent",e1);
 			}
