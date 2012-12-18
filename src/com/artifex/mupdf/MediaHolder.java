@@ -3,18 +3,24 @@
  */
 package com.artifex.mupdf;
 
+import com.librelio.lib.LibrelioApplication;
+import com.librelio.lib.adapter.SlideshowAdapter;
+import com.librelio.lib.ui.SlideShowActivity;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
-
-import com.librelio.lib.adapter.SlideshowAdapter;
+import android.widget.Gallery;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout.LayoutParams;
 
 /**
  * @author Dmitry Valetin
@@ -25,12 +31,12 @@ public class MediaHolder extends FrameLayout {
 	private LinkInfo mLinkInfo;
 	private SimpleGallery mGallery = null;
 	private WebView mWebVew = null;
+	private float scale = 1.0f;
 	private int mAutoplayDelay;
 	private Handler mAutoplayHandler;
 	private WebView mWebView;
 	private String uriString;
 	private OnClickListener listener = null;
-	private boolean fullScreen = false;
 	
 	/**
 	 * @param pContext
@@ -157,27 +163,12 @@ public class MediaHolder extends FrameLayout {
 	/**
 	 * 
 	 */
-	public void releaseResources() {
+	public void clearResources() {
+		// TODO Auto-generated method stub
 		if(mGallery != null) {
 //			mGallery.setAdapter(null);
-			mGallery.releaseResources();
 			mGallery = null;
 		}
-		System.gc();
-	}
-
-
-	public boolean isFullScreen() {
-		return fullScreen;
-	}
-
-
-	public void setFullScreen(boolean pFullScreen) {
-		fullScreen = pFullScreen;
-	}
-	
-	public void toggleFullScreen() {
-		setFullScreen(!isFullScreen());
 	}
 
 }
