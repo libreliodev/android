@@ -2,7 +2,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="5dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -13,7 +14,7 @@
 
     <Button
         android:id="@+id/billing_subs_year"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/preview_button_text_size" />
 
