@@ -1,18 +1,11 @@
 package com.librelio.base;
 
+import android.app.Service;
+import android.os.Environment;
+
 import com.librelio.lib.LibrelioApplication;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Environment;
-import android.os.IBinder;
-
-public class BaseService extends Service implements iBaseContext{
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+abstract public class BaseService extends Service implements iBaseContext {
 
 	@Override
 	public String getInternalPath() {

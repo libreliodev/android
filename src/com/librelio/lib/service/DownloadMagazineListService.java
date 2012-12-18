@@ -124,13 +124,14 @@ public class DownloadMagazineListService extends BaseService{
 			conexion.connect();
 	
 			int lenghtOfFile = conexion.getContentLength();
+			//TODO: @Mike Please replace ANDRO_ASYNC to DownloadMagazineListService
 			Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
 	
 			InputStream input = new BufferedInputStream(url.openStream());
 			OutputStream output = new FileOutputStream(filePath);
 	
 			byte data[] = new byte[1024];
-	
+			//TODO: @Mike Why It is not used?
 			long total = 0;
 
 			while ((count = input.read(data)) != -1) {
@@ -179,6 +180,7 @@ public class DownloadMagazineListService extends BaseService{
 
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, "Problem with open file", e);
+			//TODO: @Mike Please can you specify ERROR via throw or null
 			return "";
 		}
 		char[] buf = new char[1024];
@@ -192,6 +194,7 @@ public class DownloadMagazineListService extends BaseService{
 			reader.close();
 		} catch (IOException e) {
 			Log.e(TAG,"Problem with reading file",e);
+			//TODO: @Mike Please can you specify ERROR via throw or null
 			return "";
 		}
 		return fileData.toString();
