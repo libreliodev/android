@@ -41,6 +41,13 @@ import com.niveales.wind.R;
 public class BillingActivity extends BaseActivity {
 	private static final String TAG = "BillingActivity";
 	private static final int CALLBACK_CODE = 101;
+	private static final int BILLING_RESPONSE_RESULT_OK = 0;	
+	private static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
+	private static final int BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3;
+	private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
+	private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
+	private static final int CONNECTION_ALERT = 1;
+	private static final int SERVER_ALERT = 2;
 	
 	private static final String serverURL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 	private String fileName;
@@ -160,11 +167,6 @@ public class BillingActivity extends BaseActivity {
 			}.execute();
 	   }
 	};
-	private static final int BILLING_RESPONSE_RESULT_OK = 0;	
-	private static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
-	private static final int BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3;
-	private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
-	private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
 	
 	class PurchaseTask extends AsyncTask<String, String, String>{
 		Bundle buyIntentBundle = null;
@@ -238,8 +240,6 @@ public class BillingActivity extends BaseActivity {
 	   finish();
 	}
 	
-	private static final int CONNECTION_ALERT = 1;
-	private static final int SERVER_ALERT = 2;
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -284,7 +284,6 @@ public class BillingActivity extends BaseActivity {
 			public void onClick(View v) {
 				PurchaseTask task = new PurchaseTask();
 				task.execute();
-				//finish();
 			}
 		};
 	}

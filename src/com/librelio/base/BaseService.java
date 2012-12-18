@@ -5,7 +5,7 @@ import android.os.Environment;
 
 import com.librelio.lib.LibrelioApplication;
 
-abstract public class BaseService extends Service implements iBaseContext {
+abstract public class BaseService extends Service implements IBaseContext {
 
 	@Override
 	public String getInternalPath() {

@@ -1,6 +1,6 @@
 package com.librelio.base;
 
-public interface iBaseContext {
+public interface IBaseContext {
 
 	String getInternalPath();
 

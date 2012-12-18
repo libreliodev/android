@@ -34,38 +34,6 @@ public class MagazineAdapter extends BaseAdapter{
 		this.magazine = magazine;
 	}
 	
-	/*private class MagazineObserver extends PurchaseObserver{
-
-		public MagazineObserver(Activity activity, Handler handler) {
-			super(activity, handler);
-		}
-
-		@Override
-		public void onBillingSupported(boolean supported, String type) {
-			Log.d(TAG,"onBillingSupported");
-		}
-
-		@Override
-		public void onPurchaseStateChange(PurchaseState purchaseState,
-				String itemId, int quantity, long purchaseTime,
-				String developerPayload) {
-			Log.d(TAG,"onPurchaseStateChange");
-		}
-
-		@Override
-		public void onRequestPurchaseResponse(RequestPurchase request,
-				ResponseCode responseCode) {
-			Log.d(TAG,"onRequestPurchaseResponse");
-		}
-
-		@Override
-		public void onRestoreTransactionsResponse(RestoreTransactions request,
-				ResponseCode responseCode) {
-			Log.d(TAG,"onRestoreTransactionsResponse");
-		}
-		
-	}*/
-	
 	@Override
 	public int getCount() {
 		return magazine.size();
@@ -81,40 +49,47 @@ public class MagazineAdapter extends BaseAdapter{
 		return position;
 	}
 
+	static class MagazineItemHolder{
+		public TextView title;
+		public TextView subtitle;
+		public ImageView thumbnail;
+		public Button downloadOrReadButton;
+		public Button sampleOrDeleteButton;
+	}
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View res;
 		final MagazineModel currentMagazine = magazine.get(position);
+		MagazineItemHolder holder = new MagazineItemHolder();
 		
 		if(convertView == null){
-			res = LayoutInflater.from(context).inflate(R.layout.magazine_list_item, null);
+			convertView = LayoutInflater.from(context).inflate(R.layout.magazine_list_item, null);
+			holder.title = (TextView)convertView.findViewById(R.id.item_title);;
+			holder.subtitle = (TextView)convertView.findViewById(R.id.item_subtitle);;
+			holder.thumbnail = (ImageView)convertView.findViewById(R.id.item_thumbnail);
+			/**
+			 * downloadOrReadButton - this button can be "Download button" or "Read button"
+			 */
+			holder.downloadOrReadButton = (Button)convertView.findViewById(R.id.item_button_one);
+			/**
+			 * sampleOrDeleteButton - this button can be "Delete button" or "Sample button"
+			 */
+			holder.sampleOrDeleteButton = (Button)convertView.findViewById(R.id.item_button_two);
+			convertView.setTag(holder);
 		} else {
-			res = convertView;
+			holder = (MagazineItemHolder)convertView.getTag();
 		}
-		//TODO: @Mike please can you add ViewHolder pattern
-		TextView title = (TextView)res.findViewById(R.id.item_title);
-		TextView subtitle = (TextView)res.findViewById(R.id.item_subtitle);
-		ImageView thumbnail = (ImageView)res.findViewById(R.id.item_thumbnail);
-
-		title.setText(currentMagazine.getTitle());
-		subtitle.setText(currentMagazine.getSubtitle());
+		holder.title.setText(currentMagazine.getTitle());
+		holder.subtitle.setText(currentMagazine.getSubtitle());
 		
 		String imagePath = currentMagazine.getPngPath();
-		thumbnail.setImageBitmap(BitmapFactory.decodeFile(imagePath));
-		/**
-		 * downloadOrReadButton - this button can be "Download button" or "Read button"
-		 */
-		Button downloadOrReadButton = (Button)res.findViewById(R.id.item_button_one);
-		/**
-		 * sampleOrDeleteButton - this button can be "Delete button" or "Sample button"
-		 */
-		Button sampleOrDeleteButton = (Button)res.findViewById(R.id.item_button_two);
+		holder.thumbnail.setImageBitmap(BitmapFactory.decodeFile(imagePath));
 
 		if (currentMagazine.isDownloaded()) {
 			// Read case
-			downloadOrReadButton.setText(context.getResources().getString(
+			holder.downloadOrReadButton.setText(context.getResources().getString(
 					R.string.read));
-			downloadOrReadButton.setOnClickListener(new OnClickListener() {
+			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					LibrelioApplication.startPDFActivity(context,
@@ -123,9 +98,9 @@ public class MagazineAdapter extends BaseAdapter{
 			});
 		} else {
 			// download case
-			downloadOrReadButton.setText(context.getResources().getString(
+			holder.downloadOrReadButton.setText(context.getResources().getString(
 					R.string.download));
-			downloadOrReadButton.setOnClickListener(new OnClickListener() {
+			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					if(currentMagazine.isPaid()){
@@ -146,24 +121,24 @@ public class MagazineAdapter extends BaseAdapter{
 			});
 		}
 		//
-		sampleOrDeleteButton.setVisibility(View.VISIBLE);
+		holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
 		if (!currentMagazine.isPaid() && !currentMagazine.isDownloaded()) {
-			sampleOrDeleteButton.setVisibility(View.INVISIBLE);
+			holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 		} else if (currentMagazine.isDownloaded()) {
 				// delete case
-				sampleOrDeleteButton.setText(context.getResources().getString(
+			holder.sampleOrDeleteButton.setText(context.getResources().getString(
 						R.string.delete));
-				sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						currentMagazine.delete();
-					}
-				});
+			holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currentMagazine.delete();
+			}
+			});
 		} else {
 			// Sample case
-			sampleOrDeleteButton.setText(context.getResources().getString(
+			holder.sampleOrDeleteButton.setText(context.getResources().getString(
 					R.string.sample));
-			sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+			holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					File sample = new File(currentMagazine.getSamplePath());
@@ -185,7 +160,7 @@ public class MagazineAdapter extends BaseAdapter{
 			});
 		}
 
-		return res;
+		return convertView;
 	}
 
 }

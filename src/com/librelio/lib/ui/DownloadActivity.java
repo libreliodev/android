@@ -60,21 +60,25 @@ public class DownloadActivity extends BaseActivity {
 	private DownloadTask download;
 	private DownloadLinksTask downloadLinks;
 	private MagazineModel magazine;
+	private InputStream input;
+	private OutputStream output;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		String title = getIntent().getExtras().getString(TITLE_KEY);
 		String subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
 		fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
-		magazine = new MagazineModel(fileName, title, subtitle, "", this);
+		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
+		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
 		
+		magazine = new MagazineModel(fileName, title, subtitle, "", this);		
 		setContentView(R.layout.download);
 		preview = (ImageView)findViewById(R.id.download_preview_image);
 		text = (TextView)findViewById(R.id.download_progress_text);
 		progress = (ProgressBar)findViewById(R.id.download_progress);
 		progress.setProgress(0);
-		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
-		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
+		
 		fileUrl = magazine.getPdfUrl();
 		filePath = magazine.getPdfPath();
 		if(isSample){
@@ -83,17 +87,12 @@ public class DownloadActivity extends BaseActivity {
 		} else if (isTemp){
 			fileUrl = getIntent().getExtras().getString(TEMP_URL_KEY);
 		}
-		
-		//
-		//
-		String imagePath = magazine.getPngPath();
-		preview.setImageBitmap(BitmapFactory.decodeFile(imagePath));
-		text.setText("Downloading");
+		preview.setImageBitmap(BitmapFactory.decodeFile(magazine.getPngPath()));
+		text.setText(getResources().getString(R.string.download));	
 		//
 		if(!LibrelioApplication.thereIsConnection(this)){
 			showDialog(CONNECTION_ALERT);
 		} else {
-		//
 			Log.d(TAG, "isSample: "+isSample+"\nfileUrl: "+fileUrl+"\nfilePath: "+filePath);
 			download = new DownloadTask();
 			try{
@@ -107,8 +106,6 @@ public class DownloadActivity extends BaseActivity {
 	}
 
 	
-	private InputStream input;
-	private OutputStream output;
 	class DownloadTask extends AsyncTask<String, String, String>{
 		@Override
 		protected void onPreExecute() {
@@ -119,9 +116,7 @@ public class DownloadActivity extends BaseActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			int count;
-			//DownloadMagazineListService.downloadFromUrl(fileUrl, filePath);
 			try {
-	
 				URL url = new URL(fileUrl);
 				URLConnection conexion = url.openConnection();
 				conexion.connect();	
