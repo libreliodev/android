@@ -77,10 +77,12 @@ public class MuPDFPageView extends PageView {
 					public void onClick(View pV) {
 						MediaHolder mh = (MediaHolder) pV;
 						removeView(mh);
-						mh.clearResources();
+						mh.releaseResources();
 						Intent intent = new Intent(getContext(), SlideShowActivity.class);
 						intent.putExtra("path", uri.getPath());
 						getContext().startActivity(intent);
+//						mh.toggleFullScreen();
+//						requestLayout();
 					}});
 				this.mediaHolders.put(uriString, h);
 				addView(h);
@@ -123,10 +125,14 @@ public class MuPDFPageView extends PageView {
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
 			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 			LinkInfo currentLink = mLinkHolder.getLinkInfo();
-			mLinkHolder.layout((int) (currentLink.left * scale),
+			if(mLinkHolder.isFullScreen()) {
+				mLinkHolder.layout(0, 0, getWidth(), getHeight());
+			} else {
+				mLinkHolder.layout((int) (currentLink.left * scale),
 					(int) (currentLink.top * scale),
 					(int) (currentLink.right * scale),
 					(int) (currentLink.bottom * scale));
+			}
 		}
 	}
 	
