@@ -85,7 +85,8 @@ public class BillingActivity extends BaseActivity {
 	private void initViews() {
 		setContentView(R.layout.billing_activity);
 		buy = (Button)findViewById(R.id.billing_buy_button);
-		subs = (Button)findViewById(R.id.billing_subs_button);
+		subsMonthly = (Button)findViewById(R.id.billing_subs_monthly);
+		subsYear = (Button)findViewById(R.id.billing_subs_year);
 		cancel = (Button)findViewById(R.id.billing_cancel_button);
 		//
 		cancel.setOnClickListener(new OnClickListener() {
