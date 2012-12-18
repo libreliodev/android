@@ -48,19 +48,21 @@ public class BillingActivity extends BaseActivity {
 	private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
 	private static final int CONNECTION_ALERT = 1;
 	private static final int SERVER_ALERT = 2;
-	
+
 	private static final String serverURL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
+
 	private String fileName;
 	private String title;
 	private String subtitle;
 	private String productId;
 	private String productPrice;
-	private IInAppBillingService mService;
+
 	private Button buy;
 	private Button cancel;
 	private Button subsYear;
 	private Button subsMonthly;
 
+	private IInAppBillingService billingService;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,13 +132,13 @@ public class BillingActivity extends BaseActivity {
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			Log.d(TAG, "onServiceDisconnected");
-			mService = null;
+			billingService = null;
 		}
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.d(TAG, "onServiceConnected");
-			mService = IInAppBillingService.Stub.asInterface(service);
+			billingService = IInAppBillingService.Stub.asInterface(service);
 			new AsyncTask<String, String, Bundle>() {
 				
 				@Override
@@ -147,7 +149,7 @@ public class BillingActivity extends BaseActivity {
 						skuList.add(productId);
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
-						skuDetails = mService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
+						skuDetails = billingService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
 					} catch (RemoteException e) {
 						Log.d(TAG, "InAppBillingService failed", e);
 						return null;
@@ -311,7 +313,7 @@ public class BillingActivity extends BaseActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				buyIntentBundle = mService.getBuyIntent(3, getPackageName(),
+				buyIntentBundle = billingService.getBuyIntent(3, getPackageName(),
 						   productId, "inapp", null);
 			} catch (RemoteException e1) {
 				Log.e(TAG,"Problem with getBuyIntent",e1);
