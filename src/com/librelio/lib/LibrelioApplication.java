@@ -21,7 +21,6 @@ public class LibrelioApplication extends Application {
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
 	public static String BASE_URL;
-	public static String APP_DIRECTORY = "/data/data/com.niveales.wind/librelio/";
 	
 	@Override
 	public void onCreate() {

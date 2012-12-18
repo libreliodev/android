@@ -2,8 +2,6 @@ package com.librelio.base;
 
 import java.util.Locale;
 
-import com.librelio.lib.LibrelioApplication;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,8 +23,9 @@ abstract public class BaseActivity extends Activity implements IBaseContext{
 
 	@Override
 	public String getInternalPath() {
-		return LibrelioApplication.APP_DIRECTORY;
+		return getDir("librelio", MODE_PRIVATE).getAbsolutePath();
 	}
+
 	@Override
 	public String getExternalPath() {
 		return Environment.getExternalStorageDirectory() + "/librelio/";
