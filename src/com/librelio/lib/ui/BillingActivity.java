@@ -52,10 +52,11 @@ public class BillingActivity extends BaseActivity {
 	private static final String serverURL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 
 	private String fileName;
-	private String title;
+	private String titleKey;
 	private String subtitle;
 	private String productId;
 	private String productPrice;
+	private String productTitle;
 
 	private Button buy;
 	private Button cancel;
@@ -77,7 +78,7 @@ public class BillingActivity extends BaseActivity {
 							mServiceConn, 
 							Context.BIND_AUTO_CREATE);
 			fileName = getIntent().getExtras().getString(DownloadActivity.FILE_NAME_KEY);
-			title = getIntent().getExtras().getString(DownloadActivity.TITLE_KEY);
+			titleKey = getIntent().getExtras().getString(DownloadActivity.TITLE_KEY);
 			subtitle = getIntent().getExtras().getString(DownloadActivity.SUBTITLE_KEY);
 			int finId = fileName.indexOf("/");
 			productId = fileName.substring(0,finId);
@@ -101,7 +102,7 @@ public class BillingActivity extends BaseActivity {
 		if(productPrice == null){
 			buy.setVisibility(View.GONE);
 		} else {
-			buy.setText(title + ": " + productPrice);
+			buy.setText(productTitle + ": "+ productPrice);
 			buy.setOnClickListener(getBuyOnClick());
 		}
 		//
@@ -170,8 +171,9 @@ public class BillingActivity extends BaseActivity {
 								object = new JSONObject(thisResponse);
 								sku = object.getString("productId");
 								price = object.getString("price");
+								productTitle = object.getString("title");
 							} catch (JSONException e) {
-								e.printStackTrace();
+								Log.e(TAG, "getSKU details failed", e);
 							}
 							if (sku.equals(productId)) {
 								productPrice = price;
@@ -300,7 +302,7 @@ public class BillingActivity extends BaseActivity {
             Intent intent = new Intent(getContext(),DownloadActivity.class);
             intent.putExtra(DownloadActivity.FILE_NAME_KEY,fileName);
             intent.putExtra(DownloadActivity.SUBTITLE_KEY,subtitle);
-            intent.putExtra(DownloadActivity.TITLE_KEY,title);
+            intent.putExtra(DownloadActivity.TITLE_KEY,titleKey);
             intent.putExtra(DownloadActivity.IS_TEMP_KEY, true);
             intent.putExtra(DownloadActivity.IS_SAMPLE_KEY, false);
             intent.putExtra(DownloadActivity.TEMP_URL_KEY, tempURL);
