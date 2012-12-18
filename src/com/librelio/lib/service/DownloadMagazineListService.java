@@ -23,7 +23,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.librelio.base.BaseService;
-import com.librelio.base.iBaseContext;
+import com.librelio.base.IBaseContext;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.storage.DataBaseHelper;
@@ -46,10 +46,15 @@ public class DownloadMagazineListService extends BaseService{
 	
 	private String plistUrl;
 	private String pList;
+	private Calendar calendar;
+	private SimpleDateFormat dateFormat;
+
 	
 	@Override
 	public void onCreate() {
-		AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+		calendar = Calendar.getInstance();
+		dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		new AsyncTask<Void, Void, Void>() {
 			
 			@Override
 			protected Void doInBackground(Void... params) {
@@ -57,15 +62,15 @@ public class DownloadMagazineListService extends BaseService{
 				cleanMagazinesListInBase();
 				//
 				plistUrl = LibrelioApplication.BASE_URL+"Magazines.plist";
-				Log.d(TAG,"onCreate path:"+((iBaseContext)getContext()).getStoragePath());
+				Log.d(TAG,"onCreate path:"+((IBaseContext)getContext()).getStoragePath());
 				
 				
 				// Plist downloading
 				if(LibrelioApplication.thereIsConnection(getContext())){
-					downloadFromUrl(plistUrl,((iBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);					
+					downloadFromUrl(plistUrl,((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);					
 				}
 				//Convert plist to String for parsing
-				pList = getStringFromFile(((iBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
+				pList = getStringFromFile(((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
 				//Parsing
 				PListXMLHandler handler = new PListXMLHandler();
 				PListXMLParser parser = new PListXMLParser();
@@ -100,6 +105,8 @@ public class DownloadMagazineListService extends BaseService{
 				sendBroadcast(intent);
 				Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 				sendBroadcast(intentInvalidate);
+				Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
+				sendBroadcast(updateProgressStop);
 				//
 				stopSelf();
 				return null;
@@ -122,17 +129,13 @@ public class DownloadMagazineListService extends BaseService{
 			conexion.connect();
 	
 			int lenghtOfFile = conexion.getContentLength();
-			Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
+			Log.d(TAG, "Lenght of file: " + lenghtOfFile);
 	
 			InputStream input = new BufferedInputStream(url.openStream());
 			OutputStream output = new FileOutputStream(filePath);
 	
 			byte data[] = new byte[1024];
-	
-			long total = 0;
-
 			while ((count = input.read(data)) != -1) {
-				total += count;
 				output.write(data, 0, count);
 			}
 			output.flush();
@@ -141,32 +144,6 @@ public class DownloadMagazineListService extends BaseService{
 		} catch (Exception e) {
 			Log.e(TAG, "Problem with download: "+filePath,e);
 		}
-		/*try{
-			URL url = new URL(sUrl);
-			File file = new File(filePath);
-			
-			URLConnection ucon = url.openConnection();
-			
-			InputStream is = ucon.getInputStream();
-            BufferedInputStream bis = new BufferedInputStream(is);
-            
-            ByteArrayBuffer baf = new ByteArrayBuffer(50);
-            int current = 0;
-            while ((current = bis.read()) != -1) {
-                    baf.append((byte) current);
-            }
-
-            /* Convert the Bytes read to a String. */
-           /* FileOutputStream fos = new FileOutputStream(file);
-            fos.write(baf.toByteArray());
-            Log.d(TAG,"File was download: "+filePath);
-            fos.close();
-		}
-        catch (FileNotFoundException e) {
-        	Log.e(TAG,"File not found: "+filePath,e);
-		} catch (IOException e) {
-			Log.e(TAG,"IOException",e);
-		} */
 	}
 	
 	public static String getStringFromFile(String path){
@@ -177,7 +154,7 @@ public class DownloadMagazineListService extends BaseService{
 
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, "Problem with open file", e);
-			return "";
+			return null;
 		}
 		char[] buf = new char[1024];
 		int numRead = 0;
@@ -190,15 +167,13 @@ public class DownloadMagazineListService extends BaseService{
 			reader.close();
 		} catch (IOException e) {
 			Log.e(TAG,"Problem with reading file",e);
-			return "";
+			return null;
 		}
 		return fileData.toString();
 	}
 	
 	private String getCurrentDate(){
-		Calendar c = Calendar.getInstance();
-		SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-		return df.format(c.getTime());
+		return dateFormat.format(calendar.getTime());
 	}
 	
 	private synchronized void cleanMagazinesListInBase(){
@@ -213,4 +188,5 @@ public class DownloadMagazineListService extends BaseService{
 	private Context getContext(){
 		return this;
 	}
+
 }

@@ -52,6 +52,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -90,6 +91,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		CloudEventListener {
 	private static final String TAG = "OceanActivity";
 	public static final String REQUEST_SUBS = "request_subs";
+	public static final String UPDATE_PROGRESS_STOP = "updeta_pregress_stop";
 	
 
 	/**
@@ -106,7 +108,11 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	private PurchaseDatabase mPurchaseDatabase;
 	private Cursor mOwnedItemsCursor;
 	private Set<String> mOwnedItems = new HashSet<String>();
-
+	private BroadcastReceiver gridInvalidate;
+	private BroadcastReceiver requestSubsAPIv2;
+	private BroadcastReceiver updateProgressStop;
+	private Timer update;
+	private Intent intent;
 	/**
 	 * The developer payload that is sent with subsequent purchase requests.
 	 */
@@ -142,7 +148,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 
 		@Override
 		public void onBillingSupported(boolean supported, String type) {
-			if (Consts.DEBUG) {
+			/*if (Consts.DEBUG) {
 				Log.i(TAG, "supported: " + supported);
 			}
 			if (type == null || type.equals(Consts.ITEM_TYPE_INAPP)) {
@@ -155,14 +161,14 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				}
 			} else if (!type.equals(Consts.ITEM_TYPE_SUBSCRIPTION)) {
 				showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-			}
+			}*/
 		}
 
 		@Override
 		public void onPurchaseStateChange(PurchaseState purchaseState,
 				String itemId, int quantity, long purchaseTime,
 				String developerPayload) {
-			if (Consts.DEBUG) {
+			/*if (Consts.DEBUG) {
 				Log.i(TAG, "onPurchaseStateChange() itemId: " + itemId + " "
 						+ purchaseState);
 			}
@@ -184,13 +190,13 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 //			mCatalogAdapter.setOwnedItems(mOwnedItems);
 			cloud.setIssuePurchiseState(mOwnedItems);
 			mOwnedItemsCursor.requery();
-			mIssueListGrid.invalidateViews();
+			mIssueListGrid.invalidateViews();*/
 		}
 
 		@Override
 		public void onRequestPurchaseResponse(RequestPurchase request,
 				ResponseCode responseCode) {
-			if (Consts.DEBUG) {
+			/*if (Consts.DEBUG) {
 				Log.d(TAG, request.mProductId + ": " + responseCode);
 			}
 			if (responseCode == ResponseCode.RESULT_OK) {
@@ -205,13 +211,13 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				if (Consts.DEBUG) {
 					Log.i(TAG, "purchase failed");
 				}
-			}
+			}*/
 		}
 
 		@Override
 		public void onRestoreTransactionsResponse(RestoreTransactions request,
 				ResponseCode responseCode) {
-			if (responseCode == ResponseCode.RESULT_OK) {
+			/*if (responseCode == ResponseCode.RESULT_OK) {
 				if (Consts.DEBUG) {
 					Log.d(TAG, "completed RestoreTransactions request");
 				}
@@ -225,7 +231,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				if (Consts.DEBUG) {
 					Log.d(TAG, "RestoreTransactions error: " + responseCode);
 				}
-			}
+			}*/
 		}
 	}
 
@@ -325,10 +331,6 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		db.close();
 	}
 	
-	private BroadcastReceiver br;
-	private BroadcastReceiver requestSubsAPIv2;
-	private Timer update;
-	private Intent intent;
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
@@ -354,19 +356,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"),
-		//		mServiceConn, Context.BIND_AUTO_CREATE);
-		
-		
-		
-		/*
-		tracker = GoogleAnalyticsTracker.getInstance();
-
-		tracker.startNewSession(getResources().getString(R.string.GoogleAnalyticsCode), 300, this);
-		tracker.trackPageView("/mainScreen/");
-		
-		cloud = new CloudHelper(this, this);
-		*/
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.issue_list_layout);
 		
 		magazine = new ArrayList<MagazineModel>();
@@ -375,8 +365,10 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
 		adapter = new MagazineAdapter(magazine, this);
 		grid.setAdapter(adapter);
-		
-		br = new BroadcastReceiver() {			
+		/**
+		 * Receiver for magazines view refresh
+		 */
+		gridInvalidate = new BroadcastReceiver() {			
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if(grid!=null){
@@ -388,7 +380,7 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 			}
 		};
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
-		registerReceiver(br, filter);
+		registerReceiver(gridInvalidate, filter);
 		
 		requestSubsAPIv2 = new BroadcastReceiver() {			
 			@Override
@@ -396,8 +388,8 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 				Log.d(TAG,"onReceive");
 				
 				if (!mBillingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
-	                // Note: mManagedType == Managed.SUBSCRIPTION
-	                //showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
+					//Note: mManagedType == Managed.SUBSCRIPTION
+					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
 				}
 			}
 		};
@@ -405,31 +397,13 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		registerReceiver(requestSubsAPIv2, subsFilter);
 		
 		startRegularUpdate();
-		//
-		
-	
+
 		mHandler = new Handler();
 		mLibrelioPurchaseObserver = new LibrelioPurchaseObserver(mHandler);
 		mBillingService = new BillingService();
 		mBillingService.setContext(this);
 		
-		/*CATALOG = initCatalog(this);
-		mDownloadManager = (DownloadManager) this
-				.getSystemService(Activity.DOWNLOAD_SERVICE);
-
-		mPurchaseDatabase = new PurchaseDatabase(this);
-		setupWidgets();*/
-
-		// Check if billing is supported.
 		ResponseHandler.register(mLibrelioPurchaseObserver);
-		/*if (!mBillingService.checkBillingSupported()) {
-			showDialog(DIALOG_CANNOT_CONNECT_ID);
-		}
-
-		if (!mBillingService
-				.checkBillingSupported(Consts.ITEM_TYPE_SUBSCRIPTION)) {
-			showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-		}*/
 	}
 
 	private void startRegularUpdate(){
@@ -455,7 +429,14 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	protected void onStart() {
 		super.onStart();
 		ResponseHandler.register(mLibrelioPurchaseObserver);
-		//initializeOwnedItems();
+		updateProgressStop = new BroadcastReceiver() {			
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				setProgressBarIndeterminateVisibility(false);
+			}
+		};
+		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
+		registerReceiver(updateProgressStop, filter);
 	}
 
 	/**
@@ -463,27 +444,15 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	 */
 	@Override
 	protected void onStop() {
-		super.onStop();
+		unregisterReceiver(gridInvalidate);
+		unregisterReceiver(updateProgressStop);
+		unregisterReceiver(requestSubsAPIv2);
 		ResponseHandler.unregister(mLibrelioPurchaseObserver);
+		super.onStop();
 	}
-
 	@Override
 	protected void onDestroy() {
-		/*super.onDestroy();
-		mPurchaseDatabase.close();
-		mBillingService.unbind();
-		this.unregisterReceiver(mDownloadBroadcasReciever);
-		for (Iterator<Long> mDownloadRequestsIterator = mDownloadRequestsHashMap
-				.keySet().iterator(); mDownloadRequestsIterator.hasNext(); mDownloadManager
-				.remove(mDownloadRequestsIterator.next()))
-			;
-		cloud.recycle();*/
-		/*if (mServiceConn != null) {
-		      unbindService(mServiceConn);
-		   }*/
 		stopRegularUpdate();
-		unregisterReceiver(br);
-		unregisterReceiver(requestSubsAPIv2);
 		super.onDestroy();
 	}
 
@@ -549,76 +518,6 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 		return str;
 	}
 
-	/**
-	 * Sets up the UI.
-	 */
-	private void setupWidgets() {
-
-		mIssueListGrid = (GridView) findViewById(R.id.issue_list_grid_view);
-
-		if (cloud.getAllIssueCursor().getCount() > 0) {
-			setGridViewAdapter(mIssueListGrid);
-
-		} else {
-			// Need to download issues for the first time
-			onReloadIssues();
-		}
-		mDownloadRequestsHashMap = new HashMap<Long, Long>();
-		mDownloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-		mDownloadBroadcasReciever = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				String action = intent.getAction();
-				if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-					long downloadId = intent.getLongExtra(
-							DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-					Query query = new Query();
-					query.setFilterById(downloadId);
-					Cursor c = mDownloadManager.query(query);
-					if (c.moveToFirst()) {
-						int columnIndex = c
-								.getColumnIndex(DownloadManager.COLUMN_STATUS);
-						if (DownloadManager.STATUS_SUCCESSFUL == c
-								.getInt(columnIndex)) {
-							String uriString = c
-									.getString(c
-											.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-							Issue issue = cloud
-									.getIssue(mDownloadRequestsHashMap
-											.get(downloadId));
-							issue.setState(issue.getState() | Issue.STATE_LOADED);
-							issue.setIssue_path(uriString);
-							cloud.updateIssue(issue);
-							mIssueListGrid.invalidateViews();
-							mDownloadRequestsHashMap.remove(downloadId);
-						}
-					}
-				}
-			}
-		};
-		this.registerReceiver(mDownloadBroadcasReciever, new IntentFilter(
-				DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
-		mOwnedItemsCursor = mPurchaseDatabase.queryAllPurchasedItems();
-		startManagingCursor(mOwnedItemsCursor);
-		String[] from = new String[] {
-				PurchaseDatabase.PURCHASED_PRODUCT_ID_COL,
-				PurchaseDatabase.PURCHASED_QUANTITY_COL };
-	}
-
-	// private void prependLogEntry(CharSequence cs) {
-	// SpannableStringBuilder contents = new SpannableStringBuilder(cs);
-	// contents.append('\n');
-	// contents.append(mLogTextView.getText());
-	// mLogTextView.setText(contents);
-	// }
-	//
-	// private void logProductActivity(String product, String activity) {
-	// SpannableStringBuilder contents = new SpannableStringBuilder();
-	// contents.append(Html.fromHtml("<b>" + product + "</b>: "));
-	// contents.append(activity);
-	// prependLogEntry(contents);
-	// }
 
 	/**
 	 * If the database has not been initialized, we send a RESTORE_TRANSACTIONS
@@ -750,74 +649,20 @@ public class MainMagazineActivity extends BaseActivity implements IssueListEvent
 	 * managed by Android Market and already purchased, then it will be
 	 * "grayed-out" in the list and not selectable.
 	 */
-	private static class CatalogAdapter extends ArrayAdapter<String> {
-		private CatalogEntry[] mCatalog;
-		private Set<String> mOwnedItems = new HashSet<String>();
-		private boolean mIsSubscriptionsSupported = false;
-
-		public CatalogAdapter(Context context, CatalogEntry[] catalog) {
-			super(context, android.R.layout.simple_spinner_item);
-			mCatalog = catalog;
-			for (CatalogEntry element : catalog) {
-				add(element.getDescription());
-			}
-			setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		}
-
-		public void setOwnedItems(Set<String> ownedItems) {
-			mOwnedItems = ownedItems;
-			notifyDataSetChanged();
-		}
-
-		public void setSubscriptionsSupported(boolean supported) {
-			mIsSubscriptionsSupported = supported;
-		}
-
-		@Override
-		public boolean areAllItemsEnabled() {
-			// Return false to have the adapter call isEnabled()
-			return false;
-		}
-
-		@Override
-		public boolean isEnabled(int position) {
-			// If the item at the given list position is not purchasable,
-			// then prevent the list item from being selected.
-			CatalogEntry entry = mCatalog[position];
-			if (entry.managed == Managed.MANAGED
-					&& mOwnedItems.contains(entry.sku)) {
-				return false;
-			}
-			if (entry.managed == Managed.SUBSCRIPTION
-					&& !mIsSubscriptionsSupported) {
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		public View getDropDownView(int position, View convertView,
-				ViewGroup parent) {
-			// If the item at the given list position is not purchasable, then
-			// "gray out" the list item.
-			View view = super.getDropDownView(position, convertView, parent);
-			view.setEnabled(isEnabled(position));
-			return view;
-		}
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.options_menu_reload:
-			//onReloadIssues();
 			if(LibrelioApplication.thereIsConnection(this)){
 				Intent intent = new Intent(this, DownloadMagazineListService.class);
 				startService(intent);
+				setProgressBarIndeterminateVisibility(true);
 				reloadMagazineData(magazine);
 				stopRegularUpdate();
 				startRegularUpdate();
+				
 			} else {
 				Toast.makeText(this, getResources().getString(R.string.connection_failed),
 						Toast.LENGTH_LONG).show();

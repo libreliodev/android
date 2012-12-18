@@ -10,7 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.librelio.base.iBaseContext;
+import com.librelio.base.IBaseContext;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
@@ -65,7 +65,7 @@ public class MagazineModel {
 	
 	public String getMagazineDir(){
 		int finishNameIndex = fileName.indexOf("/");
-		return ((iBaseContext)context).getStoragePath() + fileName.substring(0,finishNameIndex)+"/";
+		return ((IBaseContext)context).getStoragePath() + fileName.substring(0,finishNameIndex)+"/";
 	}
 	
 	public static String getAssetsBaseURL(String fileName){
@@ -93,8 +93,6 @@ public class MagazineModel {
 	public void delete(){
 		Log.d(TAG,"Deleting magazine has been initiated");
 		clearMagazineDir();
-		//new File(getMagazineDir()).delete();
-		
 		Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 		context.sendBroadcast(intentInvalidate);
 	}
@@ -115,7 +113,7 @@ public class MagazineModel {
 	private void valuesInit(String fileName) {
 		isPaid = fileName.contains("_.");
 		int startNameIndex = fileName.indexOf("/")+1;
-		String png = ((iBaseContext)context).getStoragePath()+fileName.substring(startNameIndex, fileName.length()); 
+		String png = ((IBaseContext)context).getStoragePath()+fileName.substring(startNameIndex, fileName.length()); 
 		pdfUrl = LibrelioApplication.BASE_URL + fileName;
 		pdfPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){

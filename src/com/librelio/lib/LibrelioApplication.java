@@ -18,9 +18,9 @@ public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
 	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
 	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
+	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static String BASE_URL;
 	public static String APP_DIRECTORY = "/data/data/com.niveales.wind/librelio/";
-	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	
 	@Override
 	public void onCreate() {
@@ -39,7 +39,7 @@ public class LibrelioApplication extends Application {
 			intent.setData(uri);
 			context.startActivity(intent);
 		} catch (Exception e) {
-			Log.e(TAG,"Problem with starting PDG-activity, path: "+filePath,e);
+			Log.e(TAG,"Problem with starting PDF-activity, path: "+filePath,e);
 		}
 
 	}
@@ -64,7 +64,7 @@ public class LibrelioApplication extends Application {
 		try {
 			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
 		} catch (NameNotFoundException e) {
-			Log.e(TAG,"Get mata-data error!!!",e);
+			Log.e(TAG,"Get mata-data error(getClientName)!!!",e);
 		}
 	    return (String)ai.metaData.get(META_DATA_CLIENT_NAME_KEY);
 	}
@@ -74,7 +74,7 @@ public class LibrelioApplication extends Application {
 		try {
 			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
 		} catch (NameNotFoundException e) {
-			Log.e(TAG,"Get mata-data error!!!",e);
+			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
 		}
 	    return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
 	}
