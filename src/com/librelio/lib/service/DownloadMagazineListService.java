@@ -67,7 +67,7 @@ public class DownloadMagazineListService extends BaseService{
 				
 				// Plist downloading
 				if(LibrelioApplication.thereIsConnection(getContext())){
-					downloadFromUrl(plistUrl,((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);					
+					downloadFromUrl(plistUrl,((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
 				}
 				//Convert plist to String for parsing
 				pList = getStringFromFile(((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
@@ -85,8 +85,7 @@ public class DownloadMagazineListService extends BaseService{
 					String subtitle = dict.getConfiguration(SUBTITLE_KEY).getValue().toString();
 					String downloadDate = getCurrentDate();
 					
-					MagazineModel magazine = new MagazineModel(fileName, title,
-							subtitle, downloadDate, getContext());
+					MagazineModel magazine = new MagazineModel(fileName, title, subtitle, downloadDate, getContext());
 					//saving png
 					File png = new File(magazine.getPngPath());
 					if(!png.exists()){
@@ -101,13 +100,17 @@ public class DownloadMagazineListService extends BaseService{
 				}
 				Log.d(TAG,"Downloading is finished");
 				//
-				Intent intent = new Intent(StartupActivity.BROADCAST_ACTION);
-				sendBroadcast(intent);
-				Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
-				sendBroadcast(intentInvalidate);
-				Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
-				sendBroadcast(updateProgressStop);
+				try {
+					Intent intent = new Intent(StartupActivity.BROADCAST_ACTION);
+					sendBroadcast(intent);
+					Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
+					sendBroadcast(intentInvalidate);
+					Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
+					sendBroadcast(updateProgressStop);
 				//
+				} catch (IllegalArgumentException e) {
+					Log.e(TAG, "sendBroadcast failed", e);
+				}
 				stopSelf();
 				return null;
 			}
@@ -142,7 +145,7 @@ public class DownloadMagazineListService extends BaseService{
 			output.close();
 			input.close();
 		} catch (Exception e) {
-			Log.e(TAG, "Problem with download: "+filePath,e);
+			Log.e(TAG, "Problem with download: " + filePath, e);
 		}
 	}
 	

@@ -19,6 +19,7 @@ public class LibrelioApplication extends Application {
 	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
 	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
+	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
 	public static String BASE_URL;
 	public static String APP_DIRECTORY = "/data/data/com.niveales.wind/librelio/";
 	

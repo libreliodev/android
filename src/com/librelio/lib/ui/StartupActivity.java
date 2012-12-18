@@ -29,7 +29,6 @@ import com.librelio.lib.storage.Magazines;
 import com.niveales.wind.R;
 
 public class StartupActivity extends BaseActivity {
-	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
 	private BroadcastReceiver br;
 	
 	private static final String TAG = "StartupActivity";

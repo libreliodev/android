@@ -12,15 +12,17 @@
         android:text="@string/what_do_you_want_to_buy" />
 
     <Button
-        android:id="@+id/billing_subs_button"
+        android:id="@+id/billing_subs_year"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SUBS" />
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/billing_subs_monthly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/billing_buy_button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="BUY" />
+        android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/billing_cancel_button"
