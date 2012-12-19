@@ -34,6 +34,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
@@ -53,6 +54,7 @@ import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.utils.BillingService;
 import com.librelio.lib.utils.Consts;
+import com.librelio.lib.utils.ResponseHandler;
 import com.niveales.wind.R;
 
 /**
@@ -114,6 +116,8 @@ public class MainMagazineActivity extends BaseActivity {
 	private GridView grid;
 	private ArrayList<MagazineModel> magazines;
 	private MagazineAdapter adapter;
+	private LibrelioPurchaseObserver librelioPurchaseObserver;
+	private Handler handler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -142,6 +146,10 @@ public class MainMagazineActivity extends BaseActivity {
 
 		billingService = new BillingService();
 		billingService.setContext(this);
+		handler = new Handler();
+		librelioPurchaseObserver = new LibrelioPurchaseObserver(handler);
+		ResponseHandler.register(librelioPurchaseObserver);
+
 	}
 
 	@Override
@@ -173,6 +181,7 @@ public class MainMagazineActivity extends BaseActivity {
 		setProgressBarIndeterminateVisibility(false);
 		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
 		registerReceiver(updateProgressStop, filter);
+		ResponseHandler.register(librelioPurchaseObserver);
 	}
 
 	/**
@@ -181,6 +190,7 @@ public class MainMagazineActivity extends BaseActivity {
 	@Override
 	protected void onStop() {
 		unregisterReceiver(updateProgressStop);
+		ResponseHandler.unregister(librelioPurchaseObserver);
 		super.onStop();
 	}
 
