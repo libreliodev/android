@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
+import com.librelio.lib.model.MagazineModel;
 import com.niveales.wind.R;
 
 public class BillingActivity extends BaseActivity {
@@ -50,9 +51,8 @@ public class BillingActivity extends BaseActivity {
 	private static final int SERVER_ALERT = 2;
 
 	private static final String serverURL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
-
 	private String fileName;
-	private String titleKey;
+	private String title;
 	private String subtitle;
 	private String productId;
 	private String productPrice;
@@ -64,7 +64,7 @@ public class BillingActivity extends BaseActivity {
 	private Button subsMonthly;
 
 	private IInAppBillingService billingService;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,7 +78,7 @@ public class BillingActivity extends BaseActivity {
 							mServiceConn, 
 							Context.BIND_AUTO_CREATE);
 			fileName = getIntent().getExtras().getString(DownloadActivity.FILE_NAME_KEY);
-			titleKey = getIntent().getExtras().getString(DownloadActivity.TITLE_KEY);
+			title = getIntent().getExtras().getString(DownloadActivity.TITLE_KEY);
 			subtitle = getIntent().getExtras().getString(DownloadActivity.SUBTITLE_KEY);
 			int finId = fileName.indexOf("/");
 			productId = fileName.substring(0,finId);
@@ -141,7 +141,7 @@ public class BillingActivity extends BaseActivity {
 			Log.d(TAG, "onServiceConnected");
 			billingService = IInAppBillingService.Stub.asInterface(service);
 			new AsyncTask<String, String, Bundle>() {
-				
+				Bundle ownedItems = null;
 				@Override
 				protected Bundle doInBackground(String... params) {
 					Bundle skuDetails = null;
@@ -151,6 +151,7 @@ public class BillingActivity extends BaseActivity {
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
 						skuDetails = billingService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
+						ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 					} catch (RemoteException e) {
 						Log.d(TAG, "InAppBillingService failed", e);
 						return null;
@@ -159,6 +160,18 @@ public class BillingActivity extends BaseActivity {
 				}
 				@Override
 				protected void onPostExecute(Bundle skuDetails) {
+					//If item was purchase then download begin without open billing activity 
+					int getPurchaseResponse = ownedItems.getInt("RESPONSE_CODE");
+					if(getPurchaseResponse == 0){
+						ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+						if(ownedSkus.contains(productId)){
+							DownloadFromTempURLTask download = new DownloadFromTempURLTask();
+				            download.execute();
+				            finish();
+				            return;
+						}
+					}
+					//
 					int response = skuDetails.getInt("RESPONSE_CODE");
 					if (response == 0) {
 						ArrayList<String> responseList = skuDetails
@@ -192,9 +205,7 @@ public class BillingActivity extends BaseActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
 		Log.d(TAG,requestCode+" "+resultCode);
 	   if (requestCode == CALLBACK_CODE) {    	
-	      int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
 	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-	      String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
 	        
 	      if (resultCode == RESULT_OK&purchaseData!=null) {
 	         try {
@@ -202,8 +213,7 @@ public class BillingActivity extends BaseActivity {
 	            JSONObject jo = new JSONObject(purchaseData);
 	            String sku = jo.getString("productId");
 	            Log.d(TAG,"You have bought the " + sku + ". Excellent choice,adventurer!");
-	            /*DownloadFromTempURLTask download = new DownloadFromTempURLTask();
-	            download.execute();*/
+	            new DownloadFromTempURLTask().execute();
 	          }
 	          catch (JSONException e) {
 	             Log.d(TAG,"Failed to parse purchase data.");
@@ -256,6 +266,7 @@ public class BillingActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				new PurchaseTask().execute();
+				finish();
 			}
 		};
 	}
@@ -274,7 +285,12 @@ public class BillingActivity extends BaseActivity {
 		protected Void doInBackground(Void... params) {
 			
 			HttpClient httpclient = new DefaultHttpClient();
-			HttpGet httpget = new HttpGet(serverURL+"?product_id="+productId+"&code=HFGKEBNMVUKKEBFPOLJOIMKN34");
+			String query = serverURL+"?product_id="+productId
+					+"&code=HFGKEBNMVUKKEBFPOLJOIMKN34"
+					+"&urlstring="+LibrelioApplication.getClientName(getContext())+"/"
+					+LibrelioApplication.getMagazineName(getContext())+"/"+fileName;
+			Log.d(TAG,"query = "+query);
+			HttpGet httpget = new HttpGet(query);
 			HttpParams params1 = httpclient.getParams();
 			HttpClientParams.setRedirecting(params1, false);
 			try {
@@ -294,15 +310,15 @@ public class BillingActivity extends BaseActivity {
 				}
                 Log.d(TAG,"res- name:"+h.getName()+"  val:"+h.getValue());
 			}
-			if(tempURL==null){
-				//showDialog(SERVER_ALERT);
+			if(tempURL == null){
+				Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
+				finish();
 				return;
 			}
-            //
             Intent intent = new Intent(getContext(),DownloadActivity.class);
             intent.putExtra(DownloadActivity.FILE_NAME_KEY,fileName);
             intent.putExtra(DownloadActivity.SUBTITLE_KEY,subtitle);
-            intent.putExtra(DownloadActivity.TITLE_KEY,titleKey);
+            intent.putExtra(DownloadActivity.TITLE_KEY,title);
             intent.putExtra(DownloadActivity.IS_TEMP_KEY, true);
             intent.putExtra(DownloadActivity.IS_SAMPLE_KEY, false);
             intent.putExtra(DownloadActivity.TEMP_URL_KEY, tempURL);
@@ -334,8 +350,7 @@ public class BillingActivity extends BaseActivity {
 			}
 			//
 			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
-				DownloadFromTempURLTask download = new DownloadFromTempURLTask();
-	            download.execute();
+				new DownloadFromTempURLTask().execute();
 	            return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
 				PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");

@@ -170,6 +170,7 @@ public class MainMagazineActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		setProgressBarIndeterminateVisibility(false);
 		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
 		registerReceiver(updateProgressStop, filter);
 	}

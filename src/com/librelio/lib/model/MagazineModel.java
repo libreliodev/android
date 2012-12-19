@@ -20,6 +20,7 @@ public class MagazineModel {
 	private static final String TAG = "MagazineModel";
 	private static final String COMPLETE_FILE = ".complete";
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
+	private static final String PAYED_FILE = ".payed";
 	
 	private Context context;
 	private String title;
@@ -143,7 +144,19 @@ public class MagazineModel {
 		try {
 			create = file.createNewFile();
 		} catch (IOException e) {
-			Log.d(TAG,"Problem with create .complete, createNewFile() return "+create,e);
+			Log.d(TAG,"Problem with create "+completeModificator+", createNewFile() return "+create,e);
+		}
+	}
+	public void makePayedFile(){
+		File file = new File(getMagazineDir()+PAYED_FILE);
+		boolean create = false;
+		if(file.exists()){
+			return;
+		}
+		try {
+			create = file.createNewFile();
+		} catch (IOException e) {
+			Log.d(TAG,"Problem with create "+PAYED_FILE+", createNewFile() return "+create,e);
 		}
 	}
 	
