@@ -63,7 +63,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		int count = mCore.countPages();
+		int count = mCore.countSinglePages();
 		return count;
 	}
 
@@ -86,7 +86,13 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	@Override
 	public long getItemId(int pPosition) {
 		// TODO Auto-generated method stub
-		return pPosition;
+		if(mCore.getDisplayPages() == 1) 
+			return pPosition;
+		else
+			if(pPosition > 0)
+				return (pPosition + 1) / 2;
+			else 
+				return 0;
 	}
 
 	public View getView(final int position, View convertView, ViewGroup parent) {
@@ -118,7 +124,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 					mPreviewSize = new Point();
 					int padding = mContext.getResources()
 							.getDimensionPixelSize(R.dimen.page_preview_size);
-					PointF mPageSize = mCore.getPageSize(position);
+					PointF mPageSize = mCore.getSinglePageSize(position);
 					float scale = mPageSize.y / mPageSize.x;
 					mPreviewSize.x = (int) ((float) padding / scale);
 					mPreviewSize.y = padding;
@@ -169,8 +175,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 		if (lq == null) {
 			lq = Bitmap.createBitmap(mPreviewSize.x, mPreviewSize.y,
 					Bitmap.Config.ARGB_8888);
-			mCore.drawPage(position, lq, mPreviewSize.x, mPreviewSize.y, 0, 0,
-					mPreviewSize.x, mPreviewSize.y);
+			mCore.drawSinglePage(position, lq, mPreviewSize.x, mPreviewSize.y);
 			try {
 				lq.compress(CompressFormat.JPEG, 50, new FileOutputStream(
 						mCachedBitmapFile));

@@ -29,7 +29,7 @@ public class SlideShowActivity extends BaseActivity {
 
 		String path = getIntent().getExtras().getString("path");
 
-		SlideshowAdapter adapter = new SlideshowAdapter(this,getStoragePath()+"/wind_355/"+path);
+		SlideshowAdapter adapter = new SlideshowAdapter(this, path);
 //		SlideshowAdapter adapter = new SlideshowAdapter(this, 
 //				((LibrelioApplication)getApplication()).appDirectory+"/wind_355/PWAVIETNAM_4.jpg");
 

@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -111,6 +113,7 @@ public class MuPDFActivity extends BaseActivity
 	private FrameLayout mPreviewBarHolder;
 	private HorizontalListView mPreview;
 	private MuPDFPageAdapter mDocViewAdapter;
+	private int mOrientation;
 
 	private MuPDFCore openFile(String path)
 	{
@@ -189,6 +192,12 @@ public class MuPDFActivity extends BaseActivity
 					});
 			alert.show();
 			return;
+		}
+		mOrientation = getResources().getConfiguration().orientation;
+		if(mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+			core.setDisplayPages(2);
+		} else {
+			core.setDisplayPages(1);
 		}
 
 		createUI(savedInstanceState);
@@ -459,7 +468,17 @@ public class MuPDFActivity extends BaseActivity
 
 		// Reenstate last state if it was recorded
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-		mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileName, 0));
+		int orientation = prefs.getInt("orientation", mOrientation);
+		int pageNum = prefs.getInt("page"+mFileName, 0);
+		if(orientation == mOrientation)
+			mDocView.setDisplayedViewIndex(pageNum);
+		else {
+			if(orientation == Configuration.ORIENTATION_PORTRAIT) {
+				mDocView.setDisplayedViewIndex((pageNum + 1) / 2);
+			} else {
+				mDocView.setDisplayedViewIndex((pageNum == 0) ? 0 : pageNum * 2 - 1);
+			}
+		}
 
 		if (savedInstanceState == null || !savedInstanceState.getBoolean("ButtonsHidden", false))
 			showButtons();
@@ -471,8 +490,9 @@ public class MuPDFActivity extends BaseActivity
 		RelativeLayout layout = new RelativeLayout(this);
 		layout.addView(mDocView);
 		layout.addView(mButtonsView);
-		layout.setBackgroundResource(R.drawable.tiled_background);
+//		layout.setBackgroundResource(R.drawable.tiled_background);
 		//layout.setBackgroundResource(R.color.canvas);
+		layout.setBackgroundColor(Color.BLACK);
 		setContentView(layout);
 	}
 
@@ -504,6 +524,7 @@ public class MuPDFActivity extends BaseActivity
 			SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("page"+mFileName, mDocView.getDisplayedViewIndex());
+			edit.putInt("orientation", mOrientation);
 			edit.commit();
 		}
 
@@ -524,6 +545,7 @@ public class MuPDFActivity extends BaseActivity
 			SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("page"+mFileName, mDocView.getDisplayedViewIndex());
+			edit.putInt("orientation", mOrientation);
 			edit.commit();
 		}
 	}
@@ -651,7 +673,7 @@ public class MuPDFActivity extends BaseActivity
 					int position, long id) {
 				// TODO Auto-generated method stub
 				hideButtons();
-				mDocView.setDisplayedViewIndex(position);
+				mDocView.setDisplayedViewIndex((int)id);
 			}
 
 		});

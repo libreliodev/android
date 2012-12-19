@@ -19,7 +19,7 @@ public class MuPDFCore {
 	/* Readable members */
 	private int pageNum = -1;;
 	private int numPages = -1;
-	private int displayPages = 1;
+	private int displayPages = 2;
 	public float pageWidth;
 	public float pageHeight;
 	private String mFileName;
@@ -124,14 +124,30 @@ public class MuPDFCore {
 	public synchronized void onDestroy() {
 		destroying();
 	}
+	
+	public synchronized PointF getSinglePageSize(int page) {
+		gotoPage(page);
+		return new PointF(pageWidth, pageHeight);
+	}
+	
+	public synchronized void drawPageSynchrinized(int page, Bitmap bitmap, int pageW,
+			int pageH, int patchX, int patchY, int patchW, int patchH) {
+		gotoPage(page);
+		drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
+	}
+	
+	public synchronized void drawSinglePage(int page, Bitmap bitmap, int pageW,
+			int pageH) {
+
+				drawPageSynchrinized(page, bitmap, pageW, pageH, 0, 0, pageW, pageH);
+	}
 
 	public synchronized void drawPage(int page, Bitmap bitmap, int pageW,
 			int pageH, int patchX, int patchY, int patchW, int patchH) {
 		Canvas canvas = new Canvas(bitmap);
 		try {
 			if (displayPages == 1) {
-				gotoPage(page);
-				drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
+				drawPageSynchrinized(page, bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
 			} else {
 				page = (page == 0) ? 0 : page * 2 - 1;
 				int leftPageW = pageW / 2;
@@ -155,8 +171,7 @@ public class MuPDFCore {
 					if (leftBmWidth > 0) {
 						Bitmap bm = Bitmap.createBitmap(leftBmWidth, patchH,
 								Bitmap.Config.ARGB_8888);
-						gotoPage(page);
-						drawPage(bm, leftPageW, pageH,
+						drawPageSynchrinized(page, bm, leftPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, leftBmWidth, patchH);
 						Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
@@ -168,8 +183,7 @@ public class MuPDFCore {
 					if (rightBmWidth > 0) {
 						Bitmap bm = Bitmap.createBitmap(rightBmWidth, patchH,
 								Bitmap.Config.ARGB_8888);
-						gotoPage(page);
-						drawPage(bm, rightPageW, pageH,
+						drawPageSynchrinized(page, bm, rightPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, rightBmWidth, patchH);
 						Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
@@ -180,20 +194,18 @@ public class MuPDFCore {
 					Log.d("bitmap width", "" + bitmap.getWidth());
 					canvas.drawColor(Color.BLACK);
 					Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-					gotoPage(page);
 					if (leftBmWidth > 0) {
 						Bitmap leftBm = Bitmap.createBitmap(leftBmWidth,
 								patchH, Bitmap.Config.ARGB_8888);
-						drawPage(leftBm, leftPageW, pageH, patchX, patchY,
+						drawPageSynchrinized(page, leftBm, leftPageW, pageH, patchX, patchY,
 								leftBmWidth, patchH);
 						canvas.drawBitmap(leftBm, 0, 0, paint);
 						leftBm.recycle();
 					}
-					gotoPage(page + 1);
 					if (rightBmWidth > 0) {
 						Bitmap rightBm = Bitmap.createBitmap(rightBmWidth,
 								patchH, Bitmap.Config.ARGB_8888);
-						drawPage(rightBm, rightPageW, pageH,
+						drawPageSynchrinized(page + 1, rightBm, rightPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, rightBmWidth, patchH);
 
@@ -206,9 +218,9 @@ public class MuPDFCore {
 			}
 		} catch (OutOfMemoryError e) {
 			e.printStackTrace();
-			System.gc();
 			canvas.drawColor(Color.TRANSPARENT);
 		}
+		System.gc();
 	}
 
 	public synchronized int hitLinkPage(int page, float x, float y) {
@@ -316,5 +328,13 @@ public class MuPDFCore {
 			throw new IllegalStateException("MuPDFCore can only handle 1 or 2 pages per screen!");
 		}
 		displayPages = pages;
+	}
+
+	/**
+	 * @return
+	 */
+	public int countSinglePages() {
+		// TODO Auto-generated method stub
+		return numPages;
 	}
 }
