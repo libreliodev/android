@@ -36,7 +36,6 @@ import android.widget.Toast;
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
-import com.librelio.lib.model.MagazineModel;
 import com.niveales.wind.R;
 
 public class BillingActivity extends BaseActivity {

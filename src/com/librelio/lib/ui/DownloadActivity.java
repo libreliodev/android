@@ -15,15 +15,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Surface;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -72,7 +69,7 @@ public class DownloadActivity extends BaseActivity {
 		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
 		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
 		
-		magazine = new MagazineModel(fileName, title, subtitle, "", this);		
+		magazine = new MagazineModel(fileName, title, subtitle, "", this);
 		setContentView(R.layout.download);
 		preview = (ImageView)findViewById(R.id.download_preview_image);
 		text = (TextView)findViewById(R.id.download_progress_text);
@@ -284,7 +281,7 @@ public class DownloadActivity extends BaseActivity {
 		case CONNECTION_ALERT:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			String message = getResources().getString(R.string.connection_failed);
-			builder.setMessage(message).setPositiveButton("OK", new OnClickListener() {
+			builder.setMessage(message).setPositiveButton(R.string.ok, new OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					finish();
