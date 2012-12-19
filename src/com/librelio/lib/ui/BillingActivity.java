@@ -108,24 +108,32 @@ public class BillingActivity extends BaseActivity {
 		String abonnement = getResources().getString(R.string.abonnement_wind);
 		String year = getResources().getString(R.string.year);
 		String month = getResources().getString(R.string.month);
-		subsYear.setText("   " + abonnement + " 1 " + year + "   ");
-		subsYear.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainMagazineActivity.REQUEST_SUBS);
-				sendBroadcast(intent);
-				finish();
-			}
-		});
-		subsMonthly.setText("   " + abonnement + " 1 " + month + "   ");
-		subsMonthly.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainMagazineActivity.REQUEST_SUBS);
-				sendBroadcast(intent);
-				finish();
-			}
-		});
+		if(LibrelioApplication.isEnableYearlySubs(getContext())){
+			subsYear.setText("   " + abonnement + " 1 " + year + "   ");
+			subsYear.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(MainMagazineActivity.REQUEST_SUBS);
+					sendBroadcast(intent);
+					finish();
+				}
+			});
+		} else {
+			subsYear.setVisibility(View.GONE);
+		}
+		if(LibrelioApplication.isEnableMonthlySubs(getContext())){
+			subsMonthly.setText("   " + abonnement + " 1 " + month + "   ");
+			subsMonthly.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(MainMagazineActivity.REQUEST_SUBS);
+					sendBroadcast(intent);
+					finish();
+				}
+			});
+		} else {
+			subsMonthly.setVisibility(View.GONE);
+		}
 	}
 
 	private ServiceConnection mServiceConn = new ServiceConnection() {
@@ -265,7 +273,6 @@ public class BillingActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				new PurchaseTask().execute();
-				finish();
 			}
 		};
 	}

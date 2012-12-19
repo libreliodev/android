@@ -17,6 +17,8 @@ public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
 	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
 	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
+	private static final String META_DATA_EARLY_SUBS_KEY = "EnableYearlySubs";
+	private static final String META_DATA_MONTHLY_SUBS_KEY = "EnableMonthlySubs";
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
 	public static String BASE_URL;
@@ -76,5 +78,33 @@ public class LibrelioApplication extends Application {
 			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
 		}
 	    return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
+	}
+	public static boolean isEnableYearlySubs(Context context){
+		ApplicationInfo ai = null;
+		try {
+			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
+		} catch (NameNotFoundException e) {
+			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
+		}
+		String data = ai.metaData.get(META_DATA_EARLY_SUBS_KEY).toString();
+		if(data.equalsIgnoreCase("true")){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public static boolean isEnableMonthlySubs(Context context){
+		ApplicationInfo ai = null;
+		try {
+			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
+		} catch (NameNotFoundException e) {
+			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
+		}
+		String data = ai.metaData.get(META_DATA_MONTHLY_SUBS_KEY).toString();
+		if(data.equalsIgnoreCase("true")){
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
