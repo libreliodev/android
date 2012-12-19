@@ -18,10 +18,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.librelio.base.BaseActivity;
 import com.librelio.base.BaseService;
 import com.librelio.base.IBaseContext;
 import com.librelio.lib.LibrelioApplication;
@@ -29,7 +29,6 @@ import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.ui.MainMagazineActivity;
-import com.librelio.lib.ui.StartupActivity;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
@@ -101,7 +100,7 @@ public class DownloadMagazineListService extends BaseService{
 				Log.d(TAG,"Downloading is finished");
 				//
 				try {
-					Intent intent = new Intent(StartupActivity.BROADCAST_ACTION);
+					Intent intent = new Intent(BaseActivity.BROADCAST_ACTION);
 					sendBroadcast(intent);
 					Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 					sendBroadcast(intentInvalidate);

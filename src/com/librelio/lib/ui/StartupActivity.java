@@ -30,8 +30,8 @@ import com.niveales.wind.R;
 
 public class StartupActivity extends BaseActivity {
 	private BroadcastReceiver br;
-	
 	private static final String TAG = "StartupActivity";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		File f = new File(getStoragePath());
@@ -150,5 +150,10 @@ public class StartupActivity extends BaseActivity {
 				MainMagazineActivity.class);
 		startActivity(intent);
 		finish();
+	}
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		setContentView(R.layout.startup);
+		super.onConfigurationChanged(newConfig);
 	}
 }

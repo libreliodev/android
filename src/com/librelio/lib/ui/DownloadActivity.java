@@ -291,12 +291,9 @@ public class DownloadActivity extends BaseActivity {
 		}
 		return super.onCreateDialog(id);
 	}
-	
-	/**
-	 * Done empty for lock the activity orientation change.
-	 */
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 }

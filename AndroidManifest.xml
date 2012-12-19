@@ -20,8 +20,6 @@
         
         <meta-data android:name="ClientName" android:value="niveales"/>
         <meta-data android:name="MagazineName" android:value="wind"/>
-        <meta-data android:name="EnableYearlySubs" android:value="true"/>
-        <meta-data android:name="EnableMonthlySubs" android:value="true"/>
         
         
         <activity
@@ -46,7 +44,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name="com.librelio.lib.ui.StartupActivity" 
+        <activity android:name="com.librelio.lib.ui.StartupActivity"
+            android:configChanges="orientation|keyboardHidden" 
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"><intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

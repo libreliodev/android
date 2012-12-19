@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.artifex.mupdf.MuPDFActivity;
+import com.niveales.wind.R;
 
 public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
@@ -80,13 +81,7 @@ public class LibrelioApplication extends Application {
 	    return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
 	}
 	public static boolean isEnableYearlySubs(Context context){
-		ApplicationInfo ai = null;
-		try {
-			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
-		} catch (NameNotFoundException e) {
-			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
-		}
-		String data = ai.metaData.get(META_DATA_EARLY_SUBS_KEY).toString();
+		String data = context.getResources().getString(R.string.enable_yearly_subs);
 		if(data.equalsIgnoreCase("true")){
 			return true;
 		} else {
@@ -94,13 +89,7 @@ public class LibrelioApplication extends Application {
 		}
 	}
 	public static boolean isEnableMonthlySubs(Context context){
-		ApplicationInfo ai = null;
-		try {
-			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
-		} catch (NameNotFoundException e) {
-			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
-		}
-		String data = ai.metaData.get(META_DATA_MONTHLY_SUBS_KEY).toString();
+		String data = context.getResources().getString(R.string.enable_monthly_subs);
 		if(data.equalsIgnoreCase("true")){
 			return true;
 		} else {

@@ -4,11 +4,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/black" >
 
-    <ImageView
-        android:id="@+id/download_preview_image"
-        android:layout_width="@dimen/preview_image_width"
-        android:layout_height="@dimen/preview_image_height"
-        android:layout_centerInParent="true" />
 
     <ProgressBar
         android:id="@+id/download_progress"
@@ -21,7 +16,6 @@
         android:layout_marginRight="15dp"
         android:max="100"
         android:progress="20" />
-
     <TextView
         android:id="@+id/download_progress_text"
         android:layout_width="wrap_content"
@@ -30,5 +24,18 @@
         android:layout_centerHorizontal="true"
         android:textColor="@android:color/white" >
     </TextView>
-
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/download_progress_text"
+        >
+    <ImageView
+        android:id="@+id/download_preview_image"
+        android:layout_width="@dimen/preview_image_width"
+        android:layout_height="@dimen/preview_image_height"
+        android:layout_centerInParent="true"
+        android:layout_above="@id/download_progress"
+        android:layout_marginBottom="10dp" />
+    </RelativeLayout>
+    
 </RelativeLayout>
