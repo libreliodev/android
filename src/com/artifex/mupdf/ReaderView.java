@@ -57,12 +57,14 @@ public class ReaderView extends AdapterView<Adapter>
 	private int               mScrollerLastX;
 	private int               mScrollerLastY;
 	private boolean           mScrollDisabled;
+	private SparseArray<LinkInfo[]> linkOfDocument;
 
-	public ReaderView(Context context) {
+	public ReaderView(Context context,SparseArray<LinkInfo[]> linkOfDocument) {
 		super(context);
 		mGestureDetector = new GestureDetector(this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
 		mScroller        = new Scroller(context);
+		this.linkOfDocument = linkOfDocument;
 	}
 
 	public ReaderView(Context context, AttributeSet attrs) {
@@ -86,6 +88,7 @@ public class ReaderView extends AdapterView<Adapter>
 	public void setDisplayedViewIndex(int i) {
 		if (0 <= i && i < mAdapter.getCount()) {
 			mCurrent = i;
+			mScale = 1;
 			onMoveToChild(i);
 			mResetLayout = true;
 			requestLayout();
@@ -240,7 +243,7 @@ public class ReaderView extends AdapterView<Adapter>
 		}
 		return true;
 	}
-
+	
 	public boolean onScaleBegin(ScaleGestureDetector detector) {
 		mScaling = true;
 		// Ignore any scroll amounts yet to be accounted for: the
