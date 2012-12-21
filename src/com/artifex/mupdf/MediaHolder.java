@@ -29,6 +29,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.librelio.lib.adapter.SlideshowAdapter;
 
@@ -65,21 +66,46 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			return;
 		}
 		
-		boolean autoPlay = Uri.parse(uriString).getQueryParameter("waplay") != null && Uri.parse(uriString).getQueryParameter("waplay").equals("auto");
+		//boolean autoPlay = Uri.parse(uriString).getQueryParameter("waplay") != null && Uri.parse(uriString).getQueryParameter("waplay").equals("auto");
+		boolean autoPlay = true;
+		Log.d("TAG", "autoPlay = "+autoPlay);
 
-		
+		//
 		if(uriString.startsWith("http://localhost/")) {
+			ImagePager imPager = new ImagePager(getContext(),basePath + Uri.parse(uriString).getPath());
+			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+			lp.gravity = Gravity.CENTER;
+			imPager.setLayoutParams(lp);
+			mAutoplayDelay = 3000;
+			if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
+				mAutoplayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
+			}
+			//int bgColor = Color.BLACK;
+			int bgColor = Color.WHITE;
+			if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
+				bgColor = Uri.parse(uriString).getQueryParameter("wabgcolor").equals("white") ?
+						Color.WHITE : Color.BLACK;
+			}
+			
+			
+			addView(imPager);
+			requestLayout();
+		}
+		//
+		/*if(uriString.startsWith("http://localhost/")) {
 			// local resource
 			final String path = Uri.parse(uriString).getPath();
 			if (path.endsWith("jpg") || path.endsWith("png")
 					|| path.endsWith("bmp")) {
 				
-				mAutoplayDelay = 800;
+				mAutoplayDelay = 3000;
 				if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
 					mAutoplayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
 				}
 				
-				int bgColor = Color.BLACK;
+				//int bgColor = Color.BLACK;
+				int bgColor = Color.WHITE;
 				if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
 					bgColor = Uri.parse(uriString).getQueryParameter("wabgcolor").equals("white") ?
 							Color.WHITE : Color.BLACK;
@@ -115,17 +141,22 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					mGallery.setAnimation(null);
 				}
 				if(autoPlay) {
+					
 					mAutoplayHandler = new Handler();
 					mAutoplayHandler.postDelayed(new Runnable() {
 
 						@Override
 						public void run() {
-							int item = mGallery.getSelectedItemPosition() + 1;
-							if(item >= mGallery.getCount()) {
-								item = 0;
-							}
+							Log.d("TAG", "run");
+							int item = mGallery.getCurrencPosition()+1;
+							//int item = mGallery.getSelectedItemPosition() + 1;
+							//if(item >= mGallery.getCount()) {
+							//	item = 0;
+							//}
 							mGallery.setSelection(item);
-							mAutoplayHandler.postDelayed(this, mAutoplayDelay);
+							if(item<mGallery.getCount()-1){
+								mAutoplayHandler.postDelayed(this, mAutoplayDelay);
+							}
 						}}, mAutoplayDelay);
 				} else {
 					setVisibility(View.GONE);
@@ -180,7 +211,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				setVisibility(View.GONE);
 			}
 			
-		}
+		}*/
 	}
 
 	

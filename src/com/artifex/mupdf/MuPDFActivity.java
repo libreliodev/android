@@ -1,5 +1,7 @@
 package com.artifex.mupdf;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -18,6 +20,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -37,6 +40,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.librelio.base.BaseActivity;
+import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
@@ -114,6 +118,7 @@ public class MuPDFActivity extends BaseActivity
 	private HorizontalListView mPreview;
 	private MuPDFPageAdapter mDocViewAdapter;
 	private int mOrientation;
+	private SparseArray<LinkInfo[]> linkOfDocument;
 
 	private MuPDFCore openFile(String path)
 	{
@@ -122,6 +127,28 @@ public class MuPDFActivity extends BaseActivity
 					? path
 					: path.substring(lastSlashPos+1));
 		System.out.println("Trying to open "+path);
+		PDFParser linkGetter = new PDFParser(path);
+		linkOfDocument = linkGetter.getLinkInfo();
+		for(int i=0;i<linkOfDocument.size();i++){
+			Log.d(TAG,"--- i = "+i);
+			if(linkOfDocument.get(i)!=null){
+				for(int j=0;j<linkOfDocument.get(i).length;j++){
+					String link = linkOfDocument.get(i)[j].uri;
+					Log.d(TAG,"link[" + j + "] = "+link);
+					String local = "http://localhost";
+					if(link.startsWith(local)){
+						int startIdx = local.length()+1;
+						int finIdx = link.length();
+						if(link.contains("?")){
+							finIdx = link.indexOf("?");
+						}
+						String assetsFile = link.substring(startIdx, finIdx);
+						Log.d(TAG,"   link: "+MagazineModel.getAssetsBaseURL(path)+assetsFile);
+						Log.d(TAG,"   file: "+assetsFile);
+					}
+				}
+			}
+		}
 		try
 		{
 			core = new MuPDFCore(path);
@@ -136,10 +163,12 @@ public class MuPDFActivity extends BaseActivity
 		return core;
 	}
 
+	private static final String TAG = "MuPDFActivity";
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
+
 		super.onCreate(savedInstanceState);
 
 		mAlertBuilder = new AlertDialog.Builder(this);
@@ -237,9 +266,9 @@ public class MuPDFActivity extends BaseActivity
 		// Now create the UI.
 		// First create the document view making use of the ReaderView's internal
 		// gesture recognition
-		mDocView = new ReaderView(this) {
+		mDocView = new ReaderView(this,linkOfDocument) {
 			private boolean showButtonsDisabled;
-
+			
 			public boolean onSingleTapUp(MotionEvent e) {
 				if (e.getX() < TAP_PAGE_MARGIN) {
 					super.moveToPrevious();
@@ -304,6 +333,7 @@ public class MuPDFActivity extends BaseActivity
 //			}
 
 			protected void onMoveToChild(int i) {
+				Log.d(TAG,"onMoveToChild id = "+i);
 				if (core == null)
 					return;
 //				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
@@ -844,7 +874,8 @@ public class MuPDFActivity extends BaseActivity
 				Intent intent = new Intent(this, SlideShowActivity.class);
 				intent.putExtra("path", path);
 				intent.putExtra("uri", linkString);
-//				startActivity(intent);
+				Log.d("TAG","basePath = "+path+"\nuri = "+ linkString);
+				//startActivity(intent);
 			}
 			if(path.endsWith("mp4") && isFullScreen) {
 				// start a video player

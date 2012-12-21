@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,10 +18,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.artifex.mupdf.LinkInfo;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.ui.BillingActivity;
 import com.librelio.lib.ui.DownloadActivity;
+import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{
@@ -96,6 +99,34 @@ public class MagazineAdapter extends BaseAdapter{
 							currentMagazine.getPdfPath());
 				}
 			});
+			//
+			/*PDFParser linkGetter = new PDFParser(currentMagazine.getPdfPath());
+			SparseArray<LinkInfo[]> linkBuf = linkGetter.getLinkInfo();
+			if(linkBuf==null){
+				Log.d(TAG,"There is no links");
+			} else {
+				for(int i=0;i<linkBuf.size();i++){
+					Log.d(TAG,"--- i = "+i);
+					if(linkBuf.get(i)!=null){
+						for(int j=0;j<linkBuf.get(i).length;j++){
+							String link = linkBuf.get(i)[j].uri;
+							Log.d(TAG,"link[" + j + "] = "+link);
+							String local = "http://localhost";
+							if(link.startsWith(local)){
+								int startIdx = local.length()+1;
+								int finIdx = link.length();
+								if(link.contains("?")){
+									finIdx = link.indexOf("?");
+								}
+								String assetsFile = link.substring(startIdx, finIdx);
+								Log.d(TAG,"   link: "+MagazineModel.getAssetsBaseURL(currentMagazine.getPdfPath())+assetsFile);
+								Log.d(TAG,"   file: "+assetsFile);
+							}
+						}
+					}
+				}
+			}*/
+			//
 		} else {
 			// download case
 			holder.downloadOrReadButton.setText(context.getResources().getString(

@@ -5,22 +5,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.librelio.lib.LibrelioApplication;
-import com.librelio.lib.ui.SlideShowActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewParent;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
-import android.widget.Gallery;
+
+import com.librelio.lib.ui.SlideShowActivity;
 
 public class MuPDFPageView extends PageView {
 	private final MuPDFCore mCore;
@@ -44,6 +39,7 @@ public class MuPDFPageView extends PageView {
 	}
 
 	public String hitLinkUri(float x, float y) {
+		Log.d("TAG","hitLinkUri");
 		float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
@@ -69,14 +65,17 @@ public class MuPDFPageView extends PageView {
 			boolean fullScreen = uri.getQueryParameter("warect") != null
 					&& uri.getQueryParameter("warect").equals("full");
 			try {
-				if (!fullScreen) {
-					final String basePath = mCore.getFileDirectory();
-					MediaHolder h = new MediaHolder(getContext(), mLink,
-							basePath);
+				final String basePath = mCore.getFileDirectory();
+				MediaHolder h = new MediaHolder(getContext(), mLink,
+						basePath);
+				this.mediaHolders.put(uriString, h);
+				addView(h);
+				h.setVisibility(View.VISIBLE);
+				if (fullScreen) {
 					h.setOnClickListener(new OnClickListener() {
-
 						@Override
 						public void onClick(View pV) {
+							Log.d("TAG","onClick");
 							MediaHolder mh = (MediaHolder) pV;
 							removeView(mh);
 							mh.clearResources();
@@ -86,9 +85,6 @@ public class MuPDFPageView extends PageView {
 							getContext().startActivity(intent);
 						}
 					});
-					this.mediaHolders.put(uriString, h);
-					addView(h);
-					h.setVisibility(View.VISIBLE);
 				}
 			} catch (IllegalStateException e) {
 				e.printStackTrace();

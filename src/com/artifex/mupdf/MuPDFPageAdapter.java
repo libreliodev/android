@@ -3,19 +3,19 @@ package com.artifex.mupdf;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.os.AsyncTask;
+import android.util.Log;
 import android.util.SparseArray;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 
 public class MuPDFPageAdapter extends BaseAdapter {
+	private static final String TAG = "MuPDFPageAdapter";
 	private final Context mContext;
 	private final MuPDFCore mCore;
 	private final SparseArray<PointF> mPageSizes = new SparseArray<PointF>();
+	
+
 
 	public MuPDFPageAdapter(Context c, MuPDFCore core) {
 		mContext = c;
@@ -35,6 +35,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
 	}
 
 	public View getView(final int position, View convertView, ViewGroup parent) {
+		Log.d(TAG,"getView");
 		final MuPDFPageView pageView;
 		if (convertView == null) {
 			pageView = new MuPDFPageView(mContext, mCore, new Point(parent.getWidth(), parent.getHeight()));
