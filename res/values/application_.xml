@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources 
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:ignore="MissingTranslation">
     <string name="GoogleAnalyticsCode">UA_xxxxxx</string>
     <string name="enable_yearly_subs">true</string>
     <string name="enable_monthly_subs">true</string>    
