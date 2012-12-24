@@ -228,6 +228,7 @@ public class MainMagazineActivity extends BaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+
 		case R.id.options_menu_reload:
 			if(LibrelioApplication.thereIsConnection(this)){
 				Intent intent = new Intent(this, DownloadMagazineListService.class);
@@ -236,20 +237,17 @@ public class MainMagazineActivity extends BaseActivity {
 				reloadMagazineData(magazines);
 				stopRegularUpdate();
 				startRegularUpdate();
-				
+
 			} else {
 				Toast.makeText(this, getResources().getString(R.string.connection_failed),
 						Toast.LENGTH_LONG).show();
 			}
 			return true;
+
 		case R.id.options_menu_restore:
 			restorePurchises();
 			return true;
-		case R.id.options_menu_test: {
-			Intent testIntent = new Intent(this, MuPDFActivity.class);
-			startActivity(testIntent);
-			return true;
-		}
+
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -261,8 +259,7 @@ public class MainMagazineActivity extends BaseActivity {
 		inflater.inflate(R.menu.options_menu, menu);
 		MenuItem item = menu.getItem(0);
 		item.setIcon(R.drawable.ic_menu_refresh);
-		MenuItemCompat.setShowAsAction(menu.getItem(0),
-				MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItemCompat.setShowAsAction(menu.getItem(0), MenuItem.SHOW_AS_ACTION_ALWAYS);
 		return true;
 	}
 
