@@ -11,7 +11,9 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -30,6 +32,8 @@ public class ImagePager extends RelativeLayout{
 	protected Context context;
 	private LayoutInflater inflater;
 	private String basePath;
+	private int backgroungColor = Color.BLACK;
+	private boolean transition = true;
 
 	protected PhotoPagerListener listener;
 	private SimpleImageAdapter imageAdapter;
@@ -52,9 +56,10 @@ public class ImagePager extends RelativeLayout{
 		init(context);
 	}
 
-	public ImagePager(Context context,String basePath) {
+	public ImagePager(Context context,String basePath,boolean transition) {
 		super(context);
 		this.basePath = basePath;
+		this.transition = transition;
 		init(context);
 	}
 
@@ -84,16 +89,20 @@ public class ImagePager extends RelativeLayout{
 		return imageAdapter.getCount();
 	}
 	
-	public void setCurrentPosition(int position){
+	public void setCurrentPosition(int position,boolean smoothScroll){
 		if(position>=getCount()){
 			position = getCount()-1;
 		}
 		if(position<0){
 			position = 0;
 		}
-		viewPager.setCurrentItem(position, true);
+		viewPager.setCurrentItem(position, smoothScroll);
 	}
 
+	public int getCurrentPosition(){
+		return viewPager.getCurrentItem();
+	}
+	
 	public void jumpTo(int index) {
 		viewPager.setCurrentItem(index, false);
 	}
@@ -106,23 +115,52 @@ public class ImagePager extends RelativeLayout{
 		return 2;
 	}
 
-	protected int getMinimalAmountInPage() {
-		return 1;
-	}
-
 	private void init(Context context) {
 		this.context = context;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.image_pager, this, true);
-		viewPager = (ViewPager) findViewById(R.id.image_pager_view);
-		Log.d("TAG", "init, vp = "+viewPager);
+		//viewPager = (ViewPager) findViewById(R.id.image_pager_view);
+		if(transition){
+			Log.d(TAG,"transition = "+transition);
+			viewPager = new ViewPager(getContext());
+		} else {
+			viewPager = new ViewPager(getContext()){
+				float x1 = 0, x2, y1 = 0, y2, dx, dy;
+				@Override
+			    public boolean onTouchEvent(MotionEvent event) {
+					switch(event.getAction()) {
+					    case(MotionEvent.ACTION_DOWN):
+					        x1 = event.getX();
+					        y1 = event.getY();
+					        break;
+					    case(MotionEvent.ACTION_UP): {
+					        x2 = event.getX();
+					        y2 = event.getY();
+					        dx = x2-x1;
+					        dy = y2-y1;
+					        if(Math.abs(dx) > Math.abs(dy)) {
+					            if(dx>0){
+					            	//"right";
+					            	setCurrentItem(Math.max(0,getCurrentPosition()-1),false);
+					            } else {
+					            	//"left";
+					            	setCurrentItem(Math.min(getCurrentPosition()+1,getCount()-1),false);
+					            }
+					        }
+					    }
+					}
+			        return true;
+			    }
+			};
+		}
 		viewPager.setAdapter(getAdapter());
 		viewPager.setHorizontalFadingEdgeEnabled(true);
 		viewPager.setFadingEdgeLength(0);
 		viewPager.setOffscreenPageLimit(getPageLimit());
+		addView(viewPager);
 	}
 
-
+	
 	protected PagerAdapter getAdapter() {
 		if (null == imageAdapter) {
 			imageAdapter = new SimpleImageAdapter(context, minCountFromInfinityLoop,basePath);
@@ -134,8 +172,14 @@ public class ImagePager extends RelativeLayout{
 		this.listener = listener;
 	}
 
-	protected class SimpleImageAdapter extends PagerAdapter {
-
+	@Override
+	public void setBackgroundColor(int color) {
+		backgroungColor = color;
+		super.setBackgroundColor(color);
+	}
+	
+	protected class SimpleImageAdapter extends PagerAdapter{
+		
 		protected Context context;
 
 		protected int imageViewId;
@@ -146,7 +190,6 @@ public class ImagePager extends RelativeLayout{
 		private String mSlideshowPreffix;
 		private String mSlideshowSuffix;
 		private LayoutInflater inflater;
-		private int backColor = Color.BLACK;
 		
 		public SimpleImageAdapter(Context context, int minCountFromInfinityLoop, String path) {
 			this.context = context;
@@ -155,15 +198,12 @@ public class ImagePager extends RelativeLayout{
 			File mFile = new File(path);
 			mSlideshowAssetDir = mFile.getParent();
 			String mFileName = mFile.getName();
-			mSlideshowCount = Integer
-					.valueOf(mFileName.split("_")[1].split("\\.")[0]);
+			mSlideshowCount = Integer.valueOf(mFileName.split("_")[1].split("\\.")[0]);
 			mSlideshowPreffix = mFileName.split("_")[0];
 			mSlideshowSuffix = mFileName.split("_")[1].split("\\.")[1];
 			this.minCountFromInfinityLoop = minCountFromInfinityLoop;
 		}
-		public void setBackgroundColor(int color){
-			this.backColor = color;
-		}
+
 		@Override
 		public int getCount() {
 			return mSlideshowCount;//countPhotos;
@@ -197,12 +237,14 @@ public class ImagePager extends RelativeLayout{
 					path = (String) pParams[0];
 					img = (ImageView)view.findViewById(R.id.SlideshowImage);
 					background = (FrameLayout)view.findViewById(R.id.slide_show_frame);
-					background.setBackgroundColor(backColor);
-					return BitmapFactory.decodeFile(path);
+					BitmapFactory.Options options=new BitmapFactory.Options();
+					options.inSampleSize = 2;
+					return BitmapFactory.decodeFile(path,options);
 				}
 				
 				@Override
 				protected void onPostExecute(Bitmap bmp) {
+					background.setBackgroundColor(backgroungColor);
 					img.setImageBitmap(bmp);
 				}
 			}.execute(path);
@@ -211,12 +253,11 @@ public class ImagePager extends RelativeLayout{
 			container.addView(view);
 			return view;
 		}
-
+		
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
 			container.removeView((View)object);
 		}
-
 	}
 
 }

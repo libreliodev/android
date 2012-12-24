@@ -50,6 +50,7 @@ class SearchTaskResult {
 	public final int   pageNumber;
 	public final RectF searchBoxes[];
 	static private SearchTaskResult singleton;
+	public static String currentMagazineFileName;
 
 	SearchTaskResult(String _txt, int _pageNumber, RectF _searchBoxes[]) {
 		txt = _txt;
@@ -865,7 +866,7 @@ public class MuPDFActivity extends BaseActivity
 			
 			// get the current page view
 			String path = uri.getPath();
-			Log.d("PATH", path);
+			Log.d(TAG, path);
 			if(path == null)
 				return;
 			
@@ -874,14 +875,14 @@ public class MuPDFActivity extends BaseActivity
 				Intent intent = new Intent(this, SlideShowActivity.class);
 				intent.putExtra("path", path);
 				intent.putExtra("uri", linkString);
-				Log.d("TAG","basePath = "+path+"\nuri = "+ linkString);
+				Log.d(TAG,"basePath = "+path+"\nuri = "+ linkString);
 				//startActivity(intent);
 			}
 			if(path.endsWith("mp4") && isFullScreen) {
 				// start a video player
-				Uri videoUri = Uri.parse("file://" + getStoragePath() + "/wind_355" + path);
-				Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
-				startActivity(intent);
+				//Uri videoUri = Uri.parse("file://" + getStoragePath() + "/wind_355" + path);
+				//Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
+				//startActivity(intent);
 			}
 		} else {
 			//TODO: replace with custom activity

@@ -18,6 +18,9 @@ import android.widget.FrameLayout;
 import com.librelio.lib.ui.SlideShowActivity;
 
 public class MuPDFPageView extends PageView {
+	public static final String PATH_KEY = "path";
+	public static final String LINK_URI_KEY = "link_uri";
+	
 	private final MuPDFCore mCore;
 	private HashMap<String, FrameLayout> mediaHolders = new HashMap<String, FrameLayout>();
 
@@ -67,25 +70,10 @@ public class MuPDFPageView extends PageView {
 			try {
 				final String basePath = mCore.getFileDirectory();
 				MediaHolder h = new MediaHolder(getContext(), mLink,
-						basePath);
+						basePath,fullScreen);
+				h.setVisibility(View.VISIBLE);
 				this.mediaHolders.put(uriString, h);
 				addView(h);
-				h.setVisibility(View.VISIBLE);
-				if (fullScreen) {
-					h.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View pV) {
-							Log.d("TAG","onClick");
-							MediaHolder mh = (MediaHolder) pV;
-							removeView(mh);
-							mh.clearResources();
-							Intent intent = new Intent(getContext(),
-									SlideShowActivity.class);
-							intent.putExtra("path", basePath + uri.getPath());
-							getContext().startActivity(intent);
-						}
-					});
-				}
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 				return null;

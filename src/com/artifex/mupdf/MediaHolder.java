@@ -3,11 +3,17 @@
  */
 package com.artifex.mupdf;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -15,6 +21,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,18 +33,21 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
+import android.widget.MediaController;
+import android.widget.VideoView;
 
-import com.librelio.lib.adapter.SlideshowAdapter;
+import com.librelio.lib.ui.SlideShowActivity;
+import com.librelio.lib.ui.VideoActivity;
 
 /**
  * @author Dmitry Valetin
  *
  */
 public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpdateListener, OnCompletionListener, OnVideoSizeChangedListener, OnPreparedListener {
+	private static final String TAG = "MediaHolder";
+	public static final String URI_STRING_KEY = "uri_string_key";
+	public static final String BASE_PATH_KEY = "base_path_key";
 
 	private LinkInfo mLinkInfo;
 	private SimpleGallery mGallery = null;
@@ -51,123 +61,99 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private MediaPlayer mMediaPlayer;
 	private SurfaceHolder holder;
 	private String videoFileName;
+	private ImagePager imPager;
+	private boolean transition = true;
 	
 	/**
 	 * @param pContext
 	 */
 	@SuppressLint("SetJavaScriptEnabled")
-	public MediaHolder(Context pContext, LinkInfo link, String basePath) throws IllegalStateException{
+	public MediaHolder(Context pContext, LinkInfo link,String basePath,boolean full) throws IllegalStateException{
 		super(pContext);
 		mLinkInfo = link;
 		uriString = link.uri;
+		Log.d(TAG,"basePath = "+basePath+"\nuriString = "+uriString);
 		if(uriString == null)
 			return;
-		if(Uri.parse(uriString).getQueryParameter("warect") != null && Uri.parse(uriString).getQueryParameter("warect").equals("full")) {
-			return;
-		}
 		
-		//boolean autoPlay = Uri.parse(uriString).getQueryParameter("waplay") != null && Uri.parse(uriString).getQueryParameter("waplay").equals("auto");
-		boolean autoPlay = true;
-		Log.d("TAG", "autoPlay = "+autoPlay);
+		
+		
+		boolean autoPlay = Uri.parse(uriString).getQueryParameter("waplay") != null 
+				&& Uri.parse(uriString).getQueryParameter("waplay").equals("auto");
 
-		//
 		if(uriString.startsWith("http://localhost/")) {
-			ImagePager imPager = new ImagePager(getContext(),basePath + Uri.parse(uriString).getPath());
-			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			lp.gravity = Gravity.CENTER;
-			imPager.setLayoutParams(lp);
-			mAutoplayDelay = 3000;
-			if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
-				mAutoplayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
-			}
-			//int bgColor = Color.BLACK;
-			int bgColor = Color.WHITE;
-			if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
-				bgColor = Uri.parse(uriString).getQueryParameter("wabgcolor").equals("white") ?
-						Color.WHITE : Color.BLACK;
-			}
-			
-			
-			addView(imPager);
-			requestLayout();
-		}
-		//
-		/*if(uriString.startsWith("http://localhost/")) {
-			// local resource
 			final String path = Uri.parse(uriString).getPath();
-			if (path.endsWith("jpg") || path.endsWith("png")
-					|| path.endsWith("bmp")) {
-				
-				mAutoplayDelay = 3000;
+			if (path.endsWith("jpg") || path.endsWith("png") || path.endsWith("bmp")) {
+				if(full){
+					Log.d(TAG,"full = "+full);
+					Intent intent = new Intent(getContext(),
+							SlideShowActivity.class);
+					intent.putExtra(MuPDFPageView.PATH_KEY, basePath);
+					intent.putExtra(MuPDFPageView.LINK_URI_KEY, uriString);
+					getContext().startActivity(intent);
+					return;
+				}
+				mAutoplayDelay = 2000;
 				if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
 					mAutoplayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
 				}
-				
-				//int bgColor = Color.BLACK;
-				int bgColor = Color.WHITE;
+				int bgColor = Color.BLACK;
 				if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
 					bgColor = Uri.parse(uriString).getQueryParameter("wabgcolor").equals("white") ?
 							Color.WHITE : Color.BLACK;
 				}
+				
+				if(Uri.parse(uriString).getQueryParameter("watransition") != null) {
+					transition = !Uri.parse(uriString).getQueryParameter("watransition").equals("none");
+					Log.d(TAG,"transition = "+transition);
+				}
+				//
+				imPager = new ImagePager(getContext(),basePath + Uri.parse(uriString).getPath(),transition);
 				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				lp.gravity = Gravity.CENTER;
-				mGallery = new SimpleGallery(getContext());
-
-				mGallery.setAdapter(new SlideshowAdapter(getContext(),
-						basePath
-								+ Uri.parse(uriString).getPath()));
-				mGallery.setLayoutParams(lp);
-				mGallery.setBackgroundColor(bgColor);
-
-				mGallery.setOnItemClickListener(new OnItemClickListener() {
-
-					public void onClick(View pV) {
-						if(listener != null) {
-							listener.onClick(MediaHolder.this);
-						}
-					}
-
-					@Override
-					public void onItemClick(AdapterView<?> pParent, View pView,
-							int pPosition, long pId) {
-						if(listener != null) {
-							listener.onClick(MediaHolder.this);
-						}
-					}
-				});
-				if(Uri.parse(uriString).getQueryParameter("watransition") != null && Uri.parse(uriString).getQueryParameter("watransition").equals("none")) {
-					mGallery.setAnimation(null);
-				}
+				imPager.setLayoutParams(lp);
+				//
 				if(autoPlay) {
-					
 					mAutoplayHandler = new Handler();
 					mAutoplayHandler.postDelayed(new Runnable() {
-
 						@Override
 						public void run() {
-							Log.d("TAG", "run");
-							int item = mGallery.getCurrencPosition()+1;
-							//int item = mGallery.getSelectedItemPosition() + 1;
-							//if(item >= mGallery.getCount()) {
-							//	item = 0;
-							//}
-							mGallery.setSelection(item);
-							if(item<mGallery.getCount()-1){
+							int item = imPager.getCurrentPosition()+1;
+							imPager.setCurrentPosition(item,transition);
+							if(item<imPager.getCount()-1){
 								mAutoplayHandler.postDelayed(this, mAutoplayDelay);
 							}
 						}}, mAutoplayDelay);
 				} else {
 					setVisibility(View.GONE);
 				}
-				addView(mGallery);
-//				requestLayout();
-			} else if (path.endsWith("mp4")) {
 				
-			} 
-			
+				imPager.setBackgroundColor(bgColor);
+				
+				addView(imPager);
+				requestLayout();
+			} else if (path.endsWith("mp4")) {
+				boolean fullVideo = Uri.parse(uriString).getQueryParameter("warect") != null 
+						&& Uri.parse(uriString).getQueryParameter("warect").equals("full");
+				fullVideo = false;
+				if(fullVideo){
+					Intent intent = new Intent(getContext(), VideoActivity.class);
+					intent.putExtra(URI_STRING_KEY, uriString);
+					intent.putExtra(BASE_PATH_KEY, basePath);
+					getContext().startActivity(intent);
+				} else {
+					VideoActivity.createTempVideoFile(uriString, basePath, VideoActivity.getTempPath());
+					VideoView video = new VideoView(getContext());
+					addView(video);
+					video.setVideoPath(VideoActivity.getTempPath());
+					video.setMediaController(new MediaController(getContext()));
+					video.requestFocus();
+					video.start();
+				}
+			}
 		} else if(uriString.contains("mp4")) {
+			if(full)
 			mMediaPlayer = getMediaPlayer(uriString);
 			videoFileName = uriString;
 			SurfaceView sv = new SurfaceView(getContext());
@@ -211,7 +197,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				setVisibility(View.GONE);
 			}
 			
-		}*/
+		}
 	}
 
 	
