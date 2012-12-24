@@ -49,7 +49,6 @@ public class BillingActivity extends BaseActivity {
 	private static final int CONNECTION_ALERT = 1;
 	private static final int SERVER_ALERT = 2;
 
-	private static final String serverURL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 	private String fileName;
 	private String title;
 	private String subtitle;
@@ -63,7 +62,7 @@ public class BillingActivity extends BaseActivity {
 	private Button subsMonthly;
 
 	private IInAppBillingService billingService;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -285,17 +284,28 @@ public class BillingActivity extends BaseActivity {
 		return this;
 	}
 
+	private String buildQuery() {
+		StringBuilder query = new StringBuilder(LibrelioApplication.getServerUrl());
+		query.append("?product_id=")
+			.append(productId)
+			.append("&code=HFGKEBNMVUKKEBFPOLJOIMKN34")
+			.append("&urlstring=")
+			.append(LibrelioApplication.getClientName(getContext()))
+			.append("/")
+			.append(LibrelioApplication.getMagazineName(getContext()))
+			.append("/")
+			.append(fileName);
+		return query.toString();
+	}
+
 	private class DownloadFromTempURLTask extends AsyncTask<Void, Void, Void>{
 		HttpResponse res = null;
 		@Override
 		protected Void doInBackground(Void... params) {
 			
 			HttpClient httpclient = new DefaultHttpClient();
-			String query = serverURL+"?product_id="+productId
-					+"&code=HFGKEBNMVUKKEBFPOLJOIMKN34"
-					+"&urlstring="+LibrelioApplication.getClientName(getContext())+"/"
-					+LibrelioApplication.getMagazineName(getContext())+"/"+fileName;
-			Log.d(TAG,"query = "+query);
+			String query = buildQuery();
+			Log.d(TAG,"query = " + query);
 			HttpGet httpget = new HttpGet(query);
 			HttpParams params1 = httpclient.getParams();
 			HttpClientParams.setRedirecting(params1, false);
@@ -314,21 +324,21 @@ public class BillingActivity extends BaseActivity {
 				if(h.getName().equalsIgnoreCase("location")){
 					tempURL = h.getValue();
 				}
-                Log.d(TAG,"res- name:"+h.getName()+"  val:"+h.getValue());
+				Log.d(TAG, "res- name:" + h.getName() + "  val:" + h.getValue());
 			}
 			if(tempURL == null){
 				Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
 				finish();
 				return;
 			}
-            Intent intent = new Intent(getContext(),DownloadActivity.class);
-            intent.putExtra(DownloadActivity.FILE_NAME_KEY,fileName);
-            intent.putExtra(DownloadActivity.SUBTITLE_KEY,subtitle);
-            intent.putExtra(DownloadActivity.TITLE_KEY,title);
-            intent.putExtra(DownloadActivity.IS_TEMP_KEY, true);
-            intent.putExtra(DownloadActivity.IS_SAMPLE_KEY, false);
-            intent.putExtra(DownloadActivity.TEMP_URL_KEY, tempURL);
-            startActivity(intent);
+			Intent intent = new Intent(getContext(), DownloadActivity.class);
+			intent.putExtra(DownloadActivity.FILE_NAME_KEY, fileName);
+			intent.putExtra(DownloadActivity.SUBTITLE_KEY, subtitle);
+			intent.putExtra(DownloadActivity.TITLE_KEY, title);
+			intent.putExtra(DownloadActivity.IS_TEMP_KEY, true);
+			intent.putExtra(DownloadActivity.IS_SAMPLE_KEY, false);
+			intent.putExtra(DownloadActivity.TEMP_URL_KEY, tempURL);
+			startActivity(intent);
 		};
 	}
 
@@ -357,7 +367,7 @@ public class BillingActivity extends BaseActivity {
 			//
 			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
 				new DownloadFromTempURLTask().execute();
-	            return;
+				return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
 				PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
 				if(pendingIntent==null){

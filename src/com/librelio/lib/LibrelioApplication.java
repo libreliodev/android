@@ -15,15 +15,16 @@ import com.artifex.mupdf.MuPDFActivity;
 import com.niveales.wind.R;
 
 public class LibrelioApplication extends Application {
-	private static final String TAG = "LibrelioApplication";
-	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
-	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
-	private static final String META_DATA_EARLY_SUBS_KEY = "EnableYearlySubs";
-	private static final String META_DATA_MONTHLY_SUBS_KEY = "EnableMonthlySubs";
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
 	public static String BASE_URL;
-	
+
+	private static final String TAG = "LibrelioApplication";
+	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
+	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
+	private static final String SERVER_URL = "http://download.librelio.com/downloads/android_verify.php";
+
+
 	@Override
 	public void onCreate() {
 		String clientName = getClientName(this);
@@ -32,7 +33,7 @@ public class LibrelioApplication extends Application {
 				clientName + "/" + magazineName + "/";
 		super.onCreate();
 	}
-	
+
 	public static void startPDFActivity(Context context,String filePath){
 		try{
 			Uri uri = Uri.parse(filePath);
@@ -68,7 +69,7 @@ public class LibrelioApplication extends Application {
 		} catch (NameNotFoundException e) {
 			Log.e(TAG,"Get mata-data error(getClientName)!!!",e);
 		}
-	    return (String)ai.metaData.get(META_DATA_CLIENT_NAME_KEY);
+		return (String)ai.metaData.get(META_DATA_CLIENT_NAME_KEY);
 	}
 	
 	public static String getMagazineName(Context context){
@@ -78,8 +79,9 @@ public class LibrelioApplication extends Application {
 		} catch (NameNotFoundException e) {
 			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
 		}
-	    return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
+		return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
 	}
+
 	public static boolean isEnableYearlySubs(Context context){
 		String data = context.getResources().getString(R.string.enable_yearly_subs);
 		if(data.equalsIgnoreCase("true")){
@@ -88,6 +90,7 @@ public class LibrelioApplication extends Application {
 			return false;
 		}
 	}
+
 	public static boolean isEnableMonthlySubs(Context context){
 		String data = context.getResources().getString(R.string.enable_monthly_subs);
 		if(data.equalsIgnoreCase("true")){
@@ -95,5 +98,9 @@ public class LibrelioApplication extends Application {
 		} else {
 			return false;
 		}
+	}
+
+	public static String getServerUrl(){
+		return SERVER_URL;
 	}
 }
