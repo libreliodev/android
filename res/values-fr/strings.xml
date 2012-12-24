@@ -88,5 +88,6 @@
     <string name="months">mois</string>
     <string name="year">an</string>
     <string name="week">semaine</string>
+    <string name="ok">OK</string>
     
 </resources>
