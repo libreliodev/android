@@ -31,9 +31,47 @@ import com.niveales.wind.R;
 public class StartupActivity extends BaseActivity {
 	private BroadcastReceiver br;
 	private static final String TAG = "StartupActivity";
+	public static final String TEST_FILE_NAME = "test/test.pdf";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		/**
+		 * TODO delete after testing
+		 */
+		String[] assetsList1 = null;
+		String testDir = getStoragePath()+"test/";
+		Log.d(TAG,"testDir: "+testDir);
+		File dir = new File(testDir);
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+		try {
+			assetsList1 = getResources().getAssets().list("test");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		for(String file : assetsList1){
+			Log.d(TAG,file);
+			try {
+				int count;
+				InputStream input = getAssets().open("test/"+file);
+				OutputStream output = new FileOutputStream(testDir+file);
+				byte data[] = new byte[1024];
+				
+				long total = 0;
+
+				while ((count = input.read(data)) != -1) {
+					total += count;
+					output.write(data, 0, count);
+				}
+				output.flush();
+				output.close();
+				input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		//--------------------------------------------
 		File f = new File(getStoragePath());
 		if(!f.exists()){
 			Log.d(TAG,"onCreate directory was create");

@@ -277,6 +277,10 @@ public class MainMagazineActivity extends BaseActivity {
 		}
 		c.close();
 		db.close();
+		/**
+		 * TODO delete after testing
+		 */
+		magazine.add(new MagazineModel(StartupActivity.TEST_FILE_NAME, "TEST", "test", "", this));
 	}
 
 	private void startRegularUpdate(){

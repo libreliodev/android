@@ -17,12 +17,14 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.artifex.mupdf.LinkInfo;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.ui.BillingActivity;
 import com.librelio.lib.ui.DownloadActivity;
+import com.librelio.lib.ui.StartupActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
@@ -87,7 +89,28 @@ public class MagazineAdapter extends BaseAdapter{
 		
 		String imagePath = currentMagazine.getPngPath();
 		holder.thumbnail.setImageBitmap(BitmapFactory.decodeFile(imagePath));
-
+		
+		/**
+		 * TODO delete after testing
+		 */
+		if(currentMagazine.getFileName().equals(StartupActivity.TEST_FILE_NAME)){
+			holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
+			holder.downloadOrReadButton.setText(context.getResources().getString(
+					R.string.read));
+			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(new File(currentMagazine.getPdfPath()).exists()){
+						LibrelioApplication.startPDFActivity(context,
+								currentMagazine.getPdfPath());
+					} else {
+						Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
+					}
+				}
+			});
+			return convertView;
+		}
+		
 		if (currentMagazine.isDownloaded()) {
 			// Read case
 			holder.downloadOrReadButton.setText(context.getResources().getString(
