@@ -27,28 +27,14 @@ public class VideoActivity extends BaseActivity{
 	private String temp;
 	private String uriString;
 	private String basePath;
+	private boolean autoPlay = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG,"onCreate");
 		uriString = getIntent().getExtras().getString(MediaHolder.URI_STRING_KEY);
 		basePath = getIntent().getExtras().getString(MediaHolder.BASE_PATH_KEY);
-		
-		
-		String local = "http://localhost/";
-		int startIdx = local.length();
-		int finIdx = uriString.length();
-		if(uriString.contains("?")){
-			finIdx = uriString.indexOf("?");
-		}
-		String assetsFile = uriString.substring(startIdx, finIdx);
-		String videoPath = basePath+"/"+assetsFile;
-				
-		setContentView(R.layout.video_activity_layout);
-		video = (VideoView)findViewById(R.id.video_frame);
-		video.setVideoPath(videoPath);
-		video.setMediaController(new MediaController(getContext()));
-		video.requestFocus();
-		video.start();
+		autoPlay = getIntent().getExtras().getBoolean(MediaHolder.AUTO_PLAY_KEY);
+
 		
 		new AsyncTask<Void, Void, Void>(){
 			String temp;
@@ -67,7 +53,9 @@ public class VideoActivity extends BaseActivity{
 				video.setVideoPath(getTempPath());
 				video.setMediaController(new MediaController(getContext()));
 				video.requestFocus();
-				video.start();
+				if(autoPlay){
+					video.start();
+				}
 			}
 		}.execute();
 		

@@ -235,10 +235,16 @@ public class ImagePager extends RelativeLayout{
 				@Override
 				protected Bitmap doInBackground(Object... pParams) {
 					path = (String) pParams[0];
+					File file = new File(path);
+					int size = (int)(file.length()/1024);
 					img = (ImageView)view.findViewById(R.id.SlideshowImage);
 					background = (FrameLayout)view.findViewById(R.id.slide_show_frame);
 					BitmapFactory.Options options=new BitmapFactory.Options();
-					options.inSampleSize = 2;
+					if(size>200){
+						options.inSampleSize = 2;
+					} else {
+						options.inSampleSize = 1;
+					}
 					return BitmapFactory.decodeFile(path,options);
 				}
 				

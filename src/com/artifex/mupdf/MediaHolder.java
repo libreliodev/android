@@ -3,13 +3,7 @@
  */
 package com.artifex.mupdf;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,10 +15,10 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -39,6 +33,7 @@ import android.widget.VideoView;
 
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.ui.VideoActivity;
+import com.niveales.wind.R;
 
 /**
  * @author Dmitry Valetin
@@ -48,6 +43,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private static final String TAG = "MediaHolder";
 	public static final String URI_STRING_KEY = "uri_string_key";
 	public static final String BASE_PATH_KEY = "base_path_key";
+	public static final String AUTO_PLAY_KEY = "auto_play_key";
 
 	private LinkInfo mLinkInfo;
 	private SimpleGallery mGallery = null;
@@ -136,65 +132,77 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			} else if (path.endsWith("mp4")) {
 				boolean fullVideo = Uri.parse(uriString).getQueryParameter("warect") != null 
 						&& Uri.parse(uriString).getQueryParameter("warect").equals("full");
-				fullVideo = false;
 				if(fullVideo){
 					Intent intent = new Intent(getContext(), VideoActivity.class);
 					intent.putExtra(URI_STRING_KEY, uriString);
 					intent.putExtra(BASE_PATH_KEY, basePath);
+					intent.putExtra(AUTO_PLAY_KEY, autoPlay);
 					getContext().startActivity(intent);
 				} else {
+					LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					inflater.inflate(R.layout.video_activity_layout, this, true);
+					
 					VideoActivity.createTempVideoFile(uriString, basePath, VideoActivity.getTempPath());
-					VideoView video = new VideoView(getContext());
-					addView(video);
+					VideoView video = (VideoView)findViewById(R.id.video_frame);// new VideoView(getContext());
+					//video.setLayoutParams(new FrameLayout.LayoutParams
+					//		(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT));
 					video.setVideoPath(VideoActivity.getTempPath());
-					video.setMediaController(new MediaController(getContext()));
+					MediaController mc = new MediaController(getContext());
+					mc.setAnchorView(video);
+					video.setMediaController(mc);
 					video.requestFocus();
-					video.start();
+					//addView(video);
+					if(autoPlay){
+						video.start();
+					}
 				}
 			}
 		} else if(uriString.contains("mp4")) {
-			if(full)
-			mMediaPlayer = getMediaPlayer(uriString);
-			videoFileName = uriString;
-			SurfaceView sv = new SurfaceView(getContext());
-			
-			sv.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-			holder = sv.getHolder();
-	        holder.addCallback(this);
-	        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-			addView(sv);
-			mMediaPlayer.setDisplay(sv.getHolder());
-		} else {
-			mWebView = new WebView(getContext());
-			String htmlString = "<html> <body> <embed src=\""+uriString+"\"; type=application/x-shockwave-flash width="+getWidth()+" height="+getHeight()+"> </embed> </body> </html>";
-			mWebView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; U; Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17");
-			mWebView.getSettings().setJavaScriptEnabled(true);
-			mWebView.getSettings().setPluginsEnabled(true);
-			mWebView.getSettings().setPluginState(PluginState.ON_DEMAND);
-			mWebView.getSettings().setAllowFileAccess(true);
-			mWebView.getSettings().setAppCacheEnabled(true);
-			mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-			mWebView.setWebChromeClient(new WebChromeClient() {
-				   public void onProgressChanged(WebView view, int progress) {
-				     // Activities and WebViews measure progress with different scales.
-				     // The progress meter will automatically disappear when we reach 100%
-//				     activity.setProgress(progress * 1000);
-				   }
-				 });
-			mWebView.setWebViewClient(new MyClient());
-
-			FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			lp.gravity = Gravity.CENTER;
-			mWebView.setLayoutParams(lp);
-			addView(mWebView);
-			if(autoPlay) {
-				mWebView.loadUrl(uriString);
-//				mWebView.loadDataWithBaseURL(null,htmlString ,"text/html", "UTF-8",null);
+			boolean fullVideo = Uri.parse(uriString).getQueryParameter("warect") != null 
+					&& Uri.parse(uriString).getQueryParameter("warect").equals("full");
+			if(fullVideo){
+				mMediaPlayer = getMediaPlayer(uriString);
+				videoFileName = uriString;
+				SurfaceView sv = new SurfaceView(getContext());
 				
-				setVisibility(View.VISIBLE);
+				sv.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+				holder = sv.getHolder();
+		        holder.addCallback(this);
+		        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+				addView(sv);
+				mMediaPlayer.setDisplay(sv.getHolder());
 			} else {
-				setVisibility(View.GONE);
+				mWebView = new WebView(getContext());
+				String htmlString = "<html> <body> <embed src=\""+uriString+"\"; type=application/x-shockwave-flash width="+getWidth()+" height="+getHeight()+"> </embed> </body> </html>";
+				mWebView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; U; Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17");
+				mWebView.getSettings().setJavaScriptEnabled(true);
+				mWebView.getSettings().setPluginsEnabled(true);
+				mWebView.getSettings().setPluginState(PluginState.ON_DEMAND);
+				mWebView.getSettings().setAllowFileAccess(true);
+				mWebView.getSettings().setAppCacheEnabled(true);
+				mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+				mWebView.setWebChromeClient(new WebChromeClient() {
+					   public void onProgressChanged(WebView view, int progress) {
+					     // Activities and WebViews measure progress with different scales.
+					     // The progress meter will automatically disappear when we reach 100%
+	//				     activity.setProgress(progress * 1000);
+					   }
+					 });
+				mWebView.setWebViewClient(new MyClient());
+	
+				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				lp.gravity = Gravity.CENTER;
+				mWebView.setLayoutParams(lp);
+				addView(mWebView);
+				if(autoPlay) {
+					mWebView.loadUrl(uriString);
+	//				mWebView.loadDataWithBaseURL(null,htmlString ,"text/html", "UTF-8",null);
+					
+					setVisibility(View.VISIBLE);
+				} else {
+					setVisibility(View.GONE);
+				}
 			}
 			
 		}
