@@ -101,6 +101,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				
 				if(Uri.parse(uriString).getQueryParameter("watransition") != null) {
 					transition = !Uri.parse(uriString).getQueryParameter("watransition").equals("none");
+					mAutoplayDelay = 1000;
 					Log.d(TAG,"transition = "+transition);
 				}
 				//
@@ -143,14 +144,14 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					inflater.inflate(R.layout.video_activity_layout, this, true);
 					
 					VideoActivity.createTempVideoFile(uriString, basePath, VideoActivity.getTempPath());
-					VideoView video = (VideoView)findViewById(R.id.video_frame);// new VideoView(getContext());
-					//video.setLayoutParams(new FrameLayout.LayoutParams
-					//		(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT));
+					final VideoView video = (VideoView)findViewById(R.id.video_frame);// new VideoView(getContext());
 					video.setVideoPath(VideoActivity.getTempPath());
 					MediaController mc = new MediaController(getContext());
 					mc.setAnchorView(video);
+					mc.setMediaPlayer(video);
 					video.setMediaController(mc);
 					video.requestFocus();
+					mc.show(4000);
 					//addView(video);
 					if(autoPlay){
 						video.start();

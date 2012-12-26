@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -41,6 +42,7 @@ public class ImagePager extends RelativeLayout{
 	protected int countPhotos;
 	protected String projectId;
 	protected int minCountFromInfinityLoop = 12;
+	private Handler mAutoplayHandler;
 
 	public interface PhotoPagerListener {
 		void onClickItem(int photoId);
@@ -124,6 +126,7 @@ public class ImagePager extends RelativeLayout{
 			Log.d(TAG,"transition = "+transition);
 			viewPager = new ViewPager(getContext());
 		} else {
+			final int mAutoplayDelay = 200;
 			viewPager = new ViewPager(getContext()){
 				float x1 = 0, x2, y1 = 0, y2, dx, dy;
 				@Override
@@ -139,13 +142,23 @@ public class ImagePager extends RelativeLayout{
 					        dx = x2-x1;
 					        dy = y2-y1;
 					        if(Math.abs(dx) > Math.abs(dy)) {
-					            if(dx>0){
-					            	//"right";
-					            	setCurrentItem(Math.max(0,getCurrentPosition()-1),false);
-					            } else {
-					            	//"left";
-					            	setCurrentItem(Math.min(getCurrentPosition()+1,getCount()-1),false);
-					            }
+					        	mAutoplayHandler = new Handler();
+								mAutoplayHandler.postDelayed(new Runnable() {
+									@Override
+									public void run() {
+										int item = 0;
+										if(dx>0){
+							            	//"right";
+								            item = getCurrentPosition()-1;
+										} else {
+							            	//"left";
+											item = getCurrentPosition()+1;
+										}
+										setCurrentPosition(item,transition);
+										if(0<=item&&item<getCount()-1){
+											mAutoplayHandler.postDelayed(this, mAutoplayDelay);
+										}
+								}}, mAutoplayDelay);
 					        }
 					    }
 					}
