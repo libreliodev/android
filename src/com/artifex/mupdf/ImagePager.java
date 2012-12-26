@@ -27,6 +27,7 @@ import com.niveales.wind.R;
 public class ImagePager extends RelativeLayout{
 
 	protected static final String TAG = "PhotoPager";
+	protected static final int MULTIPLIER = 100000;
 	protected ViewPager viewPager;
 	protected TextView titleView;
 
@@ -35,6 +36,7 @@ public class ImagePager extends RelativeLayout{
 	private String basePath;
 	private int backgroungColor = Color.BLACK;
 	private boolean transition = true;
+	private float viewWidth;
 
 	protected PhotoPagerListener listener;
 	private SimpleImageAdapter imageAdapter;
@@ -58,29 +60,16 @@ public class ImagePager extends RelativeLayout{
 		init(context);
 	}
 
-	public ImagePager(Context context,String basePath,boolean transition) {
+	public ImagePager(Context context,String basePath,boolean transition,float viewWidth) {
 		super(context);
 		this.basePath = basePath;
 		this.transition = transition;
+		this.viewWidth = viewWidth;
 		init(context);
 	}
 
 	public void setTitle(final String titleTable, final String titleUrl){
 		titleView.setText(titleTable);
-	}
-
-	public void setCountPhotos(int count, String projectId){
-		this.countPhotos = count;
-		this.projectId = projectId;
-		viewPager.setAdapter(getAdapter());
-		//viewPager.setPageMargin(getPageMargin());
-		viewPager.setHorizontalFadingEdgeEnabled(true);
-		viewPager.setFadingEdgeLength(0);
-		viewPager.setOffscreenPageLimit(getPageLimit());
-
-		if (count > minCountFromInfinityLoop) {
-			jumpTo(0);
-		}
 	}
 
 	public void setMinCountFromInfinityLoop(int minCountFromInfinityLoop){
@@ -106,7 +95,7 @@ public class ImagePager extends RelativeLayout{
 	}
 	
 	public void jumpTo(int index) {
-		viewPager.setCurrentItem(index, false);
+		viewPager.setCurrentItem(getCount() * MULTIPLIER / 2 + index, false);
 	}
 
 	protected int getPageMargin() {
@@ -117,20 +106,21 @@ public class ImagePager extends RelativeLayout{
 		return 2;
 	}
 
+	
+	
 	private void init(Context context) {
 		this.context = context;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.image_pager, this, true);
-		//viewPager = (ViewPager) findViewById(R.id.image_pager_view);
+
 		if(transition){
-			Log.d(TAG,"transition = "+transition);
 			viewPager = new ViewPager(getContext());
 		} else {
-			final int mAutoplayDelay = 200;
 			viewPager = new ViewPager(getContext()){
 				float x1 = 0, x2, y1 = 0, y2, dx, dy;
 				@Override
 			    public boolean onTouchEvent(MotionEvent event) {
+					Log.d(TAG,"viewWidth = "+viewWidth);
 					switch(event.getAction()) {
 					    case(MotionEvent.ACTION_DOWN):
 					        x1 = event.getX();
@@ -142,23 +132,23 @@ public class ImagePager extends RelativeLayout{
 					        dx = x2-x1;
 					        dy = y2-y1;
 					        if(Math.abs(dx) > Math.abs(dy)) {
-					        	mAutoplayHandler = new Handler();
-								mAutoplayHandler.postDelayed(new Runnable() {
-									@Override
-									public void run() {
-										int item = 0;
-										if(dx>0){
-							            	//"right";
-								            item = getCurrentPosition()-1;
-										} else {
-							            	//"left";
-											item = getCurrentPosition()+1;
-										}
-										setCurrentPosition(item,transition);
-										if(0<=item&&item<getCount()-1){
-											mAutoplayHandler.postDelayed(this, mAutoplayDelay);
-										}
-								}}, mAutoplayDelay);
+								float move = Math.abs(dx);
+								Log.d(TAG,"move = "+move);
+								if(dx>0){
+					            	//"right";
+									if(move<(viewWidth/3)){
+										setCurrentPosition(getCurrentPosition()-1,transition);
+									} else {
+										flipSlides(dx);
+									}
+								} else {
+									//"left";
+									if(move<(viewWidth/3)){
+										setCurrentPosition(getCurrentPosition()+1,transition);
+									} else {
+										flipSlides(dx);										
+									}
+								}
 					        }
 					    }
 					}
@@ -170,9 +160,37 @@ public class ImagePager extends RelativeLayout{
 		viewPager.setHorizontalFadingEdgeEnabled(true);
 		viewPager.setFadingEdgeLength(0);
 		viewPager.setOffscreenPageLimit(getPageLimit());
+		viewPager.setCurrentItem(imageAdapter.getSlideCount()*MULTIPLIER, false);
 		addView(viewPager);
 	}
 
+	
+	public void setViewWidth(int viewWidth){
+		this.viewWidth = viewWidth;
+	}
+	
+	private int count = 0;
+	private void flipSlides(final float dx){
+		count = 0;
+		final int mAutoplayDelay = 200;
+		mAutoplayHandler = new Handler();
+		mAutoplayHandler.postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				count++;
+				int item = 0;
+				if(dx>0){
+					item = getCurrentPosition()-1;
+				} else {
+					item = getCurrentPosition()+1;
+				}
+				setCurrentPosition(item,transition);
+				if(count<imageAdapter.getSlideCount()){
+					mAutoplayHandler.postDelayed(this, mAutoplayDelay);
+				}
+		}}, mAutoplayDelay);
+	}
 	
 	protected PagerAdapter getAdapter() {
 		if (null == imageAdapter) {
@@ -219,7 +237,7 @@ public class ImagePager extends RelativeLayout{
 
 		@Override
 		public int getCount() {
-			return mSlideshowCount;//countPhotos;
+			return Integer.MAX_VALUE;
 		}
 
 		@Override
@@ -236,7 +254,7 @@ public class ImagePager extends RelativeLayout{
 		public View instantiateItem(ViewGroup container, int position) {
 			Log.d("TAG", "instantiateItem");
 			
-			String path = getItem(position);
+			String path = getItem(position%mSlideshowCount);
 			
 			final View view = inflater.inflate(R.layout.slideshow_item_layout, null);
 			view.setTag(position);
@@ -276,6 +294,10 @@ public class ImagePager extends RelativeLayout{
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
 			container.removeView((View)object);
+		}
+		
+		public int getSlideCount(){
+			return mSlideshowCount;
 		}
 	}
 

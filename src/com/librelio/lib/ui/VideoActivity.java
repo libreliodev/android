@@ -27,13 +27,13 @@ import com.niveales.wind.R;
 
 public class VideoActivity extends BaseActivity{
 	private static final String TAG = "VideoActivity";
-	
-	
+		
 	private VideoView video;
 	private String temp;
 	private String uriString;
 	private String basePath;
 	private boolean autoPlay = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG,"onCreate");

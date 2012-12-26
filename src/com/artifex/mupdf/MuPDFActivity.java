@@ -120,7 +120,17 @@ public class MuPDFActivity extends BaseActivity
 	private MuPDFPageAdapter mDocViewAdapter;
 	private int mOrientation;
 	private SparseArray<LinkInfo[]> linkOfDocument;
+	private static RecycleObserver observer;
 
+	
+	public interface RecycleObserver{
+		public void recycle();
+	}
+	
+	public static void setObserver(RecycleObserver ro){
+		observer = ro;
+	}
+	
 	private MuPDFCore openFile(String path)
 	{
 		int lastSlashPos = path.lastIndexOf('/');
@@ -130,6 +140,7 @@ public class MuPDFActivity extends BaseActivity
 		System.out.println("Trying to open "+path);
 		PDFParser linkGetter = new PDFParser(path);
 		linkOfDocument = linkGetter.getLinkInfo();
+		Log.d(TAG,"link size = "+linkOfDocument.size());
 		for(int i=0;i<linkOfDocument.size();i++){
 			Log.d(TAG,"--- i = "+i);
 			if(linkOfDocument.get(i)!=null){
@@ -335,6 +346,9 @@ public class MuPDFActivity extends BaseActivity
 
 			protected void onMoveToChild(int i) {
 				Log.d(TAG,"onMoveToChild id = "+i);
+				if(observer!=null){
+					observer.recycle();
+				}
 				if (core == null)
 					return;
 //				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
@@ -891,4 +905,6 @@ public class MuPDFActivity extends BaseActivity
 		}
 		
 	}
+	
+
 }

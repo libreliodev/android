@@ -39,7 +39,8 @@ import com.niveales.wind.R;
  * @author Dmitry Valetin
  *
  */
-public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpdateListener, OnCompletionListener, OnVideoSizeChangedListener, OnPreparedListener {
+public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpdateListener, OnCompletionListener, OnVideoSizeChangedListener,
+		OnPreparedListener,MuPDFActivity.RecycleObserver {
 	private static final String TAG = "MediaHolder";
 	public static final String URI_STRING_KEY = "uri_string_key";
 	public static final String BASE_PATH_KEY = "base_path_key";
@@ -51,6 +52,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private float scale = 1.0f;
 	private int mAutoplayDelay;
 	private Handler mAutoplayHandler;
+	private VideoView video;
 	private WebView mWebView;
 	private String uriString;
 	private OnClickListener listener = null;
@@ -66,6 +68,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	@SuppressLint("SetJavaScriptEnabled")
 	public MediaHolder(Context pContext, LinkInfo link,String basePath,boolean full) throws IllegalStateException{
 		super(pContext);
+		MuPDFActivity.setObserver(this);
 		mLinkInfo = link;
 		uriString = link.uri;
 		Log.d(TAG,"basePath = "+basePath+"\nuriString = "+uriString);
@@ -105,22 +108,28 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					Log.d(TAG,"transition = "+transition);
 				}
 				//
-				imPager = new ImagePager(getContext(),basePath + Uri.parse(uriString).getPath(),transition);
+				
+				imPager = new ImagePager(getContext(),basePath + Uri.parse(uriString).getPath(),
+						transition,(mLinkInfo.right-mLinkInfo.left));
+				post(new Runnable() {
+					@Override
+					public void run() {
+						imPager.setViewWidth(getWidth());
+					}
+				});
 				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				lp.gravity = Gravity.CENTER;
 				imPager.setLayoutParams(lp);
-				//
+				
 				if(autoPlay) {
 					mAutoplayHandler = new Handler();
 					mAutoplayHandler.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							int item = imPager.getCurrentPosition()+1;
-							imPager.setCurrentPosition(item,transition);
-							if(item<imPager.getCount()-1){
-								mAutoplayHandler.postDelayed(this, mAutoplayDelay);
-							}
+							Log.d(TAG,"run");
+							imPager.setCurrentPosition(imPager.getCurrentPosition()+1,transition);
+							mAutoplayHandler.postDelayed(this, mAutoplayDelay);
 						}}, mAutoplayDelay);
 				} else {
 					setVisibility(View.GONE);
@@ -144,7 +153,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					inflater.inflate(R.layout.video_activity_layout, this, true);
 					
 					VideoActivity.createTempVideoFile(uriString, basePath, VideoActivity.getTempPath());
-					final VideoView video = (VideoView)findViewById(R.id.video_frame);// new VideoView(getContext());
+					video = (VideoView)findViewById(R.id.video_frame);
 					video.setVideoPath(VideoActivity.getTempPath());
 					MediaController mc = new MediaController(getContext());
 					mc.setAnchorView(video);
@@ -381,6 +390,17 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public void onBufferingUpdate(MediaPlayer pMp, int pPercent) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void recycle() {
+		Log.d(TAG,"resycle was called");
+		if(mAutoplayHandler!=null){
+			mAutoplayHandler.removeCallbacksAndMessages(null);
+		}
+		if(video!=null){
+			video.stopPlayback();
+		}
 	}
 
 }

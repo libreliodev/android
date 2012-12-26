@@ -29,9 +29,10 @@ import com.librelio.lib.storage.Magazines;
 import com.niveales.wind.R;
 
 public class StartupActivity extends BaseActivity {
-	private BroadcastReceiver br;
 	private static final String TAG = "StartupActivity";
 	public static final String TEST_FILE_NAME = "test/test.pdf";
+
+	private BroadcastReceiver br;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +144,12 @@ public class StartupActivity extends BaseActivity {
 	}
 	
 	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		setContentView(R.layout.startup);
+		super.onConfigurationChanged(newConfig);
+	}
+
+	@Override
 	protected void onDestroy() {
 		if(br!=null){
 			unregisterReceiver(br);
@@ -155,11 +162,6 @@ public class StartupActivity extends BaseActivity {
 				MainMagazineActivity.class);
 		startActivity(intent);
 		finish();
-	}
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		setContentView(R.layout.startup);
-		super.onConfigurationChanged(newConfig);
 	}
 	
 	private void copyFromAssets(String src,String dst){
