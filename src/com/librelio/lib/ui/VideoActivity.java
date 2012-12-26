@@ -8,11 +8,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.artifex.mupdf.MediaHolder;
@@ -51,7 +57,19 @@ public class VideoActivity extends BaseActivity{
 				setContentView(R.layout.video_activity_layout);
 				video = (VideoView)findViewById(R.id.video_frame);
 				video.setVideoPath(getTempPath());
-				video.setMediaController(new MediaController(getContext()));
+				
+				video.post(new Runnable() {
+					@Override
+					public void run() {
+						MedContr mc = new MedContr(getContext(),video);
+						
+						mc.setAnchorView(video);
+						mc.setMediaPlayer(video);
+						
+						video.setMediaController(mc);
+						mc.show(4000);
+					}
+				});
 				video.requestFocus();
 				if(autoPlay){
 					video.start();
@@ -107,5 +125,19 @@ public class VideoActivity extends BaseActivity{
 	
 	public static String getTempPath(){
 		return "/mnt/sdcard/librelio/tmp.mp4";
+	}
+	
+	public class MedContr extends MediaController{
+
+		public MedContr(Context context,View anchor) {
+			super(context);
+			super.setAnchorView(anchor);
+		}
+		
+		@Override
+		public void setAnchorView(View view) {
+			// TODO Auto-generated method stub
+			//super.setAnchorView(view);
+		}
 	}
 }
