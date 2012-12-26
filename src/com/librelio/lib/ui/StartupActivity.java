@@ -52,25 +52,9 @@ public class StartupActivity extends BaseActivity {
 		}
 		for(String file : assetsList1){
 			Log.d(TAG,file);
-			try {
-				int count;
-				InputStream input = getAssets().open("test/"+file);
-				OutputStream output = new FileOutputStream(testDir+file);
-				byte data[] = new byte[1024];
-				
-				long total = 0;
-
-				while ((count = input.read(data)) != -1) {
-					total += count;
-					output.write(data, 0, count);
-				}
-				output.flush();
-				output.close();
-				input.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			copyFromAssets("test/"+file, testDir+file);
 		}
+		copyFromAssets("test.png", getStoragePath()+"test.png");
 		//--------------------------------------------
 		File f = new File(getStoragePath());
 		if(!f.exists()){
@@ -111,24 +95,7 @@ public class StartupActivity extends BaseActivity {
 			}
 			for(String file : assetsList){
 				if(file.contains(".plist")||file.contains(".png")){
-					try {
-						int count;
-						InputStream input = getAssets().open(file);
-						OutputStream output = new FileOutputStream(getStoragePath()+file);
-						byte data[] = new byte[1024];
-						
-						long total = 0;
-
-						while ((count = input.read(data)) != -1) {
-							total += count;
-							output.write(data, 0, count);
-						}
-						output.flush();
-						output.close();
-						input.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					copyFromAssets(file, getStoragePath()+file);
 				}
 			}
 			
@@ -193,5 +160,26 @@ public class StartupActivity extends BaseActivity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		setContentView(R.layout.startup);
 		super.onConfigurationChanged(newConfig);
+	}
+	
+	private void copyFromAssets(String src,String dst){
+		try {
+			int count;
+			InputStream input = getAssets().open(src);
+			OutputStream output = new FileOutputStream(dst);
+			byte data[] = new byte[1024];
+			
+			long total = 0;
+
+			while ((count = input.read(data)) != -1) {
+				total += count;
+				output.write(data, 0, count);
+			}
+			output.flush();
+			output.close();
+			input.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

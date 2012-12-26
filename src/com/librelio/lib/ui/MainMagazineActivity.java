@@ -265,6 +265,10 @@ public class MainMagazineActivity extends BaseActivity {
 
 	private void reloadMagazineData(ArrayList<MagazineModel> magazine){
 		magazine.clear();
+		/**
+		 * TODO delete after testing
+		 */
+		magazine.add(new MagazineModel(StartupActivity.TEST_FILE_NAME, "TEST", "test", "", this));
 		DataBaseHelper dbhelp = new DataBaseHelper(this);
 		SQLiteDatabase db = dbhelp.getReadableDatabase();
 		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
@@ -277,10 +281,6 @@ public class MainMagazineActivity extends BaseActivity {
 		}
 		c.close();
 		db.close();
-		/**
-		 * TODO delete after testing
-		 */
-		magazine.add(new MagazineModel(StartupActivity.TEST_FILE_NAME, "TEST", "test", "", this));
 	}
 
 	private void startRegularUpdate(){
