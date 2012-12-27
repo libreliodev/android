@@ -38,6 +38,7 @@ public class StartupActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		/**
 		 * TODO delete after testing
+		 * @Mike Did you test?
 		 */
 		String[] assetsList1 = null;
 		String testDir = getStoragePath()+"test/";
@@ -51,6 +52,7 @@ public class StartupActivity extends BaseActivity {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		//TODO: @Mike please move it from ui-thread to async method
 		for(String file : assetsList1){
 			Log.d(TAG,file);
 			copyFromAssets("test/"+file, testDir+file);
@@ -66,6 +68,7 @@ public class StartupActivity extends BaseActivity {
 		setContentView(R.layout.startup);
 		DataBaseHelper dbhelp = new DataBaseHelper(this);
 		SQLiteDatabase db = dbhelp.getReadableDatabase();
+		//TODO: @Mike please move it from ui-thread to async method
 		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
 		if(c.getCount()>0){
 		
@@ -103,7 +106,7 @@ public class StartupActivity extends BaseActivity {
 			Intent intent = new Intent(this, DownloadMagazineListService.class);
 			startService(intent);
 			
-			br = new BroadcastReceiver() {			
+			br = new BroadcastReceiver() {
 				@Override
 				public void onReceive(Context context, Intent intent) {
 					startMagazinesView();
@@ -116,8 +119,8 @@ public class StartupActivity extends BaseActivity {
 		db.close();
 	}
 
-
-	public static String getStringFromFile(String path){
+	//TODO: @Mike why it here?
+	private static String getStringFromFile(String path){
 		StringBuffer fileData = new StringBuffer(1000);
 		BufferedReader reader = null;
 		try {

@@ -44,7 +44,6 @@ import android.view.Window;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.artifex.mupdf.MuPDFActivity;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.adapter.MagazineAdapter;

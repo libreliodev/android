@@ -6,3 +6,5 @@
 *.directory
 *.orig
 *~
+target/*
+bin/*
