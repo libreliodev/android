@@ -140,7 +140,10 @@ abstract public class BaseActivity extends Activity implements IBaseContext{
 	public String getStoragePath(){
 		return getInternalPath();
 	}
-
+	
+	public  String getVideoTempPath(){
+		return getExternalPath()+"tmp.mp4";
+	}
 	/**
 	 * Replaces the language and/or country of the device into the given string.
 	 * The pattern "%lang%" will be replaced by the device's language code and

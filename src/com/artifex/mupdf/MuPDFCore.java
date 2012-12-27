@@ -19,7 +19,7 @@ public class MuPDFCore {
 	/* Readable members */
 	private int pageNum = -1;;
 	private int numPages = -1;
-	private int displayPages = 2;
+	private int displayPages = 1;
 	public float pageWidth;
 	public float pageHeight;
 	private String mFileName;

@@ -175,4 +175,8 @@ public class MuPDFPageView extends PageView {
 	protected LinkInfo[] getExternalLinkInfo() {
 		return mCore.getPageURIs(mPageNumber);
 	}
+	
+	public void addMediaHolder(MediaHolder h,String uriString){
+		this.mediaHolders.put(uriString, h);
+	}
 }

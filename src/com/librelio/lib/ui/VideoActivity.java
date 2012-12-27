@@ -49,14 +49,14 @@ public class VideoActivity extends BaseActivity{
 			};
 			@Override
 			protected Void doInBackground(Void... params) {
-				createTempVideoFile(uriString,basePath, getTempPath());
+				createTempVideoFile(uriString,basePath, getVideoTempPath());
 				return null;
 			}
 			@Override
 			protected void onPostExecute(Void result) {
 				setContentView(R.layout.video_activity_layout);
 				video = (VideoView)findViewById(R.id.video_frame);
-				video.setVideoPath(getTempPath());
+				video.setVideoPath(getVideoTempPath());
 				
 				video.post(new Runnable() {
 					@Override
@@ -71,9 +71,7 @@ public class VideoActivity extends BaseActivity{
 					}
 				});
 				video.requestFocus();
-				if(autoPlay){
-					video.start();
-				}
+				video.start();
 			}
 		}.execute();
 		
@@ -123,9 +121,7 @@ public class VideoActivity extends BaseActivity{
 		}	
 	}
 	
-	public static String getTempPath(){
-		return "/mnt/sdcard/librelio/tmp.mp4";
-	}
+
 	
 	public class MedContr extends MediaController{
 

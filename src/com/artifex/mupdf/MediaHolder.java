@@ -31,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.librelio.base.BaseActivity;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.ui.VideoActivity;
 import com.niveales.wind.R;
@@ -95,6 +96,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				mAutoplayDelay = 2000;
 				if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
 					mAutoplayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
+					autoPlay = true;
 				}
 				int bgColor = Color.BLACK;
 				if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
@@ -152,19 +154,16 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 					inflater.inflate(R.layout.video_activity_layout, this, true);
 					
-					VideoActivity.createTempVideoFile(uriString, basePath, VideoActivity.getTempPath());
+					VideoActivity.createTempVideoFile(uriString, basePath, ((BaseActivity)getContext()).getVideoTempPath());
 					video = (VideoView)findViewById(R.id.video_frame);
-					video.setVideoPath(VideoActivity.getTempPath());
+					video.setVideoPath(((BaseActivity)getContext()).getVideoTempPath());
 					MediaController mc = new MediaController(getContext());
 					mc.setAnchorView(video);
 					mc.setMediaPlayer(video);
 					video.setMediaController(mc);
 					video.requestFocus();
 					mc.show(4000);
-					//addView(video);
-					if(autoPlay){
-						video.start();
-					}
+					video.start();
 				}
 			}
 		} else if(uriString.contains("mp4")) {
@@ -396,6 +395,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public void recycle() {
 		Log.d(TAG,"resycle was called");
 		if(mAutoplayHandler!=null){
+			Log.d(TAG,"removeCallbacksAndMessages");
 			mAutoplayHandler.removeCallbacksAndMessages(null);
 		}
 		if(video!=null){

@@ -1,7 +1,5 @@
 package com.artifex.mupdf;
 
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -40,7 +38,6 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.librelio.base.BaseActivity;
-import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
@@ -149,14 +146,7 @@ public class MuPDFActivity extends BaseActivity
 					Log.d(TAG,"link[" + j + "] = "+link);
 					String local = "http://localhost";
 					if(link.startsWith(local)){
-						int startIdx = local.length()+1;
-						int finIdx = link.length();
-						if(link.contains("?")){
-							finIdx = link.indexOf("?");
-						}
-						String assetsFile = link.substring(startIdx, finIdx);
-						Log.d(TAG,"   link: "+MagazineModel.getAssetsBaseURL(path)+assetsFile);
-						Log.d(TAG,"   file: "+assetsFile);
+						Log.d(TAG,"   link: "+link);
 					}
 				}
 			}
@@ -346,11 +336,46 @@ public class MuPDFActivity extends BaseActivity
 
 			protected void onMoveToChild(int i) {
 				Log.d(TAG,"onMoveToChild id = "+i);
+				//
+				//
 				if(observer!=null){
 					observer.recycle();
 				}
 				if (core == null)
 					return;
+				LinkInfo[] links1 = core.getPageLinks(i);
+				for(LinkInfo link : links1){
+					final LinkInfo fLink = link;
+					Log.d(TAG,"link: "+link.uri);
+					if (link.uri.startsWith("http") && (link.uri.contains("youtube") || link.uri.contains("vimeo") || link.uri.contains("localhost"))) {
+						boolean autoPlay = Uri.parse(link.uri).getQueryParameter("waplay") != null 
+								&& Uri.parse(link.uri).getQueryParameter("waplay").equals("auto");
+						boolean fullScreen =Uri.parse(link.uri).getQueryParameter("warect") != null 
+								&& Uri.parse(link.uri).getQueryParameter("warect").equals("full");
+						if(autoPlay){
+							try {
+								final String basePath = core.getFileDirectory();
+								final MediaHolder h = new MediaHolder(getContext(), link,
+										basePath,fullScreen);
+								this.post(new Runnable() {
+									public void run() {
+										MuPDFPageView pageView = (MuPDFPageView)getDisplayedView();
+										if (pageView != null) {
+											h.setVisibility(View.VISIBLE);
+											pageView.addMediaHolder(h, fLink.uri);
+											pageView.addView(h);
+											h.requestLayout();
+										}
+										
+									}
+								});
+							} catch (IllegalStateException e) {
+								
+								e.printStackTrace();
+							}
+						}
+					}
+				}
 //				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
 //				mPageSlider.setMax((core.countPages()-1) * mPageSliderRes);
 //				mPageSlider.setProgress(i * mPageSliderRes);
@@ -906,5 +931,11 @@ public class MuPDFActivity extends BaseActivity
 		
 	}
 	
-
+	@Override
+	public void onBackPressed() {
+		if(observer!=null){
+			observer.recycle();
+		}
+		super.onBackPressed();
+	}
 }
