@@ -1,0 +1,3 @@
+[submodule "third-lib/android-plist-parser"]
+	path = third-lib/android-plist-parser
+	url = git://github.com/tenaciousRas/android-plist-parser.git
