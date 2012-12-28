@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.librelio.base.BaseActivity;
 import com.niveales.wind.R;
 
-public class GooglePlayActivity extends BaseActivity {
+abstract public class GooglePlayActivity extends BaseActivity {
 	/**
 	 * The developer payload that is sent with subsequent purchase requests.
 	 */

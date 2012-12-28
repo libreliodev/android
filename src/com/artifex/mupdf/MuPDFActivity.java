@@ -42,6 +42,7 @@ import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
+//TODO: @Mike please move it to nested or own-file(split) class
 class SearchTaskResult {
 	public final String txt;
 	public final int   pageNumber;
@@ -64,6 +65,7 @@ class SearchTaskResult {
 	}
 }
 
+//TODO: @Mike please move it to nested or own-file(split) class
 class ProgressDialogX extends ProgressDialog {
 	public ProgressDialogX(Context context) {
 		super(context);
@@ -81,6 +83,7 @@ class ProgressDialogX extends ProgressDialog {
 		super.cancel();
 	}
 }
+//TODO: remove preffix mXXXX from all properties this class
 public class MuPDFActivity extends BaseActivity
 {
 	/* The core rendering instance */
@@ -199,9 +202,10 @@ public class MuPDFActivity extends BaseActivity
 				core = openFile(Uri.decode(uri.getEncodedPath()));
 				SearchTaskResult.set(null);
 			} else {
+				//TODO: @Mike why is it here? 
 				String filePath="/mnt/sdcard/wind_355.pdf";
 				
-				PDFParser p = new PDFParser(filePath);				
+				PDFParser p = new PDFParser(filePath);
 				core = openFile(filePath);
 				SearchTaskResult.set(null);
 			}
@@ -242,6 +246,7 @@ public class MuPDFActivity extends BaseActivity
 		AlertDialog alert = mAlertBuilder.create();
 		alert.setTitle(R.string.enter_password);
 		alert.setView(mPasswordView);
+		//TODO: @Mike move all strings to android resources! 
 		alert.setButton(AlertDialog.BUTTON_POSITIVE, "Ok",
 				new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
@@ -252,6 +257,7 @@ public class MuPDFActivity extends BaseActivity
 				}
 			}
 		});
+		//TODO: @Mike move all strings to android resources!
 		alert.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
 				new DialogInterface.OnClickListener() {
 
@@ -347,6 +353,9 @@ public class MuPDFActivity extends BaseActivity
 				for(LinkInfo link : links1){
 					final LinkInfo fLink = link;
 					Log.d(TAG,"link: "+link.uri);
+					if (null == link.uri) {
+						continue;
+					}
 					if (link.uri.startsWith("http") && (link.uri.contains("youtube") || link.uri.contains("vimeo") || link.uri.contains("localhost"))) {
 						boolean autoPlay = Uri.parse(link.uri).getQueryParameter("waplay") != null 
 								&& Uri.parse(link.uri).getQueryParameter("waplay").equals("auto");
@@ -496,6 +505,7 @@ public class MuPDFActivity extends BaseActivity
 			}
 		});
 
+// TODO: @Mike I think we can remove below code?
 /* XXX
 		mLinkButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

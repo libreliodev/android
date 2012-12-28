@@ -20,7 +20,7 @@ import com.niveales.wind.R;
 
 /**
  * @author Dmitry Valetin
- * 
+ * TODO: @Mike Is it used? Please delete if not!
  */
 public class SlideShowActivity extends BaseActivity {
 	private SimpleGallery mSlideshowGallery;
