@@ -145,11 +145,16 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				boolean fullVideo = Uri.parse(uriString).getQueryParameter("warect") != null 
 						&& Uri.parse(uriString).getQueryParameter("warect").equals("full");
 				if(fullVideo){
-					Intent intent = new Intent(getContext(), VideoActivity.class);
+					VideoActivity.createTempVideoFile(uriString, basePath, ((BaseActivity)getContext()).getVideoTempPath());
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					Uri data = Uri.parse(((BaseActivity)getContext()).getVideoTempPath());
+					intent.setDataAndType(data, "video/*");
+					getContext().startActivity(intent);
+					/*Intent intent = new Intent(getContext(), VideoActivity.class);
 					intent.putExtra(URI_STRING_KEY, uriString);
 					intent.putExtra(BASE_PATH_KEY, basePath);
 					intent.putExtra(AUTO_PLAY_KEY, autoPlay);
-					getContext().startActivity(intent);
+					getContext().startActivity(intent);*/
 				} else {
 					LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 					inflater.inflate(R.layout.video_activity_layout, this, true);
