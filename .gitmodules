@@ -1,3 +1,6 @@
 [submodule "third-lib/android-plist-parser"]
 	path = third-lib/android-plist-parser
 	url = git://github.com/netcook/android-plist-parser.git
+[submodule "third-lib/crash-catcher"]
+	path = third-lib/crash-catcher
+	url = git@github.com:netcook/crash-catcher.git
