@@ -147,6 +147,7 @@ public class MainMagazineActivity extends BaseActivity {
 		billingService.setContext(this);
 		handler = new Handler();
 		librelioPurchaseObserver = new LibrelioPurchaseObserver(handler);
+		throw new RuntimeException("TEST!!!!!!!!!!!!!!!!!!!!");
 	}
 
 	@Override

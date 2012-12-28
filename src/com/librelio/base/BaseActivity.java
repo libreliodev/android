@@ -2,11 +2,11 @@ package com.librelio.base;
 
 import java.util.Locale;
 
-import android.app.Activity;
+import org.netcook.android.tools.CrashCatcherActivity;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Environment;
 import android.os.Handler;
 
@@ -16,7 +16,7 @@ import com.librelio.lib.utils.Consts.PurchaseState;
 import com.librelio.lib.utils.Consts.ResponseCode;
 import com.librelio.lib.utils.PurchaseObserver;
 
-abstract public class BaseActivity extends Activity implements IBaseContext{
+public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
 
 	/**
@@ -165,5 +165,15 @@ abstract public class BaseActivity extends Activity implements IBaseContext{
 	
 	protected int getUpdatePeriod() {
 		return 1800000;
+	}
+
+	@Override
+	protected String getRecipient() {
+		return "android@netcook.org";
+	}
+
+	@Override
+	protected Class<?> getStartActivityAfterCrached() {
+		return BaseActivity.class;
 	}
 }
