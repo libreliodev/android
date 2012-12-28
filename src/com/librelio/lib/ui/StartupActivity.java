@@ -18,6 +18,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -36,114 +37,102 @@ public class StartupActivity extends BaseActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		/**
-		 * TODO delete after testing
-		 * @Mike Did you test?
-		 */
-		String[] assetsList1 = null;
-		String testDir = getStoragePath()+"test/";
-		Log.d(TAG,"testDir: "+testDir);
-		File dir = new File(testDir);
-		if(!dir.exists()){
-			dir.mkdir();
-		}
-		try {
-			assetsList1 = getResources().getAssets().list("test");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		//TODO: @Mike please move it from ui-thread to async method
-		for(String file : assetsList1){
-			Log.d(TAG,file);
-			copyFromAssets("test/"+file, testDir+file);
-		}
-		copyFromAssets("test.png", getStoragePath()+"test.png");
-		//--------------------------------------------
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.startup);
 		File f = new File(getStoragePath());
 		if(!f.exists()){
 			Log.d(TAG,"onCreate directory was create");
 			f.mkdirs();
 		}
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.startup);
-		DataBaseHelper dbhelp = new DataBaseHelper(this);
-		SQLiteDatabase db = dbhelp.getReadableDatabase();
-		//TODO: @Mike please move it from ui-thread to async method
-		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
-		if(c.getCount()>0){
-		
-			new Timer().schedule(new TimerTask() {
-				@Override
-				public void run() {
-					startMagazinesView();
+		/**
+		 * TODO delete after testing
+		 * @Mike Did you test?
+		 */
+		new AsyncTask<Void, Void, Void>(){
+			String[] assetsList1 = null;
+			String testDir = null;
+			protected void onPreExecute() {
+				testDir = getStoragePath()+"test/";
+				Log.d(TAG,"testDir: "+testDir);
+				File dir = new File(testDir);
+				if(!dir.exists()){
+					dir.mkdir();
 				}
-			}, 2000);
-		} else if(LibrelioApplication.thereIsConnection(this)){
-			Intent intent = new Intent(this, DownloadMagazineListService.class);
-			startService(intent);
-			
-			br = new BroadcastReceiver() {			
-				@Override
-				public void onReceive(Context context, Intent intent) {
-					startMagazinesView();
-				}
+				try {
+					assetsList1 = getResources().getAssets().list("test");
+				} catch (IOException e1) {
+					Log.e(TAG,"Test directory in assets is unavailable",e1);
+				}				
 			};
-			IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
-			registerReceiver(br, filter);
-		} else {
-			String[] assetsList = null;
-			try {
-				assetsList = getResources().getAssets().list("");
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			for(String file : assetsList){
-				if(file.contains(".plist")||file.contains(".png")){
-					copyFromAssets(file, getStoragePath()+file);
+			@Override
+			protected Void doInBackground(Void... params) {
+				for(String file : assetsList1){
+					Log.d(TAG,file);
+					copyFromAssets("test/"+file, testDir+file);
 				}
+				copyFromAssets("test.png", getStoragePath()+"test.png");				
+				return null;
+			}
+			@Override
+			protected void onPostExecute(Void result) {
+				new StartUpTask().execute();
+				super.onPostExecute(result);
 			}
 			
-			Intent intent = new Intent(this, DownloadMagazineListService.class);
-			startService(intent);
-			
-			br = new BroadcastReceiver() {
-				@Override
-				public void onReceive(Context context, Intent intent) {
-					startMagazinesView();
-				}
-			};
-			IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
-			registerReceiver(br, filter);
-		}
-		c.close();
-		db.close();
+		}.execute();
+
 	}
-
-	//TODO: @Mike why it here?
-	private static String getStringFromFile(String path){
-		StringBuffer fileData = new StringBuffer(1000);
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(path));
-
-		} catch (FileNotFoundException e) {
-			Log.e(TAG, "Problem with open file", e);
-			return "";
+	
+	public class StartUpTask extends AsyncTask<Void, Void, Void>{
+		DataBaseHelper dbhelp;
+		SQLiteDatabase db;
+		Cursor c;
+		@Override
+		protected Void doInBackground(Void... params) {
+			dbhelp = new DataBaseHelper(getContext());
+			db = dbhelp.getReadableDatabase();
+			c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
+			return null;
 		}
-		char[] buf = new char[1024];
-		int numRead = 0;
-		try {
-			while ((numRead = reader.read(buf)) != -1) {
-				String readData = String.valueOf(buf, 0, numRead);
-				fileData.append(readData);
-				buf = new char[1024];
+		@Override
+		protected void onPostExecute(Void result) {
+			if(c.getCount()>0){
+				new Timer().schedule(new TimerTask() {
+					@Override
+					public void run() {
+						startMagazinesView();
+					}
+				}, 1000);
+			} else {
+				if(!LibrelioApplication.thereIsConnection(getContext())){
+					String[] assetsList = null;
+					try {
+						assetsList = getResources().getAssets().list("");
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					for(String file : assetsList){
+						if(file.contains(".plist")||file.contains(".png")){
+							copyFromAssets(file, getStoragePath()+file);
+						}
+					}
+				}
+				Intent intent = new Intent(getContext(), DownloadMagazineListService.class);
+				startService(intent);
+				br = new BroadcastReceiver() {
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						startMagazinesView();
+					}
+				};
+				IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
+				registerReceiver(br, filter);
 			}
-			reader.close();
-		} catch (IOException e) {
-			Log.e(TAG,"Problem with reading file",e);
-			return "";
+			c.close();
+			db.close();
+			super.onPostExecute(result);
 		}
-		return fileData.toString();
+		
 	}
 	
 	@Override
@@ -186,5 +175,9 @@ public class StartupActivity extends BaseActivity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private Context getContext(){
+		return this;
 	}
 }

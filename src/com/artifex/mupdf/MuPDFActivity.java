@@ -1,5 +1,7 @@
 package com.artifex.mupdf;
 
+import java.util.ArrayList;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,6 +13,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
@@ -42,47 +45,6 @@ import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
-//TODO: @Mike please move it to nested or own-file(split) class
-class SearchTaskResult {
-	public final String txt;
-	public final int   pageNumber;
-	public final RectF searchBoxes[];
-	static private SearchTaskResult singleton;
-	public static String currentMagazineFileName;
-
-	SearchTaskResult(String _txt, int _pageNumber, RectF _searchBoxes[]) {
-		txt = _txt;
-		pageNumber = _pageNumber;
-		searchBoxes = _searchBoxes;
-	}
-
-	static public SearchTaskResult get() {
-		return singleton;
-	}
-
-	static public void set(SearchTaskResult r) {
-		singleton = r;
-	}
-}
-
-//TODO: @Mike please move it to nested or own-file(split) class
-class ProgressDialogX extends ProgressDialog {
-	public ProgressDialogX(Context context) {
-		super(context);
-	}
-
-	private boolean mCancelled = false;
-
-	public boolean isCancelled() {
-		return mCancelled;
-	}
-
-	@Override
-	public void cancel() {
-		mCancelled = true;
-		super.cancel();
-	}
-}
 //TODO: remove preffix mXXXX from all properties this class
 public class MuPDFActivity extends BaseActivity
 {
@@ -246,8 +208,7 @@ public class MuPDFActivity extends BaseActivity
 		AlertDialog alert = mAlertBuilder.create();
 		alert.setTitle(R.string.enter_password);
 		alert.setView(mPasswordView);
-		//TODO: @Mike move all strings to android resources! 
-		alert.setButton(AlertDialog.BUTTON_POSITIVE, "Ok",
+		alert.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.ok),
 				new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				if (core.authenticatePassword(mPasswordView.getText().toString())) {
@@ -257,8 +218,7 @@ public class MuPDFActivity extends BaseActivity
 				}
 			}
 		});
-		//TODO: @Mike move all strings to android resources!
-		alert.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+		alert.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.cancel),
 				new DialogInterface.OnClickListener() {
 
 			public void onClick(DialogInterface dialog, int which) {
@@ -347,44 +307,11 @@ public class MuPDFActivity extends BaseActivity
 				if(observer!=null){
 					observer.recycle();
 				}
-				if (core == null)
+				if (core == null){
 					return;
-				LinkInfo[] links1 = core.getPageLinks(i);
-				for(LinkInfo link : links1){
-					final LinkInfo fLink = link;
-					Log.d(TAG,"link: "+link.uri);
-					if (null == link.uri) {
-						continue;
-					}
-					if (link.uri.startsWith("http") && (link.uri.contains("youtube") || link.uri.contains("vimeo") || link.uri.contains("localhost"))) {
-						boolean autoPlay = Uri.parse(link.uri).getQueryParameter("waplay") != null 
-								&& Uri.parse(link.uri).getQueryParameter("waplay").equals("auto");
-						boolean fullScreen =Uri.parse(link.uri).getQueryParameter("warect") != null 
-								&& Uri.parse(link.uri).getQueryParameter("warect").equals("full");
-						if(autoPlay){
-							try {
-								final String basePath = core.getFileDirectory();
-								final MediaHolder h = new MediaHolder(getContext(), link,
-										basePath,fullScreen);
-								this.post(new Runnable() {
-									public void run() {
-										MuPDFPageView pageView = (MuPDFPageView)getDisplayedView();
-										if (pageView != null) {
-											h.setVisibility(View.VISIBLE);
-											pageView.addMediaHolder(h, fLink.uri);
-											pageView.addView(h);
-											h.requestLayout();
-										}
-										
-									}
-								});
-							} catch (IllegalStateException e) {
-								
-								e.printStackTrace();
-							}
-						}
-					}
-				}
+					
+				} 
+				new ActivateAutoLinks().execute(i);
 //				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
 //				mPageSlider.setMax((core.countPages()-1) * mPageSliderRes);
 //				mPageSlider.setProgress(i * mPageSliderRes);
@@ -505,32 +432,6 @@ public class MuPDFActivity extends BaseActivity
 			}
 		});
 
-// TODO: @Mike I think we can remove below code?
-/* XXX
-		mLinkButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				switch(mLinkState) {
-				case DEFAULT:
-					mLinkState = LinkState.HIGHLIGHT;
-					mLinkButton.setImageResource(R.drawable.ic_hl_link);
-					//Inform pages of the change.
-					mDocView.resetupChildren();
-					break;
-				case HIGHLIGHT:
-					mLinkState = LinkState.INHIBIT;
-					mLinkButton.setImageResource(R.drawable.ic_nolink);
-					//Inform pages of the change.
-					mDocView.resetupChildren();
-					break;
-				case INHIBIT:
-					mLinkState = LinkState.DEFAULT;
-					mLinkButton.setImageResource(R.drawable.ic_link);
-					break;
-				}
-			}
-		});
-*/
-
 		if (core.hasOutline()) {
 			mOutlineButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
@@ -576,6 +477,53 @@ public class MuPDFActivity extends BaseActivity
 		setContentView(layout);
 	}
 
+	public class ActivateAutoLinks extends AsyncTask<Integer, Void, Void>{
+		private ArrayList<LinkInfo> autoLinks;
+		@Override
+		protected Void doInBackground(Integer... params) {
+			autoLinks = new ArrayList<LinkInfo>();
+			LinkInfo[] links1 = core.getPageLinks(params[0].intValue());
+			if(links1==null){
+				return null;
+			}
+			for(LinkInfo link : links1){
+				Log.d(TAG,"link: "+link.uri);
+				if (null == link.uri) {
+					continue;
+				}
+				if (link.uri.startsWith("http") && (link.uri.contains("youtube") || link.uri.contains("vimeo") || link.uri.contains("localhost"))) {
+					boolean autoPlay = Uri.parse(link.uri).getQueryParameter("waplay") != null 
+							&& Uri.parse(link.uri).getQueryParameter("waplay").equals("auto");
+					if(autoPlay){
+						autoLinks.add(link);
+					}
+				}
+			}
+			return null;
+		}
+		@Override
+		protected void onPostExecute(Void result) {
+			mDocView.post(new Runnable() {
+				public void run() {
+					for(LinkInfo link : autoLinks){
+						boolean fullScreen =Uri.parse(link.uri).getQueryParameter("warect") != null 
+								&& Uri.parse(link.uri).getQueryParameter("warect").equals("full");
+						MuPDFPageView pageView = (MuPDFPageView)mDocView.getDisplayedView();
+						if (pageView != null) {
+							String basePath = core.getFileDirectory();
+							MediaHolder h = new MediaHolder(getContext(), link,basePath,fullScreen);
+							pageView.addMediaHolder(h, link.uri);
+							h.setVisibility(View.VISIBLE);							
+							pageView.addView(h);
+							h.requestLayout();
+						}
+					}
+				}
+			});
+			super.onPostExecute(result);
+		}
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode >= 0)
@@ -947,5 +895,9 @@ public class MuPDFActivity extends BaseActivity
 			observer.recycle();
 		}
 		super.onBackPressed();
+	}
+	
+	private Context getContext(){
+		return this;
 	}
 }
