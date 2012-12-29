@@ -3,4 +3,5 @@
     <item android:id="@+id/options_menu_reload" android:showAsAction="always|withText" android:title="@string/reload"></item>
     <item android:id="@+id/options_menu_restore" android:title="@string/restore_purchise"></item>
     <item android:id="@+id/options_menu_subscribe" android:title="@string/subscribe_year"></item>
+    <item android:id="@+id/options_menu_send_log" android:title="@string/send_log"></item>
 </menu>

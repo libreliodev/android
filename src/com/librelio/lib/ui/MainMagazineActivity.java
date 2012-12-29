@@ -120,6 +120,7 @@ public class MainMagazineActivity extends BaseActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -246,7 +247,9 @@ public class MainMagazineActivity extends BaseActivity {
 		case R.id.options_menu_restore:
 			restorePurchises();
 			return true;
-
+		case R.id.options_menu_send_log:
+			new CrashSend().execute();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
