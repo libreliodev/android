@@ -55,6 +55,8 @@ public class BillingActivity extends BaseActivity {
 	private String productId;
 	private String productPrice;
 	private String productTitle;
+	private String dataResponse;
+	private String signatureResponse;
 
 	private Button buy;
 	private Button cancel;
@@ -144,10 +146,12 @@ public class BillingActivity extends BaseActivity {
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
+			
 			Log.d(TAG, "onServiceConnected");
 			billingService = IInAppBillingService.Stub.asInterface(service);
 			new AsyncTask<String, String, Bundle>() {
 				Bundle ownedItems = null;
+				//int responseCons = -1;
 				@Override
 				protected Bundle doInBackground(String... params) {
 					Bundle skuDetails = null;
@@ -156,6 +160,8 @@ public class BillingActivity extends BaseActivity {
 						skuList.add(productId);
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
+						//String purchaseToken = "inapp:"+getPackageName()+":android.test.purchased";
+						//responseCons = billingService.consumePurchase(3, getPackageName(),purchaseToken);
 						skuDetails = billingService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
 						ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 					} catch (RemoteException e) {
@@ -166,13 +172,16 @@ public class BillingActivity extends BaseActivity {
 				}
 				@Override
 				protected void onPostExecute(Bundle skuDetails) {
+					//Log.d(TAG,"responseCons"+responseCons);
 					//If item was purchase then download begin without open billing activity 
 					int getPurchaseResponse = ownedItems.getInt("RESPONSE_CODE");
 					if(getPurchaseResponse == 0){
 						ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+						for(String s : ownedSkus){
+							Log.d(TAG,"owned: "+s);
+						}
 						if(ownedSkus.contains(productId)){
-							DownloadFromTempURLTask download = new DownloadFromTempURLTask();
-				            download.execute();
+							new DownloadFromTempURLTask().execute();
 				            finish();
 				            return;
 						}
@@ -210,6 +219,9 @@ public class BillingActivity extends BaseActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
 		Log.d(TAG,requestCode+" "+resultCode);
+		Log.d(TAG,"data = "+data.getExtras().getString("INAPP_PURCHASE_DATA"));
+		Log.d(TAG,"signature = "+data.getExtras().getString("INAPP_DATA_SIGNATURE"));
+		
 	   if (requestCode == CALLBACK_CODE) {    	
 	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
 	        
@@ -218,6 +230,8 @@ public class BillingActivity extends BaseActivity {
 	        	 Log.d(TAG,"Succes!!!");
 	            JSONObject jo = new JSONObject(purchaseData);
 	            String sku = jo.getString("productId");
+	            dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
+	            signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
 	            Log.d(TAG,"You have bought the " + sku + ". Excellent choice,adventurer!");
 	            new DownloadFromTempURLTask().execute();
 	          }
@@ -288,7 +302,10 @@ public class BillingActivity extends BaseActivity {
 		StringBuilder query = new StringBuilder(LibrelioApplication.getServerUrl());
 		query.append("?product_id=")
 			.append(productId)
-			.append("&code=HFGKEBNMVUKKEBFPOLJOIMKN34")
+			.append("&data=")
+			.append(dataResponse)
+			.append("&signature=")
+			.append(signatureResponse)
 			.append("&urlstring=")
 			.append(LibrelioApplication.getClientName(getContext()))
 			.append("/")
@@ -370,6 +387,7 @@ public class BillingActivity extends BaseActivity {
 				return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
 				PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+				Log.d(TAG,"pendingIntent = "+pendingIntent);
 				if(pendingIntent==null){
 					Toast.makeText(getContext(), "Error!", Toast.LENGTH_LONG).show();
 					return;

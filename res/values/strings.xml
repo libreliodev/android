@@ -89,4 +89,5 @@
     <string name="week">week</string>
     <string name="ok">OK</string>
     
+    <string name="send_log">Send log</string>
 </resources>
