@@ -1,9 +1,8 @@
 ## About the Librelio Magazine Solution
 The Librelio Magazine Solution is intended mainly for magazine publishers. It consists in:
 - customizable mobile apps: a complete version has been developed on iOS, and is under development on Android (here) and [Windows 8](https://github.com/Librelio/windows8)
-- a cloud based hosting server, which will need to be used on Android, but does not require any development. This server will be called "the S3 server". Each magazine has its own directory on the S3 server.
-- a php script which has been developed for iOS and will need to be developed for Android. This php script is hosted on a server called "the EC2 server".
-Examples of apps developed using this solution are listed on www.librelio.com . A good example of app is the [Wind magazine app](https://itunes.apple.com/fr/app/wind-magazine/id433594605?mt=8). The reader is encouraged to download one or more of the app listed to fully understand what follows.
+- a cloud based server
+- Examples of apps developed using this solution are listed on www.librelio.com . A good example of app is the [Wind magazine app](https://itunes.apple.com/fr/app/wind-magazine/id433594605?mt=8). The reader is encouraged to download one or more of the app listed to fully understand what follows.
 
 ## Purpose of this project
 This project aims at porting the exsiting iOS customizable app to Android. 
