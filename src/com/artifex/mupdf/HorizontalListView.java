@@ -59,6 +59,8 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 	private OnItemClickListener mOnItemClicked;
 	private OnItemLongClickListener mOnItemLongClicked;
 	private boolean mDataChanged = false;
+	private int mMinX = 0;
+
 	
 	public HorizontalListView(Context context) {
 		super(context);
@@ -181,8 +183,8 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 			mNextX = scrollx;
 		}
 		
-		if(mNextX <= 0){
-			mNextX = 0;
+		if(mNextX <= mMinX){
+			mNextX = mMinX;
 			mScroller.forceFinished(true);
 		}
 		if(mNextX >= mMaxX) {
@@ -251,6 +253,12 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 			View child = mAdapter.getView(mLeftViewIndex, mRemovedViewQueue.poll(), this);
 			addAndMeasureChild(child, 0);
 			leftEdge -= child.getMeasuredWidth();
+			if(mLeftViewIndex == 0) {
+				mMinX = mCurrentX + leftEdge;
+			}
+			if(mMinX < 0) {
+				mMinX = 0;
+			}
 			mLeftViewIndex--;
 			mDisplayOffset -= child.getMeasuredWidth();
 		}
@@ -303,7 +311,7 @@ public class HorizontalListView extends AdapterView<ListAdapter> {
 	protected boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
 		synchronized(HorizontalListView.this){
-			mScroller.fling(mNextX, 0, (int)-velocityX, 0, 0, mMaxX, 0, 0);
+			mScroller.fling(mNextX, 0, (int)-velocityX, 0, mMinX, mMaxX, 0, 0);
 		}
 		requestLayout();
 		
