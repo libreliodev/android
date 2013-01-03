@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.librelio.lib.adapter;
+package com.librelio.adapter;
 
 import java.io.File;
 

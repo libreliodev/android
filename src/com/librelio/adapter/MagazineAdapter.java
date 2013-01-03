@@ -1,4 +1,4 @@
-package com.librelio.lib.adapter;
+package com.librelio.adapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,11 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.artifex.mupdf.LinkInfo;
-import com.librelio.lib.LibrelioApplication;
+import com.librelio.LibrelioApplication;
+import com.librelio.activity.BillingActivity;
+import com.librelio.activity.DownloadActivity;
+import com.librelio.activity.StartupActivity;
 import com.librelio.lib.model.MagazineModel;
-import com.librelio.lib.ui.BillingActivity;
-import com.librelio.lib.ui.DownloadActivity;
-import com.librelio.lib.ui.StartupActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 

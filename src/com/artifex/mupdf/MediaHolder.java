@@ -31,9 +31,9 @@ import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.librelio.activity.VideoActivity;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.ui.SlideShowActivity;
-import com.librelio.lib.ui.VideoActivity;
 import com.niveales.wind.R;
 
 /**

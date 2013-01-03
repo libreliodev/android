@@ -4,10 +4,7 @@
 package com.librelio.lib.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 
 import com.artifex.mupdf.LinkInfo;
@@ -15,7 +12,6 @@ import com.artifex.mupdf.MediaHolder;
 import com.artifex.mupdf.MuPDFPageView;
 import com.artifex.mupdf.SimpleGallery;
 import com.librelio.base.BaseActivity;
-import com.librelio.lib.adapter.SlideshowAdapter;
 import com.niveales.wind.R;
 
 /**

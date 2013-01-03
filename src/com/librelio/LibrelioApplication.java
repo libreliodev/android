@@ -1,4 +1,4 @@
-package com.librelio.lib;
+package com.librelio;
 
 import android.app.Application;
 import android.content.Context;

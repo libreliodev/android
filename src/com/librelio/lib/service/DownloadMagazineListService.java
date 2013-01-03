@@ -21,14 +21,14 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.librelio.LibrelioApplication;
+import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.BaseActivity;
 import com.librelio.base.BaseService;
 import com.librelio.base.IBaseContext;
-import com.librelio.lib.LibrelioApplication;
 import com.librelio.lib.model.MagazineModel;
 import com.librelio.lib.storage.DataBaseHelper;
 import com.librelio.lib.storage.Magazines;
-import com.librelio.lib.ui.MainMagazineActivity;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
