@@ -29,7 +29,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,6 +41,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -65,12 +65,26 @@ import com.niveales.wind.R;
  */
 public class BillingActivity extends BaseActivity {
 	private static final String TAG = "BillingActivity";
+
+	// Only for test. Must always be FALSE!
+	private static final boolean TEST_MODE = true;
+	/*
+	 * productId can be the following values:
+	 *	android.test.purchased
+	 *	android.test.canceled
+	 *	android.test.refunded
+	 *	android.test.item_unavailable
+	 */
+	private static final String TEST_PRODUCT_ID = "android.test.refunded";
+	
 	private static final int CALLBACK_CODE = 101;
-	private static final int BILLING_RESPONSE_RESULT_OK = 0;	
+	
+	private static final int BILLING_RESPONSE_RESULT_OK = 0;
 	private static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
 	private static final int BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3;
 	private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
 	private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
+	
 	private static final int CONNECTION_ALERT = 1;
 	private static final int SERVER_ALERT = 2;
 
@@ -106,7 +120,7 @@ public class BillingActivity extends BaseActivity {
 			title = getIntent().getExtras().getString(DownloadActivity.TITLE_KEY);
 			subtitle = getIntent().getExtras().getString(DownloadActivity.SUBTITLE_KEY);
 			int finId = fileName.indexOf("/");
-			productId = fileName.substring(0,finId);
+			productId = fileName.substring(0, finId);
 		}
 	}
 
@@ -165,18 +179,16 @@ public class BillingActivity extends BaseActivity {
 	private ServiceConnection mServiceConn = new ServiceConnection() {
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-			Log.d(TAG, "onServiceDisconnected");
 			billingService = null;
 		}
 
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			
-			Log.d(TAG, "onServiceConnected");
 			billingService = IInAppBillingService.Stub.asInterface(service);
 			new AsyncTask<String, String, Bundle>() {
-				Bundle ownedItems = null;
-				//int responseCons = -1;
+				private Bundle ownedItems = null;
+
 				@Override
 				protected Bundle doInBackground(String... params) {
 					Bundle skuDetails = null;
@@ -185,8 +197,6 @@ public class BillingActivity extends BaseActivity {
 						skuList.add(productId);
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
-						//String purchaseToken = "inapp:"+getPackageName()+":android.test.purchased";
-						//responseCons = billingService.consumePurchase(3, getPackageName(),purchaseToken);
 						skuDetails = billingService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
 						ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 					} catch (RemoteException e) {
@@ -195,27 +205,30 @@ public class BillingActivity extends BaseActivity {
 					}
 					return skuDetails;
 				}
+
 				@Override
 				protected void onPostExecute(Bundle skuDetails) {
-					//Log.d(TAG,"responseCons"+responseCons);
 					//If item was purchase then download begin without open billing activity 
 					int getPurchaseResponse = ownedItems.getInt("RESPONSE_CODE");
+					if (TEST_MODE) {
+						getPurchaseResponse = -1;
+					}
 					if(getPurchaseResponse == 0){
 						ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
 						for(String s : ownedSkus){
-							Log.d(TAG,"owned: "+s);
+							Log.d(TAG, "already purchased: " + s);
 						}
 						if(ownedSkus.contains(productId)){
-							new DownloadFromTempURLTask().execute();
-				            finish();
-				            return;
+							onDownloadAction();
+							finish();
+							return;
 						}
 					}
 					//
 					int response = skuDetails.getInt("RESPONSE_CODE");
 					if (response == 0) {
-						ArrayList<String> responseList = skuDetails
-								.getStringArrayList("DETAILS_LIST");
+						Log.d(TAG, "response code was success");
+						ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
 						for (String thisResponse : responseList) {
 							JSONObject object = null;
 							String sku = "";
@@ -238,35 +251,32 @@ public class BillingActivity extends BaseActivity {
 				}
 				
 			}.execute();
-	   }
+		}
 	};
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
-		Log.d(TAG,requestCode+" "+resultCode);
-		Log.d(TAG,"data = "+data.getExtras().getString("INAPP_PURCHASE_DATA"));
-		Log.d(TAG,"signature = "+data.getExtras().getString("INAPP_DATA_SIGNATURE"));
-		
-	   if (requestCode == CALLBACK_CODE) {    	
-	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-	        
-	      if (resultCode == RESULT_OK&purchaseData!=null) {
-	         try {
-	        	 Log.d(TAG,"Succes!!!");
-	            JSONObject jo = new JSONObject(purchaseData);
-	            String sku = jo.getString("productId");
-	            dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
-	            signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
-	            Log.d(TAG,"You have bought the " + sku + ". Excellent choice,adventurer!");
-	            new DownloadFromTempURLTask().execute();
-	          }
-	          catch (JSONException e) {
-	             Log.d(TAG,"Failed to parse purchase data.");
-	             e.printStackTrace();
-	          }
-	      } 
-	   } 
-	   finish();
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d(TAG, requestCode + " " + resultCode);
+		Log.d(TAG, "data = " + data.getExtras().getString("INAPP_PURCHASE_DATA"));
+		Log.d(TAG, "signature = " + data.getExtras().getString("INAPP_DATA_SIGNATURE"));
+
+		if (requestCode == CALLBACK_CODE) {
+			String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+
+			if (resultCode == RESULT_OK && purchaseData != null) {
+				try {
+					JSONObject jo = new JSONObject(purchaseData);
+					String sku = jo.getString("productId");
+					dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
+					signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
+					Log.d(TAG, "You have bought the " + sku + ". Excellent choice, adventurer!");
+					onDownloadAction();
+				} catch (JSONException e) {
+					Log.e(TAG, "Failed to parse purchase data.", e);
+				}
+			}
+		}
+		finish();
 	}
 	
 	@Override
@@ -306,6 +316,10 @@ public class BillingActivity extends BaseActivity {
 		super.onDestroy();
 	}
 
+	protected void onDownloadAction() {
+		new DownloadFromTempURLTask().execute(buildVerifyQuery());
+	}
+
 	private OnClickListener getBuyOnClick(){
 		return new OnClickListener() {
 			@Override
@@ -323,12 +337,12 @@ public class BillingActivity extends BaseActivity {
 		return this;
 	}
 
-	private String buildQuery() {
+	private String buildVerifyQuery() {
 		StringBuilder query = new StringBuilder(LibrelioApplication.getServerUrl());
 		query.append("?product_id=")
 			.append(productId)
 			.append("&data=")
-			.append(dataResponse)
+			.append(Uri.encode(dataResponse))
 			.append("&signature=")
 			.append(signatureResponse)
 			.append("&urlstring=")
@@ -340,29 +354,34 @@ public class BillingActivity extends BaseActivity {
 		return query.toString();
 	}
 
-	private class DownloadFromTempURLTask extends AsyncTask<Void, Void, Void>{
-		HttpResponse res = null;
+	private class DownloadFromTempURLTask extends AsyncTask<String, Void, HttpResponse>{
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected HttpResponse doInBackground(String... params) {
 			
 			HttpClient httpclient = new DefaultHttpClient();
-			String query = buildQuery();
-			Log.d(TAG,"query = " + query);
-			HttpGet httpget = new HttpGet(query);
-			HttpParams params1 = httpclient.getParams();
-			HttpClientParams.setRedirecting(params1, false);
+			String verifyQuery = params[0];
+			Log.d(TAG, "Verify query = " + verifyQuery);
 			try {
-				res = httpclient.execute(httpget);
+				HttpGet httpget = new HttpGet(verifyQuery);
+				HttpClientParams.setRedirecting(httpclient.getParams(), false);
+				return httpclient.execute(httpget);
+			} catch (IllegalArgumentException e) {
+				Log.e(TAG, "URI is malformed", e);
 			} catch (ClientProtocolException e) {
-				e.printStackTrace();
+				Log.e(TAG, "Download failed", e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.e(TAG, "Download failed", e);
 			}
 			return null;
 		}
-		protected void onPostExecute(Void result) {
+
+		protected void onPostExecute(HttpResponse response) {
 			String tempURL = null;
-			for(Header h : res.getAllHeaders()){
+			if (null == response) {
+				//TODO: @Niko need check for this situation
+				return;
+			}
+			for(Header h : response.getAllHeaders()){
 				if(h.getName().equalsIgnoreCase("location")){
 					tempURL = h.getValue();
 				}
@@ -384,21 +403,30 @@ public class BillingActivity extends BaseActivity {
 		};
 	}
 
-	private class PurchaseTask extends AsyncTask<String, String, String>{
-		Bundle buyIntentBundle = null;
+	private class PurchaseTask extends AsyncTask<String, String, Bundle>{
+
 		@Override
-		protected String doInBackground(String... params) {
+		protected Bundle doInBackground(String... params) {
 			try {
-				buyIntentBundle = billingService.getBuyIntent(3, getPackageName(),
-						   productId, "inapp", null);
-			} catch (RemoteException e1) {
-				Log.e(TAG,"Problem with getBuyIntent",e1);
+				if (TEST_MODE) {
+					productId = TEST_PRODUCT_ID;
+				}
+				return billingService.getBuyIntent(3, getPackageName(), productId, "inapp", null);
+			} catch (RemoteException e) {
+				Log.e(TAG, "Problem with getBuyIntent", e);
 			}
 			return null;
 		}
-		protected void onPostExecute(String result) {
-			int response = buyIntentBundle.getInt("RESPONSE_CODE");
-			Log.d(TAG,"response = "+response);
+
+		protected void onPostExecute(Bundle result) {
+			super.onPostExecute(result);
+
+			if (null == result) {
+				//TODO: @Niko need check for this situation
+				return;
+			}
+			int response = result.getInt("RESPONSE_CODE");
+			Log.d(TAG, "Purchase response = " + response);
 			switch (response) {
 			case BILLING_RESPONSE_RESULT_USER_CANCELED:
 			case BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE:
@@ -406,26 +434,22 @@ public class BillingActivity extends BaseActivity {
 				Toast.makeText(getContext(), "Error!", Toast.LENGTH_LONG).show();
 				return;
 			}
-			//
 			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
-				new DownloadFromTempURLTask().execute();
+				onDownloadAction();
 				return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
-				PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-				Log.d(TAG,"pendingIntent = "+pendingIntent);
-				if(pendingIntent==null){
+				PendingIntent pendingIntent = result.getParcelable("BUY_INTENT");
+				Log.d(TAG, "pendingIntent = " + pendingIntent);
+				if (pendingIntent == null) {
 					Toast.makeText(getContext(), "Error!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				try {
-					startIntentSenderForResult(pendingIntent.getIntentSender(),
-							CALLBACK_CODE, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
-							Integer.valueOf(0));
+					startIntentSenderForResult(pendingIntent.getIntentSender(), CALLBACK_CODE, new Intent(), 0, 0, 0);
 				} catch (SendIntentException e) {
-					Log.e(TAG,"Problem with startIntentSenderForResult",e);
+					Log.e(TAG, "Problem with startIntentSenderForResult", e);
 				}
 			}
-			super.onPostExecute(result);
 		}
 	}
 }

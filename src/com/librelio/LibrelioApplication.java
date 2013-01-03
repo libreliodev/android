@@ -22,8 +22,8 @@ public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
 	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
 	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
-	private static final String SERVER_URL = "http://download.librelio.com/downloads/android_verify.php";
-	//private static final String SERVER_URL = "http://10.168.1.255/samples/verify.php";
+//	private static final String SERVER_URL = "http://download.librelio.com/downloads/android_verify.php";
+	private static final String SERVER_URL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 
 
 	@Override
