@@ -40,9 +40,9 @@ import android.util.Log;
 
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
-import com.librelio.lib.service.DownloadMagazineListService;
-import com.librelio.lib.storage.DataBaseHelper;
-import com.librelio.lib.storage.Magazines;
+import com.librelio.service.DownloadMagazineListService;
+import com.librelio.storage.DataBaseHelper;
+import com.librelio.storage.Magazines;
 import com.niveales.wind.R;
 
 /**

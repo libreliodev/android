@@ -1,4 +1,4 @@
-package com.librelio.lib.model;
+package com.librelio.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +13,8 @@ import android.util.Log;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.IBaseContext;
-import com.librelio.lib.storage.DataBaseHelper;
-import com.librelio.lib.storage.Magazines;
+import com.librelio.storage.DataBaseHelper;
+import com.librelio.storage.Magazines;
 
 public class MagazineModel {
 	private static final String TAG = "MagazineModel";

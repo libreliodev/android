@@ -3,12 +3,10 @@ package com.librelio.adapter;
 import java.io.File;
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,13 +17,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.artifex.mupdf.LinkInfo;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
 import com.librelio.activity.StartupActivity;
-import com.librelio.lib.model.MagazineModel;
-import com.librelio.lib.utils.PDFParser;
+import com.librelio.model.MagazineModel;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{

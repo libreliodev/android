@@ -3,9 +3,9 @@
  */
 package com.artifex.mupdf;
 
+import java.io.File;
 import java.io.IOException;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -37,38 +37,38 @@ import com.librelio.lib.ui.SlideShowActivity;
 import com.niveales.wind.R;
 
 /**
+ * The class for display all pdf's media-resources
+ * 
  * @author Dmitry Valetin
- *
+ * @author Nikolay Moskvin <moskvin@netcook.org>
  */
 public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpdateListener, OnCompletionListener, OnVideoSizeChangedListener,
 		OnPreparedListener,MuPDFActivity.RecycleObserver {
 	private static final String TAG = "MediaHolder";
+
 	public static final String URI_STRING_KEY = "uri_string_key";
 	public static final String BASE_PATH_KEY = "base_path_key";
 	public static final String AUTO_PLAY_KEY = "auto_play_key";
 
 	private LinkInfo mLinkInfo;
 	private SimpleGallery mGallery = null;
-	private WebView mWebVew = null;
 	private float scale = 1.0f;
 	private int mAutoplayDelay;
 	private Handler mAutoplayHandler;
+	
 	private VideoView video;
 	private WebView mWebView;
+	private ImagePager imagePager;
+	private MediaPlayer mMediaPlayer;
+
 	private String uriString;
 	private OnClickListener listener = null;
-	private MediaPlayer mMediaPlayer;
 	private SurfaceHolder holder;
 	private String videoFileName;
-	private ImagePager imPager;
 	private boolean transition = true;
-	
-	/**
-	 * @param pContext
-	 */
-	@SuppressLint("SetJavaScriptEnabled")
-	public MediaHolder(Context pContext, LinkInfo link,String basePath,boolean full) throws IllegalStateException{
-		super(pContext);
+
+	public MediaHolder(Context context, LinkInfo link,String basePath,boolean full) throws IllegalStateException{
+		super(context);
 		MuPDFActivity.setObserver(this);
 		mLinkInfo = link;
 		uriString = link.uri;
@@ -110,19 +110,20 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					Log.d(TAG,"transition = "+transition);
 				}
 				//
-				
-				imPager = new ImagePager(getContext(),basePath + Uri.parse(uriString).getPath(),
+				final String fullPath = basePath + Uri.parse(uriString).getPath();
+				Log.d(TAG, "exist file " + fullPath + "? " + new File(fullPath).exists());
+				imagePager = new ImagePager(getContext(), fullPath,
 						transition,(mLinkInfo.right-mLinkInfo.left));
 				post(new Runnable() {
 					@Override
 					public void run() {
-						imPager.setViewWidth(getWidth());
+						imagePager.setViewWidth(getWidth());
 					}
 				});
 				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 						LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				lp.gravity = Gravity.CENTER;
-				imPager.setLayoutParams(lp);
+				imagePager.setLayoutParams(lp);
 				
 				if(autoPlay) {
 					mAutoplayHandler = new Handler();
@@ -130,16 +131,16 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 						@Override
 						public void run() {
 							Log.d(TAG,"run");
-							imPager.setCurrentPosition(imPager.getCurrentPosition()+1,transition);
+							imagePager.setCurrentPosition(imagePager.getCurrentPosition()+1,transition);
 							mAutoplayHandler.postDelayed(this, mAutoplayDelay);
 						}}, mAutoplayDelay);
 				} else {
 					setVisibility(View.GONE);
 				}
 				
-				imPager.setBackgroundColor(bgColor);
+				imagePager.setBackgroundColor(bgColor);
 				
-				addView(imPager);
+				addView(imagePager);
 				requestLayout();
 			} else if (path.endsWith("mp4")) {
 				boolean fullVideo = Uri.parse(uriString).getQueryParameter("warect") != null 

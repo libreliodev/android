@@ -1,4 +1,23 @@
-package com.librelio.lib.service;
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
+package com.librelio.service;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -26,16 +45,22 @@ import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.BaseActivity;
 import com.librelio.base.BaseService;
 import com.librelio.base.IBaseContext;
-import com.librelio.lib.model.MagazineModel;
-import com.librelio.lib.storage.DataBaseHelper;
-import com.librelio.lib.storage.Magazines;
+import com.librelio.model.MagazineModel;
+import com.librelio.storage.DataBaseHelper;
+import com.librelio.storage.Magazines;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
 
-public class DownloadMagazineListService extends BaseService{
+/**
+ * The service for download magazines
+ * 
+ * @author Nikolay Moskvin <moskvin@netcook.org>
+ * 
+ */
+public class DownloadMagazineListService extends BaseService {
 	private static final String TAG = "DownloadPlistService";
 	private static final String PLIST_FILE_NAME = "magazines.plist";
 	private static final String FILE_NAME_KEY = "FileName";

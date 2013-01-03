@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.niveales.wind"
     android:versionCode="10"
-    android:versionName="1.0.9" >
+    android:versionName="1.0.10" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -29,10 +29,8 @@
             android:label="@string/outline_title" >
         </activity>
 
-        <service android:name="com.librelio.lib.utils.BillingService" >
-        </service>
-        <service android:name="com.librelio.lib.service.DownloadMagazineListService" >
-        </service>
+        <service android:name="com.librelio.lib.utils.BillingService" />
+        <service android:name="com.librelio.service.DownloadMagazineListService" />
 
         <receiver android:name="com.librelio.lib.utils.BillingReceiver" >
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.librelio.lib.storage;
+package com.librelio.storage;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

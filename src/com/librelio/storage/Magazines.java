@@ -1,4 +1,4 @@
-package com.librelio.lib.storage;
+package com.librelio.storage;
 
 public class Magazines {
 	public static final String TABLE_NAME = "Magazines";

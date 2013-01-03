@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -47,9 +49,9 @@ import android.widget.TextView;
 import com.artifex.mupdf.LinkInfo;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
-import com.librelio.lib.model.MagazineModel;
-import com.librelio.lib.service.DownloadMagazineListService;
 import com.librelio.lib.utils.PDFParser;
+import com.librelio.model.MagazineModel;
+import com.librelio.service.DownloadMagazineListService;
 import com.niveales.wind.R;
 
 /**
@@ -110,7 +112,7 @@ public class DownloadActivity extends BaseActivity {
 			fileUrl = getIntent().getExtras().getString(TEMP_URL_KEY);
 		}
 		preview.setImageBitmap(BitmapFactory.decodeFile(magazine.getPngPath()));
-		text.setText(getResources().getString(R.string.download));	
+		text.setText(getResources().getString(R.string.download));
 		//
 		if(!LibrelioApplication.thereIsConnection(this)){
 			showDialog(CONNECTION_ALERT);
@@ -127,8 +129,11 @@ public class DownloadActivity extends BaseActivity {
 		}
 	}
 
-	
-	class DownloadTask extends AsyncTask<String, String, String>{
+
+	private class DownloadTask extends AsyncTask<String, Double, String>{
+		
+		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
+		
 		@Override
 		protected void onPreExecute() {
 			magazine.clearMagazineDir(); 
@@ -142,15 +147,16 @@ public class DownloadActivity extends BaseActivity {
 				URL url = new URL(fileUrl);
 				URLConnection conexion = url.openConnection();
 				conexion.connect();	
-				int lenghtOfFile = conexion.getContentLength();
-				Log.d(TAG, "Lenght of file: " + lenghtOfFile);
+				int lengthOfFile = conexion.getContentLength();
+				Log.d(TAG, "Length of file: " + lengthOfFile);
 				input = new BufferedInputStream(url.openStream());
 				output = new FileOutputStream(filePath);
 				byte data[] = new byte[1024];
 				long total = 0;
 				while ((count = input.read(data)) != -1) {
 					total += count;
-					publishProgress(""+(int)((total*100)/lenghtOfFile));
+					final double progress = total / (lengthOfFile * 1.0);
+					publishProgress(progress);
 					if(isCancelled()){
 						output.flush();
 						output.close();
@@ -167,20 +173,27 @@ public class DownloadActivity extends BaseActivity {
 				// If download was interrupted then file delete
 				File f = new File(filePath);
 				f.delete();
-				Log.e(TAG, "Problem with download!",e);
+				Log.e(TAG, "Problem with download!", e);
 				return STOP;
 			}
 			return filePath;
 		}
+
 		@Override
-		protected void onProgressUpdate(String... p) {
-			int curProgress = Integer.parseInt(p[0]);
-			text.setText("Downloading "+curProgress+"%");
-			progress.setProgress(curProgress);
+		protected void onProgressUpdate(Double... p) {
+			if (isCancelled()) {
+				return;
+			}
+			final double curProgress = p[0];
+			final String msg = String.format(Locale.getDefault(), "Downloading %s", formater.format(curProgress));
+			Log.d(TAG, msg);
+			text.setText(msg);
+			progress.setProgress((int)curProgress * 100);
 		}
+
 		@Override
 		protected void onPostExecute(String result) {
-			if(result.equals(STOP)){
+			if(isCancelled() || result.equals(STOP)){
 				closeDownloadScreen();
 				return;
 			}
@@ -190,7 +203,7 @@ public class DownloadActivity extends BaseActivity {
 		}
 	}
 
-	class DownloadLinksTask extends AsyncTask<String, String, Integer>{
+	private class DownloadLinksTask extends AsyncTask<String, String, Integer>{
 		private ArrayList<String> links;
 		private ArrayList<String> assetsNames;
 		@Override

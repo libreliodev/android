@@ -157,8 +157,8 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 		// Substitute language and or region if present in string
 		if (str.contains("%lang%") || str.contains("%region%")) {
 			Locale locale = Locale.getDefault();
-			str = str.replace("%lang%", locale.getLanguage().toLowerCase());
-			str = str.replace("%region%", locale.getCountry().toLowerCase());
+			str = str.replace("%lang%", locale.getLanguage().toLowerCase(Locale.getDefault()));
+			str = str.replace("%region%", locale.getCountry().toLowerCase(Locale.getDefault()));
 		}
 		return str;
 	}

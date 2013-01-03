@@ -50,13 +50,13 @@ import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
-import com.librelio.lib.model.MagazineModel;
-import com.librelio.lib.service.DownloadMagazineListService;
-import com.librelio.lib.storage.DataBaseHelper;
-import com.librelio.lib.storage.Magazines;
 import com.librelio.lib.utils.BillingService;
 import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.ResponseHandler;
+import com.librelio.model.MagazineModel;
+import com.librelio.service.DownloadMagazineListService;
+import com.librelio.storage.DataBaseHelper;
+import com.librelio.storage.Magazines;
 import com.niveales.wind.R;
 
 /**

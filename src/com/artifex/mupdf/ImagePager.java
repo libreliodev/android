@@ -12,7 +12,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,7 +25,8 @@ import com.niveales.wind.R;
 
 public class ImagePager extends RelativeLayout{
 
-	protected static final String TAG = "PhotoPager";
+	protected static final String TAG = "ImagePager";
+
 	protected static final int MULTIPLIER = 100000;
 	protected ViewPager viewPager;
 	protected TextView titleView;
@@ -60,7 +60,7 @@ public class ImagePager extends RelativeLayout{
 		init(context);
 	}
 
-	public ImagePager(Context context,String basePath,boolean transition,float viewWidth) {
+	public ImagePager(Context context, String basePath, boolean transition, float viewWidth) {
 		super(context);
 		this.basePath = basePath;
 		this.transition = transition;
@@ -106,8 +106,6 @@ public class ImagePager extends RelativeLayout{
 		return 2;
 	}
 
-	
-	
 	private void init(Context context) {
 		this.context = context;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -146,7 +144,7 @@ public class ImagePager extends RelativeLayout{
 									if(move<(viewWidth/3)){
 										setCurrentPosition(getCurrentPosition()+1,transition);
 									} else {
-										flipSlides(dx);										
+										flipSlides(dx);
 									}
 								}
 					        }
@@ -224,14 +222,13 @@ public class ImagePager extends RelativeLayout{
 		
 		public SimpleImageAdapter(Context context, int minCountFromInfinityLoop, String path) {
 			this.context = context;
-			inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			File mFile = new File(path);
-			mSlideshowAssetDir = mFile.getParent();
-			String mFileName = mFile.getName();
-			mSlideshowCount = Integer.valueOf(mFileName.split("_")[1].split("\\.")[0]);
-			mSlideshowPreffix = mFileName.split("_")[0];
-			mSlideshowSuffix = mFileName.split("_")[1].split("\\.")[1];
+			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			File file = new File(path);
+			mSlideshowAssetDir = file.getParent();
+			String fileName = file.getName();
+			mSlideshowCount = Integer.valueOf(fileName.split("_")[1].split("\\.")[0]);
+			mSlideshowPreffix = fileName.split("_")[0];
+			mSlideshowSuffix = fileName.split("_")[1].split("\\.")[1];
 			this.minCountFromInfinityLoop = minCountFromInfinityLoop;
 		}
 
@@ -252,9 +249,9 @@ public class ImagePager extends RelativeLayout{
 
 		@Override
 		public View instantiateItem(ViewGroup container, int position) {
-			Log.d("TAG", "instantiateItem");
+			Log.d(TAG, "instantiateItem");
 			
-			String path = getItem(position%mSlideshowCount);
+			String path = getItem(position % mSlideshowCount);
 			
 			final View view = inflater.inflate(R.layout.slideshow_item_layout, null);
 			view.setTag(position);
