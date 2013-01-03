@@ -4,3 +4,6 @@
 [submodule "third-lib/crash-catcher"]
 	path = third-lib/crash-catcher
 	url = git@github.com:netcook/crash-catcher.git
+[submodule "third-lib/mupdf"]
+	path = third-lib/mupdf
+	url = git@github.com:netcook/mupdf.git
