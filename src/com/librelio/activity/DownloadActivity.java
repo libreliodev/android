@@ -221,10 +221,11 @@ public class DownloadActivity extends BaseActivity {
 				return;
 			}
 			for(int i=0;i<linkBuf.size();i++){
+				int key = linkBuf.keyAt(i);
 				Log.d(TAG,"--- i = "+i);
-				if(linkBuf.get(i)!=null){
-					for(int j=0;j<linkBuf.get(i).length;j++){
-						String link = linkBuf.get(i)[j].uri;
+				if(linkBuf.get(key)!=null){
+					for(int j=0;j<linkBuf.get(key).length;j++){
+						String link = linkBuf.get(key)[j].uri;
 						Log.d(TAG,"link[" + j + "] = "+link);
 						String local = "http://localhost";
 						if(link.startsWith(local)){
