@@ -1,5 +1,10 @@
 package com.librelio.base;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Locale;
 
 import org.netcook.android.tools.CrashCatcherActivity;
@@ -9,7 +14,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 
+import com.librelio.LibrelioApplication;
 import com.librelio.lib.utils.BillingService.RequestPurchase;
 import com.librelio.lib.utils.BillingService.RestoreTransactions;
 import com.librelio.lib.utils.Consts.PurchaseState;
@@ -17,6 +24,8 @@ import com.librelio.lib.utils.Consts.ResponseCode;
 import com.librelio.lib.utils.PurchaseObserver;
 
 public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
+	private static final String TAG = "BaseActivity";
+
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
 
 	/**
@@ -175,5 +184,55 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 	@Override
 	protected Class<?> getStartActivityAfterCrached() {
 		return BaseActivity.class;
+	}
+
+	@Override
+	public boolean isOnline() {
+		return LibrelioApplication.thereIsConnection(getBaseContext());
+	}
+
+	/**
+	 * Creates storage directories if necessary
+	 */
+	protected void initStorage(String... folders) {
+		File f = new File(getStoragePath());
+		if (!f.exists()) {
+			Log.d(TAG, getStoragePath() + " was create");
+			f.mkdirs();
+		}
+		if (null != folders && folders.length != 0) {
+			for (String folder : folders) {
+				File dir = new File(getStoragePath() + folder);
+				if (!dir.exists()) {
+					dir.mkdir();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Copy files from android assets directory
+	 * 
+	 * @param src
+	 *            the source target
+	 * @param dst
+	 *            the destination target
+	 */
+	protected void copyFromAssets(String src, String dst){
+		try {
+			int count;
+			InputStream input = getAssets().open(src);
+			OutputStream output = new FileOutputStream(dst);
+			byte data[] = new byte[1024];
+
+			while ((count = input.read(data)) != -1) {
+				output.write(data, 0, count);
+			}
+			output.flush();
+			output.close();
+			input.close();
+		} catch (IOException e) {
+			Log.e(TAG, "copyFromAssets failed", e);
+		}
 	}
 }

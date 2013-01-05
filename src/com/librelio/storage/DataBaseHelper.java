@@ -15,17 +15,17 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("CREATE TABLE "+Magazines.TABLE_NAME+ "(" 
-							+ Magazines.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-							+ Magazines.FIELD_FILE_NAME + " TEXT, "
-							+ Magazines.FIELD_TITLE + " TEXT, "
-							+ Magazines.FIELD_DOWNLOAD_DATE + " TEXT, "
-							+ Magazines.FIELD_SUBTITLE + " TEXT);");
+		db.execSQL("CREATE TABLE "+MagazineManager.TABLE_NAME+ "(" 
+							+ MagazineManager.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+							+ MagazineManager.FIELD_FILE_NAME + " TEXT, "
+							+ MagazineManager.FIELD_TITLE + " TEXT, "
+							+ MagazineManager.FIELD_DOWNLOAD_DATE + " TEXT, "
+							+ MagazineManager.FIELD_SUBTITLE + " TEXT);");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + Magazines.TABLE_NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + MagazineManager.TABLE_NAME);
 		onCreate(db);
 	}
 }

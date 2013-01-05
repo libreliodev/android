@@ -53,10 +53,10 @@ import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.BillingService;
 import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.ResponseHandler;
-import com.librelio.model.MagazineModel;
+import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.librelio.storage.DataBaseHelper;
-import com.librelio.storage.Magazines;
+import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
 /**
@@ -118,23 +118,22 @@ public class MainMagazineActivity extends BaseActivity {
 	private BillingService billingService;
 
 	private GridView grid;
-	private ArrayList<MagazineModel> magazines;
+	private ArrayList<Magazine> magazines;
 	private MagazineAdapter adapter;
 	private LibrelioPurchaseObserver librelioPurchaseObserver;
 	private Handler handler;
+	private MagazineManager magazineManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
 		super.onCreate(savedInstanceState);
-
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
 		setContentView(R.layout.issue_list_layout);
+		magazineManager = new MagazineManager(this);
 
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
 
-		magazines = new ArrayList<MagazineModel>();
+		magazines = new ArrayList<Magazine>();
 		reloadMagazineData(magazines);
 
 		adapter = new MagazineAdapter(magazines, this);
@@ -270,37 +269,25 @@ public class MainMagazineActivity extends BaseActivity {
 		return true;
 	}
 
-	private void reloadMagazineData(ArrayList<MagazineModel> magazine){
+	private void reloadMagazineData(ArrayList<Magazine> magazine) {
 		magazine.clear();
-		/**
-		 * TODO delete after testing
-		 */
-		magazine.add(new MagazineModel(StartupActivity.TEST_FILE_NAME, "TEST", "test", "", this));
-		DataBaseHelper dbhelp = new DataBaseHelper(this);
-		SQLiteDatabase db = dbhelp.getReadableDatabase();
-		Cursor c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
-		if(c.getCount()>0){
-			c.moveToFirst();
-			do{
-				MagazineModel buf = new MagazineModel(c, this);
-				magazine.add(buf);
-			}  while(c.moveToNext());
-		}
-		c.close();
-		db.close();
+		magazine.addAll(magazineManager.getMagazines());
 	}
 
 	private void startRegularUpdate(){
 		long period = getUpdatePeriod();
 		updateTimer = new Timer();
-		final Intent intent = new Intent(this, DownloadMagazineListService.class);
 		TimerTask updateTask = new TimerTask() {
+			private boolean isFirst = true;
 			@Override
 			public void run() {
+				Intent intent = new Intent(getBaseContext(), DownloadMagazineListService.class);
+				intent.putExtra(DownloadMagazineListService.USE_STATIC_MAGAZINES, isFirst);
 				startService(intent);
+				isFirst = false;
 			}
 		};
-		updateTimer.schedule(updateTask, period, period);
+		updateTimer.schedule(updateTask, 0, period);
 	}
 
 	private void stopRegularUpdate(){

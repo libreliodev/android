@@ -1,5 +1,7 @@
 package com.librelio.base;
 
+import com.librelio.LibrelioApplication;
+
 import android.app.Service;
 import android.os.Environment;
 
@@ -20,4 +22,8 @@ abstract public class BaseService extends Service implements IBaseContext {
 		return getInternalPath();
 	}
 
+	@Override
+	public boolean isOnline() {
+		return LibrelioApplication.thereIsConnection(getBaseContext());
+	}
 }

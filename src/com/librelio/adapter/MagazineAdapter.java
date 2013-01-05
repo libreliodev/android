@@ -21,16 +21,16 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
 import com.librelio.activity.StartupActivity;
-import com.librelio.model.MagazineModel;
+import com.librelio.model.Magazine;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
-	private ArrayList<MagazineModel> magazine;
+	private ArrayList<Magazine> magazine;
 
 	
-	public MagazineAdapter(ArrayList<MagazineModel> magazine,Context context){
+	public MagazineAdapter(ArrayList<Magazine> magazine,Context context){
 		this.context = context;
 		this.magazine = magazine;
 	}
@@ -60,7 +60,7 @@ public class MagazineAdapter extends BaseAdapter{
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final MagazineModel currentMagazine = magazine.get(position);
+		final Magazine currentMagazine = magazine.get(position);
 		MagazineItemHolder holder = new MagazineItemHolder();
 		
 		if(convertView == null){

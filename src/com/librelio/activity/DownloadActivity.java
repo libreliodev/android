@@ -50,7 +50,7 @@ import com.artifex.mupdf.LinkInfo;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
-import com.librelio.model.MagazineModel;
+import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.niveales.wind.R;
 
@@ -63,16 +63,18 @@ import com.niveales.wind.R;
 public class DownloadActivity extends BaseActivity {
 	private static final String TAG = "DownloadActivity";
 	private static final String STOP = "stop_modificator";
+
 	private static final int INTERRUPT = -1;
 	private static final int FINISH = 0;
-	
+	private static final int CONNECTION_ALERT = 1;
+
 	public static final String FILE_NAME_KEY = "file_name_key";
 	public static final String TITLE_KEY = "title_key";
 	public static final String SUBTITLE_KEY = "subtitle_key";
 	public static final String IS_SAMPLE_KEY = "issample";
 	public static final String IS_TEMP_KEY = "istemp";
 	public static final String TEMP_URL_KEY = "tempurl";
-	
+
 	private String fileName;
 	private String fileUrl;
 	private String filePath;
@@ -83,10 +85,10 @@ public class DownloadActivity extends BaseActivity {
 	private ProgressBar progress;
 	private DownloadTask download;
 	private DownloadLinksTask downloadLinks;
-	private MagazineModel magazine;
+	private Magazine magazine;
 	private InputStream input;
 	private OutputStream output;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,7 +98,7 @@ public class DownloadActivity extends BaseActivity {
 		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
 		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
 		
-		magazine = new MagazineModel(fileName, title, subtitle, "", this);
+		magazine = new Magazine(fileName, title, subtitle, "", this);
 		setContentView(R.layout.download);
 		preview = (ImageView)findViewById(R.id.download_preview_image);
 		text = (TextView)findViewById(R.id.download_progress_text);
@@ -130,16 +132,16 @@ public class DownloadActivity extends BaseActivity {
 	}
 
 
-	private class DownloadTask extends AsyncTask<String, Double, String>{
-		
+	private class DownloadTask extends AsyncTask<String, Double, String> {
 		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
-		
+
 		@Override
 		protected void onPreExecute() {
 			magazine.clearMagazineDir(); 
 			magazine.makeMagazineDir();
 			super.onPreExecute();
 		}
+
 		@Override
 		protected String doInBackground(String... params) {
 			int count;
@@ -203,7 +205,7 @@ public class DownloadActivity extends BaseActivity {
 		}
 	}
 
-	private class DownloadLinksTask extends AsyncTask<String, String, Integer>{
+	private class DownloadLinksTask extends AsyncTask<String, String, Integer> {
 		private ArrayList<String> links;
 		private ArrayList<String> assetsNames;
 		@Override
@@ -216,11 +218,11 @@ public class DownloadActivity extends BaseActivity {
 			//
 			PDFParser linkGetter = new PDFParser(filePath);
 			SparseArray<LinkInfo[]> linkBuf = linkGetter.getLinkInfo();
-			if(linkBuf==null){
-				Log.d(TAG,"There is no links");
+			if (linkBuf == null) {
+				Log.d(TAG, "There is no links");
 				return;
 			}
-			for(int i=0;i<linkBuf.size();i++){
+			for (int i = 0; i < linkBuf.size(); i++) {
 				int key = linkBuf.keyAt(i);
 				Log.d(TAG,"--- i = "+i);
 				if(linkBuf.get(key)!=null){
@@ -235,9 +237,9 @@ public class DownloadActivity extends BaseActivity {
 								finIdx = link.indexOf("?");
 							}
 							String assetsFile = link.substring(startIdx, finIdx);
-							links.add(MagazineModel.getAssetsBaseURL(fileName)+assetsFile);
+							links.add(Magazine.getAssetsBaseURL(fileName)+assetsFile);
 							assetsNames.add(assetsFile);
-							Log.d(TAG,"   link: "+MagazineModel.getAssetsBaseURL(fileName)+assetsFile);
+							Log.d(TAG,"   link: "+Magazine.getAssetsBaseURL(fileName)+assetsFile);
 							Log.d(TAG,"   file: "+assetsFile);
 						}
 					}
@@ -303,17 +305,15 @@ public class DownloadActivity extends BaseActivity {
 		finish();
 		super.onBackPressed();
 	}
-	
+
 	private void closeDownloadScreen(){
 		finish();
 	}
-	
+
 	private Context getContext(){
 		return this;
 	}
 
-	
-	private static final int CONNECTION_ALERT = 1;
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {

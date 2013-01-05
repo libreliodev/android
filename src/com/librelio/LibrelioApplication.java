@@ -17,7 +17,6 @@ import com.niveales.wind.R;
 public class LibrelioApplication extends Application {
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
-	public static String BASE_URL;
 
 	private static final String TAG = "LibrelioApplication";
 	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
@@ -25,13 +24,13 @@ public class LibrelioApplication extends Application {
 	private static final String SERVER_URL = "http://download.librelio.com/downloads/android_verify.php";
 //	private static final String SERVER_URL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 
+	private static String baseUrl;
 
 	@Override
 	public void onCreate() {
 		String clientName = getClientName(this);
 		String magazineName = getMagazineName(this);
-		BASE_URL = "http://librelio-europe.s3.amazonaws.com/" + 
-				clientName + "/" + magazineName + "/";
+		baseUrl = "http://librelio-europe.s3.amazonaws.com/" + clientName + "/" + magazineName + "/";
 		super.onCreate();
 	}
 
@@ -103,5 +102,9 @@ public class LibrelioApplication extends Application {
 
 	public static String getServerUrl(){
 		return SERVER_URL;
+	}
+
+	public static String getAmazonServerUrl(){
+		return baseUrl;
 	}
 }

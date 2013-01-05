@@ -35,7 +35,6 @@ import java.util.Calendar;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
@@ -44,10 +43,8 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.BaseActivity;
 import com.librelio.base.BaseService;
-import com.librelio.base.IBaseContext;
-import com.librelio.model.MagazineModel;
-import com.librelio.storage.DataBaseHelper;
-import com.librelio.storage.Magazines;
+import com.librelio.model.Magazine;
+import com.librelio.storage.MagazineManager;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
@@ -62,67 +59,70 @@ import com.longevitysoft.android.xml.plist.domain.PList;
  */
 public class DownloadMagazineListService extends BaseService {
 	private static final String TAG = "DownloadPlistService";
+
+	public static final String USE_STATIC_MAGAZINES = "USE_STATIC_MAGAZINES";
+
 	private static final String PLIST_FILE_NAME = "magazines.plist";
 	private static final String FILE_NAME_KEY = "FileName";
 	private static final String TITLE_KEY = "Title";
 	private static final String SUBTITLE_KEY = "Subtitle";
-	
-	
+
 	private String plistUrl;
 	private String pList;
 	private Calendar calendar;
 	private SimpleDateFormat dateFormat;
+	private MagazineManager magazineManager;
+	private boolean useStaticMagazines;
 
-	
 	@Override
 	public void onCreate() {
 		calendar = Calendar.getInstance();
 		dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		magazineManager = new MagazineManager(this);
 		new AsyncTask<Void, Void, Void>() {
 			
 			@Override
 			protected Void doInBackground(Void... params) {
 				//
-				cleanMagazinesListInBase();
+				magazineManager.cleanMagazines();
 				//
-				plistUrl = LibrelioApplication.BASE_URL+"Magazines.plist";
-				Log.d(TAG,"onCreate path:"+((IBaseContext)getContext()).getStoragePath());
-				
+				plistUrl = LibrelioApplication.getAmazonServerUrl() + "Magazines.plist";
+				Log.d(TAG, "onCreate path:" + getStoragePath());
 				
 				// Plist downloading
-				if(LibrelioApplication.thereIsConnection(getContext())){
-					downloadFromUrl(plistUrl,((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
+				if (isOnline() && !useStaticMagazines) {
+					downloadFromUrl(plistUrl, getStoragePath() + PLIST_FILE_NAME);
 				}
 				//Convert plist to String for parsing
-				pList = getStringFromFile(((IBaseContext)getContext()).getStoragePath() +PLIST_FILE_NAME);
+				pList = getStringFromFile(getStoragePath() + PLIST_FILE_NAME);
 				//Parsing
 				PListXMLHandler handler = new PListXMLHandler();
 				PListXMLParser parser = new PListXMLParser();
 				parser.setHandler(handler);
 				parser.parse(pList);
 				PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
-				Array arr = (Array)list.getRootElement();
-				for(int i=0; i<arr.size();i++){
-					Dict dict = (Dict)arr.get(i);
+				Array arr = (Array) list.getRootElement();
+				for (int i = 0; i < arr.size(); i++) {
+					Dict dict = (Dict) arr.get(i);
 					String fileName = dict.getConfiguration(FILE_NAME_KEY).getValue().toString();
 					String title = dict.getConfiguration(TITLE_KEY).getValue().toString();
 					String subtitle = dict.getConfiguration(SUBTITLE_KEY).getValue().toString();
 					String downloadDate = getCurrentDate();
 					
-					MagazineModel magazine = new MagazineModel(fileName, title, subtitle, downloadDate, getContext());
+					Magazine magazine = new Magazine(fileName, title, subtitle, downloadDate, getContext());
 					//saving png
 					File png = new File(magazine.getPngPath());
-					if(!png.exists()){
-						if(LibrelioApplication.thereIsConnection(getContext())){
-							downloadFromUrl(magazine.getPngUrl(),magazine.getPngPath());
+					if (!png.exists()) {
+						if (isOnline() && !useStaticMagazines) {
+							downloadFromUrl(magazine.getPngUrl(), magazine.getPngPath());
 						}
-						Log.d(TAG,"Image download: "+magazine.getPngPath());
+						Log.d(TAG, "Image download: " + magazine.getPngPath());
 					} else {
-						Log.d(TAG,magazine.getPngPath()+" already exist");
+						Log.d(TAG, magazine.getPngPath() + " already exist");
 					}
 					magazine.saveInBase();
 				}
-				Log.d(TAG,"Downloading is finished");
+				Log.d(TAG, "Downloading is finished");
 				//
 				try {
 					Intent intent = new Intent(BaseActivity.BROADCAST_ACTION);
@@ -136,18 +136,26 @@ public class DownloadMagazineListService extends BaseService {
 					Log.e(TAG, "sendBroadcast failed", e);
 				}
 				stopSelf();
+				if (useStaticMagazines) {
+					startSelf();
+				}
 				return null;
 			}
 		}.execute();
 		super.onCreate();
 	}
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
-	
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		useStaticMagazines = intent.getBooleanExtra(USE_STATIC_MAGAZINES, false);
+		return super.onStartCommand(intent, flags, startId);
+	}
+
 	public static void downloadFromUrl(String sUrl, String filePath){
 		int count;
 		try{
@@ -172,8 +180,8 @@ public class DownloadMagazineListService extends BaseService {
 			Log.e(TAG, "Problem with download: " + filePath, e);
 		}
 	}
-	
-	public static String getStringFromFile(String path){
+
+	private static String getStringFromFile(String path){
 		StringBuffer fileData = new StringBuffer(1000);
 		BufferedReader reader = null;
 		try {
@@ -202,18 +210,12 @@ public class DownloadMagazineListService extends BaseService {
 	private String getCurrentDate(){
 		return dateFormat.format(calendar.getTime());
 	}
-	
-	private synchronized void cleanMagazinesListInBase(){
-		SQLiteDatabase db;
-		DataBaseHelper dbhelp = new DataBaseHelper(getApplicationContext());
-		db = dbhelp.getWritableDatabase();
-		db.execSQL("DELETE FROM "+Magazines.TABLE_NAME+" WHERE 1");
-		db.close();
-		Log.d(TAG, "at cleanMagazinesListInBase: "+Magazines.TABLE_NAME+" table was clean");
+
+	private void startSelf() {
+		startService(new Intent(getApplicationContext(), DownloadMagazineListService.class));
 	}
 	
-	private Context getContext(){
+	private Context getContext() {
 		return this;
 	}
-
 }

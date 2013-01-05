@@ -7,4 +7,6 @@ public interface IBaseContext {
 	String getExternalPath();
 
 	String getStoragePath();
+
+	boolean isOnline();
 }

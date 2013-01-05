@@ -14,10 +14,10 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.storage.DataBaseHelper;
-import com.librelio.storage.Magazines;
+import com.librelio.storage.MagazineManager;
 
-public class MagazineModel {
-	private static final String TAG = "MagazineModel";
+public class Magazine {
+	private static final String TAG = "Magazine";
 	private static final String COMPLETE_FILE = ".complete";
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
 	private static final String PAYED_FILE = ".payed";
@@ -38,8 +38,7 @@ public class MagazineModel {
 	private String assetsDir;
 	private String downloadDate;
 
-	public MagazineModel(String fileName, String title, String subtitle,
-			String downloadDate, Context context) {
+	public Magazine(String fileName, String title, String subtitle, String downloadDate, Context context) {
 		this.fileName = fileName;
 		this.title = title;
 		this.subtitle = subtitle;
@@ -49,11 +48,11 @@ public class MagazineModel {
 		valuesInit(fileName);
 	}
 
-	public MagazineModel(Cursor cursor, Context context) {
-		int titleColumnId = cursor.getColumnIndex(Magazines.FIELD_TITLE);
-		int subitleColumnId = cursor.getColumnIndex(Magazines.FIELD_SUBTITLE);
-		int fileNameColumnId = cursor.getColumnIndex(Magazines.FIELD_FILE_NAME);
-		int dateColumnId = cursor.getColumnIndex(Magazines.FIELD_DOWNLOAD_DATE);
+	public Magazine(Cursor cursor, Context context) {
+		int titleColumnId = cursor.getColumnIndex(MagazineManager.FIELD_TITLE);
+		int subitleColumnId = cursor.getColumnIndex(MagazineManager.FIELD_SUBTITLE);
+		int fileNameColumnId = cursor.getColumnIndex(MagazineManager.FIELD_FILE_NAME);
+		int dateColumnId = cursor.getColumnIndex(MagazineManager.FIELD_DOWNLOAD_DATE);
 		
 		this.fileName = cursor.getString(fileNameColumnId);
 		this.title = cursor.getString(titleColumnId);
@@ -71,7 +70,7 @@ public class MagazineModel {
 	
 	public static String getAssetsBaseURL(String fileName){
 		int finishNameIndex = fileName.indexOf("/");
-		return LibrelioApplication.BASE_URL+fileName.substring(0,finishNameIndex)+"/";
+		return LibrelioApplication.getAmazonServerUrl() + fileName.substring(0,finishNameIndex) + "/";
 	}
 
 	public void makeMagazineDir(){
@@ -103,11 +102,11 @@ public class MagazineModel {
 		DataBaseHelper dbhelp = new DataBaseHelper(context);
 		db = dbhelp.getWritableDatabase();
 		ContentValues cv = new ContentValues();
-		cv.put(Magazines.FIELD_FILE_NAME, fileName);
-		cv.put(Magazines.FIELD_DOWNLOAD_DATE, downloadDate);
-		cv.put(Magazines.FIELD_TITLE, title);
-		cv.put(Magazines.FIELD_SUBTITLE, subtitle);
-		db.insert(Magazines.TABLE_NAME, null, cv);
+		cv.put(MagazineManager.FIELD_FILE_NAME, fileName);
+		cv.put(MagazineManager.FIELD_DOWNLOAD_DATE, downloadDate);
+		cv.put(MagazineManager.FIELD_TITLE, title);
+		cv.put(MagazineManager.FIELD_SUBTITLE, subtitle);
+		db.insert(MagazineManager.TABLE_NAME, null, cv);
 		db.close();
 	}
 
@@ -115,7 +114,7 @@ public class MagazineModel {
 		isPaid = fileName.contains("_.");
 		int startNameIndex = fileName.indexOf("/")+1;
 		String png = ((IBaseContext)context).getStoragePath()+fileName.substring(startNameIndex, fileName.length()); 
-		pdfUrl = LibrelioApplication.BASE_URL + fileName;
+		pdfUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
 		pdfPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
 			pngUrl = pdfUrl.replace("_.pdf", ".png");

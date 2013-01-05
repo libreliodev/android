@@ -19,30 +19,17 @@
 
 package com.librelio.activity;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
-import com.librelio.service.DownloadMagazineListService;
-import com.librelio.storage.DataBaseHelper;
-import com.librelio.storage.Magazines;
 import com.niveales.wind.R;
 
 /**
@@ -55,149 +42,116 @@ public class StartupActivity extends BaseActivity {
 	private static final String TAG = "StartupActivity";
 	public static final String TEST_FILE_NAME = "test/test.pdf";
 
-	private BroadcastReceiver br;
-	
+//	private BroadcastReceiver startAplicationReceiver;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
-		File f = new File(getStoragePath());
-		if(!f.exists()){
-			Log.d(TAG,"onCreate directory was create");
-			f.mkdirs();
-		}
-		/**
-		 * TODO delete after testing
-		 * @Mike Did you test?
-		 */
-		new AsyncTask<Void, Void, Void>(){
-			String[] assetsList1 = null;
-			String testDir = null;
-			protected void onPreExecute() {
-				testDir = getStoragePath()+"test/";
-				Log.d(TAG,"testDir: "+testDir);
-				File dir = new File(testDir);
-				if(!dir.exists()){
-					dir.mkdir();
-				}
-				try {
-					assetsList1 = getResources().getAssets().list("test");
-				} catch (IOException e1) {
-					Log.e(TAG,"Test directory in assets is unavailable",e1);
-				}				
-			};
-			@Override
-			protected Void doInBackground(Void... params) {
-				//FIXME: @Mike Please add check if copy-process was failed!
-				for(String file : assetsList1){
-					Log.d(TAG,file);
-					copyFromAssets("test/"+file, testDir+file);
-				}
-				copyFromAssets("test.png", getStoragePath() + "test.png");
-				return null;
-			}
-			@Override
-			protected void onPostExecute(Void result) {
-				new StartUpTask().execute();
-				super.onPostExecute(result);
-			}
-			
-		}.execute();
 
+		initStorage("test");
+
+		new InitTestMagazines().execute("test");
 	}
-	
-	public class StartUpTask extends AsyncTask<Void, Void, Void>{
-		DataBaseHelper dbhelp;
-		SQLiteDatabase db;
-		Cursor c;
+
+	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
+
 		@Override
-		protected Void doInBackground(Void... params) {
-			dbhelp = new DataBaseHelper(getContext());
-			db = dbhelp.getReadableDatabase();
-			c = db.rawQuery("select * from "+Magazines.TABLE_NAME, null);
-			return null;
+		protected Integer doInBackground(String... params) {
+			try {
+				final String name = params[0];
+				final String testDir = getStoragePath() + name;
+				final String testImage = name + ".png";
+				final String testImagePath = getStoragePath() + testImage;
+				String[] assetsList = getResources().getAssets().list(name);
+				for(String file : assetsList){
+					copyFromAssets(name + "/" + file, testDir + file);
+				}
+				copyFromAssets(testImage, testImagePath);
+				return 0;
+			} catch (IOException e) {
+				Log.e(TAG,"Test directory in assets is unavailable", e);
+			}
+			return -1;
 		}
+
 		@Override
-		protected void onPostExecute(Void result) {
-			if(c.getCount()>0){
-				new Timer().schedule(new TimerTask() {
-					@Override
-					public void run() {
-						startMagazinesView();
-					}
-				}, 1000);
-			} else {
-				if(!LibrelioApplication.thereIsConnection(getContext())){
-					String[] assetsList = null;
-					try {
-						assetsList = getResources().getAssets().list("");
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-					for(String file : assetsList){
-						if(file.contains(".plist")||file.contains(".png")){
-							copyFromAssets(file, getStoragePath()+file);
-						}
+		protected void onPostExecute(Integer result) {
+			if (isCancelled()) {
+				return;
+			}
+			new InitPredefinedMagazinesTask().execute();
+		}
+	};
+
+	private class InitPredefinedMagazinesTask extends AsyncTask<Void, Void, Integer>{
+		@Override
+		protected Integer doInBackground(Void... params) {
+			String[] assetsList = null;
+			try {
+				assetsList = getResources().getAssets().list("");
+				for (String file : assetsList) {
+					if (file.contains(".plist") || file.contains(".png")) {
+						copyFromAssets(file, getStoragePath() + file);
 					}
 				}
+				return 0;
+			} catch (IOException e) {
+				Log.e(TAG, "copy fake-magazines failed", e);
+			}
+
+			return -1;
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+			/*
 				Intent intent = new Intent(getContext(), DownloadMagazineListService.class);
 				startService(intent);
-				br = new BroadcastReceiver() {
+				startAplicationReceiver = new BroadcastReceiver() {
 					@Override
 					public void onReceive(Context context, Intent intent) {
 						startMagazinesView();
 					}
 				};
 				IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
-				registerReceiver(br, filter);
+				registerReceiver(startAplicationReceiver, filter);
+				*/
+//			}
+//			c.close();
+//			db.close();
+			if (isCancelled()) {
+				return;
 			}
-			c.close();
-			db.close();
-			super.onPostExecute(result);
+
+			new Timer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					startMagazinesView();
+				}
+			}, 1000);
+
 		}
-		
+
 	}
-	
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		setContentView(R.layout.startup);
 		super.onConfigurationChanged(newConfig);
 	}
 
-	@Override
-	protected void onDestroy() {
-		if(br!=null){
-			unregisterReceiver(br);
-		}
-		super.onDestroy();
-	}
-	
+//	@Override
+//	protected void onDestroy() {
+//		if (startAplicationReceiver != null) {
+//			unregisterReceiver(startAplicationReceiver);
+//		}
+//		super.onDestroy();
+//	}
+
 	private void startMagazinesView(){
-		Intent intent = new Intent(getApplicationContext(),
-				MainMagazineActivity.class);
+		Intent intent = new Intent(getApplicationContext(), MainMagazineActivity.class);
 		startActivity(intent);
 		finish();
-	}
-	
-	private void copyFromAssets(String src, String dst){
-		try {
-			int count;
-			InputStream input = getAssets().open(src);
-			OutputStream output = new FileOutputStream(dst);
-			byte data[] = new byte[1024];
-
-			while ((count = input.read(data)) != -1) {
-				output.write(data, 0, count);
-			}
-			output.flush();
-			output.close();
-			input.close();
-		} catch (IOException e) {
-			Log.e(TAG, "copyFromAssets failed", e);
-		}
-	}
-	
-	private Context getContext(){
-		return this;
 	}
 }
