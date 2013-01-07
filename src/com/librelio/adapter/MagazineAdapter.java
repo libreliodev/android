@@ -94,7 +94,6 @@ public class MagazineAdapter extends BaseAdapter{
 			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Log.d(TAG, "!!!!!!!!!!!!!!!!!!!!!1PATH " + currentMagazine.getPdfPath());
 					if(new File(currentMagazine.getPdfPath()).exists()){
 						LibrelioApplication.startPDFActivity(context, currentMagazine.getPdfPath());
 					} else {

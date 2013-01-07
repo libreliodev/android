@@ -76,4 +76,29 @@ public class MagazineManager extends BaseManager {
 		db.close();
 		Log.d(TAG, "at cleanMagazinesListInBase: " + MagazineManager.TABLE_NAME + " table was clean");
 	}
+
+	/**
+	 * Look up magazine by path
+	 * @param path
+	 * @return
+	 */
+	public Magazine findByFileName(String path) {
+		Magazine magazine = null;
+		SQLiteDatabase db;
+		DataBaseHelper dbhelp = new DataBaseHelper(getContext());
+		db = dbhelp.getReadableDatabase();
+//		Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
+//		while(cursor.moveToNext()) {
+//			magazine = new Magazine(cursor, getContext());
+//			Log.d(TAG, "'" + magazine.getFileName() + "' <====> '" + path + "'");
+//		}
+		Cursor cursor = db.query(TABLE_NAME, null, FIELD_FILE_NAME + "=?", new String[]{path}, null, null, null);
+		if (cursor.moveToFirst()) {
+			magazine = new Magazine(cursor, getContext());
+		}
+
+		cursor.close();
+		db.close();
+		return magazine;
+	}
 }

@@ -40,9 +40,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.librelio.activity.BillingActivity;
+import com.librelio.activity.DownloadActivity;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
+import com.librelio.model.Magazine;
+import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
@@ -58,10 +62,6 @@ public class MuPDFActivity extends BaseActivity {
 
 	public interface RecycleObserver {
 		public void recycle();
-	}
-
-	public interface OpenLinkListener {
-		public void onBuy(String path);
 	}
 
 	private MuPDFCore    core;
@@ -95,50 +95,9 @@ public class MuPDFActivity extends BaseActivity {
 	private int mOrientation;
 	private SparseArray<LinkInfo[]> linkOfDocument;
 	private static RecycleObserver observer;
-	/**
-	 * Listeners
-	 */
-	private OpenLinkListener openLinkListener;
 
 	public static void setObserver(RecycleObserver ro){
 		observer = ro;
-	}
-	
-	private MuPDFCore openFile(String path)
-	{
-		int lastSlashPos = path.lastIndexOf('/');
-		mFileName = new String(lastSlashPos == -1
-					? path
-					: path.substring(lastSlashPos+1));
-		System.out.println("Trying to open "+path);
-		PDFParser linkGetter = new PDFParser(path);
-		linkOfDocument = linkGetter.getLinkInfo();
-		Log.d(TAG,"link size = "+linkOfDocument.size());
-		for(int i=0;i<linkOfDocument.size();i++){
-			Log.d(TAG,"--- i = "+i);
-			if(linkOfDocument.get(i)!=null){
-				for(int j=0;j<linkOfDocument.get(i).length;j++){
-					String link = linkOfDocument.get(i)[j].uri;
-					Log.d(TAG,"link[" + j + "] = "+link);
-					String local = "http://localhost";
-					if(link.startsWith(local)){
-						Log.d(TAG,"   link: "+link);
-					}
-				}
-			}
-		}
-		try
-		{
-			core = new MuPDFCore(path);
-			// New file: drop the old outline data
-			OutlineActivityData.set(null);
-		}
-		catch (Exception e)
-		{
-			System.out.println(e);
-			return null;
-		}
-		return core;
 	}
 
 	@Override
@@ -522,7 +481,7 @@ public class MuPDFActivity extends BaseActivity {
 							String basePath = core.getFileDirectory();
 							MediaHolder h = new MediaHolder(getContext(), link,basePath,fullScreen);
 							pageView.addMediaHolder(h, link.uri);
-							h.setVisibility(View.VISIBLE);							
+							h.setVisibility(View.VISIBLE);
 							pageView.addView(h);
 							h.requestLayout();
 						}
@@ -586,18 +545,28 @@ public class MuPDFActivity extends BaseActivity {
 			edit.commit();
 		}
 	}
+	
+	@Override
+	public void onBackPressed() {
+		if (observer != null) {
+			observer.recycle();
+		}
+		super.onBackPressed();
+	}
 
-	public void onDestroy()
-	{
-		if (core != null)
+	@Override
+	public void onDestroy() {
+		if (core != null) {
 			core.onDestroy();
+		}
 		core = null;
 		super.onDestroy();
 	}
 
 	void showButtons() {
-		if (core == null)
+		if (core == null) {
 			return;
+		}
 		if (!mButtonsVisible) {
 			mButtonsVisible = true;
 			// Update page number text and slider
@@ -859,6 +828,39 @@ public class MuPDFActivity extends BaseActivity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+	private MuPDFCore openFile(String path) {
+		int lastSlashPos = path.lastIndexOf('/');
+		mFileName = new String(lastSlashPos == -1
+					? path
+					: path.substring(lastSlashPos+1));
+		Log.d(TAG, "Trying to open " + path);
+		PDFParser linkGetter = new PDFParser(path);
+		linkOfDocument = linkGetter.getLinkInfo();
+		Log.d(TAG,"link size = "+linkOfDocument.size());
+		for(int i=0;i<linkOfDocument.size();i++){
+			Log.d(TAG,"--- i = "+i);
+			if(linkOfDocument.get(i)!=null){
+				for(int j=0;j<linkOfDocument.get(i).length;j++){
+					String link = linkOfDocument.get(i)[j].uri;
+					Log.d(TAG,"link[" + j + "] = "+link);
+					String local = "http://localhost";
+					if(link.startsWith(local)){
+						Log.d(TAG,"   link: "+link);
+					}
+				}
+			}
+		}
+		try {
+			core = new MuPDFCore(path);
+			// New file: drop the old outline data
+			OutlineActivityData.set(null);
+		} catch (Exception e) {
+			Log.e(TAG, "get core failed", e);
+			return null;
+		}
+		return core;
+	}
+
 	/**
 	 * @param linkString - url to open
 	 */
@@ -891,10 +893,7 @@ public class MuPDFActivity extends BaseActivity {
 				//startActivity(intent);
 			}
 		} else if(linkString.startsWith("buy://localhost")) {
-			Log.d(TAG, "onBuy event path = " + uri.getPath());
-			if (null != openLinkListener) {
-				openLinkListener.onBuy(uri.getPath());
-			}
+			onBuy(uri.getPath().substring(1));
 		} else {
 			//TODO: replace with custom activity
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -903,12 +902,18 @@ public class MuPDFActivity extends BaseActivity {
 		
 	}
 
-	@Override
-	public void onBackPressed() {
-		if (observer != null) {
-			observer.recycle();
+	private void onBuy(String path) {
+		Log.d(TAG, "onBuy event path = " + path);
+		MagazineManager magazineManager = new MagazineManager(getContext());
+		Magazine magazine = magazineManager.findByFileName(path);
+		if (null != magazine) {
+			Intent intent = new Intent(getContext(), BillingActivity.class);
+			intent
+				.putExtra(DownloadActivity.FILE_NAME_KEY, magazine.getFileName())
+				.putExtra(DownloadActivity.TITLE_KEY, magazine.getTitle())
+				.putExtra(DownloadActivity.SUBTITLE_KEY, magazine.getSubtitle());
+			getContext().startActivity(intent);
 		}
-		super.onBackPressed();
 	}
 
 	private Context getContext() {

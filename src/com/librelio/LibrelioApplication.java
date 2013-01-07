@@ -34,7 +34,7 @@ public class LibrelioApplication extends Application {
 		super.onCreate();
 	}
 
-	public static void startPDFActivity(Context context,String filePath){
+	public static void startPDFActivity(Context context, String filePath){
 		try{
 			Uri uri = Uri.parse(filePath);
 			Intent intent = new Intent(context,MuPDFActivity.class);
