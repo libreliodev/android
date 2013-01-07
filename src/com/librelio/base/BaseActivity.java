@@ -12,6 +12,7 @@ import org.netcook.android.tools.CrashCatcherActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
@@ -22,11 +23,15 @@ import com.librelio.lib.utils.BillingService.RestoreTransactions;
 import com.librelio.lib.utils.Consts.PurchaseState;
 import com.librelio.lib.utils.Consts.ResponseCode;
 import com.librelio.lib.utils.PurchaseObserver;
+import com.niveales.wind.R;
 
 public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 	private static final String TAG = "BaseActivity";
 
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
+	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
+
+	private SharedPreferences sharedPreferences;
 
 	/**
 	 * The receiver for stop progress in action bar
@@ -37,7 +42,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 			setProgressBarIndeterminateVisibility(false);
 		}
 	};
-	
+
 	/**
 	 * A {@link PurchaseObserver} is used to get callbacks when Android Market
 	 * sends messages to this application so that we can update the UI.
@@ -138,21 +143,27 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 
 	@Override
 	public String getInternalPath() {
-		return getDir("librelio", MODE_PRIVATE).getAbsolutePath();
+		return getDir("librelio", MODE_PRIVATE).getAbsolutePath() + "/";
 	}
 
 	@Override
 	public String getExternalPath() {
 		return Environment.getExternalStorageDirectory() + "/librelio/";
 	}
+
 	@Override
 	public String getStoragePath(){
-		return getInternalPath();
+		if (getResources().getBoolean(R.bool.use_internal_storage)) {
+			return getInternalPath();
+		} else {
+			return getExternalPath();
+		}
 	}
-	
-	public  String getVideoTempPath(){
-		return getExternalPath()+"tmp.mp4";
+
+	public String getVideoTempPath(){
+		return getExternalPath() + ".tmp.mp4";
 	}
+
 	/**
 	 * Replaces the language and/or country of the device into the given string.
 	 * The pattern "%lang%" will be replaced by the device's language code and
@@ -191,6 +202,14 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 		return LibrelioApplication.thereIsConnection(getBaseContext());
 	}
 
+	@Override
+	public SharedPreferences getPreferences() {
+		if (null == sharedPreferences) {
+			sharedPreferences = getSharedPreferences(LIBRELIO_SHARED_PREFERENCES, MODE_PRIVATE); 
+		}
+		return sharedPreferences;
+	}
+
 	/**
 	 * Creates storage directories if necessary
 	 */
@@ -218,9 +237,10 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 	 * @param dst
 	 *            the destination target
 	 */
-	protected void copyFromAssets(String src, String dst){
+	protected int copyFromAssets(String src, String dst){
+		int count = -1;
+		Log.d(TAG, "copyFromAssets " + src + " => " + dst);
 		try {
-			int count;
 			InputStream input = getAssets().open(src);
 			OutputStream output = new FileOutputStream(dst);
 			byte data[] = new byte[1024];
@@ -234,5 +254,10 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 		} catch (IOException e) {
 			Log.e(TAG, "copyFromAssets failed", e);
 		}
+		return count;
+	}
+	
+	protected boolean hasTestMagazine() {
+		return getResources().getBoolean(R.bool.enable_test_magazine);
 	}
 }

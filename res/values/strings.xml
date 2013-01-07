@@ -90,4 +90,5 @@
     <string name="ok">OK</string>
     
     <string name="send_log">Send log</string>
+    <string name="download_service_already_running">Download service already running</string>
 </resources>

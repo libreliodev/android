@@ -46,12 +46,24 @@ import com.librelio.lib.utils.PDFParser;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
-public class MuPDFActivity extends BaseActivity
-{
-	/* The core rendering instance */
-	private enum LinkState {DEFAULT, HIGHLIGHT, INHIBIT};
-	private final int    TAP_PAGE_MARGIN = 70;
-	private static final int    SEARCH_PROGRESS_DELAY = 200;
+public class MuPDFActivity extends BaseActivity {
+	private static final String TAG = "MuPDFActivity";
+
+	private static final int TAP_PAGE_MARGIN = 70;
+	private static final int SEARCH_PROGRESS_DELAY = 200;
+
+	private enum LinkState {
+		DEFAULT, HIGHLIGHT, INHIBIT
+	};
+
+	public interface RecycleObserver {
+		public void recycle();
+	}
+
+	public interface OpenLinkListener {
+		public void onBuy(String path);
+	}
+
 	private MuPDFCore    core;
 	private String       mFileName;
 	private ReaderView   mDocView;
@@ -83,12 +95,11 @@ public class MuPDFActivity extends BaseActivity
 	private int mOrientation;
 	private SparseArray<LinkInfo[]> linkOfDocument;
 	private static RecycleObserver observer;
+	/**
+	 * Listeners
+	 */
+	private OpenLinkListener openLinkListener;
 
-	
-	public interface RecycleObserver{
-		public void recycle();
-	}
-	
 	public static void setObserver(RecycleObserver ro){
 		observer = ro;
 	}
@@ -130,8 +141,6 @@ public class MuPDFActivity extends BaseActivity
 		return core;
 	}
 
-	private static final String TAG = "MuPDFActivity";
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -854,7 +863,7 @@ public class MuPDFActivity extends BaseActivity
 	 * @param linkString - url to open
 	 */
 	private void openLink(String linkString) {
-		Log.d("URI", linkString);
+		Log.d(TAG, "openLink " + linkString);
 		Uri uri = Uri.parse(linkString);
 		String warect = uri.getQueryParameter("warect");
 		Boolean isFullScreen = warect != null && warect.equals("full");
@@ -863,7 +872,7 @@ public class MuPDFActivity extends BaseActivity
 			
 			// get the current page view
 			String path = uri.getPath();
-			Log.d(TAG, path);
+			Log.d(TAG, "localhost path = " + path);
 			if(path == null)
 				return;
 			
@@ -881,6 +890,11 @@ public class MuPDFActivity extends BaseActivity
 				//Intent intent = new Intent(Intent.ACTION_VIEW, videoUri);
 				//startActivity(intent);
 			}
+		} else if(linkString.startsWith("buy://localhost")) {
+			Log.d(TAG, "onBuy event path = " + uri.getPath());
+			if (null != openLinkListener) {
+				openLinkListener.onBuy(uri.getPath());
+			}
 		} else {
 			//TODO: replace with custom activity
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -888,16 +902,16 @@ public class MuPDFActivity extends BaseActivity
 		}
 		
 	}
-	
+
 	@Override
 	public void onBackPressed() {
-		if(observer!=null){
+		if (observer != null) {
 			observer.recycle();
 		}
 		super.onBackPressed();
 	}
-	
-	private Context getContext(){
+
+	private Context getContext() {
 		return this;
 	}
 }

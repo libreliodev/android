@@ -1,6 +1,10 @@
 package com.librelio.base;
 
+import android.content.SharedPreferences;
+
 public interface IBaseContext {
+
+	String LIBRELIO_SHARED_PREFERENCES = "LIBRELIO_SHARED_PREFERENCES";
 
 	String getInternalPath();
 
@@ -9,4 +13,6 @@ public interface IBaseContext {
 	String getStoragePath();
 
 	boolean isOnline();
+
+	SharedPreferences getPreferences();
 }

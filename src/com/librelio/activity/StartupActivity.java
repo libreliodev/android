@@ -40,18 +40,21 @@ import com.niveales.wind.R;
  */
 public class StartupActivity extends BaseActivity {
 	private static final String TAG = "StartupActivity";
-	public static final String TEST_FILE_NAME = "test/test.pdf";
-
-//	private BroadcastReceiver startAplicationReceiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
 
-		initStorage("test");
 
-		new InitTestMagazines().execute("test");
+		if (hasTestMagazine() && !getPreferences().getBoolean(TEST_INIT_COMPLETE, false)) {
+			initStorage("test");
+			new InitTestMagazines().execute("test");
+		} else {
+			initStorage("test");
+			onStartMagazine();
+		}
+
 	}
 
 	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
@@ -60,7 +63,7 @@ public class StartupActivity extends BaseActivity {
 		protected Integer doInBackground(String... params) {
 			try {
 				final String name = params[0];
-				final String testDir = getStoragePath() + name;
+				final String testDir = getStoragePath() + name + "/";
 				final String testImage = name + ".png";
 				final String testImagePath = getStoragePath() + testImage;
 				String[] assetsList = getResources().getAssets().list(name);
@@ -105,32 +108,11 @@ public class StartupActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(Integer result) {
-			/*
-				Intent intent = new Intent(getContext(), DownloadMagazineListService.class);
-				startService(intent);
-				startAplicationReceiver = new BroadcastReceiver() {
-					@Override
-					public void onReceive(Context context, Intent intent) {
-						startMagazinesView();
-					}
-				};
-				IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
-				registerReceiver(startAplicationReceiver, filter);
-				*/
-//			}
-//			c.close();
-//			db.close();
 			if (isCancelled()) {
 				return;
 			}
-
-			new Timer().schedule(new TimerTask() {
-				@Override
-				public void run() {
-					startMagazinesView();
-				}
-			}, 1000);
-
+			getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, true).commit();
+			onStartMagazine();
 		}
 
 	}
@@ -141,17 +123,14 @@ public class StartupActivity extends BaseActivity {
 		super.onConfigurationChanged(newConfig);
 	}
 
-//	@Override
-//	protected void onDestroy() {
-//		if (startAplicationReceiver != null) {
-//			unregisterReceiver(startAplicationReceiver);
-//		}
-//		super.onDestroy();
-//	}
-
-	private void startMagazinesView(){
-		Intent intent = new Intent(getApplicationContext(), MainMagazineActivity.class);
-		startActivity(intent);
-		finish();
+	protected void onStartMagazine() {
+		new Timer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Intent intent = new Intent(getApplicationContext(), MainMagazineActivity.class);
+				startActivity(intent);
+				finish();
+			}
+		}, 1000);
 	}
 }

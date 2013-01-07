@@ -20,21 +20,23 @@ import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
-import com.librelio.activity.StartupActivity;
 import com.librelio.model.Magazine;
+import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
 	private ArrayList<Magazine> magazine;
+	private boolean hasTestMagazine;
 
 	
-	public MagazineAdapter(ArrayList<Magazine> magazine,Context context){
+	public MagazineAdapter(ArrayList<Magazine> magazine, Context context, boolean hasTestMagazine) {
 		this.context = context;
 		this.magazine = magazine;
+		this.hasTestMagazine = hasTestMagazine;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return magazine.size();
@@ -50,14 +52,14 @@ public class MagazineAdapter extends BaseAdapter{
 		return position;
 	}
 
-	static class MagazineItemHolder{
+	static class MagazineItemHolder {
 		public TextView title;
 		public TextView subtitle;
 		public ImageView thumbnail;
 		public Button downloadOrReadButton;
 		public Button sampleOrDeleteButton;
 	}
-	
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final Magazine currentMagazine = magazine.get(position);
@@ -86,19 +88,15 @@ public class MagazineAdapter extends BaseAdapter{
 		String imagePath = currentMagazine.getPngPath();
 		holder.thumbnail.setImageBitmap(BitmapFactory.decodeFile(imagePath));
 		
-		/**
-		 * TODO delete after testing
-		 */
-		if(currentMagazine.getFileName().equals(StartupActivity.TEST_FILE_NAME)){
+		if(hasTestMagazine && currentMagazine.isFake()){
 			holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
-			holder.downloadOrReadButton.setText(context.getResources().getString(
-					R.string.read));
+			holder.downloadOrReadButton.setText(context.getResources().getString(R.string.read));
 			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					Log.d(TAG, "!!!!!!!!!!!!!!!!!!!!!1PATH " + currentMagazine.getPdfPath());
 					if(new File(currentMagazine.getPdfPath()).exists()){
-						LibrelioApplication.startPDFActivity(context,
-								currentMagazine.getPdfPath());
+						LibrelioApplication.startPDFActivity(context, currentMagazine.getPdfPath());
 					} else {
 						Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
 					}
@@ -118,33 +116,6 @@ public class MagazineAdapter extends BaseAdapter{
 							currentMagazine.getPdfPath());
 				}
 			});
-			//
-			/*PDFParser linkGetter = new PDFParser(currentMagazine.getPdfPath());
-			SparseArray<LinkInfo[]> linkBuf = linkGetter.getLinkInfo();
-			if(linkBuf==null){
-				Log.d(TAG,"There is no links");
-			} else {
-				for(int i=0;i<linkBuf.size();i++){
-					Log.d(TAG,"--- i = "+i);
-					if(linkBuf.get(i)!=null){
-						for(int j=0;j<linkBuf.get(i).length;j++){
-							String link = linkBuf.get(i)[j].uri;
-							Log.d(TAG,"link[" + j + "] = "+link);
-							String local = "http://localhost";
-							if(link.startsWith(local)){
-								int startIdx = local.length()+1;
-								int finIdx = link.length();
-								if(link.contains("?")){
-									finIdx = link.indexOf("?");
-								}
-								String assetsFile = link.substring(startIdx, finIdx);
-								Log.d(TAG,"   link: "+MagazineModel.getAssetsBaseURL(currentMagazine.getPdfPath())+assetsFile);
-								Log.d(TAG,"   file: "+assetsFile);
-							}
-						}
-					}
-				}
-			}*/
 			//
 		} else {
 			// download case

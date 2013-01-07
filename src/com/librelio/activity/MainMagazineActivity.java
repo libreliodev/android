@@ -33,8 +33,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,7 +53,6 @@ import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
-import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
@@ -72,6 +69,7 @@ public class MainMagazineActivity extends BaseActivity {
 	public static final String REQUEST_SUBS = "request_subs";
 	public static final String UPDATE_PROGRESS_STOP = "updeta_pregress_stop";
 	public static final String BROADCAST_ACTION_IVALIDATE = "com.librelio.lib.service.broadcast.invalidate";
+	private static final String START_FIRST_TIME = "START_FIRST_TIME";
 
 	private static final int DIALOG_CANNOT_CONNECT_ID = 1;
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
@@ -80,39 +78,12 @@ public class MainMagazineActivity extends BaseActivity {
 	/**
 	 * Receiver for magazines view refresh
 	 */
-	private BroadcastReceiver gridInvalidate = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if(grid!=null){
-				Log.d(TAG, "onReceive: grid was invalidate");
-				reloadMagazineData(magazines);
-				grid.invalidate();
-				grid.invalidateViews();
-			}
-		}
-	};
+	private BroadcastReceiver gridInvalidate;
 	/**
 	 * The Purchase receivers
 	 */
-	private BroadcastReceiver subscriptionYear = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG,"onReceive subscription year");
-			if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
-				//Note: mManagedType == Managed.SUBSCRIPTION
-				showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-			}
-		}
-	};
-	private BroadcastReceiver subscriptionMonthly = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG,"onReceive subscription monthly");
-			if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_MONTHLY_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
-				showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-			}
-		}
-	};
+	private BroadcastReceiver subscriptionYear;
+	private BroadcastReceiver subscriptionMonthly;
 
 	private Timer updateTimer;
 	private BillingService billingService;
@@ -123,12 +94,17 @@ public class MainMagazineActivity extends BaseActivity {
 	private LibrelioPurchaseObserver librelioPurchaseObserver;
 	private Handler handler;
 	private MagazineManager magazineManager;
+	
+	private boolean hasTestMagazine;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.issue_list_layout);
+
+		hasTestMagazine = hasTestMagazine();
+
 		magazineManager = new MagazineManager(this);
 
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
@@ -136,8 +112,39 @@ public class MainMagazineActivity extends BaseActivity {
 		magazines = new ArrayList<Magazine>();
 		reloadMagazineData(magazines);
 
-		adapter = new MagazineAdapter(magazines, this);
+		adapter = new MagazineAdapter(magazines, this, hasTestMagazine);
 		grid.setAdapter(adapter);
+
+		gridInvalidate = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (grid != null) {
+					Log.d(TAG, "onReceive: grid was invalidate");
+					reloadMagazineData(magazines);
+					grid.invalidate();
+					grid.invalidateViews();
+				}
+			}
+		};
+		subscriptionYear = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.d(TAG,"onReceive subscription year");
+				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
+					//Note: mManagedType == Managed.SUBSCRIPTION
+					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
+				}
+			}
+		};
+		subscriptionMonthly = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.d(TAG,"onReceive subscription monthly");
+				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_MONTHLY_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
+					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
+				}
+			}
+		};
 
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
 		IntentFilter subsFilter = new IntentFilter(REQUEST_SUBS);
@@ -180,7 +187,7 @@ public class MainMagazineActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		setProgressBarIndeterminateVisibility(false);
+		showProgress(false);
 		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
 		registerReceiver(updateProgressStop, filter);
 		ResponseHandler.register(librelioPurchaseObserver);
@@ -234,17 +241,19 @@ public class MainMagazineActivity extends BaseActivity {
 		switch (item.getItemId()) {
 
 		case R.id.options_menu_reload:
-			if(LibrelioApplication.thereIsConnection(this)){
-				Intent intent = new Intent(this, DownloadMagazineListService.class);
-				startService(intent);
-				setProgressBarIndeterminateVisibility(true);
-				reloadMagazineData(magazines);
-				stopRegularUpdate();
-				startRegularUpdate();
-
+			if (isOnline()) {
+				if (!getPreferences().getBoolean(DownloadMagazineListService.ALREADY_RUNNING, false)) {
+					Intent intent = new Intent(this, DownloadMagazineListService.class);
+					startService(intent);
+					showProgress(true);
+					reloadMagazineData(magazines);
+//					stopRegularUpdate();
+//					startRegularUpdate();
+				} else {
+					Toast.makeText(this, getResources().getString(R.string.download_service_already_running), Toast.LENGTH_LONG).show();
+				}
 			} else {
-				Toast.makeText(this, getResources().getString(R.string.connection_failed),
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getResources().getString(R.string.connection_failed), Toast.LENGTH_LONG).show();
 			}
 			return true;
 
@@ -269,25 +278,29 @@ public class MainMagazineActivity extends BaseActivity {
 		return true;
 	}
 
-	private void reloadMagazineData(ArrayList<Magazine> magazine) {
-		magazine.clear();
-		magazine.addAll(magazineManager.getMagazines());
+	private void reloadMagazineData(ArrayList<Magazine> magazines) {
+		magazines.clear();
+		magazines.addAll(magazineManager.getMagazines(hasTestMagazine));
 	}
 
 	private void startRegularUpdate(){
 		long period = getUpdatePeriod();
 		updateTimer = new Timer();
 		TimerTask updateTask = new TimerTask() {
-			private boolean isFirst = true;
 			@Override
 			public void run() {
+				boolean isFirst = getPreferences().getBoolean(START_FIRST_TIME, true);
 				Intent intent = new Intent(getBaseContext(), DownloadMagazineListService.class);
 				intent.putExtra(DownloadMagazineListService.USE_STATIC_MAGAZINES, isFirst);
 				startService(intent);
-				isFirst = false;
+				getPreferences().edit().putBoolean(START_FIRST_TIME, false).commit();
 			}
 		};
-		updateTimer.schedule(updateTask, 0, period);
+		long startTime = 0;
+		if (magazineManager.getCount() > 0) {
+			startTime = period;
+		}
+		updateTimer.schedule(updateTask, startTime, period);
 	}
 
 	private void stopRegularUpdate(){
@@ -310,10 +323,8 @@ public class MainMagazineActivity extends BaseActivity {
 				.setNegativeButton(R.string.learn_more,
 						new DialogInterface.OnClickListener() {
 							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								Intent intent = new Intent(Intent.ACTION_VIEW,
-										helpUri);
+							public void onClick(DialogInterface dialog, int which) {
+								Intent intent = new Intent(Intent.ACTION_VIEW, helpUri);
 								startActivity(intent);
 							}
 						});
@@ -323,4 +334,7 @@ public class MainMagazineActivity extends BaseActivity {
 	private void restorePurchises() {
 	}
 
+	private void showProgress(boolean progress) {
+		setProgressBarIndeterminateVisibility(progress);
+	}
 }

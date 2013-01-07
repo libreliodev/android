@@ -58,9 +58,10 @@ import com.longevitysoft.android.xml.plist.domain.PList;
  * 
  */
 public class DownloadMagazineListService extends BaseService {
-	private static final String TAG = "DownloadPlistService";
+	private static final String TAG = "DownloadMagazinesService";
 
 	public static final String USE_STATIC_MAGAZINES = "USE_STATIC_MAGAZINES";
+	public static final String ALREADY_RUNNING = "DownloadMagazineListService_ALREADY_RUNNING";
 
 	private static final String PLIST_FILE_NAME = "magazines.plist";
 	private static final String FILE_NAME_KEY = "FileName";
@@ -76,19 +77,22 @@ public class DownloadMagazineListService extends BaseService {
 
 	@Override
 	public void onCreate() {
+		if (getPreferences().getBoolean(ALREADY_RUNNING, false)) {
+			return;
+		}
+		getPreferences().edit().putBoolean(ALREADY_RUNNING, true).commit();
 		calendar = Calendar.getInstance();
 		dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		magazineManager = new MagazineManager(this);
 		new AsyncTask<Void, Void, Void>() {
-			
+
 			@Override
 			protected Void doInBackground(Void... params) {
-				//
 				magazineManager.cleanMagazines();
 				//
 				plistUrl = LibrelioApplication.getAmazonServerUrl() + "Magazines.plist";
-				Log.d(TAG, "onCreate path:" + getStoragePath());
-				
+				Log.d(TAG, "Downloading start path:" + getStoragePath() + ", mode = " + useStaticMagazines);
+
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
 					downloadFromUrl(plistUrl, getStoragePath() + PLIST_FILE_NAME);
@@ -120,9 +124,10 @@ public class DownloadMagazineListService extends BaseService {
 					} else {
 						Log.d(TAG, magazine.getPngPath() + " already exist");
 					}
-					magazine.saveInBase();
+					magazineManager.addMagazine(magazine);
 				}
-				Log.d(TAG, "Downloading is finished");
+
+				Log.d(TAG, "Downloading was finished");
 				//
 				try {
 					Intent intent = new Intent(BaseActivity.BROADCAST_ACTION);
@@ -136,6 +141,7 @@ public class DownloadMagazineListService extends BaseService {
 					Log.e(TAG, "sendBroadcast failed", e);
 				}
 				stopSelf();
+				getPreferences().edit().putBoolean(ALREADY_RUNNING, false).commit();
 				if (useStaticMagazines) {
 					startSelf();
 				}
@@ -156,15 +162,15 @@ public class DownloadMagazineListService extends BaseService {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	public static void downloadFromUrl(String sUrl, String filePath){
-		int count;
+	public static int downloadFromUrl(String sUrl, String filePath){
+		int count = -1;
 		try{
 			URL url = new URL(sUrl);
 			URLConnection conexion = url.openConnection();
 			conexion.connect();
 	
 			int lenghtOfFile = conexion.getContentLength();
-			Log.d(TAG, "Lenght of file: " + lenghtOfFile);
+			Log.d(TAG, "downloadFromUrl Lenght of file: " + lenghtOfFile);
 	
 			InputStream input = new BufferedInputStream(url.openStream());
 			OutputStream output = new FileOutputStream(filePath);
@@ -179,6 +185,7 @@ public class DownloadMagazineListService extends BaseService {
 		} catch (Exception e) {
 			Log.e(TAG, "Problem with download: " + filePath, e);
 		}
+		return count;
 	}
 
 	private static String getStringFromFile(String path){
@@ -201,7 +208,7 @@ public class DownloadMagazineListService extends BaseService {
 			}
 			reader.close();
 		} catch (IOException e) {
-			Log.e(TAG,"Problem with reading file",e);
+			Log.e(TAG,"Problem with reading file", e);
 			return null;
 		}
 		return fileData.toString();

@@ -3,17 +3,14 @@ package com.librelio.model;
 import java.io.File;
 import java.io.IOException;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.IBaseContext;
-import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 
 public class Magazine {
@@ -95,19 +92,6 @@ public class Magazine {
 		clearMagazineDir();
 		Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 		context.sendBroadcast(intentInvalidate);
-	}
-	
-	public synchronized void saveInBase() {
-		SQLiteDatabase db;
-		DataBaseHelper dbhelp = new DataBaseHelper(context);
-		db = dbhelp.getWritableDatabase();
-		ContentValues cv = new ContentValues();
-		cv.put(MagazineManager.FIELD_FILE_NAME, fileName);
-		cv.put(MagazineManager.FIELD_DOWNLOAD_DATE, downloadDate);
-		cv.put(MagazineManager.FIELD_TITLE, title);
-		cv.put(MagazineManager.FIELD_SUBTITLE, subtitle);
-		db.insert(MagazineManager.TABLE_NAME, null, cv);
-		db.close();
 	}
 
 	private void valuesInit(String fileName) {
@@ -252,6 +236,10 @@ public class Magazine {
 
 	public void setDownloadDate(String downloadDate) {
 		this.downloadDate = downloadDate;
+	}
+
+	public boolean isFake() {
+		return getFileName().equals(MagazineManager.TEST_FILE_NAME);
 	}
 
 }

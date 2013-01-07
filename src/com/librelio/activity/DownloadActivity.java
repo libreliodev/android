@@ -188,7 +188,7 @@ public class DownloadActivity extends BaseActivity {
 			}
 			final double curProgress = p[0];
 			final String msg = String.format(Locale.getDefault(), "Downloading %s", formater.format(curProgress));
-			Log.d(TAG, msg);
+			//Log.d(TAG, msg);
 			text.setText(msg);
 			progress.setProgress((int)curProgress * 100);
 		}
