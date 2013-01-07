@@ -16,7 +16,7 @@ This project aims at porting the existing iOS customizable app to Android.
 
 ## 2- Rename the package in Eclipse:
 As explained on [Stack Overflow](http://stackoverflow.com/questions/3697899/package-renaming-in-eclipse-android-project), press F2 on package name. 
-![RenamePackage](RenamePackage.PNG)
+
 
 
 ## 3- Update AndroidManifest.xml:
