@@ -55,6 +55,7 @@ public class MuPDFActivity extends BaseActivity {
 
 	private static final int TAP_PAGE_MARGIN = 70;
 	private static final int SEARCH_PROGRESS_DELAY = 200;
+	private static final String FILE_NAME = "FileName";
 
 	private enum LinkState {
 		DEFAULT, HIGHLIGHT, INHIBIT
@@ -64,15 +65,17 @@ public class MuPDFActivity extends BaseActivity {
 		public void recycle();
 	}
 
-	private MuPDFCore    core;
-	private String       mFileName;
-	private ReaderView   mDocView;
+	private MuPDFCore core;
+	private String fileName;
+	private int mOrientation;
+
+	private AlertDialog.Builder alertBuilder;
+	private ReaderView   docView;
 	private View         mButtonsView;
 	private boolean      mButtonsVisible;
 	private EditText     mPasswordView;
 	private TextView     mFilenameView;
 //	private SeekBar      mPageSlider;
-	private ViewPager	mPreviewBar;
 	private int          mPageSliderRes;
 //	private TextView     mPageNumberView;
 	private ImageButton  mSearchButton;
@@ -86,13 +89,11 @@ public class MuPDFActivity extends BaseActivity {
 	private EditText     mSearchText;
 	private SafeAsyncTask<Void,Integer,SearchTaskResult> mSearchTask;
 	//private SearchTaskResult mSearchTaskResult;
-	private AlertDialog.Builder mAlertBuilder;
 	private LinkState    mLinkState = LinkState.DEFAULT;
 	private final Handler mHandler = new Handler();
 	private FrameLayout mPreviewBarHolder;
 	private HorizontalListView mPreview;
 	private MuPDFPageAdapter mDocViewAdapter;
-	private int mOrientation;
 	private SparseArray<LinkInfo[]> linkOfDocument;
 	private static RecycleObserver observer;
 
@@ -101,64 +102,20 @@ public class MuPDFActivity extends BaseActivity {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 
-		mAlertBuilder = new AlertDialog.Builder(this);
-
+		alertBuilder = new AlertDialog.Builder(this);
+	
+		core = getMuPdfCore(savedInstanceState);
+	
 		if (core == null) {
-			core = (MuPDFCore)getLastNonConfigurationInstance();
-
-			if (savedInstanceState != null && savedInstanceState.containsKey("FileName")) {
-				mFileName = savedInstanceState.getString("FileName");
-			}
-		}
-		if (core == null) {
-			Intent intent = getIntent();
-			if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-				Uri uri = intent.getData();
-				if (uri.toString().startsWith("content://media/external/file")) {
-					// Handle view requests from the Transformer Prime's file manager
-					// Hopefully other file managers will use this same scheme, if not
-					// using explicit paths.
-					Cursor cursor = getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
-					if (cursor.moveToFirst()) {
-						uri = Uri.parse(cursor.getString(0));
-					}
-				}
-
-				core = openFile(Uri.decode(uri.getEncodedPath()));
-				SearchTaskResult.set(null);
-			} else {
-				//TODO: @Mike why is it here? 
-				String filePath="/mnt/sdcard/wind_355.pdf";
-				
-				PDFParser p = new PDFParser(filePath);
-				core = openFile(filePath);
-				SearchTaskResult.set(null);
-			}
-			if (core != null && core.needsPassword()) {
-				requestPassword(savedInstanceState);
-				return;
-			}
-		}
-		if (core == null)
-		{
-			AlertDialog alert = mAlertBuilder.create();
-			
-			alert.setTitle(R.string.open_failed);
-			alert.setButton(AlertDialog.BUTTON_POSITIVE, "Dismiss",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							finish();
-						}
-					});
-			alert.show();
 			return;
 		}
+	
 		mOrientation = getResources().getConfiguration().orientation;
+
 		if(mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
 			core.setDisplayPages(2);
 		} else {
@@ -168,12 +125,12 @@ public class MuPDFActivity extends BaseActivity {
 		createUI(savedInstanceState);
 	}
 
-	public void requestPassword(final Bundle savedInstanceState) {
+	private void requestPassword(final Bundle savedInstanceState) {
 		mPasswordView = new EditText(this);
 		mPasswordView.setInputType(EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
 		mPasswordView.setTransformationMethod(new PasswordTransformationMethod());
 
-		AlertDialog alert = mAlertBuilder.create();
+		AlertDialog alert = alertBuilder.create();
 		alert.setTitle(R.string.enter_password);
 		alert.setView(mPasswordView);
 		alert.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.ok),
@@ -196,13 +153,60 @@ public class MuPDFActivity extends BaseActivity {
 		alert.show();
 	}
 
-	public void createUI(Bundle savedInstanceState) {
+	private MuPDFCore getMuPdfCore(Bundle savedInstanceState) {
+		MuPDFCore core = null;
+		if (core == null) {
+			core = (MuPDFCore)getLastNonConfigurationInstance();
+
+			if (savedInstanceState != null && savedInstanceState.containsKey(FILE_NAME)) {
+				fileName = savedInstanceState.getString(FILE_NAME);
+			}
+		}
+		if (core == null) {
+			Intent intent = getIntent();
+			if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+				Uri uri = intent.getData();
+				if (uri.toString().startsWith("content://media/external/file")) {
+					// Handle view requests from the Transformer Prime's file manager
+					// Hopefully other file managers will use this same scheme, if not
+					// using explicit paths.
+					Cursor cursor = getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
+					if (cursor.moveToFirst()) {
+						uri = Uri.parse(cursor.getString(0));
+					}
+				}
+
+				core = openFile(Uri.decode(uri.getEncodedPath()));
+				SearchTaskResult.set(null);
+			}
+			if (core != null && core.needsPassword()) {
+				requestPassword(savedInstanceState);
+				return null;
+			}
+		}
+		if (core == null) {
+			AlertDialog alert = alertBuilder.create();
+			
+			alert.setTitle(R.string.open_failed);
+			alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dismiss),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					});
+			alert.show();
+			return null;
+		}
+		return core;
+	}
+
+	private void createUI(Bundle savedInstanceState) {
 		if (core == null)
 			return;
 		// Now create the UI.
 		// First create the document view making use of the ReaderView's internal
 		// gesture recognition
-		mDocView = new ReaderView(this,linkOfDocument) {
+		docView = new ReaderView(this,linkOfDocument) {
 			private boolean showButtonsDisabled;
 			
 			public boolean onSingleTapUp(MotionEvent e) {
@@ -214,7 +218,7 @@ public class MuPDFActivity extends BaseActivity {
 					int linkPage = -1;
 					String linkString = null;
 					if (mLinkState != LinkState.INHIBIT) {
-						MuPDFPageView pageView = (MuPDFPageView) mDocView.getDisplayedView();
+						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
 						if (pageView != null) {
 							linkPage = pageView.hitLinkPage(e.getX(), e.getY());
 							linkString = pageView.hitLinkUri(e.getX(),  e.getY());
@@ -222,7 +226,7 @@ public class MuPDFActivity extends BaseActivity {
 					}
 
 					if (linkPage != -1) {
-						mDocView.setDisplayedViewIndex(linkPage);
+						docView.setDisplayedViewIndex(linkPage);
 					} else if (linkString != null) {
 						// start intent with url as linkString
 						openLink(linkString);
@@ -285,7 +289,7 @@ public class MuPDFActivity extends BaseActivity {
 //				mPageSlider.setProgress(i * mPageSliderRes);
 				if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber != i) {
 					SearchTaskResult.set(null);
-					mDocView.resetupChildren();
+					docView.resetupChildren();
 				}
 			}
 
@@ -307,7 +311,7 @@ public class MuPDFActivity extends BaseActivity {
 			}
 		};
 		mDocViewAdapter = new MuPDFPageAdapter(this, core);
-		mDocView.setAdapter(mDocViewAdapter);
+		docView.setAdapter(mDocViewAdapter);
 
 		// Make the buttons overlay, and store all its
 		// controls in variables
@@ -318,7 +322,7 @@ public class MuPDFActivity extends BaseActivity {
 		mPageSliderRes = ((10 + smax - 1)/smax) * 2;
 
 		// Set the file-name text
-		mFilenameView.setText(mFileName);
+		mFilenameView.setText(fileName);
 
 		// Activate the seekbar
 //		mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -362,7 +366,7 @@ public class MuPDFActivity extends BaseActivity {
 				// Remove any previous search results
 				if (SearchTaskResult.get() != null && !mSearchText.getText().toString().equals(SearchTaskResult.get().txt)) {
 					SearchTaskResult.set(null);
-					mDocView.resetupChildren();
+					docView.resetupChildren();
 				}
 			}
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -418,14 +422,14 @@ public class MuPDFActivity extends BaseActivity {
 		// Reenstate last state if it was recorded
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 		int orientation = prefs.getInt("orientation", mOrientation);
-		int pageNum = prefs.getInt("page"+mFileName, 0);
+		int pageNum = prefs.getInt("page"+fileName, 0);
 		if(orientation == mOrientation)
-			mDocView.setDisplayedViewIndex(pageNum);
+			docView.setDisplayedViewIndex(pageNum);
 		else {
 			if(orientation == Configuration.ORIENTATION_PORTRAIT) {
-				mDocView.setDisplayedViewIndex((pageNum + 1) / 2);
+				docView.setDisplayedViewIndex((pageNum + 1) / 2);
 			} else {
-				mDocView.setDisplayedViewIndex((pageNum == 0) ? 0 : pageNum * 2 - 1);
+				docView.setDisplayedViewIndex((pageNum == 0) ? 0 : pageNum * 2 - 1);
 			}
 		}
 
@@ -437,7 +441,7 @@ public class MuPDFActivity extends BaseActivity {
 
 		// Stick the document view and the buttons overlay into a parent view
 		RelativeLayout layout = new RelativeLayout(this);
-		layout.addView(mDocView);
+		layout.addView(docView);
 		layout.addView(mButtonsView);
 //		layout.setBackgroundResource(R.drawable.tiled_background);
 		//layout.setBackgroundResource(R.color.canvas);
@@ -445,62 +449,15 @@ public class MuPDFActivity extends BaseActivity {
 		setContentView(layout);
 	}
 
-	public class ActivateAutoLinks extends AsyncTask<Integer, Void, Void>{
-		private ArrayList<LinkInfo> autoLinks;
-		@Override
-		protected Void doInBackground(Integer... params) {
-			autoLinks = new ArrayList<LinkInfo>();
-			LinkInfo[] links1 = core.getPageLinks(params[0].intValue());
-			if(links1==null){
-				return null;
-			}
-			for(LinkInfo link : links1){
-				Log.d(TAG,"link: "+link.uri);
-				if (null == link.uri) {
-					continue;
-				}
-				if (link.uri.startsWith("http") && (link.uri.contains("youtube") || link.uri.contains("vimeo") || link.uri.contains("localhost"))) {
-					boolean autoPlay = Uri.parse(link.uri).getQueryParameter("waplay") != null 
-							&& Uri.parse(link.uri).getQueryParameter("waplay").equals("auto");
-					if(autoPlay){
-						autoLinks.add(link);
-					}
-				}
-			}
-			return null;
-		}
-		@Override
-		protected void onPostExecute(Void result) {
-			mDocView.post(new Runnable() {
-				public void run() {
-					for(LinkInfo link : autoLinks){
-						boolean fullScreen =Uri.parse(link.uri).getQueryParameter("warect") != null 
-								&& Uri.parse(link.uri).getQueryParameter("warect").equals("full");
-						MuPDFPageView pageView = (MuPDFPageView)mDocView.getDisplayedView();
-						if (pageView != null) {
-							String basePath = core.getFileDirectory();
-							MediaHolder h = new MediaHolder(getContext(), link,basePath,fullScreen);
-							pageView.addMediaHolder(h, link.uri);
-							h.setVisibility(View.VISIBLE);
-							pageView.addView(h);
-							h.requestLayout();
-						}
-					}
-				}
-			});
-			super.onPostExecute(result);
-		}
-	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode >= 0)
-			mDocView.setDisplayedViewIndex(resultCode);
+			docView.setDisplayedViewIndex(resultCode);
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	public Object onRetainNonConfigurationInstance()
-	{
+	public Object onRetainNonConfigurationInstance() {
 		MuPDFCore mycore = core;
 		core = null;
 		return mycore;
@@ -510,8 +467,8 @@ public class MuPDFActivity extends BaseActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		if (mFileName != null && mDocView != null) {
-			outState.putString("FileName", mFileName);
+		if (fileName != null && docView != null) {
+			outState.putString("FileName", fileName);
 
 			// Store current page in the prefs against the file name,
 			// so that we can pick it up each time the file is loaded
@@ -519,7 +476,7 @@ public class MuPDFActivity extends BaseActivity {
 			// so it can go in the bundle
 			SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 			SharedPreferences.Editor edit = prefs.edit();
-			edit.putInt("page"+mFileName, mDocView.getDisplayedViewIndex());
+			edit.putInt("page"+fileName, docView.getDisplayedViewIndex());
 			edit.putInt("orientation", mOrientation);
 			edit.commit();
 		}
@@ -537,10 +494,10 @@ public class MuPDFActivity extends BaseActivity {
 
 		killSearch();
 
-		if (mFileName != null && mDocView != null) {
+		if (fileName != null && docView != null) {
 			SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 			SharedPreferences.Editor edit = prefs.edit();
-			edit.putInt("page"+mFileName, mDocView.getDisplayedViewIndex());
+			edit.putInt("page"+fileName, docView.getDisplayedViewIndex());
 			edit.putInt("orientation", mOrientation);
 			edit.commit();
 		}
@@ -570,7 +527,7 @@ public class MuPDFActivity extends BaseActivity {
 		if (!mButtonsVisible) {
 			mButtonsVisible = true;
 			// Update page number text and slider
-			int index = mDocView.getDisplayedViewIndex();
+			int index = docView.getDisplayedViewIndex();
 			updatePageNumView(index);
 //			mPageSlider.setMax((core.countPages()-1)*mPageSliderRes);
 //			mPageSlider.setProgress(index*mPageSliderRes);
@@ -590,7 +547,7 @@ public class MuPDFActivity extends BaseActivity {
 			});
 			mTopBarSwitcher.startAnimation(anim);
 			// Update listView position
-			mPreview.setSelection(mDocView.getDisplayedViewIndex());
+			mPreview.setSelection(docView.getDisplayedViewIndex());
 			anim = new TranslateAnimation(0, 0, mPreviewBarHolder.getHeight(), 0);
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
@@ -653,7 +610,7 @@ public class MuPDFActivity extends BaseActivity {
 			SearchTaskResult.set(null);
 			// Make the ReaderView act on the change to mSearchTaskResult
 			// via overridden onChildSetup method.
-			mDocView.resetupChildren();
+			docView.resetupChildren();
 		}
 	}
 
@@ -679,7 +636,7 @@ public class MuPDFActivity extends BaseActivity {
 					int position, long id) {
 				// TODO Auto-generated method stub
 				hideButtons();
-				mDocView.setDisplayedViewIndex((int)id);
+				docView.setDisplayedViewIndex((int)id);
 			}
 
 		});
@@ -728,7 +685,7 @@ public class MuPDFActivity extends BaseActivity {
 		killSearch();
 
 		final int increment = direction;
-		final int startIndex = SearchTaskResult.get() == null ? mDocView.getDisplayedViewIndex() : SearchTaskResult.get().pageNumber + increment;
+		final int startIndex = SearchTaskResult.get() == null ? docView.getDisplayedViewIndex() : SearchTaskResult.get().pageNumber + increment;
 
 		final ProgressDialogX progressDialog = new ProgressDialogX(this);
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -762,14 +719,14 @@ public class MuPDFActivity extends BaseActivity {
 				progressDialog.cancel();
 				if (result != null) {
 					// Ask the ReaderView to move to the resulting page
-					mDocView.setDisplayedViewIndex(result.pageNumber);
+					docView.setDisplayedViewIndex(result.pageNumber);
 				    SearchTaskResult.set(result);
 					// Make the ReaderView act on the change to mSearchTaskResult
 					// via overridden onChildSetup method.
-				    mDocView.resetupChildren();
+				    docView.resetupChildren();
 				} else {
-					mAlertBuilder.setTitle(SearchTaskResult.get() == null ? R.string.text_not_found : R.string.no_further_occurences_found);
-					AlertDialog alert = mAlertBuilder.create();
+					alertBuilder.setTitle(SearchTaskResult.get() == null ? R.string.text_not_found : R.string.no_further_occurences_found);
+					AlertDialog alert = alertBuilder.create();
 					alert.setButton(AlertDialog.BUTTON_POSITIVE, "Dismiss",
 							(DialogInterface.OnClickListener)null);
 					alert.show();
@@ -830,7 +787,7 @@ public class MuPDFActivity extends BaseActivity {
 
 	private MuPDFCore openFile(String path) {
 		int lastSlashPos = path.lastIndexOf('/');
-		mFileName = new String(lastSlashPos == -1
+		fileName = new String(lastSlashPos == -1
 					? path
 					: path.substring(lastSlashPos+1));
 		Log.d(TAG, "Trying to open " + path);
@@ -919,4 +876,53 @@ public class MuPDFActivity extends BaseActivity {
 	private Context getContext() {
 		return this;
 	}
+
+	private class ActivateAutoLinks extends AsyncTask<Integer, Void, ArrayList<LinkInfo>> {
+
+		@Override
+		protected ArrayList<LinkInfo> doInBackground(Integer... params) {
+			int page = params[0].intValue();
+			Log.d(TAG, "Page = " + page);
+			LinkInfo[] links = core.getPageLinks(page);
+			if(null == links){
+				return null;
+			}
+			ArrayList<LinkInfo> autoLinks = new ArrayList<LinkInfo>();
+			for (LinkInfo link : links) {
+				Log.d(TAG, "activateAutoLinks link: " + link.uri);
+				if (null == link.uri) {
+					continue;
+				}
+				if (link.isMediaURI()) {
+					if (link.isAutoPlay()) {
+						autoLinks.add(link);
+					}
+				}
+			}
+			return autoLinks;
+		}
+
+		@Override
+		protected void onPostExecute(final ArrayList<LinkInfo> autoLinks) {
+			if (isCancelled()) {
+				return;
+			}
+			docView.post(new Runnable() {
+				public void run() {
+					for(LinkInfo link : autoLinks){
+						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
+						if (pageView != null) {
+							String basePath = core.getFileDirectory();
+							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);
+							pageView.addMediaHolder(mediaHolder, link.uri);
+							pageView.addView(mediaHolder);
+							mediaHolder.setVisibility(View.VISIBLE);
+							mediaHolder.requestLayout();
+						}
+					}
+				}
+			});
+		}
+	}
+
 }

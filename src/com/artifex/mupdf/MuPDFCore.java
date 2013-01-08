@@ -142,8 +142,7 @@ public class MuPDFCore {
 				drawPageSynchrinized(page, bitmap, pageW, pageH, 0, 0, pageW, pageH);
 	}
 
-	public synchronized void drawPage(int page, Bitmap bitmap, int pageW,
-			int pageH, int patchX, int patchY, int patchW, int patchH) {
+	public synchronized void drawPage(int page, Bitmap bitmap, int pageW, int pageH, int patchX, int patchY, int patchW, int patchH) {
 		Canvas canvas = new Canvas(bitmap);
 		try {
 			if (displayPages == 1) {

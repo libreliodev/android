@@ -32,7 +32,7 @@ public class SlideShowActivity extends BaseActivity {
 		String uri = getIntent().getExtras().getString(MuPDFPageView.LINK_URI_KEY);
 		LinkInfo link = new LinkInfo(0, 0, 100, 100, 0);
 		link.uri = uri;
-		MediaHolder mh = new MediaHolder(this, link, path,false);
+		MediaHolder mh = new MediaHolder(this, link, path);
 		mh.setVisibility(View.VISIBLE);
 		frame.addView(mh);
 		

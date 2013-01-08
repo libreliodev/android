@@ -43,4 +43,9 @@ abstract public class BaseService extends Service implements IBaseContext {
 		return sharedPreferences;
 	}
 
+	@Override
+	public String getVideoTempPath() {
+		return getExternalPath() + ".tmp.mp4";
+	}
+
 }

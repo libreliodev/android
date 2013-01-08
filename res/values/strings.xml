@@ -88,6 +88,7 @@
     <string name="year">year</string>
     <string name="week">week</string>
     <string name="ok">OK</string>
+    <string name="dismiss">Dismiss</string>
     
     <string name="send_log">Send log</string>
     <string name="download_service_already_running">Download service already running</string>

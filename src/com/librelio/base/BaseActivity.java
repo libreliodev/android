@@ -25,7 +25,7 @@ import com.librelio.lib.utils.Consts.ResponseCode;
 import com.librelio.lib.utils.PurchaseObserver;
 import com.niveales.wind.R;
 
-public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
+public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
 
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
@@ -160,7 +160,8 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 		}
 	}
 
-	public String getVideoTempPath(){
+	@Override
+	public String getVideoTempPath() {
 		return getExternalPath() + ".tmp.mp4";
 	}
 
@@ -217,6 +218,11 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext{
 		File f = new File(getStoragePath());
 		if (!f.exists()) {
 			Log.d(TAG, getStoragePath() + " was create");
+			f.mkdirs();
+		}
+		f = new File(getExternalPath());
+		if (!f.exists()) {
+			Log.d(TAG, getExternalPath() + " was create");
 			f.mkdirs();
 		}
 		if (null != folders && folders.length != 0) {

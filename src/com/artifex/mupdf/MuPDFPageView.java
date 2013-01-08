@@ -6,27 +6,24 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.librelio.lib.ui.SlideShowActivity;
-
 public class MuPDFPageView extends PageView {
+	private static final String TAG = "MuPDFPageView";
 	public static final String PATH_KEY = "path";
 	public static final String LINK_URI_KEY = "link_uri";
 	
-	private final MuPDFCore mCore;
+	private final MuPDFCore muPdfCore;
 	private HashMap<String, FrameLayout> mediaHolders = new HashMap<String, FrameLayout>();
 
-	public MuPDFPageView(Context c, MuPDFCore core, Point parentSize) {
+	public MuPDFPageView(Context c, MuPDFCore muPdfCore, Point parentSize) {
 		super(c, parentSize);
-		mCore = core;
+		this.muPdfCore = muPdfCore;
 	}
 
 	public int hitLinkPage(float x, float y) {
@@ -38,44 +35,39 @@ public class MuPDFPageView extends PageView {
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
 
-		return mCore.hitLinkPage(mPageNumber, docRelX, docRelY);
+		return muPdfCore.hitLinkPage(mPageNumber, docRelX, docRelY);
 	}
 
 	public String hitLinkUri(float x, float y) {
-		Log.d("TAG","hitLinkUri");
 		float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
 
-		final String uriString = mCore
+		final String uriString = muPdfCore
 				.hitLinkUri(mPageNumber, docRelX, docRelY);
 
 		if (uriString == null)
 			return null;
 
-		LinkInfo[] links = mCore.getPageLinks(getPage());
+		LinkInfo[] links = muPdfCore.getPageLinks(getPage());
 		if (links == null)
 			return null;
-		LinkInfo mLink = null;
+		LinkInfo linkInfo = null;
 		for (int i = 0; i < links.length; i++) {
 			if (links[i].uri != null && links[i].uri.equals(uriString)) {
-				mLink = links[i];
+				linkInfo = links[i];
 				break;
 			}
 		}
-		if (uriString.startsWith("http") && (uriString.contains("youtube") || uriString.contains("vimeo") || uriString.contains("localhost"))) {
-			final Uri uri = Uri.parse(uriString);
-			boolean fullScreen = uri.getQueryParameter("warect") != null
-					&& uri.getQueryParameter("warect").equals("full");
+		if (linkInfo.isMediaURI()) {
 			try {
-				final String basePath = mCore.getFileDirectory();
-				MediaHolder h = new MediaHolder(getContext(), mLink,
-						basePath,fullScreen);
+				final String basePath = muPdfCore.getFileDirectory();
+				MediaHolder h = new MediaHolder(getContext(), linkInfo, basePath);
 				h.setVisibility(View.VISIBLE);
 				this.mediaHolders.put(uriString, h);
 				addView(h);
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				Log.e(TAG, "hitLinkUri failed", e);
 				return null;
 			}
 		}
@@ -163,17 +155,17 @@ public class MuPDFPageView extends PageView {
 	@Override
 	protected void drawPage(Bitmap bm, int sizeX, int sizeY, int patchX,
 			int patchY, int patchWidth, int patchHeight) {
-		mCore.drawPage(mPageNumber, bm, sizeX, sizeY, patchX, patchY,
+		muPdfCore.drawPage(mPageNumber, bm, sizeX, sizeY, patchX, patchY,
 				patchWidth, patchHeight);
 	}
 
 	@Override
 	protected LinkInfo[] getLinkInfo() {
-		return mCore.getPageLinks(mPageNumber);
+		return muPdfCore.getPageLinks(mPageNumber);
 	}
 
 	protected LinkInfo[] getExternalLinkInfo() {
-		return mCore.getPageURIs(mPageNumber);
+		return muPdfCore.getPageURIs(mPageNumber);
 	}
 	
 	public void addMediaHolder(MediaHolder h,String uriString){

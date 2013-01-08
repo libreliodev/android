@@ -15,4 +15,6 @@ public interface IBaseContext {
 	boolean isOnline();
 
 	SharedPreferences getPreferences();
+
+	String getVideoTempPath();
 }
