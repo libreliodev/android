@@ -4,7 +4,7 @@
     <string name="GoogleAnalyticsCode">UA_xxxxxx</string>
     <string name="enable_yearly_subs">true</string>
     <string name="enable_monthly_subs">true</string>
-    <bool name="enable_test_magazine">true</bool>
+    <bool name="enable_test_magazine">false</bool>
     <bool name="use_internal_storage">true</bool>
 
 </resources>
