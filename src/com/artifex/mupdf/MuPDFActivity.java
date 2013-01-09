@@ -883,35 +883,38 @@ public class MuPDFActivity extends BaseActivity {
 		protected ArrayList<LinkInfo> doInBackground(Integer... params) {
 			int page = params[0].intValue();
 			Log.d(TAG, "Page = " + page);
-			LinkInfo[] links = core.getPageLinks(page);
-			if(null == links){
-				return null;
-			}
-			ArrayList<LinkInfo> autoLinks = new ArrayList<LinkInfo>();
-			for (LinkInfo link : links) {
-				Log.d(TAG, "activateAutoLinks link: " + link.uri);
-				if (null == link.uri) {
-					continue;
+			if (null != core) {
+				LinkInfo[] links = core.getPageLinks(page);
+				if(null == links){
+					return null;
 				}
-				if (link.isMediaURI()) {
-					if (link.isAutoPlay()) {
-						autoLinks.add(link);
+				ArrayList<LinkInfo> autoLinks = new ArrayList<LinkInfo>();
+				for (LinkInfo link : links) {
+					Log.d(TAG, "activateAutoLinks link: " + link.uri);
+					if (null == link.uri) {
+						continue;
+					}
+					if (link.isMediaURI()) {
+						if (link.isAutoPlay()) {
+							autoLinks.add(link);
+						}
 					}
 				}
+				return autoLinks;
 			}
-			return autoLinks;
+			return null;
 		}
 
 		@Override
 		protected void onPostExecute(final ArrayList<LinkInfo> autoLinks) {
-			if (isCancelled()) {
+			if (isCancelled() || autoLinks == null) {
 				return;
 			}
 			docView.post(new Runnable() {
 				public void run() {
 					for(LinkInfo link : autoLinks){
 						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
-						if (pageView != null) {
+						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
 							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);
 							pageView.addMediaHolder(mediaHolder, link.uri);

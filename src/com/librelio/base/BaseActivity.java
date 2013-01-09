@@ -262,7 +262,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 		}
 		return count;
 	}
-	
+
 	protected boolean hasTestMagazine() {
 		return getResources().getBoolean(R.bool.enable_test_magazine);
 	}

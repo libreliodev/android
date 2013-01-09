@@ -19,16 +19,7 @@
 
 package com.librelio.activity;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +28,7 @@ import android.widget.VideoView;
 
 import com.artifex.mupdf.MediaHolder;
 import com.librelio.base.BaseActivity;
+import com.librelio.task.CreateTempVideoTask;
 import com.niveales.wind.R;
 
 /**
@@ -45,43 +37,37 @@ import com.niveales.wind.R;
  * @author Nikolay Moskvin <moskvin@netcook.org>
  * 
  */
-public class VideoActivity extends BaseActivity{
+public class VideoActivity extends BaseActivity {
 	private static final String TAG = "VideoActivity";
-		
+
 	private VideoView video;
-	private String temp;
 	private String uriString;
 	private String basePath;
-	private boolean autoPlay = false;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG,"onCreate");
 		uriString = getIntent().getExtras().getString(MediaHolder.URI_STRING_KEY);
 		basePath = getIntent().getExtras().getString(MediaHolder.BASE_PATH_KEY);
-		autoPlay = getIntent().getExtras().getBoolean(MediaHolder.AUTO_PLAY_KEY);
 
-		
-		new AsyncTask<Void, Void, Void>(){
-			String temp;
+		new CreateTempVideoTask(getVideoTempPath(), basePath) {
+			@Override
 			protected void onPreExecute() {
 				setContentView(R.layout.wait_bar);
 			};
+
 			@Override
-			protected Void doInBackground(Void... params) {
-				createTempVideoFile(uriString,basePath, getVideoTempPath());
-				return null;
-			}
-			@Override
-			protected void onPostExecute(Void result) {
+			protected void onPostExecute(String videoPath) {
+				if (isCancelled()) {
+					return;
+				}
 				setContentView(R.layout.video_activity_layout);
 				video = (VideoView)findViewById(R.id.video_frame);
-				video.setVideoPath(getVideoTempPath());
-				
+				video.setVideoPath(videoPath);
 				video.post(new Runnable() {
 					@Override
 					public void run() {
-						MedContr mc = new MedContr(getContext(),video);
+						PlayStopController mc = new PlayStopController(getContext(),video);
 						
 						mc.setAnchorView(video);
 						mc.setMediaPlayer(video);
@@ -93,7 +79,7 @@ public class VideoActivity extends BaseActivity{
 				video.requestFocus();
 				video.start();
 			}
-		}.execute();
+		}.execute(uriString);
 		
 		super.onCreate(savedInstanceState);
 	}
@@ -106,50 +92,18 @@ public class VideoActivity extends BaseActivity{
 		finish();
 		super.onBackPressed();
 	}
-	
+
 	private Context getContext(){
 		return this;
 	}
-	
-	public static void createTempVideoFile(String uriString,String basePath,String temp){
-		String local = "http://localhost/";
-		int startIdx = local.length();
-		int finIdx = uriString.length();
-		if(uriString.contains("?")){
-			finIdx = uriString.indexOf("?");
-		}
-		String assetsFile = uriString.substring(startIdx, finIdx);
-		String videoPath = basePath+"/"+assetsFile;
-		File video = new File(videoPath);
-		File tmp = new File(temp);
-		//
-		try {
-			InputStream in  = new FileInputStream(video);
-			OutputStream out = new FileOutputStream(tmp);
-			byte[] buf = new byte[1024];
-			int len;
-			  while ((len = in.read(buf)) > 0){
-				  out.write(buf, 0, len);
-			  }
-			  in.close();
-			  out.close();
-			  System.out.println("File copied.");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
-	}
-	
 
-	
-	public class MedContr extends MediaController{
+	private class PlayStopController extends MediaController {
 
-		public MedContr(Context context,View anchor) {
+		public PlayStopController(Context context, View anchor) {
 			super(context);
 			super.setAnchorView(anchor);
 		}
-		
+
 		@Override
 		public void setAnchorView(View view) {
 			// TODO Auto-generated method stub

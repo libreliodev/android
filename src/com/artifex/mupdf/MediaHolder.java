@@ -15,7 +15,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -32,10 +31,9 @@ import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-import com.librelio.activity.VideoActivity;
-import com.librelio.base.BaseActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.lib.ui.SlideShowActivity;
+import com.librelio.task.CreateTempVideoTask;
 import com.niveales.wind.R;
 
 /**
@@ -151,9 +149,12 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		videoView = (VideoView) findViewById(R.id.video_frame);
 
 		final IBaseContext baseContext = ((IBaseContext)getContext());
-		new CreateTempVideoTask(baseContext.getVideoTempPath()){
+		new CreateTempVideoTask(baseContext.getVideoTempPath(), basePath){
 			@Override
 			protected void onPostExecute(String videoPath) {
+				if (isCancelled()) {
+					return;
+				}
 				videoView.setVideoPath(videoPath);
 				MediaController mc = new MediaController(getContext());
 				mc.setAnchorView(videoView);
@@ -163,22 +164,30 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				mc.show(4000);
 				videoView.start();
 			}
-		}.execute(basePath);
+		}.execute(uriString);
 
 	}
 
 	protected void onPlayVideoOutside(String basePath) {
 		Log.d(TAG, "onPlayVideoOutside " + basePath + ", linkInfo = " + linkInfo);
-		VideoActivity.createTempVideoFile(uriString, basePath, ((BaseActivity)getContext()).getVideoTempPath());
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		Uri data = Uri.parse(((BaseActivity)getContext()).getVideoTempPath());
-		intent.setDataAndType(data, "video/*");
-		getContext().startActivity(intent);
-		/*Intent intent = new Intent(getContext(), VideoActivity.class);
-		intent.putExtra(URI_STRING_KEY, uriString);
-		intent.putExtra(BASE_PATH_KEY, basePath);
-		intent.putExtra(AUTO_PLAY_KEY, autoPlay);
-		getContext().startActivity(intent);*/
+		final IBaseContext baseContext = ((IBaseContext)getContext());
+		new CreateTempVideoTask(baseContext.getVideoTempPath(), basePath){
+			@Override
+			protected void onPostExecute(String videoPath) {
+				if (isCancelled()) {
+					return;
+				}
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				Uri data = Uri.parse(videoPath);
+				intent.setDataAndType(data, "video/*");
+				getContext().startActivity(intent);
+				/*Intent intent = new Intent(getContext(), VideoActivity.class);
+				intent.putExtra(URI_STRING_KEY, uriString);
+				intent.putExtra(BASE_PATH_KEY, basePath);
+				intent.putExtra(AUTO_PLAY_KEY, autoPlay);
+				getContext().startActivity(intent);*/
+			}
+		}.execute(uriString);
 	}
 
 	protected void onPlaySlideOutside(String basePath) {
@@ -337,7 +346,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private MediaPlayer getMediaPlayer(String uriString) throws IllegalStateException {
 		return geMediaPlayer(uriString, null);
 	}
-	
+
 	private void hitLinkUri(String uri) {
 		if(linkInfo.uri.equals(uri)) {
 			// TODO: start playing link
@@ -356,21 +365,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			view.loadUrl(url);
 			return true;
 		}
-	}
-	
-	private class CreateTempVideoTask extends AsyncTask<String, Void, String> {
-		private final String videoPath;
-
-		public CreateTempVideoTask(String videoPath) {
-			this.videoPath = videoPath;
-		}
-
-		@Override
-		protected String doInBackground(String... basePaths) {
-			VideoActivity.createTempVideoFile(uriString, basePaths[0], videoPath);
-			return videoPath;
-		}
-
 	}
 }
 

@@ -258,12 +258,18 @@ public class MuPDFCore {
 		int rightPage = page * 2;
 		int leftPage = rightPage - 1;
 		if( leftPage > 0 ) {
-			leftPageLinkInfo = getPageLinksInternal(leftPage);
-			combinedSize += leftPageLinkInfo.length;
+			LinkInfo[] leftPageLinkInfoInternal = getPageLinksInternal(leftPage);
+			if (null != leftPageLinkInfoInternal) {
+				leftPageLinkInfo = leftPageLinkInfoInternal;
+				combinedSize += leftPageLinkInfo.length;
+			}
 		}
 		if( rightPage < countPages() ) {
-			rightPageLinkInfo = getPageLinksInternal(rightPage);
-			combinedSize += rightPageLinkInfo.length;
+			LinkInfo[] rightPageLinkInfoInternal = getPageLinksInternal(rightPage);
+			if (null != rightPageLinkInfoInternal) {
+				rightPageLinkInfo = rightPageLinkInfoInternal;
+				combinedSize += rightPageLinkInfo.length;
+			}
 		}
 		
 		combinedLinkInfo = new LinkInfo[combinedSize];

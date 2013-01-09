@@ -1,12 +1,10 @@
 package com.artifex.mupdf;
 
 import java.util.LinkedList;
-import java.util.Queue;
 
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
@@ -39,9 +37,7 @@ public class SimpleGallery extends AdapterView<ListAdapter> {
 	public SimpleGallery(Context context) {
 		super(context);
 		initView();
-
 	}
-	
 
 	public SimpleGallery(Context context, AttributeSet attrs) {
 		super(context, attrs);
