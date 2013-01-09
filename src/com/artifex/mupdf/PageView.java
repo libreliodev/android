@@ -1,13 +1,9 @@
 package com.artifex.mupdf;
 
 
-import com.librelio.task.SafeAsyncTask;
-import com.niveales.wind.R;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -15,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.view.View;
@@ -23,6 +18,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+
+import com.librelio.task.SafeAsyncTask;
+import com.niveales.wind.R;
 
 class PatchInfo {
 	public Bitmap bm;
@@ -66,12 +64,12 @@ public abstract class PageView extends ViewGroup {
 
 	private       Point     mPatchViewSize; // View size on the basis of which the patch was created
 	private       Rect      mPatchArea;
-	private       ImageView mPatch;
+	private       ImageView patch;
 	private       SafeAsyncTask<PatchInfo,Void,PatchInfo> mDrawPatch;
 	private       RectF     mSearchBoxes[];
 	private       LinkInfo  mLinks[];
 	private       LinkInfo  mUrls[];
-	private       View      mSearchView;
+	private       View      searchView;
 	private       boolean   mIsBlank;
 	private       boolean   mUsingHardwareAcceleration;
 	private       boolean   mHighlightLinks;
@@ -119,14 +117,14 @@ public abstract class PageView extends ViewGroup {
 			mEntire.setImageBitmap(null);
 		}
 
-		if (mPatch != null) {
-			Drawable d = mPatch.getDrawable();
+		if (patch != null) {
+			Drawable d = patch.getDrawable();
 			if(d instanceof BitmapDrawable) {
 				
 				Bitmap bm = ((BitmapDrawable)d).getBitmap();
 				if(bm != null) bm.recycle();
 			}
-			mPatch.setImageBitmap(null);
+			patch.setImageBitmap(null);
 			
 		}
 
@@ -157,8 +155,8 @@ public abstract class PageView extends ViewGroup {
 		if (mEntire != null)
 			mEntire.setImageBitmap(null);
 
-		if (mPatch != null)
-			mPatch.setImageBitmap(null);
+		if (patch != null)
+			patch.setImageBitmap(null);
 
 		if (mBusyIndicator == null) {
 			mBusyIndicator = new ProgressBar(mContext);
@@ -239,8 +237,8 @@ public abstract class PageView extends ViewGroup {
 
 		mDrawEntire.safeExecute();
 
-		if (mSearchView == null) {
-			mSearchView = new View(mContext) {
+		if (searchView == null) {
+			searchView = new View(mContext) {
 				@Override
 				protected void onDraw(Canvas canvas) {
 					super.onDraw(canvas);
@@ -269,7 +267,7 @@ public abstract class PageView extends ViewGroup {
 				}
 			};
 
-			addView(mSearchView);
+			addView(searchView);
 		}
 		
 		if(mLinksView == null ) {
@@ -281,14 +279,14 @@ public abstract class PageView extends ViewGroup {
 
 	public void setSearchBoxes(RectF searchBoxes[]) {
 		mSearchBoxes = searchBoxes;
-		if (mSearchView != null)
-			mSearchView.invalidate();
+		if (searchView != null)
+			searchView.invalidate();
 	}
 
 	public void setLinkHighlighting(boolean f) {
 		mHighlightLinks = f;
-		if (mSearchView != null)
-			mSearchView.invalidate();
+		if (searchView != null)
+			searchView.invalidate();
 	}
 
 	@Override
@@ -327,8 +325,8 @@ public abstract class PageView extends ViewGroup {
 			mEntire.layout(0, 0, w, h);
 		}
 
-		if (mSearchView != null) {
-			mSearchView.layout(0, 0, w, h);
+		if (searchView != null) {
+			searchView.layout(0, 0, w, h);
 		}
 		
 		if (mLinksView != null) {
@@ -340,10 +338,10 @@ public abstract class PageView extends ViewGroup {
 				// Zoomed since patch was created
 				mPatchViewSize = null;
 				mPatchArea     = null;
-				if (mPatch != null)
-					mPatch.setImageBitmap(null);
+				if (patch != null)
+					patch.setImageBitmap(null);
 			} else {
-				mPatch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
+				patch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
 			}
 		}
 
@@ -381,11 +379,13 @@ public abstract class PageView extends ViewGroup {
 			}
 
 			// Create and add the image view if not already done
-			if (mPatch == null) {
-				mPatch = new OpaqueImageView(mContext);
-				mPatch.setScaleType(ImageView.ScaleType.FIT_CENTER);
-				addView(mPatch);
-				mSearchView.bringToFront();
+			if (patch == null) {
+				patch = new OpaqueImageView(mContext);
+				patch.setScaleType(ImageView.ScaleType.FIT_CENTER);
+				addView(patch);
+				if (null != searchView) {
+					searchView.bringToFront();
+				}
 			}
 
 			try {
@@ -402,11 +402,11 @@ public abstract class PageView extends ViewGroup {
 				protected void onPostExecute(PatchInfo v) {
 					mPatchViewSize = v.patchViewSize;
 					mPatchArea     = v.patchArea;
-					mPatch.setImageBitmap(v.bm);
+					patch.setImageBitmap(v.bm);
 					//requestLayout();
 					// Calling requestLayout here doesn't lead to a later call to layout. No idea
 					// why, but apparently others have run into the problem.
-					mPatch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
+					patch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
 					invalidate();
 				}
 			};
@@ -429,8 +429,8 @@ public abstract class PageView extends ViewGroup {
 			// And get rid of it
 			mPatchViewSize = null;
 			mPatchArea = null;
-			if (mPatch != null)
-				mPatch.setImageBitmap(null);
+			if (patch != null)
+				patch.setImageBitmap(null);
 	}
 
 	public int getPage() {
