@@ -2,6 +2,8 @@ package com.artifex.mupdf;
 
 import java.io.File;
 
+import com.artifex.mupdf.domain.OutlineItem;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;

@@ -1,5 +1,7 @@
 package com.artifex.mupdf;
 
+import com.librelio.task.SafeAsyncTask;
+
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -11,19 +13,18 @@ import android.widget.BaseAdapter;
 
 public class MuPDFPageAdapter extends BaseAdapter {
 	private static final String TAG = "MuPDFPageAdapter";
-	private final Context mContext;
-	private final MuPDFCore mCore;
+
+	private final Context context;
+	private final MuPDFCore core;
 	private final SparseArray<PointF> mPageSizes = new SparseArray<PointF>();
-	
 
-
-	public MuPDFPageAdapter(Context c, MuPDFCore core) {
-		mContext = c;
-		mCore = core;
+	public MuPDFPageAdapter(Context context, MuPDFCore core) {
+		this.context = context;
+		this.core = core;
 	}
 
 	public int getCount() {
-		return mCore.countPages();
+		return core.countPages();
 	}
 
 	public Object getItem(int position) {
@@ -38,7 +39,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
 		Log.d(TAG,"getView");
 		final MuPDFPageView pageView;
 		if (convertView == null) {
-			pageView = new MuPDFPageView(mContext, mCore, new Point(parent.getWidth(), parent.getHeight()));
+			pageView = new MuPDFPageView(context, core, new Point(parent.getWidth(), parent.getHeight()));
 		} else {			
 			pageView = (MuPDFPageView)convertView;
 		}
@@ -55,12 +56,14 @@ public class MuPDFPageAdapter extends BaseAdapter {
 			SafeAsyncTask<Void,Void,PointF> sizingTask = new SafeAsyncTask<Void,Void,PointF>() {
 				@Override
 				protected PointF doInBackground(Void... arg0) {
-					return mCore.getPageSize(position);
+					return core.getPageSize(position);
 				}
 
 				@Override
 				protected void onPostExecute(PointF result) {
-					super.onPostExecute(result);
+					if (isCancelled()) {
+						return;
+					}
 					// We now know the page size
 					mPageSizes.put(position, result);
 					// Check that this view hasn't been reused for

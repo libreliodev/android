@@ -3,6 +3,7 @@ package com.artifex.mupdf;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -116,8 +117,17 @@ public class ReaderView extends AdapterView<Adapter>
 
 	protected void onMoveToChild(int i) {}
 
+	/**
+	 * When the layout has settled ask the page to render in HQ
+	 */
 	protected void onSettle(View v) {};
 
+	/**
+	 * When something changes making the previous settled view no longer
+	 * appropriate, tell the page to remove HQ
+	 * 
+	 * @param v the previous view
+	 */
 	protected void onUnsettle(View v) {};
 
 	protected void onNotInUse(View v) {};
@@ -219,13 +229,15 @@ public class ReaderView extends AdapterView<Adapter>
 		return true;
 	}
 
-	public void onShowPress(MotionEvent e) {
-	}
+	@Override
+	public void onShowPress(MotionEvent e) {}
 
+	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
 	}
 
+	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		float previousScale = mScale;
 		mScale = Math.min(Math.max(mScale * detector.getScaleFactor(), MIN_SCALE), MAX_SCALE);
@@ -243,7 +255,8 @@ public class ReaderView extends AdapterView<Adapter>
 		}
 		return true;
 	}
-	
+
+	@Override
 	public boolean onScaleBegin(ScaleGestureDetector detector) {
 		mScaling = true;
 		// Ignore any scroll amounts yet to be accounted for: the

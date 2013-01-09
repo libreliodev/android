@@ -1,8 +1,9 @@
-package com.artifex.mupdf;
+package com.artifex.mupdf.domain;
 
+//TODO: Added multi-thread safe for singleton property
 public class OutlineActivityData {
 	public OutlineItem items[];
-	public int         position;
+	public int position;
 	static private OutlineActivityData singleton;
 
 	static public void set(OutlineActivityData d) {

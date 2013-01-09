@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.niveales.wind"
     android:versionCode="10"
-    android:versionName="1.0.10" >
+    android:versionName="1.0.11" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -23,11 +23,6 @@
         <meta-data
             android:name="MagazineName"
             android:value="wind" />
-
-        <activity
-            android:name="com.artifex.mupdf.OutlineActivity"
-            android:label="@string/outline_title" >
-        </activity>
 
         <service android:name="com.librelio.lib.utils.BillingService" />
         <service android:name="com.librelio.service.DownloadMagazineListService" />
@@ -51,29 +46,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.artifex.mupdf.MuPDFActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
-        </activity>
-        <activity android:name="com.librelio.activity.MainMagazineActivity" >
-        </activity>
+            android:name="com.librelio.activity.MuPDFActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity
-            android:name="com.librelio.wind.test.TestPDFPageActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
-        </activity>
+            android:name="com.artifex.mupdf.OutlineActivity"
+            android:label="@string/outline_title" />
+        <activity android:name="com.librelio.activity.MainMagazineActivity" />
         <activity
             android:name="com.librelio.lib.ui.SlideShowActivity"
-            android:theme="@style/Theme.NoBackground.NoTitle" >
-        </activity>
+            android:theme="@style/Theme.NoBackground.NoTitle" />
         <activity
             android:name="com.librelio.activity.DownloadActivity"
-            android:configChanges="orientation" >
-        </activity>
+            android:configChanges="orientation" />
         <activity
             android:name="com.librelio.activity.BillingActivity"
-            android:theme="@style/Theme.Billing" >
-        </activity>
-        <activity android:name="com.librelio.activity.VideoActivity" >
-        </activity>
+            android:theme="@style/Theme.Billing" />
+        <activity android:name="com.librelio.activity.VideoActivity" />
         <activity android:name="com.librelio.base.BaseActivity" />
     </application>
 

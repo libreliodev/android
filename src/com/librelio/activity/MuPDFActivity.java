@@ -1,4 +1,4 @@
-package com.artifex.mupdf;
+package com.librelio.activity;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
@@ -40,13 +39,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
-import com.librelio.activity.BillingActivity;
-import com.librelio.activity.DownloadActivity;
+import com.artifex.mupdf.LinkInfo;
+import com.artifex.mupdf.MediaHolder;
+import com.artifex.mupdf.MuPDFCore;
+import com.artifex.mupdf.MuPDFPageAdapter;
+import com.artifex.mupdf.MuPDFPageView;
+import com.artifex.mupdf.PDFPreviewPagerAdapter;
+import com.artifex.mupdf.PageView;
+import com.artifex.mupdf.ReaderView;
+import com.artifex.mupdf.domain.OutlineActivityData;
+import com.artifex.mupdf.domain.OutlineItem;
+import com.artifex.mupdf.domain.SearchTaskResult;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
+import com.librelio.task.SafeAsyncTask;
+import com.librelio.view.HorizontalListView;
+import com.librelio.view.ProgressDialogX;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
@@ -177,7 +188,7 @@ public class MuPDFActivity extends BaseActivity {
 				}
 
 				core = openFile(Uri.decode(uri.getEncodedPath()));
-				SearchTaskResult.set(null);
+				SearchTaskResult.recycle();
 			}
 			if (core != null && core.needsPassword()) {
 				requestPassword(savedInstanceState);
@@ -206,110 +217,7 @@ public class MuPDFActivity extends BaseActivity {
 		// Now create the UI.
 		// First create the document view making use of the ReaderView's internal
 		// gesture recognition
-		docView = new ReaderView(this,linkOfDocument) {
-			private boolean showButtonsDisabled;
-			
-			public boolean onSingleTapUp(MotionEvent e) {
-				if (e.getX() < TAP_PAGE_MARGIN) {
-					super.moveToPrevious();
-				} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
-					super.moveToNext();
-				} else if (!showButtonsDisabled) {
-					int linkPage = -1;
-					String linkString = null;
-					if (mLinkState != LinkState.INHIBIT) {
-						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
-						if (pageView != null) {
-							linkPage = pageView.hitLinkPage(e.getX(), e.getY());
-							linkString = pageView.hitLinkUri(e.getX(),  e.getY());
-						}
-					}
-
-					if (linkPage != -1) {
-						docView.setDisplayedViewIndex(linkPage);
-					} else if (linkString != null) {
-						// start intent with url as linkString
-						openLink(linkString);
-					} else {
-						if (!mButtonsVisible) {
-							showButtons();
-						} else {
-							hideButtons();
-						}
-					}
-				}
-				return super.onSingleTapUp(e);
-			}
-
-			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-				if (!showButtonsDisabled)
-					hideButtons();
-
-				return super.onScroll(e1, e2, distanceX, distanceY);
-			}
-
-			public boolean onScaleBegin(ScaleGestureDetector d) {
-				// Disabled showing the buttons until next touch.
-				// Not sure why this is needed, but without it
-				// pinch zoom can make the buttons appear
-				showButtonsDisabled = true;
-				return super.onScaleBegin(d);
-			}
-
-			public boolean onTouchEvent(MotionEvent event) {
-				if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
-					showButtonsDisabled = false;
-
-				return super.onTouchEvent(event);
-			}
-
-//			protected void onChildSetup(int i, View v) {
-//				if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber == i)
-//					((PageView)v).setSearchBoxes(SearchTaskResult.get().searchBoxes);
-//				else
-//					((PageView)v).setSearchBoxes(null);
-//
-//				((PageView)v).setLinkHighlighting(mLinkState == LinkState.HIGHLIGHT);
-//			}
-
-			protected void onMoveToChild(int i) {
-				Log.d(TAG,"onMoveToChild id = "+i);
-				//
-				//
-				if(observer!=null){
-					observer.recycle();
-				}
-				if (core == null){
-					return;
-					
-				} 
-				new ActivateAutoLinks().execute(i);
-//				mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
-//				mPageSlider.setMax((core.countPages()-1) * mPageSliderRes);
-//				mPageSlider.setProgress(i * mPageSliderRes);
-				if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber != i) {
-					SearchTaskResult.set(null);
-					docView.resetupChildren();
-				}
-			}
-
-			protected void onSettle(View v) {
-				// When the layout has settled ask the page to render
-				// in HQ
-				((PageView)v).addHq();
-			}
-
-			protected void onUnsettle(View v) {
-				// When something changes making the previous settled view
-				// no longer appropriate, tell the page to remove HQ
-				((PageView)v).removeHq();
-			}
-
-			@Override
-			protected void onNotInUse(View v) {
-				((PageView)v).releaseResources();
-			}
-		};
+		docView = new DocumentReaderView(this, linkOfDocument);
 		mDocViewAdapter = new MuPDFPageAdapter(this, core);
 		docView.setAdapter(mDocViewAdapter);
 
@@ -365,7 +273,7 @@ public class MuPDFActivity extends BaseActivity {
 
 				// Remove any previous search results
 				if (SearchTaskResult.get() != null && !mSearchText.getText().toString().equals(SearchTaskResult.get().txt)) {
-					SearchTaskResult.set(null);
+					SearchTaskResult.recycle();
 					docView.resetupChildren();
 				}
 			}
@@ -607,7 +515,7 @@ public class MuPDFActivity extends BaseActivity {
 			mTopBarIsSearch = false;
 			hideKeyboard();
 			mTopBarSwitcher.showPrevious();
-			SearchTaskResult.set(null);
+			SearchTaskResult.recycle();
 			// Make the ReaderView act on the change to mSearchTaskResult
 			// via overridden onChildSetup method.
 			docView.resetupChildren();
@@ -706,8 +614,9 @@ public class MuPDFActivity extends BaseActivity {
 					publishProgress(index);
 					RectF searchHits[] = core.searchPage(index, mSearchText.getText().toString());
 
-					if (searchHits != null && searchHits.length > 0)
-						return new SearchTaskResult(mSearchText.getText().toString(), index, searchHits);
+					if (searchHits != null && searchHits.length > 0) {
+						return SearchTaskResult.init(mSearchText.getText().toString(), index, searchHits);
+					}
 
 					index += increment;
 				}
@@ -720,7 +629,7 @@ public class MuPDFActivity extends BaseActivity {
 				if (result != null) {
 					// Ask the ReaderView to move to the resulting page
 					docView.setDisplayedViewIndex(result.pageNumber);
-				    SearchTaskResult.set(result);
+				    SearchTaskResult.recycle();
 					// Make the ReaderView act on the change to mSearchTaskResult
 					// via overridden onChildSetup method.
 				    docView.resetupChildren();
@@ -928,4 +837,116 @@ public class MuPDFActivity extends BaseActivity {
 		}
 	}
 
+	private class DocumentReaderView extends ReaderView {
+		private boolean showButtonsDisabled;
+
+		public DocumentReaderView(Context context,
+				SparseArray<LinkInfo[]> linkOfDocument) {
+			super(context, linkOfDocument);
+		}
+
+		@Override
+		public boolean onSingleTapUp(MotionEvent e) {
+			if (e.getX() < TAP_PAGE_MARGIN) {
+				super.moveToPrevious();
+			} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
+				super.moveToNext();
+			} else if (!showButtonsDisabled) {
+				int linkPage = -1;
+				String linkString = null;
+				if (mLinkState != LinkState.INHIBIT) {
+					MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
+					if (pageView != null) {
+						linkPage = pageView.hitLinkPage(e.getX(), e.getY());
+						linkString = pageView.hitLinkUri(e.getX(),  e.getY());
+					}
+				}
+
+				if (linkPage != -1) {
+					docView.setDisplayedViewIndex(linkPage);
+				} else if (linkString != null) {
+					// start intent with url as linkString
+					openLink(linkString);
+				} else {
+					if (!mButtonsVisible) {
+						showButtons();
+					} else {
+						hideButtons();
+					}
+				}
+			}
+			return super.onSingleTapUp(e);
+		}
+
+		@Override
+		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+			if (!showButtonsDisabled) {
+				hideButtons();
+			}
+			return super.onScroll(e1, e2, distanceX, distanceY);
+		}
+
+		@Override
+		public boolean onScaleBegin(ScaleGestureDetector d) {
+			// Disabled showing the buttons until next touch.
+			// Not sure why this is needed, but without it
+			// pinch zoom can make the buttons appear
+			showButtonsDisabled = true;
+			return super.onScaleBegin(d);
+		}
+
+		@Override
+		public boolean onTouchEvent(MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
+				showButtonsDisabled = false;
+
+			return super.onTouchEvent(event);
+		}
+
+//		protected void onChildSetup(int i, View v) {
+//			if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber == i)
+//				((PageView)v).setSearchBoxes(SearchTaskResult.get().searchBoxes);
+//			else
+//				((PageView)v).setSearchBoxes(null);
+//
+//			((PageView)v).setLinkHighlighting(mLinkState == LinkState.HIGHLIGHT);
+//		}
+
+		@Override
+		protected void onMoveToChild(int i) {
+			Log.d(TAG,"onMoveToChild id = "+i);
+			//
+			//
+			if(observer!=null){
+				observer.recycle();
+			}
+			if (core == null){
+				return;
+				
+			} 
+			new ActivateAutoLinks().execute(i);
+//			mPageNumberView.setText(String.format("%d/%d", i+1, core.countPages()));
+//			mPageSlider.setMax((core.countPages()-1) * mPageSliderRes);
+//			mPageSlider.setProgress(i * mPageSliderRes);
+			if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber != i) {
+				SearchTaskResult.recycle();
+				docView.resetupChildren();
+			}
+		}
+
+		@Override
+		protected void onSettle(View v) {
+			((PageView)v).addHq();
+		}
+
+		@Override
+		protected void onUnsettle(View v) {
+			((PageView)v).removeHq();
+		}
+
+		@Override
+		protected void onNotInUse(View v) {
+			((PageView)v).releaseResources();
+		}
+	};
 }

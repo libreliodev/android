@@ -1,22 +1,22 @@
-package com.artifex.mupdf;
+package com.librelio.view;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 
-class ProgressDialogX extends ProgressDialog {
+public class ProgressDialogX extends ProgressDialog {
+	private boolean cancelled = false;
+
 	public ProgressDialogX(Context context) {
 		super(context);
 	}
 
-	private boolean mCancelled = false;
-
 	public boolean isCancelled() {
-		return mCancelled;
+		return cancelled;
 	}
 
 	@Override
 	public void cancel() {
-		mCancelled = true;
+		cancelled = true;
 		super.cancel();
 	}
 }

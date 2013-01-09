@@ -158,7 +158,9 @@ public class DownloadMagazineListService extends BaseService {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		useStaticMagazines = intent.getBooleanExtra(USE_STATIC_MAGAZINES, false);
+		if (null != intent) {
+			useStaticMagazines = intent.getBooleanExtra(USE_STATIC_MAGAZINES, false);
+		}
 		return super.onStartCommand(intent, flags, startId);
 	}
 

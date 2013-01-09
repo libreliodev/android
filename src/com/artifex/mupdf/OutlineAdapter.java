@@ -1,6 +1,7 @@
 package com.artifex.mupdf;
 
 
+import com.artifex.mupdf.domain.OutlineItem;
 import com.niveales.wind.R;
 
 import android.view.LayoutInflater;

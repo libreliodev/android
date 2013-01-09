@@ -31,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.task.CreateTempVideoTask;

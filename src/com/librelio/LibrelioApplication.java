@@ -11,7 +11,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
-import com.artifex.mupdf.MuPDFActivity;
+import com.librelio.activity.MuPDFActivity;
 import com.niveales.wind.R;
 
 public class LibrelioApplication extends Application {
