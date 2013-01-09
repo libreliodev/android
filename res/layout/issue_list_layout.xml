@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:numColumns="1"
-        android:verticalSpacing="15dp" >
-    </GridView>
+        android:verticalSpacing="15dp"
+        android:overScrollMode="never"/>
 
 </LinearLayout>

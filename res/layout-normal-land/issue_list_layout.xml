@@ -9,10 +9,9 @@
         android:id="@+id/issue_list_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_horizontal"           
+        android:gravity="center"
+        android:numColumns="2"
         android:verticalSpacing="15dp"
-        android:numColumns="2">
-
-    </GridView>
+        android:overScrollMode="never"/>
 
 </LinearLayout>
