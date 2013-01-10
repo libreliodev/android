@@ -83,6 +83,7 @@ public class StartupActivity extends BaseActivity {
 			if (isCancelled()) {
 				return;
 			}
+			getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, result == 0).commit();
 			new InitPredefinedMagazinesTask().execute();
 		}
 	};
@@ -111,7 +112,6 @@ public class StartupActivity extends BaseActivity {
 			if (isCancelled()) {
 				return;
 			}
-			getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, true).commit();
 			onStartMagazine();
 		}
 
