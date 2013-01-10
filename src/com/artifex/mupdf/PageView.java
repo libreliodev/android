@@ -165,7 +165,6 @@ public abstract class PageView extends ViewGroup {
 			addView(mBusyIndicator);
 		}
 	}
-
 	public void setPage(int page, PointF size) {
 		// Cancel pending render task
 		if (mDrawEntire != null) {
@@ -198,6 +197,7 @@ public abstract class PageView extends ViewGroup {
 
 		if (mEntireBm == null || mEntireBm.getWidth() != newSize.x
 				              || mEntireBm.getHeight() != newSize.y) {
+			//FIXME crash with java.lang.IllegalArgumentException: width and height must be > 0
 			mEntireBm = Bitmap.createBitmap(mSize.x, mSize.y, Bitmap.Config.ARGB_8888);
 		}
 

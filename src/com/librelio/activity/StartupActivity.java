@@ -52,7 +52,7 @@ public class StartupActivity extends BaseActivity {
 			new InitTestMagazines().execute("test");
 		} else {
 			initStorage("test");
-			onStartMagazine();
+			new InitPredefinedMagazinesTask().execute();
 		}
 
 	}

@@ -40,7 +40,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
 		final MuPDFPageView pageView;
 		if (convertView == null) {
 			pageView = new MuPDFPageView(context, core, new Point(parent.getWidth(), parent.getHeight()));
-		} else {			
+		} else {
 			pageView = (MuPDFPageView)convertView;
 		}
 
@@ -73,7 +73,7 @@ public class MuPDFPageAdapter extends BaseAdapter {
 				}
 			};
 
-			sizingTask.safeExecute((Void)null);
+			sizingTask.safeExecute();
 		}
 		return pageView;
 	}
