@@ -153,7 +153,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 
 	@Override
 	public String getStoragePath(){
-		if (getResources().getBoolean(R.bool.use_internal_storage)) {
+		if (USE_INTERNAL_STORAGE) {
 			return getInternalPath();
 		} else {
 			return getExternalPath();
