@@ -1,5 +1,7 @@
 package com.artifex.mupdf.domain;
 
+import com.artifex.mupdf.OutlineItem;
+
 //TODO: Added multi-thread safe for singleton property
 public class OutlineActivityData {
 	public OutlineItem items[];

@@ -1,4 +1,4 @@
-package com.artifex.mupdf.domain;
+package com.artifex.mupdf;
 
 public class OutlineItem {
 	public final int level;

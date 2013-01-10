@@ -1,8 +1,8 @@
 package com.librelio.activity;
 
 import com.artifex.mupdf.OutlineAdapter;
+import com.artifex.mupdf.OutlineItem;
 import com.artifex.mupdf.domain.OutlineActivityData;
-import com.artifex.mupdf.domain.OutlineItem;
 
 import android.app.ListActivity;
 import android.os.Bundle;
