@@ -27,13 +27,10 @@ public class DocumentReaderView extends ReaderView {
 	private LinkState linkState = LinkState.DEFAULT;
 
 	private boolean showButtonsDisabled;
-	private final ReaderView docView;
 
 	public DocumentReaderView(Context context, 
-			SparseArray<LinkInfo[]> linkOfDocument,
-			ReaderView docView) {
+			SparseArray<LinkInfo[]> linkOfDocument) {
 		super(context, linkOfDocument);
-		this.docView = docView;
 	}
 
 	@Override
@@ -46,7 +43,7 @@ public class DocumentReaderView extends ReaderView {
 			int linkPage = -1;
 			String linkString = null;
 			if (linkState != LinkState.INHIBIT) {
-				MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
+				MuPDFPageView pageView = (MuPDFPageView) getDisplayedView();
 				if (pageView != null) {
 					linkPage = pageView.hitLinkPage(e.getX(), e.getY());
 					linkString = pageView.hitLinkUri(e.getX(),  e.getY());
@@ -54,7 +51,7 @@ public class DocumentReaderView extends ReaderView {
 			}
 
 			if (linkPage != -1) {
-				docView.setDisplayedViewIndex(linkPage);
+				setDisplayedViewIndex(linkPage);
 			} else if (linkString != null) {
 				// start intent with url as linkString
 				openLink(linkString);
@@ -110,7 +107,7 @@ public class DocumentReaderView extends ReaderView {
 //		mPageSlider.setProgress(i * mPageSliderRes);
 		if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber != i) {
 			SearchTaskResult.recycle();
-			docView.resetupChildren();
+			resetupChildren();
 		}
 	}
 

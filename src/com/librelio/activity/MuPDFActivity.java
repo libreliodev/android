@@ -201,7 +201,7 @@ public class MuPDFActivity extends BaseActivity {
 		// Now create the UI.
 		// First create the document view making use of the ReaderView's internal
 		// gesture recognition
-		docView = new DocumentReaderView(this, linkOfDocument, docView) {
+		docView = new DocumentReaderView(this, linkOfDocument) {
 
 			@Override
 			protected void onMoveToChild(View view, int i) {
@@ -233,8 +233,9 @@ public class MuPDFActivity extends BaseActivity {
 
 			@Override
 			protected void onBuy(String path) {
-				onBuy(path);
+				MuPDFActivity.this.onBuy(path);
 			}
+
 
 		};
 		mDocViewAdapter = new MuPDFPageAdapter(this, core);
