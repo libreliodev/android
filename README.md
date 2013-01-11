@@ -8,6 +8,16 @@ Examples of apps developed using this solution are listed on www.librelio.com . 
 # Purpose of this project
 This project aims at porting the existing iOS customizable app to Android. 
 
+###License
+This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This project is:
+- Copyright 2006-2012 Artifex Software, Inc for the MuPDF library
+- Copyright 20012-2013 WidgetAvenue - Librelio
+
+
+
+
 # Customization of the app
 ## 1- Replace the following elements with your cusstom elements:
 *  assets directory
