@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
     <application
         android:name="com.librelio.LibrelioApplication"
@@ -37,7 +38,6 @@
 
         <activity
             android:name="com.librelio.activity.StartupActivity"
-            android:configChanges="orientation|keyboardHidden"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,9 +55,8 @@
         <activity
             android:name="com.librelio.lib.ui.SlideShowActivity"
             android:theme="@style/Theme.NoBackground.NoTitle" />
-        <activity
-            android:name="com.librelio.activity.DownloadActivity"
-            android:configChanges="orientation" />
+        
+        <activity android:name="com.librelio.activity.DownloadActivity"/>
         <activity
             android:name="com.librelio.activity.BillingActivity"
             android:theme="@style/Theme.Billing" />

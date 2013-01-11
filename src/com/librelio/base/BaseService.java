@@ -1,11 +1,10 @@
 package com.librelio.base;
 
-import com.librelio.LibrelioApplication;
-import com.niveales.wind.R;
-
 import android.app.Service;
 import android.content.SharedPreferences;
 import android.os.Environment;
+
+import com.librelio.LibrelioApplication;
 
 abstract public class BaseService extends Service implements IBaseContext {
 

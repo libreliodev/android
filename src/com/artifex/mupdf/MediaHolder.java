@@ -162,8 +162,10 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				mc.setMediaPlayer(videoView);
 				videoView.setMediaController(mc);
 				videoView.requestFocus();
-				mc.show(4000);
-				videoView.start();
+				if (mc.isActivated()) {
+					mc.show(4000);
+					videoView.start();
+				}
 			}
 		}.execute(uriString);
 

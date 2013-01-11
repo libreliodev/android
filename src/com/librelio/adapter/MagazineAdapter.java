@@ -21,7 +21,6 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
 import com.librelio.model.Magazine;
-import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{

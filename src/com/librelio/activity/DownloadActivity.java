@@ -131,6 +131,17 @@ public class DownloadActivity extends BaseActivity {
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		enableRotation(false);
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		enableRotation(true);
+		super.onPause();
+	}
 
 	private class DownloadTask extends AsyncTask<String, Double, String> {
 		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
@@ -330,9 +341,4 @@ public class DownloadActivity extends BaseActivity {
 		}
 		return super.onCreateDialog(id);
 	}
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-	}
-
 }

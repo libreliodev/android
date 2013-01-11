@@ -263,6 +263,11 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 		return count;
 	}
 
+	protected void enableRotation(boolean isEnable) {
+		android.provider.Settings.System.putInt(
+				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, isEnable ? 1 : 0);
+	}
+
 	protected boolean hasTestMagazine() {
 		return getResources().getBoolean(R.bool.enable_test_magazine);
 	}

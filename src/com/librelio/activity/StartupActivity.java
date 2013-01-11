@@ -24,7 +24,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,7 +45,6 @@ public class StartupActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
 
-
 		if (hasTestMagazine() && !getPreferences().getBoolean(TEST_INIT_COMPLETE, false)) {
 			initStorage("test");
 			new InitTestMagazines().execute("test");
@@ -55,6 +53,18 @@ public class StartupActivity extends BaseActivity {
 			new InitPredefinedMagazinesTask().execute();
 		}
 
+	}
+
+	@Override
+	protected void onResume() {
+		enableRotation(false);
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		enableRotation(true);
+		super.onPause();
 	}
 
 	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
@@ -115,12 +125,6 @@ public class StartupActivity extends BaseActivity {
 			onStartMagazine();
 		}
 
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		setContentView(R.layout.startup);
-		super.onConfigurationChanged(newConfig);
 	}
 
 	protected void onStartMagazine() {

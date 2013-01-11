@@ -13,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -48,6 +49,8 @@ class OpaqueImageView extends ImageView {
 }
 
 public abstract class PageView extends ViewGroup {
+	private static final String TAG = "PageView";
+
 	private static final int HIGHLIGHT_COLOR = 0x805555FF;
 	private static final int LINK_COLOR = 0x80FFCC88;
 	private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
@@ -198,7 +201,13 @@ public abstract class PageView extends ViewGroup {
 		if (mEntireBm == null || mEntireBm.getWidth() != newSize.x
 				              || mEntireBm.getHeight() != newSize.y) {
 			//FIXME crash with java.lang.IllegalArgumentException: width and height must be > 0
-			mEntireBm = Bitmap.createBitmap(mSize.x, mSize.y, Bitmap.Config.ARGB_8888);
+			Log.d(TAG, "creating bitmap " + mSize.x + "x" + mSize.y);
+			try {
+				mEntireBm = Bitmap.createBitmap(mSize.x, mSize.y, Bitmap.Config.ARGB_8888);
+			} catch(OutOfMemoryError e) {
+				Log.d(TAG, "Create entire bitmap failed", e);
+				System.gc();
+			}
 		}
 
 		// Render the page in the background
@@ -389,31 +398,31 @@ public abstract class PageView extends ViewGroup {
 			}
 
 			try {
-			Bitmap bm = Bitmap.createBitmap(patchArea.width(), patchArea.height(), Bitmap.Config.ARGB_8888);
-
-			mDrawPatch = new SafeAsyncTask<PatchInfo,Void,PatchInfo>() {
-				protected PatchInfo doInBackground(PatchInfo... v) {
-					drawPage(v[0].bm, v[0].patchViewSize.x, v[0].patchViewSize.y,
-									  v[0].patchArea.left, v[0].patchArea.top,
-									  v[0].patchArea.width(), v[0].patchArea.height());
-					return v[0];
-				}
-
-				protected void onPostExecute(PatchInfo v) {
-					mPatchViewSize = v.patchViewSize;
-					mPatchArea     = v.patchArea;
-					patch.setImageBitmap(v.bm);
-					//requestLayout();
-					// Calling requestLayout here doesn't lead to a later call to layout. No idea
-					// why, but apparently others have run into the problem.
-					patch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
-					invalidate();
-				}
-			};
-
-			mDrawPatch.safeExecute(new PatchInfo(bm, patchViewSize, patchArea));
+				Bitmap bm = Bitmap.createBitmap(patchArea.width(), patchArea.height(), Bitmap.Config.ARGB_8888);
+	
+				mDrawPatch = new SafeAsyncTask<PatchInfo,Void,PatchInfo>() {
+					protected PatchInfo doInBackground(PatchInfo... v) {
+						drawPage(v[0].bm, v[0].patchViewSize.x, v[0].patchViewSize.y,
+										  v[0].patchArea.left, v[0].patchArea.top,
+										  v[0].patchArea.width(), v[0].patchArea.height());
+						return v[0];
+					}
+	
+					protected void onPostExecute(PatchInfo v) {
+						mPatchViewSize = v.patchViewSize;
+						mPatchArea     = v.patchArea;
+						patch.setImageBitmap(v.bm);
+						//requestLayout();
+						// Calling requestLayout here doesn't lead to a later call to layout. No idea
+						// why, but apparently others have run into the problem.
+						patch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
+						invalidate();
+					}
+				};
+	
+				mDrawPatch.safeExecute(new PatchInfo(bm, patchViewSize, patchArea));
 			} catch(OutOfMemoryError e) {
-				e.printStackTrace();
+				Log.d(TAG, "Create patch Area " + patchArea.width() + "x" + patchArea.height() + " failed", e);
 				System.gc();
 			}
 		}

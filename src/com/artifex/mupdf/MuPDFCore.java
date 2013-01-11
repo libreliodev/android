@@ -17,6 +17,8 @@ public class MuPDFCore {
 		System.loadLibrary("mupdf");
 	}
 
+	private static final String TAG = "MuPDFCore";
+
 	/* Readable members */
 	private int pageNum = -1;;
 	private int numPages = -1;
@@ -217,7 +219,7 @@ public class MuPDFCore {
 				}
 			}
 		} catch (OutOfMemoryError e) {
-			e.printStackTrace();
+			Log.e(TAG, "draw page " + page + "failed", e);
 			canvas.drawColor(Color.TRANSPARENT);
 		}
 		System.gc();
