@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Random;
 
 import org.netcook.android.tools.CrashCatcherActivity;
 
@@ -162,7 +163,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 
 	@Override
 	public String getVideoTempPath() {
-		return getExternalPath() + ".tmp.mp4";
+		return getExternalPath() + "." + new Random().nextInt() + "tmp.mp4";
 	}
 
 	/**

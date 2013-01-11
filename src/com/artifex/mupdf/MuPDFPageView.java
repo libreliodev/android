@@ -123,6 +123,7 @@ public class MuPDFPageView extends PageView {
 		while (i.hasNext()) {
 			Entry<String, FrameLayout> entry = i.next();
 			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
+			mLinkHolder.recycle();
 			i.remove();
 			removeView(mLinkHolder);
 			mLinkHolder = null;
@@ -156,8 +157,13 @@ public class MuPDFPageView extends PageView {
 	@Override
 	protected void drawPage(Bitmap bm, int sizeX, int sizeY, int patchX,
 			int patchY, int patchWidth, int patchHeight) {
-		muPdfCore.drawPage(mPageNumber, bm, sizeX, sizeY, patchX, patchY,
-				patchWidth, patchHeight);
+		if (null != bm) {
+			muPdfCore.drawPage(mPageNumber, bm, sizeX, sizeY, patchX, patchY,
+					patchWidth, patchHeight);
+		} else {
+			Log.w(TAG, "IGNORED drawPage");
+		}
+
 	}
 
 	@Override

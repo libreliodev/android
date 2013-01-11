@@ -1,7 +1,9 @@
-package com.artifex.mupdf;
+package com.artifex.mupdf.view;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+
+import com.artifex.mupdf.LinkInfo;
 
 
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Scroller;
+import android.widget.TableLayout;
 
 public class ReaderView extends AdapterView<Adapter>
                         implements GestureDetector.OnGestureListener,
@@ -90,7 +93,7 @@ public class ReaderView extends AdapterView<Adapter>
 		if (0 <= i && i < mAdapter.getCount()) {
 			mCurrent = i;
 			mScale = 1;
-			onMoveToChild(i);
+			onMoveToChild(mChildViews.get(i), i);
 			mResetLayout = true;
 			requestLayout();
 		}
@@ -115,7 +118,7 @@ public class ReaderView extends AdapterView<Adapter>
 
 	protected void onChildSetup(int i, View v) {}
 
-	protected void onMoveToChild(int i) {}
+	protected void onMoveToChild(View view, int i) {}
 
 	/**
 	 * When the layout has settled ask the page to render in HQ
@@ -338,7 +341,7 @@ public class ReaderView extends AdapterView<Adapter>
 					post(this);
 
 					mCurrent++;
-					onMoveToChild(mCurrent);
+					onMoveToChild(cv, mCurrent);
 				}
 
 				if (cv.getLeft() - cvOffset.x - GAP/2 + mXScroll >= getWidth()/2 && mCurrent > 0) {
@@ -348,7 +351,7 @@ public class ReaderView extends AdapterView<Adapter>
 					post(this);
 
 					mCurrent--;
-					onMoveToChild(mCurrent);
+					onMoveToChild(cv, mCurrent);
 				}
 			}
 

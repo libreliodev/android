@@ -19,6 +19,7 @@
 
 package com.librelio.activity;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,7 +46,7 @@ public class StartupActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
 
-		if (hasTestMagazine() && !getPreferences().getBoolean(TEST_INIT_COMPLETE, false)) {
+		if (hasTestMagazine()) {
 			initStorage("test");
 			new InitTestMagazines().execute("test");
 		} else {
@@ -77,10 +78,16 @@ public class StartupActivity extends BaseActivity {
 				final String testImage = name + ".png";
 				final String testImagePath = getStoragePath() + testImage;
 				String[] assetsList = getResources().getAssets().list(name);
-				for(String file : assetsList){
-					copyFromAssets(name + "/" + file, testDir + file);
+				File file = new File(testImagePath);
+				if (!file.exists()) {
+					copyFromAssets(testImage, testImagePath);
 				}
-				copyFromAssets(testImage, testImagePath);
+				for(String asset : assetsList){
+					file = new File(testDir + asset);
+					if (!file.exists()) {
+						copyFromAssets(name + "/" + asset, testDir + asset);
+					}
+				}
 				return 0;
 			} catch (IOException e) {
 				Log.e(TAG,"Test directory in assets is unavailable", e);

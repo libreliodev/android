@@ -31,7 +31,6 @@ import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.task.CreateTempVideoTask;
@@ -44,7 +43,7 @@ import com.niveales.wind.R;
  * @author Nikolay Moskvin <moskvin@netcook.org>
  */
 public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpdateListener, OnCompletionListener, OnVideoSizeChangedListener,
-		OnPreparedListener, MuPDFActivity.RecycleObserver {
+		OnPreparedListener {
 	private static final String TAG = "MediaHolder";
 
 	public static final String URI_STRING_KEY = "uri_string_key";
@@ -69,7 +68,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 
 	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
 		super(context);
-		MuPDFActivity.setObserver(this);
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.uri;
 		
@@ -118,7 +116,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	@Override
 	public void surfaceDestroyed(SurfaceHolder pHolder) {}
 
-	@Override
 	public void recycle() {
 		Log.d(TAG,"resycle was called");
 		if(autoPlayHandler!=null){
@@ -162,7 +159,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				mc.setMediaPlayer(videoView);
 				videoView.setMediaController(mc);
 				videoView.requestFocus();
-				if (mc.isActivated()) {
+				if (null != getContext()) {
 					mc.show(4000);
 					videoView.start();
 				}
