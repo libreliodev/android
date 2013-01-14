@@ -130,7 +130,7 @@ public class MainMagazineActivity extends BaseActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d(TAG,"onReceive subscription year");
-				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
+				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, GooglePlayActivity.ITEM_TYPE_SUBSCRIPTION, null)) {
 					//Note: mManagedType == Managed.SUBSCRIPTION
 					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
 				}
@@ -140,7 +140,7 @@ public class MainMagazineActivity extends BaseActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d(TAG,"onReceive subscription monthly");
-				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_MONTHLY_KEY, Consts.ITEM_TYPE_SUBSCRIPTION, null)) {
+				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_MONTHLY_KEY, GooglePlayActivity.ITEM_TYPE_SUBSCRIPTION, null)) {
 					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
 				}
 			}
@@ -309,9 +309,6 @@ public class MainMagazineActivity extends BaseActivity {
 
 	private Dialog createDialog(int titleId, int messageId) {
 		String helpUrl = replaceLanguageAndRegion(getString(R.string.help_url));
-		if (Consts.DEBUG) {
-			Log.d(TAG, helpUrl);
-		}
 		final Uri helpUri = Uri.parse(helpUrl);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);

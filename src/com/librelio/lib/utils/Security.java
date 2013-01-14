@@ -2,15 +2,6 @@
 
 package com.librelio.lib.utils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.librelio.lib.utils.Consts.PurchaseState;
-
-import android.text.TextUtils;
-import android.util.Log;
-
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +13,15 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.librelio.lib.utils.Consts.PurchaseState;
 
 /**
  * Security-related methods. For a secure implementation, all of this code

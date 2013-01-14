@@ -30,6 +30,10 @@ import com.librelio.base.BaseActivity;
 import com.niveales.wind.R;
 
 abstract public class GooglePlayActivity extends BaseActivity {
+	// These are the types supported in the IAB v2
+	public static final String ITEM_TYPE_INAPP = "inapp";
+	public static final String ITEM_TYPE_SUBSCRIPTION = "subs";
+
 	/**
 	 * The developer payload that is sent with subsequent purchase requests.
 	 */

@@ -89,7 +89,4 @@ public class Consts {
     public static final String BILLING_RESPONSE_REQUEST_ID = "REQUEST_ID";
     public static long BILLING_RESPONSE_INVALID_REQUEST_ID = -1;
 
-    // These are the types supported in the IAB v2
-    public static final String ITEM_TYPE_INAPP = "inapp";
-    public static final String ITEM_TYPE_SUBSCRIPTION = "subs";
 }
