@@ -69,7 +69,7 @@ public class BillingActivity extends BaseActivity {
 	private static final String TAG = "BillingActivity";
 
 	// Only for test. Must always be FALSE!
-	private static final boolean TEST_MODE = true;
+	private static final boolean TEST_MODE = false;
 	/*
 	 * productId can be the following values:
 	 *	android.test.purchased
