@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.librelio.activity.MuPDFActivity;
+import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
 public class LibrelioApplication extends Application {
@@ -21,16 +22,17 @@ public class LibrelioApplication extends Application {
 	private static final String TAG = "LibrelioApplication";
 	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
 	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
-	private static final String SERVER_URL = "http://download.librelio.com/downloads/android_verify.php";
+	private static final String PATH_SEPARATOR = "/";
+	
 //	private static final String SERVER_URL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
-
+	
 	private static String baseUrl;
 
 	@Override
 	public void onCreate() {
 		String clientName = getClientName(this);
 		String magazineName = getMagazineName(this);
-		baseUrl = "http://librelio-europe.s3.amazonaws.com/" + clientName + "/" + magazineName + "/";
+		baseUrl = "http://librelio-europe.s3.amazonaws.com/" + clientName + PATH_SEPARATOR + magazineName + PATH_SEPARATOR;
 		super.onCreate();
 	}
 
@@ -48,6 +50,11 @@ public class LibrelioApplication extends Application {
 	}
 
 	public static boolean thereIsConnection(Context context) {
+		
+		if (SystemHelper.isEmulator(context)) {
+			return true;
+		}
+		
 		ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo i = conMgr.getActiveNetworkInfo();
 		if (i == null) {
@@ -81,6 +88,12 @@ public class LibrelioApplication extends Application {
 		}
 		return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
 	}
+	
+	public static String getUrlString(Context context, String fileName){
+		return LibrelioApplication.getClientName(context) + PATH_SEPARATOR 
+		+ LibrelioApplication.getMagazineName(context) + PATH_SEPARATOR + fileName;
+	}
+	
 
 	public static boolean isEnableYearlySubs(Context context){
 		String data = context.getResources().getString(R.string.enable_yearly_subs);
@@ -99,9 +112,13 @@ public class LibrelioApplication extends Application {
 			return false;
 		}
 	}
+	
+	public static boolean isEnableCodeSubs(Context context){
+		return context.getResources().getBoolean(R.bool.enable_code_subs);
+	}
 
-	public static String getServerUrl(){
-		return SERVER_URL;
+	public static String getServerUrl(Context context){
+		return context.getString(R.string.server_url);
 	}
 
 	public static String getAmazonServerUrl(){

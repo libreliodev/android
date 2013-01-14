@@ -57,6 +57,8 @@ import android.widget.Toast;
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
+import com.librelio.view.InputTextDialog;
+import com.librelio.view.InputTextDialog.OnEnterValueListener;
 import com.niveales.wind.R;
 
 /**
@@ -78,6 +80,14 @@ public class BillingActivity extends BaseActivity {
 	 *	android.test.item_unavailable
 	 */
 	private static final String TEST_PRODUCT_ID = "android.test.purchased";
+	
+	private static final String PARAM_PRODUCT_ID = "@product_id";
+	private static final String PARAM_DATA = "@data";
+	private static final String PARAM_SIGNATURE = "@signature";
+	private static final String PARAM_URLSTRING = "@urlstring";
+	private static final String PARAM_CODE = "@code";
+	private static final String PARAM_CLIENT = "@client";
+	private static final String PARAM_APP = "@app";
 	
 	private static final int CALLBACK_CODE = 101;
 	
@@ -103,6 +113,7 @@ public class BillingActivity extends BaseActivity {
 	private Button cancel;
 	private Button subsYear;
 	private Button subsMonthly;
+	private Button subsCode;
 
 	private IInAppBillingService billingService;
 
@@ -131,6 +142,7 @@ public class BillingActivity extends BaseActivity {
 		buy = (Button)findViewById(R.id.billing_buy_button);
 		subsMonthly = (Button)findViewById(R.id.billing_subs_monthly);
 		subsYear = (Button)findViewById(R.id.billing_subs_year);
+		subsCode = (Button)findViewById(R.id.billing_subs_code_button);
 		cancel = (Button)findViewById(R.id.billing_cancel_button);
 		//
 		cancel.setOnClickListener(new OnClickListener() {
@@ -175,6 +187,20 @@ public class BillingActivity extends BaseActivity {
 			});
 		} else {
 			subsMonthly.setVisibility(View.GONE);
+		}
+		
+		if (LibrelioApplication.isEnableCodeSubs(getContext())){
+			subsCode.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					InputTextDialog dialog = new InputTextDialog(getContext(),
+							getString(R.string.please_enter_your_code));
+					dialog.setOnEnterValueListener(onEnterValueListener);
+					dialog.show();
+				}
+			});
+		}else{
+			subsCode.setVisibility(View.GONE);
 		}
 	}
 
@@ -340,20 +366,37 @@ public class BillingActivity extends BaseActivity {
 	}
 
 	private String buildVerifyQuery() {
-		StringBuilder query = new StringBuilder(LibrelioApplication.getServerUrl());
-		query.append("?product_id=")
-			.append(productId)
-			.append("&data=")
-			.append(Uri.encode(dataResponse))
-			.append("&signature=")
-			.append(signatureResponse)
-			.append("&urlstring=")
-			.append(LibrelioApplication.getClientName(getContext()))
-			.append("/")
-			.append(LibrelioApplication.getMagazineName(getContext()))
-			.append("/")
-			.append(fileName);
-		return query.toString();
+		
+		StringBuilder query = new StringBuilder(
+				LibrelioApplication.getServerUrl(getContext()));
+		
+		String comand = getString(R.string.command_android_verify)
+				.replace(";", "&")
+				.replace(PARAM_PRODUCT_ID, productId)
+				.replace(PARAM_DATA, Uri.encode(dataResponse))
+				.replace(PARAM_SIGNATURE, signatureResponse)
+				.replace(PARAM_URLSTRING, 
+						LibrelioApplication.getUrlString(getContext(), fileName));
+		
+		return query.append(comand).toString();
+	}
+	
+	private String buildPswdQuery() {
+		
+		StringBuilder query = new StringBuilder(
+				LibrelioApplication.getServerUrl(getContext()));
+		
+		String comand = getString(R.string.command_pswd)
+				.replace(";", "&")
+				//TODO @Roman need insert code value
+				.replace(PARAM_CODE, "")
+				.replace(PARAM_URLSTRING, 
+						LibrelioApplication.getUrlString(getContext(), fileName))
+				//TODO @Roman need check correct values
+				.replace(PARAM_CLIENT, LibrelioApplication.getClientName(getContext()))
+				.replace(PARAM_APP, LibrelioApplication.getMagazineName(getContext()));
+		
+		return query.append(comand).toString();
 	}
 
 	private class DownloadFromTempURLTask extends AsyncTask<String, Void, HttpResponse>{
@@ -479,4 +522,12 @@ public class BillingActivity extends BaseActivity {
 			}
 		}
 	}
+	
+	private OnEnterValueListener onEnterValueListener = new OnEnterValueListener() {
+		@Override
+		public void onEnterValue(String value) {
+			Log.d(TAG, value);
+		}
+	};
+	
 }

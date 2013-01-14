@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+    <string name="server_url">http://download.librelio.com/downloads/</string>
+    <string name="command_android_verify">android_verify.php?product_id=@product_id;data=@data;signature=@signature;urlstring=@urlstring</string>
+    <string name="command_pswd">pswd.php?code=@code;urlstring=@urlstring;client=@client;app=@app</string>
+</resources>
+    
