@@ -19,10 +19,12 @@
 
 package com.librelio.activity;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -67,7 +69,7 @@ public class BillingActivity extends BaseActivity {
 	private static final String TAG = "BillingActivity";
 
 	// Only for test. Must always be FALSE!
-	private static final boolean TEST_MODE = false;
+	private static final boolean TEST_MODE = true;
 	/*
 	 * productId can be the following values:
 	 *	android.test.purchased
@@ -75,7 +77,7 @@ public class BillingActivity extends BaseActivity {
 	 *	android.test.refunded
 	 *	android.test.item_unavailable
 	 */
-	private static final String TEST_PRODUCT_ID = "android.test.refunded";
+	private static final String TEST_PRODUCT_ID = "android.test.purchased";
 	
 	private static final int CALLBACK_CODE = 101;
 	
@@ -379,13 +381,38 @@ public class BillingActivity extends BaseActivity {
 			String tempURL = null;
 			if (null == response) {
 				//TODO: @Niko need check for this situation
+				Log.w(TAG, "download response was null");
 				return;
 			}
-			for(Header h : response.getAllHeaders()){
-				if(h.getName().equalsIgnoreCase("location")){
-					tempURL = h.getValue();
+
+			Log.d(TAG, "status line: " + response.getStatusLine().toString());
+			HttpEntity entity = response.getEntity();
+
+			DataInputStream bodyStream = null;
+			if (entity != null) {
+				try {
+					bodyStream = new DataInputStream(entity.getContent());
+					StringBuilder content = new StringBuilder();
+					if (null != bodyStream) {
+						String line = null;
+						while((line = bodyStream.readLine()) != null) {
+							content.append(line).append("\n");
+						}
+					}
+					Log.d(TAG, "body: " + content.toString());
+				} catch (Exception e) {
+					Log.e(TAG, "get content failed", e); 
+				} finally {
+					try { bodyStream.close(); } catch (Exception e) {}
 				}
-				Log.d(TAG, "res- name:" + h.getName() + "  val:" + h.getValue());
+			}
+			if (null != response.getAllHeaders()) {
+				for(Header h : response.getAllHeaders()){
+					if(h.getName().equalsIgnoreCase("location")){
+						tempURL = h.getValue();
+					}
+					Log.d(TAG, "header: " + h.getName() + " => " + h.getValue());
+				}
 			}
 			if(tempURL == null){
 				Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
