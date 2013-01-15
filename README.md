@@ -22,7 +22,6 @@ The use of the Google Analytics library is governed by the following terms: http
 ## Source code of libraries used
 - MuPDF: https://github.com/Librelio/mupdf.git
 - Android P-List Parser: https://github.com/Librelio/android-plist-parser
--
 
 ## Customization of the app
 #### 1- Replace the following elements with your cusstom elements:
