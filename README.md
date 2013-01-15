@@ -14,6 +14,7 @@ This project is free software: you can redistribute it and/or modify it under th
 This project is Copyright 20012-2013 WidgetAvenue - Librelio, except included libraries:
 - Copyright 2006-2012 Artifex Software, Inc for the MuPDF library
 - Copyright Free Beachler (http://www.freebeachler.com) for the Android P-List Parser library
+
 The use of the Google Analytics library is governed by the following terms: http://www.google.com/analytics/tos.html
 
 
