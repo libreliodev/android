@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wind</string>
     <string name="no_media_warning">No media</string>
     <string name="no_media_hint">Disconnect from PC</string>
     <string name="open_failed">Cant open PDF. Please put file wind_355.pdf on SD card for testing &#8230;</string>
     <string name="search_backwards">Search back</string>
     <string name="search_forwards">Search forward</string>
     <string name="search_document">Search in document</string>
-    <string name="picker_title">Wind</string>
     <string name="outline_title">Outline</string>
     <string name="enter_password">Enter your password</string>
     <string name="text_not_found">Not found</string><string name="items_you_own">Items you own</string><string name="recent_transactions">Recent activity</string><string name="edit_payload">Edit Payload</string><string name="items_for_sale">Items for sale</string>
