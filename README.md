@@ -24,8 +24,7 @@ The use of the Google Analytics library is governed by the following terms: http
 - Android P-List Parser: https://github.com/Librelio/android-plist-parser
 
 ## Customization of the app
-#### 1- Replace the following elements with your cusstom elements:
-*  assets directory
+#### 1- Replace the following elements with your custom elements:
 *  in res directory, all subdirectories ending with -port or -land
 *  in res/values directory, application_.xml
 
