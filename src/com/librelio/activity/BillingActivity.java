@@ -79,7 +79,7 @@ public class BillingActivity extends BaseActivity {
 	 *	android.test.refunded
 	 *	android.test.item_unavailable
 	 */
-	private static final String TEST_PRODUCT_ID = "android.test.purchased";
+	private static final String TEST_PRODUCT_ID = "android.test.canceled";
 	
 	private static final String PARAM_PRODUCT_ID = "@product_id";
 	private static final String PARAM_DATA = "@data";
@@ -106,8 +106,6 @@ public class BillingActivity extends BaseActivity {
 	private String productId;
 	private String productPrice;
 	private String productTitle;
-	private String dataResponse;
-	private String signatureResponse;
 
 	private Button buy;
 	private Button cancel;
@@ -244,7 +242,7 @@ public class BillingActivity extends BaseActivity {
 					if(getPurchaseResponse == 0){
 						ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
 						for(String s : ownedSkus){
-							Log.d(TAG, "already purchased: " + s);
+							Log.d(TAG, productId + " already purchased? " + s);
 						}
 						if(ownedSkus.contains(productId)){
 							onDownloadAction();
@@ -256,13 +254,14 @@ public class BillingActivity extends BaseActivity {
 					int response = skuDetails.getInt("RESPONSE_CODE");
 					if (response == 0) {
 						Log.d(TAG, "response code was success");
-						ArrayList<String> responseList = skuDetails.getStringArrayList("DETAILS_LIST");
-						for (String thisResponse : responseList) {
+						ArrayList<String> details = skuDetails.getStringArrayList("DETAILS_LIST");
+						for (String detail : details) {
+							Log.d(TAG, "response = " + detail);
 							JSONObject object = null;
 							String sku = "";
 							String price = "";
 							try {
-								object = new JSONObject(thisResponse);
+								object = new JSONObject(detail);
 								sku = object.getString("productId");
 								price = object.getString("price");
 								productTitle = object.getString("title");
@@ -295,10 +294,10 @@ public class BillingActivity extends BaseActivity {
 				try {
 					JSONObject jo = new JSONObject(purchaseData);
 					String sku = jo.getString("productId");
-					dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
-					signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
+					String dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
+					String signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
 					Log.d(TAG, "You have bought the " + sku + ". Excellent choice, adventurer!");
-					onDownloadAction();
+					onDownloadAction(dataResponse, signatureResponse);
 				} catch (JSONException e) {
 					Log.e(TAG, "Failed to parse purchase data.", e);
 				}
@@ -344,8 +343,12 @@ public class BillingActivity extends BaseActivity {
 		super.onDestroy();
 	}
 
+	protected void onDownloadAction(String dataResponse, String signatureResponse) {
+		new DownloadFromTempURLTask().execute(buildVerifyQuery(dataResponse, signatureResponse));
+	}
+
 	protected void onDownloadAction() {
-		new DownloadFromTempURLTask().execute(buildVerifyQuery());
+		new DownloadFromTempURLTask().execute(buildVerifyQuery("", ""));
 	}
 
 	private OnClickListener getBuyOnClick(){
@@ -365,7 +368,7 @@ public class BillingActivity extends BaseActivity {
 		return this;
 	}
 
-	private String buildVerifyQuery() {
+	private String buildVerifyQuery(String dataResponse, String signatureResponse) {
 		
 		StringBuilder query = new StringBuilder(
 				LibrelioApplication.getServerUrl(getContext()));
@@ -505,6 +508,7 @@ public class BillingActivity extends BaseActivity {
 				return;
 			}
 			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
+				Log.d(TAG, productId + " ITEM_ALREADY_OWNED ");
 				onDownloadAction();
 				return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
