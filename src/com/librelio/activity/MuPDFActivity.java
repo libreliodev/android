@@ -70,7 +70,7 @@ public class MuPDFActivity extends BaseActivity {
 	private int mOrientation;
 
 	private int          mPageSliderRes;
-	private boolean      mButtonsVisible;
+	private boolean      buttonsVisible;
 	private boolean      mTopBarIsSearch;
 
 	private WeakReference<SearchTask> searchTask;
@@ -224,7 +224,7 @@ public class MuPDFActivity extends BaseActivity {
 
 			@Override
 			protected void onContextMenuClick() {
-				if (!mButtonsVisible) {
+				if (!buttonsVisible) {
 					showButtons();
 				} else {
 					hideButtons();
@@ -411,7 +411,7 @@ public class MuPDFActivity extends BaseActivity {
 			edit.commit();
 		}
 
-		if (!mButtonsVisible)
+		if (!buttonsVisible)
 			outState.putBoolean("ButtonsHidden", true);
 
 		if (mTopBarIsSearch)
@@ -447,8 +447,8 @@ public class MuPDFActivity extends BaseActivity {
 		if (core == null) {
 			return;
 		}
-		if (!mButtonsVisible) {
-			mButtonsVisible = true;
+		if (!buttonsVisible) {
+			buttonsVisible = true;
 			// Update page number text and slider
 			int index = docView.getDisplayedViewIndex();
 			updatePageNumView(index);
@@ -486,8 +486,8 @@ public class MuPDFActivity extends BaseActivity {
 	}
 
 	void hideButtons() {
-		if (mButtonsVisible) {
-			mButtonsVisible = false;
+		if (buttonsVisible) {
+			buttonsVisible = false;
 			hideKeyboard();
 
 			Animation anim = new TranslateAnimation(0, 0, 0, -mTopBarSwitcher.getHeight());
@@ -617,7 +617,7 @@ public class MuPDFActivity extends BaseActivity {
 
 	@Override
 	public boolean onSearchRequested() {
-		if (mButtonsVisible && mTopBarIsSearch) {
+		if (buttonsVisible && mTopBarIsSearch) {
 			hideButtons();
 		} else {
 			showButtons();
@@ -628,7 +628,7 @@ public class MuPDFActivity extends BaseActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		if (mButtonsVisible && !mTopBarIsSearch) {
+		if (buttonsVisible && !mTopBarIsSearch) {
 			hideButtons();
 		} else {
 			showButtons();
@@ -726,6 +726,7 @@ public class MuPDFActivity extends BaseActivity {
 			docView.post(new Runnable() {
 				public void run() {
 					for(LinkInfo link : autoLinks){
+						Log.d(TAG, "RRRRRRRRRRRR " + link);
 						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();

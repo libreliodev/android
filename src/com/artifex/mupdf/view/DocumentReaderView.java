@@ -13,9 +13,9 @@ import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MuPDFPageView;
 import com.artifex.mupdf.PageView;
 import com.artifex.mupdf.domain.SearchTaskResult;
-import com.librelio.lib.ui.SlideShowActivity;
+import com.librelio.activity.SlideShowActivity;
 
-public class DocumentReaderView extends ReaderView {
+public abstract class DocumentReaderView extends ReaderView {
 	private static final String TAG = "DocumentReaderView";
 
 	private enum LinkState {
@@ -73,9 +73,9 @@ public class DocumentReaderView extends ReaderView {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
+		if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
 			showButtonsDisabled = false;
-
+		}
 		return super.onTouchEvent(event);
 	}
 
@@ -83,13 +83,9 @@ public class DocumentReaderView extends ReaderView {
 		return showButtonsDisabled;
 	}
 
-	protected void onContextMenuClick() {
-		
-	}
+	abstract protected void onContextMenuClick();
+	abstract protected void onBuy(String path);
 
-	protected void onBuy(String path) {
-		
-	}
 	//	protected void onChildSetup(int i, View v) {
 //		if (SearchTaskResult.get() != null && SearchTaskResult.get().pageNumber == i)
 //			((PageView)v).setSearchBoxes(SearchTaskResult.get().searchBoxes);
@@ -130,7 +126,7 @@ public class DocumentReaderView extends ReaderView {
 	 * @param linkString - url to open
 	 */
 	private void openLink(String linkString) {
-		Log.d(TAG, "openLink " + linkString);
+		Log.d(TAG, "!openLink " + linkString);
 		Uri uri = Uri.parse(linkString);
 		String warect = uri.getQueryParameter("warect");
 		Boolean isFullScreen = warect != null && warect.equals("full");

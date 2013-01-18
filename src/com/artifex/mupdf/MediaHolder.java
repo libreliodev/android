@@ -31,9 +31,10 @@ import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.librelio.activity.SlideShowActivity;
 import com.librelio.base.IBaseContext;
-import com.librelio.lib.ui.SlideShowActivity;
 import com.librelio.task.CreateTempVideoTask;
+import com.librelio.view.ImagePager;
 import com.niveales.wind.R;
 
 /**
@@ -99,7 +100,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			} else {
 				onPlayVideoInsideLocal();
 			}
-			
 		}
 	}
 
@@ -199,7 +199,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	}
 
 	protected void onPlaySlideInside(String basePath) {
-		Log.d(TAG, "onPlaySlideOutside " + basePath + ", linkInfo = " + linkInfo);
+		Log.d(TAG, "onPlaySlideInside " + basePath + ", linkInfo = " + linkInfo);
 		boolean autoPlay = linkInfo.isAutoPlay();
 		autoPlayDelay = 2000;
 		if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {

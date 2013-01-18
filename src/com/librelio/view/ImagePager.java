@@ -1,4 +1,4 @@
-package com.artifex.mupdf;
+package com.librelio.view;
 
 import java.io.File;
 
@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import com.niveales.wind.R;
 
-public class ImagePager extends RelativeLayout{
+public class ImagePager extends RelativeLayout {
 
 	protected static final String TAG = "ImagePager";
 
@@ -45,6 +45,7 @@ public class ImagePager extends RelativeLayout{
 	protected String projectId;
 	protected int minCountFromInfinityLoop = 12;
 	private Handler mAutoplayHandler;
+	private int count = 0;
 
 	public interface PhotoPagerListener {
 		void onClickItem(int photoId);
@@ -166,8 +167,7 @@ public class ImagePager extends RelativeLayout{
 	public void setViewWidth(int viewWidth){
 		this.viewWidth = viewWidth;
 	}
-	
-	private int count = 0;
+
 	private void flipSlides(final float dx){
 		count = 0;
 		final int mAutoplayDelay = 200;
