@@ -6,6 +6,7 @@ package com.artifex.mupdf;
 import java.io.File;
 import java.io.IOException;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -177,10 +178,17 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				if (isCancelled()) {
 					return;
 				}
-				Intent intent = new Intent(Intent.ACTION_VIEW);
 				Uri data = Uri.parse(videoPath);
+				Intent intent = new Intent(Intent.ACTION_VIEW, data);
 				intent.setDataAndType(data, "video/*");
-				getContext().startActivity(intent);
+				try {
+					getContext().startActivity(intent);
+				} catch(ActivityNotFoundException e) {
+					Log.e(TAG, "onPlayVideoOutside failed", e);
+					intent.setClassName("com.android.gallery3d", "com.android.gallery3d.app.MovieActivity");
+					getContext().startActivity(intent);
+				}
+
 				/*Intent intent = new Intent(getContext(), VideoActivity.class);
 				intent.putExtra(URI_STRING_KEY, uriString);
 				intent.putExtra(BASE_PATH_KEY, basePath);

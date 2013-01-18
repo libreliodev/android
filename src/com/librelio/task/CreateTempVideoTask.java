@@ -23,9 +23,9 @@ public class CreateTempVideoTask extends AsyncTask<String, Void, String> {
 		this.basePath = basePath;
 	}
 
-	public CreateTempVideoTask(String videoTempPath) {
-		this(videoTempPath, null);
-	}
+//	public CreateTempVideoTask(String videoTempPath) {
+//		this(videoTempPath, null);
+//	}
 
 	@Override
 	protected String doInBackground(String... videoPaths) {
@@ -34,6 +34,14 @@ public class CreateTempVideoTask extends AsyncTask<String, Void, String> {
 		} else {
 			return createTempVideoFile(getUrlFromLocalhost(basePath, videoPaths[0]));
 		}
+	}
+
+	@Override
+	protected void onPostExecute(String path) {
+		super.onPostExecute(path);
+		File tmp = new File(path);
+		tmp.delete();
+		Log.d(TAG, "Deleted temp video file " + path);
 	}
 
 	/**
@@ -58,7 +66,7 @@ public class CreateTempVideoTask extends AsyncTask<String, Void, String> {
 			}
 			in.close();
 			out.close();
-			Log.d(TAG, "Created temp video file " + temPath);
+			Log.d(TAG, "Created temp video file " + temPath + " => " + tmp.length());
 			return temPath;
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, "Create temp video file failed", e);

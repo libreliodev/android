@@ -163,7 +163,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 
 	@Override
 	public String getVideoTempPath() {
-		return getExternalPath() + "." + new Random().nextInt() + "tmp.mp4";
+		return getExternalPath() + ".f" + new Random().nextLong() + "-video.mp4";
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package com.librelio.base;
 
+import java.util.Random;
+
 import android.app.Service;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -44,7 +46,7 @@ abstract public class BaseService extends Service implements IBaseContext {
 
 	@Override
 	public String getVideoTempPath() {
-		return getExternalPath() + ".tmp.mp4";
+		return getExternalPath() + ".f" + new Random().nextLong() + "-video.mp4";
 	}
 
 }

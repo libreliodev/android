@@ -726,7 +726,6 @@ public class MuPDFActivity extends BaseActivity {
 			docView.post(new Runnable() {
 				public void run() {
 					for(LinkInfo link : autoLinks){
-						Log.d(TAG, "RRRRRRRRRRRR " + link);
 						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
