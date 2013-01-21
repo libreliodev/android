@@ -68,7 +68,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private String videoFileName;
 	private boolean transition = true;
 
-	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
+	public MediaHolder(Context context, LinkInfo linkInfo, String basePath,boolean isRunOnFull) throws IllegalStateException{
 		super(context);
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.uri;
@@ -80,6 +80,9 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		}
 
 		boolean fullScreen = linkInfo.isFullScreen();
+		if(isRunOnFull){
+			fullScreen = false;
+		}
 
 		if (linkInfo.isExternal()) {
 			if (linkInfo.isImageFormat()) {

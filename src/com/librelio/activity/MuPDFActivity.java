@@ -729,7 +729,7 @@ public class MuPDFActivity extends BaseActivity {
 						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
-							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);
+							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath,false);
 							pageView.addMediaHolder(mediaHolder, link.uri);
 							pageView.addView(mediaHolder);
 							mediaHolder.setVisibility(View.VISIBLE);
