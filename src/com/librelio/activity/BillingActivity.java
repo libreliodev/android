@@ -79,7 +79,7 @@ public class BillingActivity extends BaseActivity {
 	 *	android.test.refunded
 	 *	android.test.item_unavailable
 	 */
-	private static final String TEST_PRODUCT_ID = "android.test.refunded";
+	private static final String TEST_PRODUCT_ID = "android.test.purchased";
 	
 	private static final String PARAM_PRODUCT_ID = "@product_id";
 	private static final String PARAM_DATA = "@data";
@@ -114,6 +114,9 @@ public class BillingActivity extends BaseActivity {
 	private Button subsCode;
 
 	private IInAppBillingService billingService;
+	
+	private String ownedItemSignature = "";
+	private String ownedItemPurshaseData = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -245,7 +248,14 @@ public class BillingActivity extends BaseActivity {
 							Log.d(TAG, productId + " already purchased? " + s);
 						}
 						if(ownedSkus.contains(productId)){
-							onDownloadAction();
+							int idx = ownedSkus.indexOf(productId);
+							ArrayList<String> purchaseDataList = 
+									ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
+							ArrayList<String> signatureList = 
+								      ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
+							ownedItemPurshaseData = purchaseDataList.get(idx);
+							ownedItemSignature = signatureList.get(idx);
+							onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
 							finish();
 							return;
 						}
@@ -346,11 +356,7 @@ public class BillingActivity extends BaseActivity {
 	protected void onDownloadAction(String dataResponse, String signatureResponse) {
 		new DownloadFromTempURLTask().execute(buildVerifyQuery(dataResponse, signatureResponse));
 	}
-
-	protected void onDownloadAction() {
-		new DownloadFromTempURLTask().execute(buildVerifyQuery("", ""));
-	}
-
+	
 	private OnClickListener getBuyOnClick(){
 		return new OnClickListener() {
 			@Override
@@ -477,10 +483,12 @@ public class BillingActivity extends BaseActivity {
 	}
 
 	private class PurchaseTask extends AsyncTask<String, String, Bundle>{
-
+		private Bundle ownedItems;
+		
 		@Override
 		protected Bundle doInBackground(String... params) {
 			try {
+				ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 				if (TEST_MODE) {
 					productId = TEST_PRODUCT_ID;
 				}
@@ -509,7 +517,9 @@ public class BillingActivity extends BaseActivity {
 			}
 			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
 				Log.d(TAG, productId + " ITEM_ALREADY_OWNED ");
-				onDownloadAction();
+				if(ownedItemPurshaseData!=""&ownedItemSignature!=""){
+					onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
+				}
 				return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
 				PendingIntent pendingIntent = result.getParcelable("BUY_INTENT");
