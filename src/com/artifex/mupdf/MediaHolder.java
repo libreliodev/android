@@ -51,10 +51,12 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public static final String URI_STRING_KEY = "uri_string_key";
 	public static final String BASE_PATH_KEY = "base_path_key";
 	public static final String AUTO_PLAY_KEY = "auto_play_key";
+	public static final String TRANSITION_KEY = "transition_key";
+	public static final String BG_COLOR_KEY = "bg_color_key";
+	public static final String FULL_PATH_KEY = "full_path_key";
+	public static final String PLAY_DELAY_KEY = "play_delay_key";
 
 	private LinkInfo linkInfo;
-
-	private int autoPlayDelay;
 	private Handler autoPlayHandler;
 
 	private VideoView videoView;
@@ -66,9 +68,14 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private OnClickListener listener = null;
 	private SurfaceHolder holder;
 	private String videoFileName;
+	
+	private int autoPlayDelay;
 	private boolean transition = true;
+	private boolean autoPlay;
+	private int bgColor;
+	private String fullPath;
 
-	public MediaHolder(Context context, LinkInfo linkInfo, String basePath,boolean isRunOnFull) throws IllegalStateException{
+	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
 		super(context);
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.uri;
@@ -80,12 +87,29 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		}
 
 		boolean fullScreen = linkInfo.isFullScreen();
-		if(isRunOnFull){
-			fullScreen = false;
-		}
 
 		if (linkInfo.isExternal()) {
 			if (linkInfo.isImageFormat()) {
+				autoPlay = linkInfo.isAutoPlay();
+				autoPlayDelay = 2000;
+				if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
+					autoPlayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
+					autoPlay = true;
+				}
+				bgColor = Color.BLACK;
+				if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
+					bgColor = Uri.parse(uriString).getQueryParameter("wabgcolor").equals("white") ?
+							Color.WHITE : Color.BLACK;
+				}
+				
+				if(Uri.parse(uriString).getQueryParameter("watransition") != null) {
+					transition = !Uri.parse(uriString).getQueryParameter("watransition").equals("none");
+					autoPlayDelay = 1000;
+					Log.d(TAG,"transition = "+transition);
+				}
+				//
+				fullPath = basePath + Uri.parse(uriString).getPath();
+				Log.d(TAG, "exist file " + fullPath + "? " + new File(fullPath).exists());
 				if (fullScreen) {
 					onPlaySlideOutside(basePath);
 				} else {
@@ -204,33 +228,17 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	protected void onPlaySlideOutside(String basePath) {
 		Log.d(TAG, "onPlaySlideOutside " + basePath + ", linkInfo = " + linkInfo);
 		Intent intent = new Intent(getContext(), SlideShowActivity.class);
-		intent.putExtra(MuPDFPageView.PATH_KEY, basePath);
-		intent.putExtra(MuPDFPageView.LINK_URI_KEY, uriString);
+		intent.putExtra(AUTO_PLAY_KEY, autoPlay);
+		intent.putExtra(TRANSITION_KEY, transition);
+		intent.putExtra(BG_COLOR_KEY,bgColor);
+		intent.putExtra(PLAY_DELAY_KEY,autoPlayDelay);
+		intent.putExtra(FULL_PATH_KEY,fullPath);
 		getContext().startActivity(intent);
 	}
 
 	protected void onPlaySlideInside(String basePath) {
 		Log.d(TAG, "onPlaySlideInside " + basePath + ", linkInfo = " + linkInfo);
-		boolean autoPlay = linkInfo.isAutoPlay();
-		autoPlayDelay = 2000;
-		if(Uri.parse(uriString).getQueryParameter("wadelay") != null) {
-			autoPlayDelay = Integer.valueOf(Uri.parse(uriString).getQueryParameter("wadelay"));
-			autoPlay = true;
-		}
-		int bgColor = Color.BLACK;
-		if(Uri.parse(uriString).getQueryParameter("wabgcolor") != null) {
-			bgColor = Uri.parse(uriString).getQueryParameter("wabgcolor").equals("white") ?
-					Color.WHITE : Color.BLACK;
-		}
 		
-		if(Uri.parse(uriString).getQueryParameter("watransition") != null) {
-			transition = !Uri.parse(uriString).getQueryParameter("watransition").equals("none");
-			autoPlayDelay = 1000;
-			Log.d(TAG,"transition = "+transition);
-		}
-		//
-		final String fullPath = basePath + Uri.parse(uriString).getPath();
-		Log.d(TAG, "exist file " + fullPath + "? " + new File(fullPath).exists());
 		imagePager = new ImagePager(getContext(), fullPath, transition, (linkInfo.right - linkInfo.left));
 		post(new Runnable() {
 			@Override

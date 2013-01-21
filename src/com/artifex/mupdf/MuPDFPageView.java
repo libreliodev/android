@@ -63,7 +63,7 @@ public class MuPDFPageView extends PageView {
 		if (linkInfo.isMediaURI()) {
 			try {
 				final String basePath = muPdfCore.getFileDirectory();
-				MediaHolder h = new MediaHolder(getContext(), linkInfo, basePath,false);
+				MediaHolder h = new MediaHolder(getContext(), linkInfo, basePath);
 				h.setVisibility(View.VISIBLE);
 				this.mediaHolders.put(uriString, h);
 				addView(h);
