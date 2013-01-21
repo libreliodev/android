@@ -210,6 +210,10 @@ public class MuPDFActivity extends BaseActivity {
 				if (core == null){
 					return;
 				} 
+				MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
+				if(pageView!=null){
+					pageView.cleanRunningLinkList();
+				}
 				new ActivateAutoLinks().safeExecute(i);
 				super.onMoveToChild(view, i);
 			}

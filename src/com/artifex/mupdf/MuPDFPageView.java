@@ -1,5 +1,6 @@
 package com.artifex.mupdf;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,10 +22,13 @@ public class MuPDFPageView extends PageView {
 	
 	private final MuPDFCore muPdfCore;
 	private HashMap<String, FrameLayout> mediaHolders = new HashMap<String, FrameLayout>();
+	
+	private ArrayList<String> runningLinks;
 
 	public MuPDFPageView(Context c, MuPDFCore muPdfCore, Point parentSize) {
 		super(c, parentSize);
 		this.muPdfCore = muPdfCore;
+		runningLinks = new ArrayList<String>();
 	}
 
 	public int hitLinkPage(float x, float y) {
@@ -49,7 +53,13 @@ public class MuPDFPageView extends PageView {
 
 		if (uriString == null)
 			return null;
-
+		if(runningLinks.contains(uriString)){
+			Log.d(TAG,"Already running link: "+uriString);
+			return uriString;
+		} else {
+			runningLinks.add(uriString);
+		}
+		
 		LinkInfo[] links = muPdfCore.getPageLinks(getPage());
 		if (links == null)
 			return null;
@@ -154,6 +164,13 @@ public class MuPDFPageView extends PageView {
 		}
 	}
 
+	public void addMediaHolder(MediaHolder h,String uriString){
+		this.mediaHolders.put(uriString, h);
+	}
+	
+	public void cleanRunningLinkList(){
+		runningLinks.clear();
+	}
 	@Override
 	protected void drawPage(Bitmap bm, int sizeX, int sizeY, int patchX,
 			int patchY, int patchWidth, int patchHeight) {
@@ -173,9 +190,5 @@ public class MuPDFPageView extends PageView {
 
 	protected LinkInfo[] getExternalLinkInfo() {
 		return muPdfCore.getPageURIs(mPageNumber);
-	}
-	
-	public void addMediaHolder(MediaHolder h,String uriString){
-		this.mediaHolders.put(uriString, h);
-	}
+	}	
 }
