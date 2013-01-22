@@ -3,9 +3,6 @@ package com.artifex.mupdf.view;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import com.artifex.mupdf.LinkInfo;
-
-
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -18,10 +15,12 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Scroller;
-import android.widget.TableLayout;
+
+import com.artifex.mupdf.LinkInfo;
 
 public class ReaderView extends AdapterView<Adapter>
                         implements GestureDetector.OnGestureListener,
+                        		   GestureDetector.OnDoubleTapListener,
                                    ScaleGestureDetector.OnScaleGestureListener,
                                    Runnable {
 	private static final int  MOVING_DIAGONALLY = 0;
@@ -219,7 +218,37 @@ public class ReaderView extends AdapterView<Adapter>
 		return true;
 	}
 
+	@Override
 	public void onLongPress(MotionEvent e) {
+	}
+
+	@Override
+	public boolean onSingleTapConfirmed(MotionEvent e) {
+		return false;
+	}
+	
+	@Override
+	public boolean onDoubleTap(MotionEvent e) {
+		float previousScale = mScale;
+		mScale += mScale + 1f;
+		float factor = mScale/previousScale;
+		
+		View v = mChildViews.get(mCurrent);
+		if (v != null) {
+			// Work out the focus point relative to the view top left
+			int viewFocusX = (int)e.getX() - (v.getLeft() + mXScroll);
+			int viewFocusY = (int)e.getY() - (v.getTop() + mYScroll);
+			// Scroll to maintain the focus point
+			mXScroll += viewFocusX - viewFocusX * factor;
+			mYScroll += viewFocusY - viewFocusY * factor;
+			requestLayout();
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onDoubleTapEvent(MotionEvent e) {
+		return false;
 	}
 
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,

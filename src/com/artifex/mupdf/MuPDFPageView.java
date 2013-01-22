@@ -70,7 +70,7 @@ public class MuPDFPageView extends PageView {
 				break;
 			}
 		}
-		if (linkInfo.isMediaURI()) {
+		if (null != linkInfo && linkInfo.isMediaURI()) {
 			try {
 				final String basePath = muPdfCore.getFileDirectory();
 				MediaHolder h = new MediaHolder(getContext(), linkInfo, basePath);

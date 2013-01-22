@@ -70,7 +70,7 @@ public abstract class DocumentReaderView extends ReaderView {
 		showButtonsDisabled = true;
 		return super.onScaleBegin(d);
 	}
-
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
