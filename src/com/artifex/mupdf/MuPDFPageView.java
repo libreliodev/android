@@ -70,7 +70,15 @@ public class MuPDFPageView extends PageView {
 				break;
 			}
 		}
-		if (null != linkInfo && linkInfo.isMediaURI()) {
+		
+		if(runningLinks.contains(linkInfo.uri)){
+			Log.d(TAG,"Already running link: "+linkInfo.uri);
+			return linkInfo.uri;
+		} else if(!linkInfo.isFullScreen()){
+			runningLinks.add(linkInfo.uri);
+		}
+		
+		if (linkInfo.isMediaURI()) {
 			try {
 				final String basePath = muPdfCore.getFileDirectory();
 				MediaHolder h = new MediaHolder(getContext(), linkInfo, basePath);

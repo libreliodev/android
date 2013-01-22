@@ -394,7 +394,7 @@ public class ReaderView extends AdapterView<Adapter>
 				int ai = childIndices[i];
 				if (ai < mCurrent - 1 || ai > mCurrent + 1) {
 					View v = mChildViews.get(ai);
-					onNotInUse(v);
+					//onNotInUse(v);
 					mViewCache.add(v);
 					removeViewInLayout(v);
 					mChildViews.remove(ai);
@@ -408,7 +408,7 @@ public class ReaderView extends AdapterView<Adapter>
 			int numChildren = mChildViews.size();
 			for (int i = 0; i < numChildren; i++) {
 				View v = mChildViews.valueAt(i);
-				onNotInUse(v);
+				//onNotInUse(v);
 				mViewCache.add(v);
 				removeViewInLayout(v);
 			}

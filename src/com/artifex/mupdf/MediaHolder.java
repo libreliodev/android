@@ -6,6 +6,7 @@ package com.artifex.mupdf;
 import java.io.File;
 import java.io.IOException;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -17,9 +18,13 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -30,6 +35,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.librelio.activity.SlideShowActivity;
@@ -56,9 +62,30 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public static final String FULL_PATH_KEY = "full_path_key";
 	public static final String PLAY_DELAY_KEY = "play_delay_key";
 
+	private Context context;
+	private String basePath;
 	private LinkInfo linkInfo;
 	private Handler autoPlayHandler;
-
+	private GestureDetector gestureDetector;
+	
+	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+        	videoView.stopPlayback();
+        	onPlayVideoOutside(basePath);
+            return true;
+        }
+    }
+	
+	@Override
+    public boolean onTouchEvent(MotionEvent e) {
+        return gestureDetector.onTouchEvent(e);
+    }
+	
 	private VideoView videoView;
 	private WebView mWebView;
 	private ImagePager imagePager;
@@ -77,10 +104,12 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 
 	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
 		super(context);
+		this.basePath = basePath;
+		this.context = context;
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.uri;
+		gestureDetector = new GestureDetector(new GestureListener());
 		
-
 		if(uriString == null) {
 			Log.w(TAG, "URI сan not be empty! basePath = " + basePath);
 			return;

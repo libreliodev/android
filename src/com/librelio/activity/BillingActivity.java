@@ -517,8 +517,10 @@ public class BillingActivity extends BaseActivity {
 			}
 			if(response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED){
 				Log.d(TAG, productId + " ITEM_ALREADY_OWNED ");
-				if(ownedItemPurshaseData!=""&ownedItemSignature!=""){
-					onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
+				if(ownedItemPurshaseData!=null&ownedItemSignature!=null){
+					if((!ownedItemPurshaseData.equals(""))&(!ownedItemSignature.equals(""))){
+						onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
+					}
 				}
 				return;
 			} else if(response == BILLING_RESPONSE_RESULT_OK){
