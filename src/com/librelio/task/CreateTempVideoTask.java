@@ -14,8 +14,12 @@ import android.util.Log;
 public class CreateTempVideoTask extends AsyncTask<String, Void, String> {
 	private static final String TAG = "CreateTempVideoTask";
 
+	public static final String IOEXEPTION_CODE = "io_exeption_code"; 
+	private static ErrorObserver errorObserver;
+	
 	private final String videoTempPath;
 	private final String basePath;
+	
 	
 
 	public CreateTempVideoTask(String videoTempPath, String basePath) {
@@ -23,6 +27,14 @@ public class CreateTempVideoTask extends AsyncTask<String, Void, String> {
 		this.basePath = basePath;
 	}
 
+	public interface ErrorObserver{
+		void onIOExeption();
+	}
+	
+	public static void setErrorObserver(ErrorObserver e){
+		errorObserver = e;
+	}
+	
 //	public CreateTempVideoTask(String videoTempPath) {
 //		this(videoTempPath, null);
 //	}
@@ -70,12 +82,23 @@ public class CreateTempVideoTask extends AsyncTask<String, Void, String> {
 			return temPath;
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, "Create temp video file failed", e);
+			publishProgress(null);
+			return IOEXEPTION_CODE;
 		} catch (IOException e) {
 			Log.e(TAG, "Create temp video file failed", e);
+			publishProgress(null);
+			return IOEXEPTION_CODE;
 		}
-		return null;
 	}
 
+	@Override
+	protected void onProgressUpdate(Void... values) {
+		if(errorObserver!=null){
+			errorObserver.onIOExeption();
+		}
+		super.onProgressUpdate(values);
+	}
+	
 	private String getUrlFromLocalhost(String basePath, String uriString) {
 		String local = "http://localhost/";
 		int startIdx = local.length();

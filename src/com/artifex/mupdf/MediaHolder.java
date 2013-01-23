@@ -212,9 +212,13 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 
 		final IBaseContext baseContext = ((IBaseContext)getContext());
 		new CreateTempVideoTask(baseContext.getVideoTempPath(), basePath){
+			protected void onPreExecute() {
+				waitObserver.onWait();
+			};
 			@Override
 			protected void onPostExecute(String videoPath) {
-				if (isCancelled()) {
+				waitObserver.onCancel();
+				if (isCancelled() || videoPath == null || videoPath.equals(IOEXEPTION_CODE)) {
 					return;
 				}
 				videoView.setVideoPath(videoPath);
@@ -242,7 +246,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			@Override
 			protected void onPostExecute(String videoPath) {
 				waitObserver.onCancel();
-				if (isCancelled()) {
+				if (isCancelled() || videoPath == null || videoPath.equals(IOEXEPTION_CODE)) {
 					return;
 				}
 				Uri data = Uri.parse(videoPath);

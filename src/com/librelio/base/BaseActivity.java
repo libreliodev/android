@@ -36,6 +36,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	protected static final int CONNECTION_ALERT = 1;
 	protected static final int SERVER_ALERT = 2;
 	protected static final int DOWNLOAD_ALERT = 3;
+	protected static final int IO_EXEPTION = 4;
 
 
 
@@ -283,6 +284,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	
 	protected void showAlertDialog(int id){
 		int msg_id = 0;
+		final int fId = id;
 		switch (id) {
 		case CONNECTION_ALERT:{
 			msg_id = R.string.connection_failed;
@@ -295,6 +297,9 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 		case DOWNLOAD_ALERT:{
 			msg_id = R.string.download_failed_please_check_your_connection;
 		}
+		case IO_EXEPTION:{
+			msg_id = R.string.no_space_on_device;
+		}
 		}
 		String message = getResources().getString(msg_id);
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -304,7 +309,9 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 			.setPositiveButton(R.string.ok, new android.content.DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					finish();
+					if(fId!=IO_EXEPTION){
+						finish();
+					}
 				}
 			});
  		AlertDialog alertDialog = alertDialogBuilder.create();
