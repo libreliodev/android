@@ -7,12 +7,14 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Scroller;
@@ -230,8 +232,9 @@ public class ReaderView extends AdapterView<Adapter>
 	
 	@Override
 	public boolean onDoubleTap(MotionEvent e) {
+		
 		float previousScale = mScale;
-		mScale += (mScale == 1f) ? 3f : -3f;
+		mScale += (mScale == 1f) ? 2f : -2f;
 		float factor = mScale/previousScale;
 		
 		View v = mChildViews.get(mCurrent);
@@ -244,6 +247,7 @@ public class ReaderView extends AdapterView<Adapter>
 			mYScroll += viewFocusY - viewFocusY * factor;
 			requestLayout();
 		}
+		
 		return true;
 	}
 
