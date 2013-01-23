@@ -6,7 +6,6 @@ package com.artifex.mupdf;
 import java.io.File;
 import java.io.IOException;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -18,10 +17,8 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,7 +32,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
-import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.librelio.activity.SlideShowActivity;
@@ -61,31 +57,15 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public static final String BG_COLOR_KEY = "bg_color_key";
 	public static final String FULL_PATH_KEY = "full_path_key";
 	public static final String PLAY_DELAY_KEY = "play_delay_key";
+	
+	private static WaitDialogObserver waitObserver;
 
 	private Context context;
 	private String basePath;
 	private LinkInfo linkInfo;
 	private Handler autoPlayHandler;
 	private GestureDetector gestureDetector;
-	
-	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-        	videoView.stopPlayback();
-        	onPlayVideoOutside(basePath);
-            return true;
-        }
-    }
-	
-	@Override
-    public boolean onTouchEvent(MotionEvent e) {
-        return gestureDetector.onTouchEvent(e);
-    }
-	
+		
 	private VideoView videoView;
 	private WebView mWebView;
 	private ImagePager imagePager;
@@ -160,6 +140,28 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		}
 	}
 
+	public static void setWaitObserver(WaitDialogObserver observer){
+		waitObserver = observer;
+	}
+	
+	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+        	videoView.stopPlayback();
+        	onPlayVideoOutside(basePath);
+            return true;
+        }
+    }
+	
+	public interface WaitDialogObserver{
+		void onWait();
+		void onCancel();
+	}
+	
 	@Override
 	public void onPrepared(MediaPlayer pMp) {}
 	@Override
@@ -183,6 +185,11 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			videoView.stopPlayback();
 		}
 	}
+	
+	@Override
+    public boolean onTouchEvent(MotionEvent e) {
+        return gestureDetector.onTouchEvent(e);
+    }
 
 	@Override
 	public void surfaceCreated(SurfaceHolder pHolder) {
@@ -229,8 +236,12 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		Log.d(TAG, "onPlayVideoOutside " + basePath + ", linkInfo = " + linkInfo);
 		final IBaseContext baseContext = ((IBaseContext)getContext());
 		new CreateTempVideoTask(baseContext.getVideoTempPath(), basePath){
+			protected void onPreExecute() {
+				waitObserver.onWait();
+			};
 			@Override
 			protected void onPostExecute(String videoPath) {
+				waitObserver.onCancel();
 				if (isCancelled()) {
 					return;
 				}

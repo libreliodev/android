@@ -40,6 +40,7 @@ import android.widget.ViewSwitcher;
 
 import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MediaHolder;
+import com.artifex.mupdf.MediaHolder.WaitDialogObserver;
 import com.artifex.mupdf.MuPDFCore;
 import com.artifex.mupdf.MuPDFPageAdapter;
 import com.artifex.mupdf.MuPDFPageView;
@@ -59,10 +60,11 @@ import com.librelio.view.ProgressDialogX;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
-public class MuPDFActivity extends BaseActivity {
+public class MuPDFActivity extends BaseActivity implements WaitDialogObserver{
 	private static final String TAG = "MuPDFActivity";
 
 	private static final int SEARCH_PROGRESS_DELAY = 200;
+	private static final int WAIT_DIALOG = 0;
 	private static final String FILE_NAME = "FileName";
 
 	private MuPDFCore core;
@@ -74,6 +76,7 @@ public class MuPDFActivity extends BaseActivity {
 	private boolean      mTopBarIsSearch;
 
 	private WeakReference<SearchTask> searchTask;
+	private ProgressDialog dialog;
 
 	private AlertDialog.Builder alertBuilder;
 	private ReaderView   docView;
@@ -118,8 +121,9 @@ public class MuPDFActivity extends BaseActivity {
 		}
 
 		createUI(savedInstanceState);
+		MediaHolder.setWaitObserver(this);
 	}
-
+	
 	private void requestPassword(final Bundle savedInstanceState) {
 		mPasswordView = new EditText(this);
 		mPasswordView.setInputType(EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
@@ -641,6 +645,21 @@ public class MuPDFActivity extends BaseActivity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+	@Override
+	public void onWait() {
+		dialog = new ProgressDialog(this);
+        dialog.setMessage(getResources().getString(R.string.loading));
+        dialog.setIndeterminate(true);
+        dialog.show();
+	}
+
+	@Override
+	public void onCancel() {
+		if(dialog!=null){
+			dialog.cancel();
+		}
+	}
+
 	private MuPDFCore openFile(String path) {
 		int lastSlashPos = path.lastIndexOf('/');
 		fileName = new String(lastSlashPos == -1
@@ -831,5 +850,4 @@ public class MuPDFActivity extends BaseActivity {
 		}
 	}
 
-	
 }

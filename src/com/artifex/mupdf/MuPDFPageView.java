@@ -53,12 +53,6 @@ public class MuPDFPageView extends PageView {
 
 		if (uriString == null)
 			return null;
-		if(runningLinks.contains(uriString)){
-			Log.d(TAG,"Already running link: "+uriString);
-			return uriString;
-		} else {
-			runningLinks.add(uriString);
-		}
 		
 		LinkInfo[] links = muPdfCore.getPageLinks(getPage());
 		if (links == null)
