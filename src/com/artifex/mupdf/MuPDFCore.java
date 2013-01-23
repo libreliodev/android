@@ -2,8 +2,8 @@ package com.artifex.mupdf;
 
 import java.io.File;
 
-
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -174,7 +174,7 @@ public class MuPDFCore {
 					canvas.drawColor(Color.BLACK);
 					if (leftBmWidth > 0) {
 						Bitmap bm = Bitmap.createBitmap(leftBmWidth, patchH,
-								Bitmap.Config.ARGB_8888);
+								getBitmapConfig());
 						drawPageSynchrinized(page, bm, leftPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, leftBmWidth, patchH);
@@ -186,7 +186,7 @@ public class MuPDFCore {
 					canvas.drawColor(Color.BLACK);
 					if (rightBmWidth > 0) {
 						Bitmap bm = Bitmap.createBitmap(rightBmWidth, patchH,
-								Bitmap.Config.ARGB_8888);
+								getBitmapConfig());
 						drawPageSynchrinized(page, bm, rightPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, rightBmWidth, patchH);
@@ -200,7 +200,7 @@ public class MuPDFCore {
 					Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
 					if (leftBmWidth > 0) {
 						Bitmap leftBm = Bitmap.createBitmap(leftBmWidth,
-								patchH, Bitmap.Config.ARGB_8888);
+								patchH, getBitmapConfig());
 						drawPageSynchrinized(page, leftBm, leftPageW, pageH, patchX, patchY,
 								leftBmWidth, patchH);
 						canvas.drawBitmap(leftBm, 0, 0, paint);
@@ -208,7 +208,7 @@ public class MuPDFCore {
 					}
 					if (rightBmWidth > 0) {
 						Bitmap rightBm = Bitmap.createBitmap(rightBmWidth,
-								patchH, Bitmap.Config.ARGB_8888);
+								patchH, getBitmapConfig());
 						drawPageSynchrinized(page + 1, rightBm, rightPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, rightBmWidth, patchH);
@@ -321,6 +321,10 @@ public class MuPDFCore {
 	public int getDisplayPages() {
 		return displayPages;
 	}
+	
+	private Config getBitmapConfig(){
+		return Config.RGB_565;
+	} 
 
 	/**
 	 * @return
