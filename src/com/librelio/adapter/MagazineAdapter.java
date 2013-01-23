@@ -5,9 +5,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
