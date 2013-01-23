@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
 import com.librelio.model.Magazine;
+import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter{
@@ -85,7 +88,11 @@ public class MagazineAdapter extends BaseAdapter{
 		holder.subtitle.setText(currentMagazine.getSubtitle());
 		
 		String imagePath = currentMagazine.getPngPath();
-		holder.thumbnail.setImageBitmap(BitmapFactory.decodeFile(imagePath));
+
+		holder.thumbnail.setImageBitmap(
+				SystemHelper.decodeSampledBitmapFromFile(imagePath,
+						(int) context.getResources().getDimension(R.dimen.preview_image_height), 
+						(int) context.getResources().getDimension(R.dimen.preview_image_width)));
 		
 		if(hasTestMagazine && currentMagazine.isFake()){
 			holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
