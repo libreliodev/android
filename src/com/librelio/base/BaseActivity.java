@@ -10,8 +10,10 @@ import java.util.Random;
 
 import org.netcook.android.tools.CrashCatcherActivity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -31,6 +33,11 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 
 	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
 	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
+	protected static final int CONNECTION_ALERT = 1;
+	protected static final int SERVER_ALERT = 2;
+	protected static final int DOWNLOAD_ALERT = 3;
+
+
 
 	private SharedPreferences sharedPreferences;
 
@@ -272,5 +279,35 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 
 	protected boolean hasTestMagazine() {
 		return getResources().getBoolean(R.bool.enable_test_magazine);
+	}
+	
+	protected void showAlertDialog(int id){
+		int msg_id = 0;
+		switch (id) {
+		case CONNECTION_ALERT:{
+			msg_id = R.string.connection_failed;
+			break;
+		}
+		case SERVER_ALERT:{
+			msg_id = R.string.server_error;
+			break;
+		}
+		case DOWNLOAD_ALERT:{
+			msg_id = R.string.download_failed_please_check_your_connection;
+		}
+		}
+		String message = getResources().getString(msg_id);
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+		alertDialogBuilder
+			.setMessage(message)
+			.setCancelable(false)
+			.setPositiveButton(R.string.ok, new android.content.DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			});
+ 		AlertDialog alertDialog = alertDialogBuilder.create();
+ 		alertDialog.show();
 	}
 }

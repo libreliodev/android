@@ -97,9 +97,6 @@ public class BillingActivity extends BaseActivity {
 	private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
 	private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
 	
-	private static final int CONNECTION_ALERT = 1;
-	private static final int SERVER_ALERT = 2;
-
 	private String fileName;
 	private String title;
 	private String subtitle;
@@ -123,7 +120,7 @@ public class BillingActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wait_bar);
 		if(!isNetworkConnected()){
-			showDialog(CONNECTION_ALERT);
+			showAlertDialog(CONNECTION_ALERT);
 		} else {
 			bindService(
 					new Intent(
@@ -252,11 +249,14 @@ public class BillingActivity extends BaseActivity {
 							ArrayList<String> purchaseDataList = 
 									ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
 							ArrayList<String> signatureList = 
-								      ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
-							ownedItemPurshaseData = purchaseDataList.get(idx);
-							ownedItemSignature = signatureList.get(idx);
+								    ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
+							if(purchaseDataList!=null){
+								ownedItemPurshaseData = purchaseDataList.get(idx);
+							}
+							if(signatureList!=null){
+								ownedItemSignature = signatureList.get(idx);
+							}
 							onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
-							finish();
 							return;
 						}
 					}
@@ -311,38 +311,12 @@ public class BillingActivity extends BaseActivity {
 				} catch (JSONException e) {
 					Log.e(TAG, "Failed to parse purchase data.", e);
 				}
+			} else {
+				finish();
 			}
+		} else {
+			finish();
 		}
-		finish();
-	}
-	
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-		case CONNECTION_ALERT:{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			String message = getResources().getString(R.string.connection_failed);
-			builder.setMessage(message).setPositiveButton(R.string.ok, new android.content.DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					finish();
-				}
-			});
-			return builder.create();
-		}
-		case SERVER_ALERT:{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			String message = getResources().getString(R.string.server_error);
-			builder.setMessage(message).setPositiveButton(R.string.ok, new android.content.DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					//finish();
-				}
-			});
-			return builder.create();
-		}
-		}
-		return super.onCreateDialog(id);
 	}
 
 	@Override
@@ -433,6 +407,7 @@ public class BillingActivity extends BaseActivity {
 			String tempURL = null;
 			if (null == response) {
 				//TODO: @Niko need check for this situation
+				showAlertDialog(DOWNLOAD_ALERT);
 				Log.w(TAG, "download response was null");
 				return;
 			}
@@ -467,8 +442,9 @@ public class BillingActivity extends BaseActivity {
 				}
 			}
 			if(tempURL == null){
-				Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
-				finish();
+				//Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
+				showAlertDialog(DOWNLOAD_ALERT);
+				
 				return;
 			}
 			Intent intent = new Intent(getContext(), DownloadActivity.class);
