@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -230,7 +231,7 @@ public class ReaderView extends AdapterView<Adapter>
 	@Override
 	public boolean onDoubleTap(MotionEvent e) {
 		float previousScale = mScale;
-		mScale += mScale + 1f;
+		mScale += (mScale == 1f) ? 3f : -3f;
 		float factor = mScale/previousScale;
 		
 		View v = mChildViews.get(mCurrent);
