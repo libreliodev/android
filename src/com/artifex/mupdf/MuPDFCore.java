@@ -323,7 +323,7 @@ public class MuPDFCore {
 	}
 	
 	private Config getBitmapConfig(){
-		return Config.RGB_565;
+		return Config.ARGB_8888;
 	} 
 
 	/**
