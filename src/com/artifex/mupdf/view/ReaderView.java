@@ -6,15 +6,14 @@ import java.util.NoSuchElementException;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AnimationSet;
-import android.view.animation.ScaleAnimation;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Scroller;
@@ -399,7 +398,9 @@ public class ReaderView extends AdapterView<Adapter>
 				int ai = childIndices[i];
 				if (ai < mCurrent - 1 || ai > mCurrent + 1) {
 					View v = mChildViews.get(ai);
-					//onNotInUse(v);
+					if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB){
+						onNotInUse(v);
+					}
 					mViewCache.add(v);
 					removeViewInLayout(v);
 					mChildViews.remove(ai);
@@ -413,7 +414,9 @@ public class ReaderView extends AdapterView<Adapter>
 			int numChildren = mChildViews.size();
 			for (int i = 0; i < numChildren; i++) {
 				View v = mChildViews.valueAt(i);
-				//onNotInUse(v);
+				if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB){
+					onNotInUse(v);
+				}
 				mViewCache.add(v);
 				removeViewInLayout(v);
 			}
