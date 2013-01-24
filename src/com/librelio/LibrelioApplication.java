@@ -70,23 +70,11 @@ public class LibrelioApplication extends Application {
 	}
 
 	public static String getClientName(Context context){
-		ApplicationInfo ai = null;
-		try {
-			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
-		} catch (NameNotFoundException e) {
-			Log.e(TAG,"Get mata-data error(getClientName)!!!",e);
-		}
-		return (String)ai.metaData.get(META_DATA_CLIENT_NAME_KEY);
+		return context.getResources().getString(R.string.client_name);
 	}
 	
 	public static String getMagazineName(Context context){
-		ApplicationInfo ai = null;
-		try {
-			ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),PackageManager.GET_META_DATA);
-		} catch (NameNotFoundException e) {
-			Log.e(TAG,"Get mata-data error(getMagazineName)!!!",e);
-		}
-		return (String)ai.metaData.get(META_DATA_MAGAZINE_NAME_KEY);
+		return context.getResources().getString(R.string.magazine_name);
 	}
 	
 	public static String getUrlString(Context context, String fileName){
