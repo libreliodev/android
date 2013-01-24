@@ -88,6 +88,7 @@ public class DownloadActivity extends BaseActivity {
 	private Magazine magazine;
 	private InputStream input;
 	private OutputStream output;
+	private boolean rotationWasDisabled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -133,13 +134,21 @@ public class DownloadActivity extends BaseActivity {
 
 	@Override
 	protected void onResume() {
-		enableRotation(false);
+		int rotationEnable = android.provider.Settings.System.getInt(
+				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, 1);
+		if(rotationEnable == 0){
+			rotationWasDisabled = true;
+		} else {
+			enableRotation(false);
+		}
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
-		enableRotation(true);
+		if(!rotationWasDisabled){
+			enableRotation(true);
+		}
 		super.onPause();
 	}
 

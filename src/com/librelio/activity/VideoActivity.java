@@ -45,6 +45,7 @@ public class VideoActivity extends BaseActivity {
 	private VideoView video;
 	private String path;
 	private int position;
+	private boolean rotationWasDisabled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,19 +92,23 @@ public class VideoActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onPause() {
-	    super.onPause();
-	    if(video!=null){
-	    	video.suspend();
-	    }
+	protected void onResume() {
+		int rotationEnable = android.provider.Settings.System.getInt(
+				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, 1);
+		if(rotationEnable == 0){
+			rotationWasDisabled = true;
+		} else {
+			enableRotation(false);
+		}
+		super.onResume();
 	}
 
 	@Override
-	protected void onResume() {
-	    super.onResume();
-	    if(video!=null){
-	    	video.resume();
-	    }
+	protected void onPause() {
+		if(!rotationWasDisabled){
+			enableRotation(true);
+		}
+		super.onPause();
 	}
 
 	@Override
