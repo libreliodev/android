@@ -20,6 +20,7 @@
 package com.librelio.activity;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,47 +41,39 @@ import com.niveales.wind.R;
 public class VideoActivity extends BaseActivity {
 	private static final String TAG = "VideoActivity";
 
+	private MediaController mc;
 	private VideoView video;
-	private String uriString;
-	private String basePath;
+	private String path;
+	private int position;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.d(TAG,"onCreate");
-		uriString = getIntent().getExtras().getString(MediaHolder.URI_STRING_KEY);
-		basePath = getIntent().getExtras().getString(MediaHolder.BASE_PATH_KEY);
-
-		new CreateTempVideoTask(getVideoTempPath(), basePath) {
+		setContentView(R.layout.video_activity_layout);
+		path = getIntent().getExtras().getString(MediaHolder.VIDEO_PATH_KEY);
+		if(getIntent().getExtras().containsKey(MediaHolder.PLAYBACK_POSITION_KEY)){
+			position = getIntent().getExtras().getInt(MediaHolder.PLAYBACK_POSITION_KEY);
+		} else {
+			position = 0;
+		}
+		video = (VideoView)findViewById(R.id.video_frame);
+		video.setVideoPath(path);
+		mc = new MediaController(getContext());
+		video.setMediaController(mc);
+		mc.setAnchorView(video);
+		video.requestFocus();
+		video.post(new Runnable() {			
 			@Override
-			protected void onPreExecute() {
-				setContentView(R.layout.wait_bar);
-			};
-
-			@Override
-			protected void onPostExecute(String videoPath) {
-				if (isCancelled()) {
-					return;
-				}
-				setContentView(R.layout.video_activity_layout);
-				video = (VideoView)findViewById(R.id.video_frame);
-				video.setVideoPath(videoPath);
-				video.post(new Runnable() {
+			public void run() {
+				video.start();
+				video.seekTo(position);
+				mc.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						PlayStopController mc = new PlayStopController(getContext(),video);
-						
-						mc.setAnchorView(video);
-						mc.setMediaPlayer(video);
-						
-						video.setMediaController(mc);
 						mc.show(4000);
 					}
-				});
-				video.requestFocus();
-				video.start();
+				}, 500);
 			}
-		}.execute(uriString);
-		
+		});
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -97,17 +90,24 @@ public class VideoActivity extends BaseActivity {
 		return this;
 	}
 
-	private class PlayStopController extends MediaController {
+	@Override
+	protected void onPause() {
+	    super.onPause();
+	    if(video!=null){
+	    	video.suspend();
+	    }
+	}
 
-		public PlayStopController(Context context, View anchor) {
-			super(context);
-			super.setAnchorView(anchor);
-		}
+	@Override
+	protected void onResume() {
+	    super.onResume();
+	    if(video!=null){
+	    	video.resume();
+	    }
+	}
 
-		@Override
-		public void setAnchorView(View view) {
-			// TODO Auto-generated method stub
-			//super.setAnchorView(view);
-		}
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+	    super.onConfigurationChanged(newConfig);
 	}
 }

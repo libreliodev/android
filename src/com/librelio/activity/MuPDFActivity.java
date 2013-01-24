@@ -653,6 +653,7 @@ public class MuPDFActivity extends BaseActivity implements WaitDialogObserver,Er
 		dialog = new ProgressDialog(this);
         dialog.setMessage(getResources().getString(R.string.loading));
         dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
         dialog.show();
 	}
 

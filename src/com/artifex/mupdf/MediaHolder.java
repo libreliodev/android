@@ -6,6 +6,7 @@ package com.artifex.mupdf;
 import java.io.File;
 import java.io.IOException;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +36,8 @@ import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.librelio.activity.SlideShowActivity;
+import com.librelio.activity.VideoActivity;
+import com.librelio.base.BaseActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.task.CreateTempVideoTask;
 import com.librelio.view.ImagePager;
@@ -57,6 +60,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public static final String BG_COLOR_KEY = "bg_color_key";
 	public static final String FULL_PATH_KEY = "full_path_key";
 	public static final String PLAY_DELAY_KEY = "play_delay_key";
+	public static final String PLAYBACK_POSITION_KEY = "playback_position_key";
+	public static final String VIDEO_PATH_KEY = "video_path_key";
 	
 	private static WaitDialogObserver waitObserver;
 
@@ -81,6 +86,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private boolean autoPlay;
 	private int bgColor;
 	private String fullPath;
+	private int currentPosition = 0;
 
 	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
 		super(context);
@@ -151,8 +157,9 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
         }
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-        	videoView.stopPlayback();
-        	onPlayVideoOutside(basePath);
+        	currentPosition = videoView.getCurrentPosition();
+        	videoView.pause();
+        	continuePlayVide(((BaseActivity)context).getVideoTempPath());
             return true;
         }
     }
@@ -222,14 +229,19 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					return;
 				}
 				videoView.setVideoPath(videoPath);
-				MediaController mc = new MediaController(getContext());
+				final MediaController mc = new MediaController(getContext());
 				mc.setAnchorView(videoView);
 				mc.setMediaPlayer(videoView);
 				videoView.setMediaController(mc);
 				videoView.requestFocus();
 				if (null != getContext()) {
-					mc.show(4000);
 					videoView.start();
+					mc.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							mc.show(4000);
+						}
+					}, 500);
 				}
 			}
 		}.execute(uriString);
@@ -269,6 +281,13 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		}.execute(uriString);
 	}
 
+	protected void continuePlayVide(String path){
+		Intent intent = new Intent(context, VideoActivity.class);
+		intent.putExtra(VIDEO_PATH_KEY, path);
+		intent.putExtra(PLAYBACK_POSITION_KEY, currentPosition);
+		context.startActivity(intent);
+	}
+	
 	protected void onPlaySlideOutside(String basePath) {
 		Log.d(TAG, "onPlaySlideOutside " + basePath + ", linkInfo = " + linkInfo);
 		Intent intent = new Intent(getContext(), SlideShowActivity.class);
