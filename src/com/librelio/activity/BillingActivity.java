@@ -249,7 +249,9 @@ public class BillingActivity extends BaseActivity {
 							ArrayList<String> purchaseDataList = 
 									ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
 							ArrayList<String> signatureList = 
-								    ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE");
+								    ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE_LIST");
+							Log.d(TAG,"[getPurchases] purchaseDataList: "+purchaseDataList);
+							Log.d(TAG,"[getPurchases] signatureList: "+signatureList);
 							if(purchaseDataList!=null){
 								ownedItemPurshaseData = purchaseDataList.get(idx);
 							}
