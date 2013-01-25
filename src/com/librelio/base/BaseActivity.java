@@ -296,9 +296,11 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 		}
 		case DOWNLOAD_ALERT:{
 			msg_id = R.string.download_failed_please_check_your_connection;
+			break;
 		}
 		case IO_EXEPTION:{
 			msg_id = R.string.no_space_on_device;
+			break;
 		}
 		}
 		String message = getResources().getString(msg_id);
