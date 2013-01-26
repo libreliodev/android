@@ -3,9 +3,6 @@ package com.librelio;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,8 +17,6 @@ public class LibrelioApplication extends Application {
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
 
 	private static final String TAG = "LibrelioApplication";
-	private static final String META_DATA_CLIENT_NAME_KEY = "ClientName";
-	private static final String META_DATA_MAGAZINE_NAME_KEY = "MagazineName";
 	private static final String PATH_SEPARATOR = "/";
 	
 //	private static final String SERVER_URL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";

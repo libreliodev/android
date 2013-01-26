@@ -34,12 +34,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
@@ -359,7 +356,7 @@ public class BillingActivity extends BaseActivity {
 				.replace(";", "&")
 				.replace(PARAM_PRODUCT_ID, productId)
 				.replace(PARAM_DATA, Uri.encode(dataResponse))
-				.replace(PARAM_SIGNATURE, signatureResponse)
+				.replace(PARAM_SIGNATURE, Uri.encode(signatureResponse))
 				.replace(PARAM_URLSTRING, 
 						LibrelioApplication.getUrlString(getContext(), fileName));
 		
