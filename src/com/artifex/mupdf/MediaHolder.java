@@ -4,13 +4,16 @@
 package com.artifex.mupdf;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -87,6 +90,9 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private int bgColor;
 	private String fullPath;
 	private int currentPosition = 0;
+	
+	private MediaPlayer mMediaPlayer;
+	private MediaController mediaController;
 
 	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
 		super(context);
@@ -95,6 +101,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.uri;
 		gestureDetector = new GestureDetector(new GestureListener());
+		mediaController = new MediaController(getContext());
+		mMediaPlayer = new MediaPlayer();
 		
 		if(uriString == null) {
 			Log.w(TAG, "URI сan not be empty! basePath = " + basePath);
@@ -169,18 +177,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		void onCancel();
 	}
 	
-	@Override
-	public void onPrepared(MediaPlayer pMp) {}
-	@Override
-	public void onVideoSizeChanged(MediaPlayer pMp, int pWidth, int pHeight) {}
-	@Override
-	public void onCompletion(MediaPlayer pMp) {}
-	@Override
-	public void onBufferingUpdate(MediaPlayer pMp, int pPercent) {}
-	@Override
-	public void surfaceChanged(SurfaceHolder pHolder, int pFormat, int pWidth, int pHeight) {}
-	@Override
-	public void surfaceDestroyed(SurfaceHolder pHolder) {}
+
 
 	public void recycle() {
 		Log.d(TAG,"resycle was called");
@@ -211,41 +208,63 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		listener = l;
 	}
 
+	static int pos = 0;
+	
 	protected void onPlayVideoInside(String basePath) {
 		Log.d(TAG, "onPlayVideoInside " + basePath + ", linkInfo = " + linkInfo);
 		LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.video_activity_layout, this, true);
-		videoView = (VideoView) findViewById(R.id.video_frame);
-
-		final IBaseContext baseContext = ((IBaseContext)getContext());
-		new CreateTempVideoTask(baseContext.getVideoTempPath(), basePath){
-			protected void onPreExecute() {
-				waitObserver.onWait();
-			};
+		inflater.inflate(R.layout.video_activity_layout2, this, true);
+		SurfaceView video = (SurfaceView)findViewById(R.id.surface_frame);
+		video.setOnClickListener(new OnClickListener() {
 			@Override
-			protected void onPostExecute(String videoPath) {
-				waitObserver.onCancel();
-				if (isCancelled() || videoPath == null || videoPath.equals(IOEXEPTION_CODE)) {
-					return;
-				}
-				videoView.setVideoPath(videoPath);
-				final MediaController mc = new MediaController(getContext());
-				mc.setAnchorView(videoView);
-				mc.setMediaPlayer(videoView);
-				videoView.setMediaController(mc);
-				videoView.requestFocus();
-				if (null != getContext()) {
-					videoView.start();
-					mc.postDelayed(new Runnable() {
-						@Override
-						public void run() {
-							mc.show(4000);
-						}
-					}, 500);
+			public void onClick(View v) {
+				if(mMediaPlayer.isPlaying()){
+					
+					mMediaPlayer.pause();
+				} else {
+					mMediaPlayer.start();
 				}
 			}
-		}.execute(uriString);
+		});
+		holder = video.getHolder();
+		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		holder.setKeepScreenOn(true);
+		holder.addCallback(new SurfaceHolder.Callback() {
+	        @Override
+	        public void surfaceCreated(SurfaceHolder mHolder) {
+	        	holder = mHolder;
+	            mMediaPlayer.setDisplay(mHolder);
+	        }
+	        @Override
+	        public void surfaceDestroyed(SurfaceHolder holder) {}
+	        @Override
+	        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
+	    });
 
+
+		String path = getPathFromLocalhost(basePath, uriString);
+		Log.d(TAG, "path: " + path);
+		File f = new File(path);
+        FileInputStream fis;
+        FileDescriptor fd;
+		try {
+			fis = new FileInputStream(f);
+			fd = fis.getFD();
+	        mMediaPlayer.setDataSource(fd);
+	        mMediaPlayer.prepareAsync();
+	        mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					mMediaPlayer.start();
+				}
+			});
+	        //mMediaPlayer.setOnVideoSizeChangedListener(this);
+	        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		MediaController mc = new MediaController(getContext());
+		
 	}
 
 	protected void onPlayVideoOutside(String basePath) {
@@ -448,5 +467,35 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			return true;
 		}
 	}
+	
+	private String getPathFromLocalhost(String basePath, String uriString) {
+		String local = "http://localhost/";
+		int startIdx = local.length();
+		int finIdx = uriString.length();
+		if(uriString.contains("?")){
+			finIdx = uriString.indexOf("?");
+		}
+		String assetsFile = uriString.substring(startIdx, finIdx);
+		return basePath + "/" + assetsFile;
+	}
+	
+    private int mVideoWidth = 0;
+    private int mVideoHeight = 0;
+	private boolean mIsVideoSizeKnown = false;
+    private boolean mIsVideoReadyToBePlayed = false;
+	@Override
+	public void onPrepared(MediaPlayer pmediaplayer) {
+	}	
+	public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+    }
+	@Override
+	public void onCompletion(MediaPlayer pMp) {}
+	@Override
+	public void onBufferingUpdate(MediaPlayer pMp, int pPercent) {}
+	@Override
+	public void surfaceChanged(SurfaceHolder pHolder, int pFormat, int pWidth, int pHeight) {}
+	@Override
+	public void surfaceDestroyed(SurfaceHolder pHolder) {}
+
 }
 
