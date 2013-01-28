@@ -354,11 +354,11 @@ public class BillingActivity extends BaseActivity {
 		
 		String comand = getString(R.string.command_android_verify)
 				.replace(";", "&")
-				.replace(PARAM_PRODUCT_ID, productId)
+				.replace(PARAM_PRODUCT_ID, Uri.encode(productId))
 				.replace(PARAM_DATA, Uri.encode(dataResponse))
 				.replace(PARAM_SIGNATURE, Uri.encode(signatureResponse))
-				.replace(PARAM_URLSTRING, 
-						LibrelioApplication.getUrlString(getContext(), fileName));
+				.replace(PARAM_URLSTRING, Uri.encode(
+						LibrelioApplication.getUrlString(getContext(), fileName)));
 		
 		return query.append(comand).toString();
 	}
