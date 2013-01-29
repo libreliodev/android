@@ -38,9 +38,8 @@ import com.niveales.wind.R;
  * @author Nikolay Moskvin <moskvin@netcook.org>
  * 
  */
-public class StartupActivity extends BaseActivity {
+public class StartupActivity extends AbstractLockRotationActivity {
 	private static final String TAG = "StartupActivity";
-	private boolean rotationWasDisabled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,26 +54,6 @@ public class StartupActivity extends BaseActivity {
 			new InitPredefinedMagazinesTask().execute();
 		}
 
-	}
-
-	@Override
-	protected void onResume() {
-		int rotationEnable = android.provider.Settings.System.getInt(
-				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, 1);
-		if(rotationEnable == 0){
-			rotationWasDisabled = true;
-		} else {
-			enableRotation(false);
-		}
-		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-		if(!rotationWasDisabled){
-			enableRotation(true);
-		}
-		super.onPause();
 	}
 
 	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {

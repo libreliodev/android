@@ -4,11 +4,10 @@
 package com.artifex.mupdf;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +16,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
@@ -36,11 +36,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
-import android.widget.VideoView;
 
 import com.librelio.activity.SlideShowActivity;
 import com.librelio.activity.VideoActivity;
-import com.librelio.base.BaseActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.task.CreateTempVideoTask;
 import com.librelio.view.ImagePager;
@@ -66,20 +64,21 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public static final String PLAYBACK_POSITION_KEY = "playback_position_key";
 	public static final String VIDEO_PATH_KEY = "video_path_key";
 	
-	private static WaitDialogObserver waitObserver;
-
 	private Context context;
 	private String basePath;
 	private LinkInfo linkInfo;
 	private Handler autoPlayHandler;
 	private GestureDetector gestureDetector;
-		
-	private VideoView videoView;
+	private boolean autoPlayFlagMP = true;
+	private ProgressDialog dialog;
+	
+	private SurfaceView videoView;
 	private WebView mWebView;
 	private ImagePager imagePager;
 	private MediaPlayer mediaPlayer;
 
 	private String uriString;
+	private String videFilePath;
 	private OnClickListener listener = null;
 	private SurfaceHolder holder;
 	private String videoFileName;
@@ -92,7 +91,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private int currentPosition = 0;
 	
 	private MediaPlayer mMediaPlayer;
-	private MediaController mediaController;
 
 	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
 		super(context);
@@ -100,8 +98,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		this.context = context;
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.uri;
+		this.videFilePath = getPathFromLocalhost(basePath, uriString);
 		gestureDetector = new GestureDetector(new GestureListener());
-		mediaController = new MediaController(getContext());
 		mMediaPlayer = new MediaPlayer();
 		
 		if(uriString == null) {
@@ -140,7 +138,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				}
 			} else if (linkInfo.isVideoFormat()) {
 				if (fullScreen) {
-					onPlayVideoOutside(basePath);
+					onPlayVideoOutside(videFilePath);
 				} else {
 					onPlayVideoInside(basePath);
 				}
@@ -153,10 +151,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			}
 		}
 	}
-
-	public static void setWaitObserver(WaitDialogObserver observer){
-		waitObserver = observer;
-	}
 	
 	private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
@@ -164,34 +158,40 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
             return true;
         }
         @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+        	if(mMediaPlayer.isPlaying()){					
+				mMediaPlayer.pause();
+			} else {
+				mMediaPlayer.start();
+			}
+        	return super.onSingleTapConfirmed(e);
+        }
+        @Override
         public boolean onDoubleTap(MotionEvent e) {
-        	currentPosition = videoView.getCurrentPosition();
-        	videoView.pause();
-        	continuePlayVide(((BaseActivity)context).getVideoTempPath());
+        	showWaitDialog();
+        	currentPosition = mMediaPlayer.getCurrentPosition();
+        	onPlayVideoOutside(videFilePath);
+        	mMediaPlayer.release();
+        	autoPlayFlagMP = false;
+        	//initMediaPlayer(true);
             return true;
         }
     }
 	
-	public interface WaitDialogObserver{
-		void onWait();
-		void onCancel();
-	}
-	
-
-
 	public void recycle() {
 		Log.d(TAG,"resycle was called");
 		if(autoPlayHandler!=null){
 			Log.d(TAG,"removeCallbacksAndMessages");
 			autoPlayHandler.removeCallbacksAndMessages(null);
 		}
-		if(videoView!=null){
-			videoView.stopPlayback();
+		if(mMediaPlayer!=null){
+			mMediaPlayer.release();
 		}
 	}
 	
 	@Override
     public boolean onTouchEvent(MotionEvent e) {
+		Log.d(TAG,"onTouchEvent");
         return gestureDetector.onTouchEvent(e);
     }
 
@@ -208,99 +208,68 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		listener = l;
 	}
 
-	static int pos = 0;
-	
 	protected void onPlayVideoInside(String basePath) {
+		showWaitDialog();
 		Log.d(TAG, "onPlayVideoInside " + basePath + ", linkInfo = " + linkInfo);
 		LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.video_activity_layout2, this, true);
-		SurfaceView video = (SurfaceView)findViewById(R.id.surface_frame);
-		video.setOnClickListener(new OnClickListener() {
+		inflater.inflate(R.layout.video_activity_layout, this, true);
+		videoView = (SurfaceView)findViewById(R.id.surface_frame);
+		videoView.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public void onClick(View v) {
-				if(mMediaPlayer.isPlaying()){
-					
-					mMediaPlayer.pause();
-				} else {
-					mMediaPlayer.start();
-				}
+			public boolean onTouch(View v, MotionEvent event) {
+				return gestureDetector.onTouchEvent(event);
 			}
-		});
-		holder = video.getHolder();
+		});		
+		holder = videoView.getHolder();
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		holder.setKeepScreenOn(true);
 		holder.addCallback(new SurfaceHolder.Callback() {
 	        @Override
 	        public void surfaceCreated(SurfaceHolder mHolder) {
-	        	holder = mHolder;
+	        	Log.d(TAG, "Callback.surfaceCreated");
+	        	if(mMediaPlayer != null){
+	        		mMediaPlayer.release();
+	        	}
+	        	mMediaPlayer = new MediaPlayer();
 	            mMediaPlayer.setDisplay(mHolder);
+	            initMediaPlayer();
 	        }
 	        @Override
-	        public void surfaceDestroyed(SurfaceHolder holder) {}
+	        public void surfaceDestroyed(SurfaceHolder holder) {
+	        	Log.d(TAG, "Callback.surfaceDestroyed");
+	        	cancelWaitDialog();
+	        }
 	        @Override
 	        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
 	    });
-
-
-		String path = getPathFromLocalhost(basePath, uriString);
-		Log.d(TAG, "path: " + path);
-		File f = new File(path);
-        FileInputStream fis;
-        FileDescriptor fd;
-		try {
-			fis = new FileInputStream(f);
-			fd = fis.getFD();
-	        mMediaPlayer.setDataSource(fd);
-	        mMediaPlayer.prepareAsync();
-	        mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
-				@Override
-				public void onPrepared(MediaPlayer mp) {
-					mMediaPlayer.start();
-				}
-			});
-	        //mMediaPlayer.setOnVideoSizeChangedListener(this);
-	        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		MediaController mc = new MediaController(getContext());
 		
 	}
 
-	protected void onPlayVideoOutside(String basePath) {
-		Log.d(TAG, "onPlayVideoOutside " + basePath + ", linkInfo = " + linkInfo);
-		final IBaseContext baseContext = ((IBaseContext)getContext());
-		new CreateTempVideoTask(baseContext.getVideoTempPath(), basePath){
-			protected void onPreExecute() {
-				waitObserver.onWait();
-			};
+	private void initMediaPlayer(){
+		
+		Log.d(TAG, "path: " + videFilePath);
+		File videoFile = new File(videFilePath);
+        FileInputStream fis;
+		try {
+			fis = new FileInputStream(videoFile);
+			mMediaPlayer.setDataSource(fis.getFD());
+		} catch (IOException e) {
+			Log.e(TAG,"Problem with input stream!",e);
+		}
+        mMediaPlayer.prepareAsync();
+        mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 			@Override
-			protected void onPostExecute(String videoPath) {
-				waitObserver.onCancel();
-				if (isCancelled() || videoPath == null || videoPath.equals(IOEXEPTION_CODE)) {
-					return;
+			public void onPrepared(MediaPlayer mp) {
+				cancelWaitDialog();
+				if(autoPlayFlagMP){
+					mMediaPlayer.start();
 				}
-				Uri data = Uri.parse(videoPath);
-				Intent intent = new Intent(Intent.ACTION_VIEW, data);
-				intent.setDataAndType(data, "video/*");
-				try {
-					getContext().startActivity(intent);
-				} catch(ActivityNotFoundException e) {
-					Log.e(TAG, "onPlayVideoOutside failed", e);
-					intent.setClassName("com.android.gallery3d", "com.android.gallery3d.app.MovieActivity");
-					getContext().startActivity(intent);
-				}
-
-				/*Intent intent = new Intent(getContext(), VideoActivity.class);
-				intent.putExtra(URI_STRING_KEY, uriString);
-				intent.putExtra(BASE_PATH_KEY, basePath);
-				intent.putExtra(AUTO_PLAY_KEY, autoPlay);
-				getContext().startActivity(intent);*/
 			}
-		}.execute(uriString);
+		});
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 	}
 
-	protected void continuePlayVide(String path){
+	protected void onPlayVideoOutside(String path){
 		Intent intent = new Intent(context, VideoActivity.class);
 		intent.putExtra(VIDEO_PATH_KEY, path);
 		intent.putExtra(PLAYBACK_POSITION_KEY, currentPosition);
@@ -479,15 +448,10 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		return basePath + "/" + assetsFile;
 	}
 	
-    private int mVideoWidth = 0;
-    private int mVideoHeight = 0;
-	private boolean mIsVideoSizeKnown = false;
-    private boolean mIsVideoReadyToBePlayed = false;
 	@Override
-	public void onPrepared(MediaPlayer pmediaplayer) {
-	}	
-	public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-    }
+	public void onPrepared(MediaPlayer pmediaplayer) {}
+	@Override
+	public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {}
 	@Override
 	public void onCompletion(MediaPlayer pMp) {}
 	@Override
@@ -496,6 +460,21 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public void surfaceChanged(SurfaceHolder pHolder, int pFormat, int pWidth, int pHeight) {}
 	@Override
 	public void surfaceDestroyed(SurfaceHolder pHolder) {}
+	
+	private void showWaitDialog() {
+		dialog = new ProgressDialog(getContext());
+        dialog.setMessage(getResources().getString(R.string.loading));
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
+        dialog.show();
+	}
+
+	private void cancelWaitDialog() {
+		if(dialog!=null){
+			dialog.cancel();
+			dialog = null;
+		}
+	}
 
 }
 

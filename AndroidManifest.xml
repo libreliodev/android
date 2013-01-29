@@ -57,7 +57,7 @@
             android:name="com.librelio.activity.BillingActivity"
             android:theme="@style/Theme.Billing" />
         <activity android:name="com.librelio.activity.VideoActivity"
-            android:configChanges="orientation"
+            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:name="com.librelio.base.BaseActivity" />
     </application>

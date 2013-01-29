@@ -40,7 +40,6 @@ import android.widget.ViewSwitcher;
 
 import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MediaHolder;
-import com.artifex.mupdf.MediaHolder.WaitDialogObserver;
 import com.artifex.mupdf.MuPDFCore;
 import com.artifex.mupdf.MuPDFPageAdapter;
 import com.artifex.mupdf.MuPDFPageView;
@@ -54,15 +53,13 @@ import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
-import com.librelio.task.CreateTempVideoTask;
-import com.librelio.task.CreateTempVideoTask.ErrorObserver;
 import com.librelio.task.TinySafeAsyncTask;
 import com.librelio.view.HorizontalListView;
 import com.librelio.view.ProgressDialogX;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
-public class MuPDFActivity extends BaseActivity implements WaitDialogObserver,ErrorObserver{
+public class MuPDFActivity extends BaseActivity{
 	private static final String TAG = "MuPDFActivity";
 
 	private static final int SEARCH_PROGRESS_DELAY = 200;
@@ -123,8 +120,6 @@ public class MuPDFActivity extends BaseActivity implements WaitDialogObserver,Er
 		}
 
 		createUI(savedInstanceState);
-		MediaHolder.setWaitObserver(this);
-		CreateTempVideoTask.setErrorObserver(this);
 	}
 	
 	private void requestPassword(final Bundle savedInstanceState) {
@@ -648,28 +643,6 @@ public class MuPDFActivity extends BaseActivity implements WaitDialogObserver,Er
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	@Override
-	public void onWait() {
-		dialog = new ProgressDialog(this);
-        dialog.setMessage(getResources().getString(R.string.loading));
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(false);
-        dialog.show();
-	}
-
-	@Override
-	public void onCancel() {
-		if(dialog!=null){
-			dialog.cancel();
-		}
-	}
-
-	@Override
-	public void onIOExeption() {
-		Log.d(TAG,"onIOExeption");
-		showAlertDialog(IO_EXEPTION);
-	}
-	
 	private MuPDFCore openFile(String path) {
 		int lastSlashPos = path.lastIndexOf('/');
 		fileName = new String(lastSlashPos == -1

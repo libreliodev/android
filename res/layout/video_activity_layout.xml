@@ -6,9 +6,10 @@
     android:background="@android:color/black"
     android:gravity="center" >
 
-    <VideoView
-        android:id="@+id/video_frame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <SurfaceView
+        android:id="@+id/surface_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_gravity="center"/>
 
 </RelativeLayout>
