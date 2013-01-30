@@ -651,20 +651,7 @@ public class MuPDFActivity extends BaseActivity{
 		Log.d(TAG, "Trying to open " + path);
 		PDFParser linkGetter = new PDFParser(path);
 		linkOfDocument = linkGetter.getLinkInfo();
-		Log.d(TAG,"link size = "+linkOfDocument.size());
-		for(int i=0;i<linkOfDocument.size();i++){
-			Log.d(TAG,"page #" + (i + 1) + ": ");
-			if(linkOfDocument.get(i)!=null){
-				for(int j=0;j<linkOfDocument.get(i).length;j++){
-					String link = linkOfDocument.get(i)[j].uri;
-					Log.d(TAG,"link[" + j + "] = "+link);
-					String local = "http://localhost";
-					if(link.startsWith(local)){
-						Log.d(TAG,"   link: "+link);
-					}
-				}
-			}
-		}
+
 		try {
 			core = new MuPDFCore(path);
 			// New file: drop the old outline data
