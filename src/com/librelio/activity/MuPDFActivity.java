@@ -653,7 +653,7 @@ public class MuPDFActivity extends BaseActivity{
 		linkOfDocument = linkGetter.getLinkInfo();
 		Log.d(TAG,"link size = "+linkOfDocument.size());
 		for(int i=0;i<linkOfDocument.size();i++){
-			Log.d(TAG,"--- i = "+i);
+			Log.d(TAG,"page #" + (i + 1) + ": ");
 			if(linkOfDocument.get(i)!=null){
 				for(int j=0;j<linkOfDocument.get(i).length;j++){
 					String link = linkOfDocument.get(i)[j].uri;
@@ -675,8 +675,6 @@ public class MuPDFActivity extends BaseActivity{
 		}
 		return core;
 	}
-
-
 
 	private void onBuy(String path) {
 		Log.d(TAG, "onBuy event path = " + path);

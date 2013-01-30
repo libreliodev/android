@@ -3,9 +3,9 @@
     android:id="@+id/slide_show_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
+
     <ImageView
-        android:id="@+id/SlideshowImage"
+        android:id="@+id/slideshow_item_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

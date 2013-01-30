@@ -1,10 +1,19 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
-    <android.support.v4.view.ViewPager
-        android:id="@+id/image_pager_view"
+    android:layout_height="match_parent" >
+
+    <ViewStub
+        android:id="@+id/image_pager_image_stub"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    
+        android:layout_height="match_parent"
+        android:inflatedId="@+id/image_pager_image"
+        android:layout="@layout/slideshow_item_layout" />
+
+    <include
+        android:id="@+id/image_pager_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/progress_bar_layout"
+        android:visibility="invisible"/>
+
 </FrameLayout>

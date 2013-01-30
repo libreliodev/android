@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -16,7 +15,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
@@ -35,12 +33,9 @@ import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.MediaController;
 
 import com.librelio.activity.SlideShowActivity;
 import com.librelio.activity.VideoActivity;
-import com.librelio.base.IBaseContext;
-import com.librelio.task.CreateTempVideoTask;
 import com.librelio.view.ImagePager;
 import com.niveales.wind.R;
 
@@ -188,12 +183,6 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			mMediaPlayer.release();
 		}
 	}
-	
-	@Override
-    public boolean onTouchEvent(MotionEvent e) {
-		Log.d(TAG,"onTouchEvent");
-        return gestureDetector.onTouchEvent(e);
-    }
 
 	@Override
 	public void surfaceCreated(SurfaceHolder pHolder) {
