@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.niveales.wind"
     android:versionCode="12"
-    android:versionName="1.0.13" >
+    android:versionName="1.0.14" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -57,7 +57,7 @@
             android:name="com.librelio.activity.BillingActivity"
             android:theme="@style/Theme.Billing" />
         <activity android:name="com.librelio.activity.VideoActivity"
-            android:configChanges="orientation"
+            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:name="com.librelio.base.BaseActivity" />
     </application>

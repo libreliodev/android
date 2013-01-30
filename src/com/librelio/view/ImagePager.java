@@ -10,12 +10,12 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -40,25 +40,18 @@ public class ImagePager extends RelativeLayout {
 
 	protected PhotoPagerListener listener;
 	private SimpleImageAdapter imageAdapter;
+	private Handler autoplayHandler;
+	private SlidesInfo slidesInfo;
+	private View progressBar;
+
 
 	protected int countPhotos;
 	protected String projectId;
 	protected int minCountFromInfinityLoop = 12;
-	private Handler mAutoplayHandler;
 	private int count = 0;
 
 	public interface PhotoPagerListener {
 		void onClickItem(int photoId);
-	}
-
-	public ImagePager(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		init(context);
-	}
-
-	public ImagePager(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(context);
 	}
 
 	public ImagePager(Context context, String basePath, boolean transition, float viewWidth) {
@@ -66,7 +59,8 @@ public class ImagePager extends RelativeLayout {
 		this.basePath = basePath;
 		this.transition = transition;
 		this.viewWidth = viewWidth;
-		init(context);
+		this.context = context;
+		init();
 	}
 
 	public void setTitle(final String titleTable, final String titleUrl){
@@ -107,52 +101,59 @@ public class ImagePager extends RelativeLayout {
 		return 2;
 	}
 
-	private void init(Context context) {
-		this.context = context;
+	private void init() {
+		slidesInfo = new SlidesInfo(basePath);
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.image_pager, this, true);
-
+		progressBar = findViewById(R.id.image_pager_progress);
+		if (slidesInfo.count > 1) {
+			initGallery();
+		} else {
+			initSingleImage();
+		}
+	}
+	private void initGallery() {
 		if(transition){
 			viewPager = new ViewPager(getContext());
 		} else {
 			viewPager = new ViewPager(getContext()){
 				float x1 = 0, x2, y1 = 0, y2, dx, dy;
 				@Override
-			    public boolean onTouchEvent(MotionEvent event) {
-					Log.d(TAG,"viewWidth = "+viewWidth);
-					switch(event.getAction()) {
-					    case(MotionEvent.ACTION_DOWN):
-					        x1 = event.getX();
-					        y1 = event.getY();
-					        break;
-					    case(MotionEvent.ACTION_UP): {
-					        x2 = event.getX();
-					        y2 = event.getY();
-					        dx = x2-x1;
-					        dy = y2-y1;
-					        if(Math.abs(dx) > Math.abs(dy)) {
-								float move = Math.abs(dx);
-								Log.d(TAG,"move = "+move);
-								if(dx>0){
-					            	//"right";
-									if(move<(viewWidth/3)){
-										setCurrentPosition(getCurrentPosition()-1,transition);
-									} else {
-										flipSlides(dx);
-									}
+				public boolean onTouchEvent(MotionEvent event) {
+					Log.d(TAG, "viewWidth = " + viewWidth);
+					switch (event.getAction()) {
+					case (MotionEvent.ACTION_DOWN):
+						x1 = event.getX();
+						y1 = event.getY();
+						break;
+					case (MotionEvent.ACTION_UP): {
+						x2 = event.getX();
+						y2 = event.getY();
+						dx = x2 - x1;
+						dy = y2 - y1;
+						if (Math.abs(dx) > Math.abs(dy)) {
+							float move = Math.abs(dx);
+							Log.d(TAG, "move = " + move);
+							if (dx > 0) {
+								// "right";
+								if (move < (viewWidth / 3)) {
+									setCurrentPosition(getCurrentPosition() - 1, transition);
 								} else {
-									//"left";
-									if(move<(viewWidth/3)){
-										setCurrentPosition(getCurrentPosition()+1,transition);
-									} else {
-										flipSlides(dx);
-									}
+									flipSlides(dx);
 								}
-					        }
-					    }
+							} else {
+								// "left";
+								if (move < (viewWidth / 3)) {
+									setCurrentPosition(getCurrentPosition() + 1, transition);
+								} else {
+									flipSlides(dx);
+								}
+							}
+						}
 					}
-			        return true;
-			    }
+					}
+					return true;
+				}
 			};
 		}
 		viewPager.setAdapter(getAdapter());
@@ -163,7 +164,23 @@ public class ImagePager extends RelativeLayout {
 		addView(viewPager);
 	}
 
-	
+	private void initSingleImage() {
+		ViewStub viewStub = (ViewStub) findViewById(R.id.image_pager_image_stub);
+		final View view = viewStub.inflate();
+		final ImageView imageView = (ImageView) view.findViewById(R.id.slideshow_item_image);
+		new GetBitmapAsyncTask(){
+			@Override
+			protected void onPostExecute(Bitmap bmp) {
+				if (isCancelled()) {
+					return;
+				}
+				view.setBackgroundColor(backgroungColor);
+				imageView.setImageBitmap(bmp);
+				super.onPostExecute(bmp);
+			}
+		}.execute(slidesInfo.getFullPathToImage(1));
+	}
+
 	public void setViewWidth(int viewWidth){
 		this.viewWidth = viewWidth;
 	}
@@ -171,28 +188,28 @@ public class ImagePager extends RelativeLayout {
 	private void flipSlides(final float dx){
 		count = 0;
 		final int mAutoplayDelay = 200;
-		mAutoplayHandler = new Handler();
-		mAutoplayHandler.postDelayed(new Runnable() {
-			
+		autoplayHandler = new Handler();
+		autoplayHandler.postDelayed(new Runnable() {
+
 			@Override
 			public void run() {
 				count++;
 				int item = 0;
-				if(dx>0){
+				if (dx > 0) {
 					item = getCurrentPosition()-1;
 				} else {
 					item = getCurrentPosition()+1;
 				}
 				setCurrentPosition(item,transition);
 				if(count<imageAdapter.getSlideCount()){
-					mAutoplayHandler.postDelayed(this, mAutoplayDelay);
+					autoplayHandler.postDelayed(this, mAutoplayDelay);
 				}
 		}}, mAutoplayDelay);
 	}
 	
 	protected PagerAdapter getAdapter() {
 		if (null == imageAdapter) {
-			imageAdapter = new SimpleImageAdapter(context, minCountFromInfinityLoop,basePath);
+			imageAdapter = new SimpleImageAdapter(context, minCountFromInfinityLoop, slidesInfo);
 		}
 		return imageAdapter;
 	}
@@ -206,7 +223,48 @@ public class ImagePager extends RelativeLayout {
 		backgroungColor = color;
 		super.setBackgroundColor(color);
 	}
-	
+
+
+	private class SlidesInfo {
+		public final String assetDir;
+		public final int count;
+		public final String preffix;
+		public final String suffix;
+
+		public SlidesInfo(String basePath) {
+			File file = new File(basePath);
+			this.assetDir = file.getParent();
+			String fileName = file.getName();
+			this.count = Integer.valueOf(fileName.split("_")[1].split("\\.")[0]);
+			this.preffix = fileName.split("_")[0];
+			this.suffix = fileName.split("_")[1].split("\\.")[1];
+		}
+
+		public String getFullPathToImage(int position) {
+			return this.assetDir + "/" + this.preffix + "_" + String.valueOf(position) + "." + this.suffix;
+		}
+	}
+
+	private class GetBitmapAsyncTask extends AsyncTask<String, Void, Bitmap> {
+		@Override
+		protected void onPreExecute() {
+			progressBar.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		protected Bitmap doInBackground(String... paths) {
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inSampleSize = 1;
+			return BitmapFactory.decodeFile(paths[0], options);
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			progressBar.setVisibility(View.INVISIBLE);
+		}
+		
+	}
+
 	protected class SimpleImageAdapter extends PagerAdapter{
 		
 		protected Context context;
@@ -214,22 +272,14 @@ public class ImagePager extends RelativeLayout {
 		protected int imageViewId;
 
 		protected int minCountFromInfinityLoop;
-		private String mSlideshowAssetDir;
-		private int mSlideshowCount;
-		private String mSlideshowPreffix;
-		private String mSlideshowSuffix;
 		private LayoutInflater inflater;
+		private final SlidesInfo slidesInfo;
 		
-		public SimpleImageAdapter(Context context, int minCountFromInfinityLoop, String path) {
+		public SimpleImageAdapter(Context context, int minCountFromInfinityLoop, SlidesInfo slidesInfo) {
 			this.context = context;
 			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			File file = new File(path);
-			mSlideshowAssetDir = file.getParent();
-			String fileName = file.getName();
-			mSlideshowCount = Integer.valueOf(fileName.split("_")[1].split("\\.")[0]);
-			mSlideshowPreffix = fileName.split("_")[0];
-			mSlideshowSuffix = fileName.split("_")[1].split("\\.")[1];
 			this.minCountFromInfinityLoop = minCountFromInfinityLoop;
+			this.slidesInfo = slidesInfo;
 		}
 
 		@Override
@@ -242,33 +292,46 @@ public class ImagePager extends RelativeLayout {
 			return view == object;
 		}
 
-		public String getItem(int pPosition) {
-			return mSlideshowAssetDir + "/" + mSlideshowPreffix + "_"
-					+ String.valueOf(pPosition + 1) + "." + mSlideshowSuffix;
+		public String getItem(int position) {
+			return slidesInfo.getFullPathToImage(position + 1);
 		}
 
 		@Override
 		public View instantiateItem(ViewGroup container, int position) {
 			Log.d(TAG, "instantiateItem");
 			
-			String path = getItem(position % mSlideshowCount);
+			String path = getItem(position % slidesInfo.count);
 			
 			final View view = inflater.inflate(R.layout.slideshow_item_layout, null);
 			view.setTag(position);
-			//
-			new AsyncTask<Object, Void, Bitmap>() {
-				String path;
+			
+			final ImageView img = (ImageView)view.findViewById(R.id.slideshow_item_image);
+			final FrameLayout background = (FrameLayout)view.findViewById(R.id.slide_show_frame);
+
+			new GetBitmapAsyncTask(){
+				@Override
+				protected void onPostExecute(Bitmap bmp) {
+					if (isCancelled()) {
+						return;
+					}
+					background.setBackgroundColor(backgroungColor);
+					img.setImageBitmap(bmp);
+					super.onPostExecute(bmp);
+				}
+			}.execute(path);
+
+			/*new AsyncTask<String, Void, Bitmap>() {
 				ImageView img;
 				FrameLayout background;
 				@Override
-				protected Bitmap doInBackground(Object... pParams) {
-					path = (String) pParams[0];
+				protected Bitmap doInBackground(String... paths) {
+					String path = paths[0];
 					File file = new File(path);
 					int size = (int)(file.length()/1024);
-					img = (ImageView)view.findViewById(R.id.SlideshowImage);
+					img = (ImageView)view.findViewById(R.id.slideshow_item_image);
 					background = (FrameLayout)view.findViewById(R.id.slide_show_frame);
-					BitmapFactory.Options options=new BitmapFactory.Options();
-					if(size>200){
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					if (size > 200) {
 						options.inSampleSize = 2;
 					} else {
 						options.inSampleSize = 1;
@@ -278,23 +341,26 @@ public class ImagePager extends RelativeLayout {
 				
 				@Override
 				protected void onPostExecute(Bitmap bmp) {
+					if (isCancelled()) {
+						return;
+					}
 					background.setBackgroundColor(backgroungColor);
 					img.setImageBitmap(bmp);
 				}
-			}.execute(path);
-			
+			}.execute(path);*/
+
 			//
 			container.addView(view);
 			return view;
 		}
-		
+
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object) {
 			container.removeView((View)object);
 		}
-		
+
 		public int getSlideCount(){
-			return mSlideshowCount;
+			return slidesInfo.count;
 		}
 	}
 

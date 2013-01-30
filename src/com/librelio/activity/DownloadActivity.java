@@ -60,7 +60,7 @@ import com.niveales.wind.R;
  * @author Nikolay Moskvin <moskvin@netcook.org>
  * 
  */
-public class DownloadActivity extends BaseActivity {
+public class DownloadActivity extends AbstractLockRotationActivity {
 	private static final String TAG = "DownloadActivity";
 	private static final String STOP = "stop_modificator";
 
@@ -88,7 +88,6 @@ public class DownloadActivity extends BaseActivity {
 	private Magazine magazine;
 	private InputStream input;
 	private OutputStream output;
-	private boolean rotationWasDisabled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,26 +129,6 @@ public class DownloadActivity extends BaseActivity {
 				finish();
 			}
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		int rotationEnable = android.provider.Settings.System.getInt(
-				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, 1);
-		if(rotationEnable == 0){
-			rotationWasDisabled = true;
-		} else {
-			enableRotation(false);
-		}
-		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-		if(!rotationWasDisabled){
-			enableRotation(true);
-		}
-		super.onPause();
 	}
 
 	private class DownloadTask extends AsyncTask<String, Double, String> {
