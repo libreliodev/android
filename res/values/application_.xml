@@ -4,13 +4,12 @@
     <string name="app_name">Wind</string>
     <string name="picker_title">Wind</string>
     <string name="GoogleAnalyticsCode">UA_xxxxxx</string>
-    <string name="enable_yearly_subs">true</string>
-    <string name="enable_monthly_subs">true</string>
-
+    <string name="enable_yearly_subs">false</string>
+    <string name="enable_monthly_subs">false</string>
     <bool name="enable_test_magazine">false</bool>
-    <bool name="enable_code_subs">true</bool>
+    <bool name="enable_code_subs">false</bool>
 
-    <string name="client_name" >niveales"</string>
+    <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>
 
 </resources>
