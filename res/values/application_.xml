@@ -8,7 +8,6 @@
     <string name="enable_monthly_subs">false</string>
     <bool name="enable_test_magazine">false</bool>
     <bool name="enable_code_subs">false</bool>
-
     <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>
 
