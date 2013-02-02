@@ -10,6 +10,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.artifex.mupdf.LinkInfo;
+import com.artifex.mupdf.LinkInfoExternal;
 import com.artifex.mupdf.MuPDFPageView;
 import com.artifex.mupdf.PageView;
 import com.artifex.mupdf.domain.SearchTaskResult;
@@ -29,8 +30,8 @@ public abstract class DocumentReaderView extends ReaderView {
 	private boolean showButtonsDisabled;
 
 	public DocumentReaderView(Context context, 
-			SparseArray<LinkInfo[]> linkOfDocument) {
-		super(context, linkOfDocument);
+			SparseArray<LinkInfoExternal[]> pLinkOfDocument) {
+		super(context, pLinkOfDocument);
 	}
 
 	@Override

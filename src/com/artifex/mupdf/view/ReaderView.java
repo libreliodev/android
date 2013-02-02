@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Scroller;
 
 import com.artifex.mupdf.LinkInfo;
+import com.artifex.mupdf.LinkInfoExternal;
 
 public class ReaderView extends AdapterView<Adapter>
                         implements GestureDetector.OnGestureListener,
@@ -62,14 +63,14 @@ public class ReaderView extends AdapterView<Adapter>
 	private int               mScrollerLastX;
 	private int               mScrollerLastY;
 	private boolean           mScrollDisabled;
-	private SparseArray<LinkInfo[]> linkOfDocument;
+	private SparseArray<LinkInfoExternal[]> linkOfDocument;
 
-	public ReaderView(Context context,SparseArray<LinkInfo[]> linkOfDocument) {
+	public ReaderView(Context context,SparseArray<LinkInfoExternal[]> pLinkOfDocument) {
 		super(context);
 		mGestureDetector = new GestureDetector(this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
 		mScroller        = new Scroller(context);
-		this.linkOfDocument = linkOfDocument;
+		this.linkOfDocument = pLinkOfDocument;
 	}
 
 	public ReaderView(Context context, AttributeSet attrs) {

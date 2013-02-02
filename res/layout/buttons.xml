@@ -14,11 +14,11 @@
             android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/bar"
             android:paddingBottom="0dp"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
-            android:paddingTop="0dp"
-            android:background="@color/bar" >
+            android:paddingTop="0dp" >
 
             <ImageButton
                 android:id="@+id/searchButton"
@@ -40,7 +40,7 @@
                 android:contentDescription="@string/search_document"
                 android:src="@drawable/ic_list" />
 
-<!--
+            <!--
             <ImageButton
                 android:id="@+id/linkButton"
                 android:layout_width="wrap_content"
@@ -49,7 +49,8 @@
                 android:layout_toLeftOf="@+id/outlineButton"
                 android:contentDescription="@string/link_control"
                 android:src="@drawable/ic_link" />
--->
+            -->
+
             <TextView
                 android:id="@+id/docNameText"
                 android:layout_width="wrap_content"
@@ -66,11 +67,11 @@
             android:id="@+id/topBar2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/bar"
             android:paddingBottom="0dp"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
-            android:paddingTop="0dp"
-            android:background="@color/bar" >
+            android:paddingTop="0dp" >
 
             <ImageButton
                 android:id="@+id/cancel"
@@ -89,8 +90,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/searchBack"
                 android:layout_toRightOf="@+id/cancel"
-                android:inputType="text"
                 android:hint="Search"
+                android:inputType="text"
                 android:singleLine="true" />
 
             <ImageButton
@@ -127,9 +128,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:background="@color/bar" >
-
         </FrameLayout>
-
     </RelativeLayout>
 
 </RelativeLayout>

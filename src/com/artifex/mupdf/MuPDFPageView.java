@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -48,9 +47,12 @@ public class MuPDFPageView extends PageView {
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
 
-		final String uriString = muPdfCore
-				.hitLinkUri(mPageNumber, docRelX, docRelY);
+		String uriString = null;
 
+		for (LinkInfo l: mLinks)
+			if (l.rect.contains(docRelX, docRelY) && (l instanceof LinkInfoExternal))
+				uriString  = ((LinkInfoExternal) l).url;;
+		
 		if (uriString == null)
 			return null;
 		
@@ -58,19 +60,22 @@ public class MuPDFPageView extends PageView {
 		if (links == null) {
 			return null;
 		}
-		LinkInfo linkInfo = null;
+		LinkInfoExternal linkInfo = null;
 		for (int i = 0; i < links.length; i++) {
-			if (links[i].uri != null && links[i].uri.equals(uriString)) {
-				linkInfo = links[i];
+			if( ! (links[i] instanceof LinkInfoExternal))
+				continue;
+			LinkInfoExternal extLinkInfo = (LinkInfoExternal) links[i];
+			if (extLinkInfo.url != null && extLinkInfo.url.equals(uriString)) {
+				linkInfo = extLinkInfo;
 				break;
 			}
 		}
 		
-		if(runningLinks.contains(linkInfo.uri)){
-			Log.d(TAG,"Already running link: "+linkInfo.uri);
-			return linkInfo.uri;
+		if(runningLinks.contains(linkInfo.url)){
+			Log.d(TAG,"Already running link: "+linkInfo.url);
+			return linkInfo.url;
 		} else if(!linkInfo.isFullScreen()){
-			runningLinks.add(linkInfo.uri);
+			runningLinks.add(linkInfo.url);
 		}
 		
 		if (linkInfo.isMediaURI()) {
@@ -99,11 +104,11 @@ public class MuPDFPageView extends PageView {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
 			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
-			LinkInfo currentLink = mLinkHolder.getLinkInfo();
+			LinkInfoExternal currentLink = mLinkHolder.getLinkInfo();
 			float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 
-			int width = (int) ((currentLink.right - currentLink.left) * scale);
-			int height = (int) ((currentLink.bottom - currentLink.top) * scale);
+			int width = (int) ((currentLink.rect.right - currentLink.rect.left) * scale);
+			int height = (int) ((currentLink.rect.bottom - currentLink.rect.top) * scale);
 			// mLinkHolder.measure(widthMeasureSpec, heightMeasureSpec);
 			mLinkHolder.measure(View.MeasureSpec.EXACTLY | width,
 					View.MeasureSpec.EXACTLY | height);
@@ -121,10 +126,10 @@ public class MuPDFPageView extends PageView {
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
 			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 			LinkInfo currentLink = mLinkHolder.getLinkInfo();
-			mLinkHolder.layout((int) (currentLink.left * scale),
-					(int) (currentLink.top * scale),
-					(int) (currentLink.right * scale),
-					(int) (currentLink.bottom * scale));
+			mLinkHolder.layout((int) (currentLink.rect.left * scale),
+					(int) (currentLink.rect.top * scale),
+					(int) (currentLink.rect.right * scale),
+					(int) (currentLink.rect.bottom * scale));
 		}
 	}
 
@@ -191,7 +196,7 @@ public class MuPDFPageView extends PageView {
 		return muPdfCore.getPageLinks(mPageNumber);
 	}
 
-	protected LinkInfo[] getExternalLinkInfo() {
-		return muPdfCore.getPageURIs(mPageNumber);
-	}	
+//	protected LinkInfo[] getExternalLinkInfo() {
+//		return muPdfCore.getPageURIs(mPageNumber);
+//	}	
 }

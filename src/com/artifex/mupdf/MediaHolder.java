@@ -61,7 +61,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	
 	private Context context;
 	private String basePath;
-	private LinkInfo linkInfo;
+	private LinkInfoExternal linkInfo;
 	private Handler autoPlayHandler;
 	private GestureDetector gestureDetector;
 	private boolean autoPlayFlagMP = true;
@@ -87,12 +87,12 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	
 	private MediaPlayer mMediaPlayer;
 
-	public MediaHolder(Context context, LinkInfo linkInfo, String basePath) throws IllegalStateException{
+	public MediaHolder(Context context, LinkInfoExternal linkInfo, String basePath) throws IllegalStateException{
 		super(context);
 		this.basePath = basePath;
 		this.context = context;
 		this.linkInfo = linkInfo;
-		this.uriString = linkInfo.uri;
+		this.uriString = linkInfo.url;
 		this.videFilePath = getPathFromLocalhost(basePath, uriString);
 		gestureDetector = new GestureDetector(new GestureListener());
 		mMediaPlayer = new MediaPlayer();
@@ -189,7 +189,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		playVideo(videoFileName);
 	}
 
-	public LinkInfo getLinkInfo() {
+	public LinkInfoExternal getLinkInfo() {
 		return linkInfo;
 	}
 
@@ -279,7 +279,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	protected void onPlaySlideInside(String basePath) {
 		Log.d(TAG, "onPlaySlideInside " + basePath + ", linkInfo = " + linkInfo);
 		
-		imagePager = new ImagePager(getContext(), fullPath, transition, (linkInfo.right - linkInfo.left));
+		imagePager = new ImagePager(getContext(), fullPath, transition, (linkInfo.rect.right - linkInfo.rect.left));
 		post(new Runnable() {
 			@Override
 			public void run() {
@@ -407,7 +407,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	}
 
 	private void hitLinkUri(String uri) {
-		if(linkInfo.uri.equals(uri)) {
+		if(linkInfo.url.equals(uri)) {
 			// TODO: start playing link
 			setVisibility(View.VISIBLE);
 			if(mWebView != null) {

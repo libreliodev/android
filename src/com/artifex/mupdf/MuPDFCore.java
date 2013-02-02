@@ -27,44 +27,53 @@ public class MuPDFCore {
 	public float pageHeight;
 	private String mFileName;
 
+	private long globals;
+
 	/* The native functions */
-	private static native int openFile(String filename);
-
-	private static native int countPagesInternal();
-
-	private static native void gotoPageInternal(int localActionPageNum);
-
-	private static native float getPageWidth();
-
-	private static native float getPageHeight();
-
-	public static native void drawPage(Bitmap bitmap, int pageW, int pageH,
-			int patchX, int patchY, int patchW, int patchH);
-
-	public static native RectF[] searchPage(String text);
-
-	public static native int getPageLink(int page, float x, float y);
-
-	public static native String getUriLink(int page, float x, float y);
-
-	public static native LinkInfo[] getPageLinksInternal(int page);
-
-	public static native LinkInfo[] getPageURIsInternal(int page);
-
-	public static native OutlineItem[] getOutlineInternal();
-
-	public static native boolean hasOutlineInternal();
-
-	public static native boolean needsPasswordInternal();
-
-	public static native boolean authenticatePasswordInternal(String password);
-
-	public static native void destroying();
+	/* The native functions */
+	private native long openFile(String filename);
+	private native long openBuffer();
+	private native int countPagesInternal();
+	private native void gotoPageInternal(int localActionPageNum);
+	private native float getPageWidth();
+	private native float getPageHeight();
+	private native void drawPage(Bitmap bitmap,
+			int pageW, int pageH,
+			int patchX, int patchY,
+			int patchW, int patchH);
+	private native void updatePageInternal(Bitmap bitmap,
+			int page,
+			int pageW, int pageH,
+			int patchX, int patchY,
+			int patchW, int patchH);
+	private native RectF[] searchPage(String text);
+	private native int passClickEventInternal(int page, float x, float y);
+	private native void setFocusedWidgetChoiceSelectedInternal(String [] selected);
+	private native String [] getFocusedWidgetChoiceSelected();
+	private native String [] getFocusedWidgetChoiceOptions();
+	private native int setFocusedWidgetTextInternal(String text);
+	private native String getFocusedWidgetTextInternal();
+	private native int getFocusedWidgetTypeInternal();
+	private native LinkInfo [] getPageLinksInternal(int page);
+	private native RectF[] getWidgetAreasInternal(int page);
+	private native OutlineItem [] getOutlineInternal();
+	private native boolean hasOutlineInternal();
+	private native boolean needsPasswordInternal();
+	private native boolean authenticatePasswordInternal(String password);
+	private native MuPDFAlertInternal waitForAlertInternal();
+	private native void replyToAlertInternal(MuPDFAlertInternal alert);
+	private native void startAlertsInternal();
+	private native void stopAlertsInternal();
+	private native void destroying();
+	private native boolean hasChangesInternal();
+	private native void saveInternal();
 
 	public MuPDFCore(String filename) throws Exception {
 		mFileName = filename;
-		if (openFile(filename) <= 0) {
-			throw new Exception("Failed to open " + filename);
+		globals = openFile(filename);
+		if (globals == 0)
+		{
+			throw new Exception("Failed to open "+filename);
 		}
 	}
 
@@ -228,31 +237,31 @@ public class MuPDFCore {
 	}
 
 	public synchronized int hitLinkPage(int page, float x, float y) {
-		if(displayPages == 1)
-			return getPageLink(page, x, y);
-		int rightPage = page * 2;
-		int leftPage = rightPage - 1;
-		if(x < pageWidth && leftPage > 0) {
-			return getPageLink(leftPage, x, y);
-		} else if(rightPage < countPages()) {
-			return getPageLink(rightPage, x - pageWidth, y);
-		}
+//		if(displayPages == 1)
+//			return getPageLink(page, x, y);
+//		int rightPage = page * 2;
+//		int leftPage = rightPage - 1;
+//		if(x < pageWidth && leftPage > 0) {
+//			return getPageLink(leftPage, x, y);
+//		} else if(rightPage < countPages()) {
+//			return getPageLink(rightPage, x - pageWidth, y);
+//		}
 		return -1;
 	}
 
-	public synchronized String hitLinkUri(int page, float x, float y) {
-		if(displayPages == 1)
-			return getUriLink(page, x, y);
-		int rightPage = page * 2;
-		int leftPage = rightPage - 1;
-		int count = countPages() * 2;
-		if(x < pageWidth && leftPage > 0) {
-			return getUriLink(leftPage, x, y);
-		} else if(rightPage < count) {
-			return getUriLink(rightPage, x - pageWidth, y);
-		}
-		return null;
-	}
+//	public synchronized String hitLinkUri(int page, float x, float y) {
+//		if(displayPages == 1)
+//			return getUriLink(page, x, y);
+//		int rightPage = page * 2;
+//		int leftPage = rightPage - 1;
+//		int count = countPages() * 2;
+//		if(x < pageWidth && leftPage > 0) {
+//			return getUriLink(leftPage, x, y);
+//		} else if(rightPage < count) {
+//			return getUriLink(rightPage, x - pageWidth, y);
+//		}
+//		return null;
+//	}
 
 	public synchronized LinkInfo[] getPageLinks(int page) {
 		if(displayPages == 1)
@@ -287,19 +296,20 @@ public class MuPDFCore {
 		LinkInfo temp;
 		for(int i = 0, j = leftPageLinkInfo.length; i < rightPageLinkInfo.length; i++, j++) {
 			temp = rightPageLinkInfo[i];
-			temp.left += pageWidth;
-			temp.right += pageWidth;
+			temp.rect.left += pageWidth;
+			temp.rect.right += pageWidth;
 			combinedLinkInfo[j] = temp;
 		}
 		for (LinkInfo linkInfo: combinedLinkInfo) {
-			Log.d(TAG, "return " + linkInfo.uri);
+			if(linkInfo instanceof LinkInfoExternal)
+				Log.d(TAG, "return " + ((LinkInfoExternal)linkInfo).url);
 		}
 		return combinedLinkInfo;
 	}
 
-	public synchronized LinkInfo[] getPageURIs(int page) {
-		return getPageURIsInternal(page);
-	}
+//	public synchronized LinkInfo[] getPageURIs(int page) {
+//		return getPageURIsInternal(page);
+//	}
 
 	public synchronized RectF[] searchPage(int page, String text) {
 		gotoPage(page);

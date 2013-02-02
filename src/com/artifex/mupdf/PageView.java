@@ -70,7 +70,7 @@ public abstract class PageView extends ViewGroup {
 	private       ImageView patch;
 	private       SafeAsyncTask<PatchInfo,Void,PatchInfo> mDrawPatch;
 	private       RectF     mSearchBoxes[];
-	private       LinkInfo  mLinks[];
+	protected       LinkInfo  mLinks[];
 	private       LinkInfo  mUrls[];
 	private       View      searchView;
 	private       boolean   mIsBlank;
@@ -80,6 +80,8 @@ public abstract class PageView extends ViewGroup {
 	private       ProgressBar mBusyIndicator;
 	private final Handler   mHandler = new Handler();
 	private FrameLayout mLinksView;
+
+	private com.artifex.mupdf.AsyncTask<Void, Void, com.artifex.mupdf.LinkInfo[]> mGetLinkInfo;
 
 	public PageView(Context c, Point parentSize) {
 		super(c);
@@ -264,15 +266,16 @@ public abstract class PageView extends ViewGroup {
 									        paint);
 					}
 
-					if (!mIsBlank && mLinks != null && mHighlightLinks) {
-						// Work out current total scale factor
-						// from source to view
-						paint.setColor(LINK_COLOR);
-						for (RectF rect : mLinks)
-							canvas.drawRect(rect.left*scale, rect.top*scale,
-									        rect.right*scale, rect.bottom*scale,
-									        paint);
-					}
+					// Magazine App does not require to highlight the links
+//					if (!mIsBlank && mLinks != null && mHighlightLinks) {
+//						// Work out current total scale factor
+//						// from source to view
+//						paint.setColor(LINK_COLOR);
+//						for (RectF rect : mLinks)
+//							canvas.drawRect(rect.left*scale, rect.top*scale,
+//									        rect.right*scale, rect.bottom*scale,
+//									        paint);
+//					}
 				}
 			};
 

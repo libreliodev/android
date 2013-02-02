@@ -47,6 +47,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artifex.mupdf.LinkInfo;
+import com.artifex.mupdf.LinkInfoExternal;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
@@ -215,7 +216,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			assetsNames = new ArrayList<String>();
 			//
 			PDFParser linkGetter = new PDFParser(filePath);
-			SparseArray<LinkInfo[]> linkBuf = linkGetter.getLinkInfo();
+			SparseArray<LinkInfoExternal[]> linkBuf = linkGetter.getLinkInfo();
 			if (linkBuf == null) {
 				Log.d(TAG, "There is no links");
 				return;
@@ -225,7 +226,8 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				Log.d(TAG,"--- i = "+i);
 				if(linkBuf.get(key)!=null){
 					for(int j=0;j<linkBuf.get(key).length;j++){
-						String link = linkBuf.get(key)[j].uri;
+						LinkInfoExternal extLink = linkBuf.get(key)[j];
+						String link = linkBuf.get(key)[j].url;
 						Log.d(TAG,"link[" + j + "] = "+link);
 						String local = "http://localhost";
 						if(link.startsWith(local)){

@@ -39,6 +39,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.artifex.mupdf.LinkInfo;
+import com.artifex.mupdf.LinkInfoExternal;
 import com.artifex.mupdf.MediaHolder;
 import com.artifex.mupdf.MuPDFCore;
 import com.artifex.mupdf.MuPDFPageAdapter;
@@ -97,7 +98,7 @@ public class MuPDFActivity extends BaseActivity{
 	private FrameLayout mPreviewBarHolder;
 	private HorizontalListView mPreview;
 	private MuPDFPageAdapter mDocViewAdapter;
-	private SparseArray<LinkInfo[]> linkOfDocument;
+	private SparseArray<LinkInfoExternal[]> linkOfDocument;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -681,10 +682,10 @@ public class MuPDFActivity extends BaseActivity{
 		return this;
 	}
 
-	private class ActivateAutoLinks extends TinySafeAsyncTask<Integer, Void, ArrayList<LinkInfo>> {
+	private class ActivateAutoLinks extends TinySafeAsyncTask<Integer, Void, ArrayList<LinkInfoExternal>> {
 
 		@Override
-		protected ArrayList<LinkInfo> doInBackground(Integer... params) {
+		protected ArrayList<LinkInfoExternal> doInBackground(Integer... params) {
 			int page = params[0].intValue();
 			Log.d(TAG, "Page = " + page);
 			if (null != core) {
@@ -692,15 +693,20 @@ public class MuPDFActivity extends BaseActivity{
 				if(null == links){
 					return null;
 				}
-				ArrayList<LinkInfo> autoLinks = new ArrayList<LinkInfo>();
+				ArrayList<LinkInfoExternal> autoLinks = new ArrayList<LinkInfoExternal>();
 				for (LinkInfo link : links) {
-					Log.d(TAG, "activateAutoLinks link: " + link.uri);
-					if (null == link.uri) {
-						continue;
-					}
-					if (link.isMediaURI()) {
-						if (link.isAutoPlay()) {
-							autoLinks.add(link);
+					if(link instanceof LinkInfoExternal) {
+						LinkInfoExternal currentLink = (LinkInfoExternal) link;
+					
+						if (null == currentLink.url) {
+							continue;
+						}
+						Log.d(TAG, "activateAutoLinks link: " + currentLink.url);
+	
+						if (currentLink.isMediaURI()) {
+							if (currentLink.isAutoPlay()) {
+								autoLinks.add(currentLink);
+							}
 						}
 					}
 				}
@@ -710,18 +716,18 @@ public class MuPDFActivity extends BaseActivity{
 		}
 
 		@Override
-		protected void onPostExecute(final ArrayList<LinkInfo> autoLinks) {
+		protected void onPostExecute(final ArrayList<LinkInfoExternal> autoLinks) {
 			if (isCancelled() || autoLinks == null) {
 				return;
 			}
 			docView.post(new Runnable() {
 				public void run() {
-					for(LinkInfo link : autoLinks){
+					for(LinkInfoExternal link : autoLinks){
 						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
 							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);
-							pageView.addMediaHolder(mediaHolder, link.uri);
+							pageView.addMediaHolder(mediaHolder, link.url);
 							pageView.addView(mediaHolder);
 							mediaHolder.setVisibility(View.VISIBLE);
 							mediaHolder.requestLayout();
