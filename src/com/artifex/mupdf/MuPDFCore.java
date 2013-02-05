@@ -245,9 +245,10 @@ public class MuPDFCore {
 			return getUriLink(page, x, y);
 		int rightPage = page * 2;
 		int leftPage = rightPage - 1;
+		int count = countPages() * 2;
 		if(x < pageWidth && leftPage > 0) {
 			return getUriLink(leftPage, x, y);
-		} else if(rightPage < countPages()) {
+		} else if(rightPage < count) {
 			return getUriLink(rightPage, x - pageWidth, y);
 		}
 		return null;
@@ -262,6 +263,7 @@ public class MuPDFCore {
 		int combinedSize = 0;
 		int rightPage = page * 2;
 		int leftPage = rightPage - 1;
+		int count = countPages() * 2;
 		if( leftPage > 0 ) {
 			LinkInfo[] leftPageLinkInfoInternal = getPageLinksInternal(leftPage);
 			if (null != leftPageLinkInfoInternal) {
@@ -269,7 +271,7 @@ public class MuPDFCore {
 				combinedSize += leftPageLinkInfo.length;
 			}
 		}
-		if( rightPage < countPages() ) {
+		if( rightPage < count ) {
 			LinkInfo[] rightPageLinkInfoInternal = getPageLinksInternal(rightPage);
 			if (null != rightPageLinkInfoInternal) {
 				rightPageLinkInfo = rightPageLinkInfoInternal;
@@ -289,7 +291,9 @@ public class MuPDFCore {
 			temp.right += pageWidth;
 			combinedLinkInfo[j] = temp;
 		}
-		
+		for (LinkInfo linkInfo: combinedLinkInfo) {
+			Log.d(TAG, "return " + linkInfo.uri);
+		}
 		return combinedLinkInfo;
 	}
 

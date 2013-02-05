@@ -55,8 +55,9 @@ public class MuPDFPageView extends PageView {
 			return null;
 		
 		LinkInfo[] links = muPdfCore.getPageLinks(getPage());
-		if (links == null)
+		if (links == null) {
 			return null;
+		}
 		LinkInfo linkInfo = null;
 		for (int i = 0; i < links.length; i++) {
 			if (links[i].uri != null && links[i].uri.equals(uriString)) {
