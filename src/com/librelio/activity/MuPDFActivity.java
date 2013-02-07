@@ -63,7 +63,7 @@ import com.niveales.wind.R;
 public class MuPDFActivity extends BaseActivity{
 	private static final String TAG = "MuPDFActivity";
 
-	private static final int SEARCH_PROGRESS_DELAY = 200;
+//	private static final int SEARCH_PROGRESS_DELAY = 200;
 	private static final int WAIT_DIALOG = 0;
 	private static final String FILE_NAME = "FileName";
 
@@ -75,7 +75,7 @@ public class MuPDFActivity extends BaseActivity{
 	private boolean      buttonsVisible;
 	private boolean      mTopBarIsSearch;
 
-	private WeakReference<SearchTask> searchTask;
+//	private WeakReference<SearchTask> searchTask;
 	private ProgressDialog dialog;
 
 	private AlertDialog.Builder alertBuilder;
@@ -602,10 +602,6 @@ public class MuPDFActivity extends BaseActivity{
 	}
 
 	void killSearch() {
-		if (searchTask != null && null != searchTask.get()) {
-			searchTask.get().cancel(true);
-			searchTask = null;
-		}
 	}
 
 	void search(int direction) {
@@ -616,10 +612,6 @@ public class MuPDFActivity extends BaseActivity{
 
 		final int increment = direction;
 		final int startIndex = SearchTaskResult.get() == null ? docView.getDisplayedViewIndex() : SearchTaskResult.get().pageNumber + increment;
-
-		SearchTask st = new SearchTask(this, increment, startIndex);
-		st.safeExecute();
-		searchTask = new WeakReference<MuPDFActivity.SearchTask>(st);
 	}
 
 	@Override
@@ -738,90 +730,90 @@ public class MuPDFActivity extends BaseActivity{
 		}
 	}
 
-	private class SearchTask extends TinySafeAsyncTask<Void, Integer, SearchTaskResult> {
-		private final int increment; 
-		private final int startIndex;
-		private final ProgressDialogX progressDialog;
-		
-		public SearchTask(Context context, int increment, int startIndex) {
-			this.increment = increment;
-			this.startIndex = startIndex;
-			progressDialog = new ProgressDialogX(context);
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			progressDialog.setTitle(getString(R.string.searching_));
-			progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-				public void onCancel(DialogInterface dialog) {
-					killSearch();
-				}
-			});
-			progressDialog.setMax(core.countPages());
+//	private class SearchTask extends TinySafeAsyncTask<Void, Integer, SearchTaskResult> {
+//		private final int increment; 
+//		private final int startIndex;
+//		private final ProgressDialogX progressDialog;
+//		
+//		public SearchTask(Context context, int increment, int startIndex) {
+//			this.increment = increment;
+//			this.startIndex = startIndex;
+//			progressDialog = new ProgressDialogX(context);
+//			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//			progressDialog.setTitle(getString(R.string.searching_));
+//			progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//				public void onCancel(DialogInterface dialog) {
+//					killSearch();
+//				}
+//			});
+//			progressDialog.setMax(core.countPages());
+//
+//		}
 
-		}
-
-		@Override
-		protected SearchTaskResult doInBackground(Void... params) {
-			int index = startIndex;
-
-			while (0 <= index && index < core.countPages() && !isCancelled()) {
-				publishProgress(index);
-				RectF searchHits[] = core.searchPage(index, mSearchText.getText().toString());
-
-				if (searchHits != null && searchHits.length > 0) {
-					return SearchTaskResult.init(mSearchText.getText().toString(), index, searchHits);
-				}
-
-				index += increment;
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(SearchTaskResult result) {
-			if (isCancelled()) {
-				return;
-			}
-			progressDialog.cancel();
-			if (result != null) {
-				// Ask the ReaderView to move to the resulting page
-				docView.setDisplayedViewIndex(result.pageNumber);
-			    SearchTaskResult.recycle();
-				// Make the ReaderView act on the change to mSearchTaskResult
-				// via overridden onChildSetup method.
-			    docView.resetupChildren();
-			} else {
-				alertBuilder.setTitle(SearchTaskResult.get() == null ? R.string.text_not_found : R.string.no_further_occurences_found);
-				AlertDialog alert = alertBuilder.create();
-				alert.setButton(AlertDialog.BUTTON_POSITIVE, "Dismiss",
-						(DialogInterface.OnClickListener)null);
-				alert.show();
-			}
-		}
-
-		@Override
-		protected void onCancelled() {
-			super.onCancelled();
-			progressDialog.cancel();
-		}
-
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-			super.onProgressUpdate(values);
-			progressDialog.setProgress(values[0].intValue());
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			mHandler.postDelayed(new Runnable() {
-				public void run() {
-					if (!progressDialog.isCancelled())
-					{
-						progressDialog.show();
-						progressDialog.setProgress(startIndex);
-					}
-				}
-			}, SEARCH_PROGRESS_DELAY);
-		}
-	}
+//		@Override
+//		protected SearchTaskResult doInBackground(Void... params) {
+//			int index = startIndex;
+//
+//			while (0 <= index && index < core.countPages() && !isCancelled()) {
+//				publishProgress(index);
+//				RectF searchHits[] = core.searchPage(index, mSearchText.getText().toString());
+//
+//				if (searchHits != null && searchHits.length > 0) {
+//					return SearchTaskResult.init(mSearchText.getText().toString(), index, searchHits);
+//				}
+//
+//				index += increment;
+//			}
+//			return null;
+//		}
+//
+//		@Override
+//		protected void onPostExecute(SearchTaskResult result) {
+//			if (isCancelled()) {
+//				return;
+//			}
+//			progressDialog.cancel();
+//			if (result != null) {
+//				// Ask the ReaderView to move to the resulting page
+//				docView.setDisplayedViewIndex(result.pageNumber);
+//			    SearchTaskResult.recycle();
+//				// Make the ReaderView act on the change to mSearchTaskResult
+//				// via overridden onChildSetup method.
+//			    docView.resetupChildren();
+//			} else {
+//				alertBuilder.setTitle(SearchTaskResult.get() == null ? R.string.text_not_found : R.string.no_further_occurences_found);
+//				AlertDialog alert = alertBuilder.create();
+//				alert.setButton(AlertDialog.BUTTON_POSITIVE, "Dismiss",
+//						(DialogInterface.OnClickListener)null);
+//				alert.show();
+//			}
+//		}
+//
+//		@Override
+//		protected void onCancelled() {
+//			super.onCancelled();
+//			progressDialog.cancel();
+//		}
+//
+//		@Override
+//		protected void onProgressUpdate(Integer... values) {
+//			super.onProgressUpdate(values);
+//			progressDialog.setProgress(values[0].intValue());
+//		}
+//
+//		@Override
+//		protected void onPreExecute() {
+//			super.onPreExecute();
+//			mHandler.postDelayed(new Runnable() {
+//				public void run() {
+//					if (!progressDialog.isCancelled())
+//					{
+//						progressDialog.show();
+//						progressDialog.setProgress(startIndex);
+//					}
+//				}
+//			}, SEARCH_PROGRESS_DELAY);
+//		}
+//	}
 
 }

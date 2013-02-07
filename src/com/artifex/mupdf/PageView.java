@@ -70,7 +70,7 @@ public abstract class PageView extends ViewGroup {
 	private       ImageView patch;
 	private       SafeAsyncTask<PatchInfo,Void,PatchInfo> mDrawPatch;
 	private       RectF     mSearchBoxes[];
-	protected       LinkInfo  mLinks[];
+	protected       LinkInfo[]  mLinks;
 	private       LinkInfo  mUrls[];
 	private       View      searchView;
 	private       boolean   mIsBlank;

@@ -48,7 +48,8 @@ public class MuPDFPageView extends PageView {
 		float docRelY = (y - getTop()) / scale;
 
 		String uriString = null;
-
+		if(mLinks == null) 
+			return null;
 		for (LinkInfo l: mLinks)
 			if (l.rect.contains(docRelX, docRelY) && (l instanceof LinkInfoExternal))
 				uriString  = ((LinkInfoExternal) l).url;;
