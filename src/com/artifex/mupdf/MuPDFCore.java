@@ -237,15 +237,14 @@ public class MuPDFCore {
 	}
 
 	public synchronized int hitLinkPage(int page, float x, float y) {
-//		if(displayPages == 1)
-//			return getPageLink(page, x, y);
-//		int rightPage = page * 2;
-//		int leftPage = rightPage - 1;
-//		if(x < pageWidth && leftPage > 0) {
-//			return getPageLink(leftPage, x, y);
-//		} else if(rightPage < countPages()) {
-//			return getPageLink(rightPage, x - pageWidth, y);
-//		}
+		LinkInfo[] pageLinks = getPageLinks(page);
+		for(LinkInfo pageLink: pageLinks) {
+			if(pageLink instanceof LinkInfoInternal) {
+				LinkInfoInternal internalLink = (LinkInfoInternal) pageLink;
+				if(internalLink.rect.contains(x, y))
+					return internalLink.pageNumber;
+			}
+		}
 		return -1;
 	}
 

@@ -31,15 +31,18 @@ public class MuPDFPageView extends PageView {
 	}
 
 	public int hitLinkPage(float x, float y) {
-		// Since link highlighting was implemented, the super class
-		// PageView has had sufficient information to be able to
-		// perform this method directly. Making that change would
-		// make MuPDFCore.hitLinkPage superfluous.
 		float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
-
-		return muPdfCore.hitLinkPage(mPageNumber, docRelX, docRelY);
+		LinkInfo[] pageLinks = muPdfCore.getPageLinks(mPageNumber);
+		for(LinkInfo pageLink: pageLinks) {
+			if(pageLink instanceof LinkInfoInternal) {
+				LinkInfoInternal internalLink = (LinkInfoInternal) pageLink;
+				if(internalLink.rect.contains(docRelX, docRelY))
+					return internalLink.pageNumber;
+			}
+		}
+		return -1;
 	}
 
 	public String hitLinkUri(float x, float y) {
