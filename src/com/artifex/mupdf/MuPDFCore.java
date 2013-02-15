@@ -93,7 +93,8 @@ public class MuPDFCore {
 		if(numPages % 2 == 0) {
 			return numPages / 2 + 1;
 		}
-		return numPages / 2;
+		int toReturn = numPages / 2;
+		return toReturn + 1;
 	}
 
 	private synchronized int countPagesSynchronized() {

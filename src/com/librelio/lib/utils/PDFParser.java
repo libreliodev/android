@@ -37,7 +37,8 @@ public class PDFParser {
 	}
 	
 	private void parseLinkInfo() {
-		for(int page = 0; page < mCore.countPages(); page++) {
+		int nPages = mCore.countPages();
+		for(int page = 0; page < nPages; page++) {
 			LinkInfo [] mPageLinkInfo = mCore.getPageLinks(page);
 			if(mPageLinkInfo != null && mPageLinkInfo.length > 0) {
 				ArrayList<LinkInfoExternal> fixedLinkInfo = new ArrayList<LinkInfoExternal>();
