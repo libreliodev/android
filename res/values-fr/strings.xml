@@ -1,33 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wind</string>
     <string name="no_media_warning">No media</string>
     <string name="no_media_hint">Disconnect from PC</string>
-    <string name="open_failed">Cant open PDF. Please put file wind_355.pdf on SD card for testing &#8230;</string>
     <string name="search_backwards">Search back</string>
     <string name="search_forwards">Search forward</string>
     <string name="search_document">Search in document</string>
-    <string name="picker_title">Wind</string>
     <string name="outline_title">Outline</string>
     <string name="enter_password">Enter your password</string>
     <string name="text_not_found">Not found</string><string name="items_you_own">Items you own</string><string name="recent_transactions">Recent activity</string><string name="edit_payload">Edit Payload</string><string name="items_for_sale">Items for sale</string>
     <string name="searching_">Searching&#8230;</string>
     <string name="link_control">Link highlight</string>
-    <string name="exit">Exit</string>
-    <string name="reload">Reload</string>
-    <string name="not_connected">Not connected to Internet&#8230;</string>
-    <string name="restore_purchise">Restore purchises</string>
-    <string name="subscription_monthly">Subscribe month</string>
-    <string name="subscription_yearly">Subscribe year</string>
-    <string name="android_purchased">Purchase finished</string>
-    <string name="android_canceled">Purchase cancelled</string>
-    <string name="android_refunded">Purchase refunded</string>
-    <string name="android_item_unavailable">Product unavailable</string>
-    <string name="cannot_connect_title">Cant connect</string>
-    <string name="cannot_connect_message">Cant connect Google Play server</string>
+    <string name="exit">Sortir</string>
+    <string name="reload">Recharger</string>
+    <string name="not_connected">Non connecté à internet&#8230;</string>
+    <string name="restore_purchise">Restaurer les achats</string>
+    <string name="subscription_monthly">Abonnement mensuel</string>
+    <string name="subscription_yearly">Abonnement annuel</string>
+    <string name="android_purchased">Achat terminé</string>
+    <string name="android_canceled">Achat annulé</string>
+    <string name="android_refunded">Achat remboursé</string>
+    <string name="android_item_unavailable">Produit non disponible</string>
+    <string name="cannot_connect_title">Connexion imposssible</string>
+    <string name="cannot_connect_message">Impossible de se connecter à Google Play</string>
     <string name="billing_not_supported_message">Google Play not supported on your device</string>
-    <string name="subscriptions_not_supported_title">Subscriptions not supported</string>
-    <string name="subscriptions_not_supported_message">Subscriptions not supported on your device</string>
+    <string name="subscriptions_not_supported_title">Abonnements non supportés</string>
+    <string name="subscriptions_not_supported_message">Abonnements non supportés sur votre appareil</string>
     <string name="billing_not_supported_title">Billing not supported.</string>
         <string name="android_test_canceled">android.test.canceled</string>
     <string name="android_test_purchased">android.test.purchased</string>
@@ -35,21 +32,18 @@
     <string name="android_test_refunded">android.test.refunded</string>
     <string name="edit_subscriptions">Edit Subscriptions</string>
     <string name="help_url" formatted="false">http://market.android.com/support/bin/answer.py?answer=1050566&amp;hl=%lang%&amp;dl=%region%</string>
-	    <string name="restoring_transactions">Restoring transactions</string>
-    <string name="learn_more">Learn more</string>
-    <string name="buy">Buy</string>
-    <string name="select_item">Select item</string>
+	    <string name="restoring_transactions">Restauration des transactions</string>
+    <string name="learn_more">En savoir plus</string>
+    <string name="buy">Acheter</string>
+    <string name="select_item">Selectionner un article</string>
     <string name="edit_payload_title">Edit the developer payload associated with this purchase</string><string name="edit_payload_accept">Set</string><string name="edit_payload_clear">No Payload</string>
-    <string name="purchise">Purchassse</string>
-    <string name="delete">Delete</string>
-    <string name="subscribe_year">Subscribe year</string>
-    <string name="no_further_occurences_found">No more found</string>
+    <string name="purchise">Acheter</string>
+    <string name="delete">Effacer</string>
     
-    <string name="connection_failed">Connection failed!</string>
+    <string name="connection_failed">La connexion a échoué!</string>
 
-    <string name="abonnement_wind">Abonnement Wind</string>
     
-    <string name="server_error">Bad responce from server.</string>
+    <string name="server_error">Erreur serveur.</string>
     <string name="connecting">Connexion...</string>
     <string name="download_failed_please_check_your_connection">Le téléchargement a échoué, veuillez vérifier votre connection internet</string>
     <string name="please_check_your_connection">Veuillez vérifier votre connection internet</string>
