@@ -3,7 +3,6 @@
 
     <string name="app_name">Wind</string>
     <string name="picker_title">Wind</string>
-    <string name="GoogleAnalyticsCode">UA_xxxxxx</string>
     <string name="enable_yearly_subs">false</string>
     <string name="enable_monthly_subs">false</string>
     <bool name="enable_test_magazine">false</bool>
