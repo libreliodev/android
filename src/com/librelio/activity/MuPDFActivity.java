@@ -1,6 +1,5 @@
 package com.librelio.activity;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -12,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,7 +54,6 @@ import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
 import com.librelio.view.HorizontalListView;
-import com.librelio.view.ProgressDialogX;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class

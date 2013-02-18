@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +24,7 @@ import android.widget.TextView;
 
 import com.niveales.wind.R;
 
-public class ImagePager extends RelativeLayout {
+public class ImagePager extends RelativeLayout{
 
 	protected static final String TAG = "ImagePager";
 
@@ -44,11 +45,10 @@ public class ImagePager extends RelativeLayout {
 	private SlidesInfo slidesInfo;
 	private View progressBar;
 
-
 	protected int countPhotos;
 	protected String projectId;
 	private int count = 0;
-
+	
 	public interface PhotoPagerListener {
 		void onClickItem(int photoId);
 	}
@@ -62,6 +62,17 @@ public class ImagePager extends RelativeLayout {
 		init();
 	}
 
+	public void setGestureDetector(final GestureDetector gestureDetector){
+		if (gestureDetector != null){
+			viewPager.setOnTouchListener(new OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return gestureDetector.onTouchEvent(event);
+				}
+			});
+		}
+	}
+	
 	public void setTitle(final String titleTable, final String titleUrl){
 		titleView.setText(titleTable);
 	}
@@ -157,6 +168,7 @@ public class ImagePager extends RelativeLayout {
 		viewPager.setFadingEdgeLength(0);
 		viewPager.setOffscreenPageLimit(getPageLimit());
 		jumpTo(0);
+		
 		addView(viewPager);
 	}
 
@@ -219,7 +231,6 @@ public class ImagePager extends RelativeLayout {
 		backgroungColor = color;
 		super.setBackgroundColor(color);
 	}
-
 
 	private class SlidesInfo {
 		public final String assetDir;
@@ -297,8 +308,10 @@ public class ImagePager extends RelativeLayout {
 			return view == object;
 		}
 
-		public String getItem(int position) {
-			return slidesInfo.getFullPathToImage(position + 1);
+		public String getItem(int position){
+			//for reversive image showing
+			position = slidesInfo.count - position;
+			return slidesInfo.getFullPathToImage(position);
 		}
 
 		@Override
@@ -337,5 +350,4 @@ public class ImagePager extends RelativeLayout {
 			return slidesInfo.count;
 		}
 	}
-
 }

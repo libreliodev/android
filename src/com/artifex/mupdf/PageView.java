@@ -400,6 +400,8 @@ public abstract class PageView extends ViewGroup {
 				}
 			}
 
+			System.gc();
+			
 			try {
 				Bitmap bm = Bitmap.createBitmap(patchArea.width(), patchArea.height(), Bitmap.Config.ARGB_8888);
 	

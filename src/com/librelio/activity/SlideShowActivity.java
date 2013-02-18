@@ -16,7 +16,6 @@ import com.librelio.base.BaseActivity;
 import com.librelio.view.ImagePager;
 import com.niveales.wind.R;
 
-
 /**
  * @author Mike Osipov
  */
@@ -26,12 +25,13 @@ public class SlideShowActivity extends BaseActivity {
 	private ImagePager imagePager;
 	private Handler autoPlayHandler;
 	
+	private String fullPath;
 	private int autoPlayDelay;
+	private int bgColor;
+	private int initialSlidePosition;	
 	private boolean transition = true;
 	private boolean autoPlay;
-	private int bgColor;
-	private String fullPath;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,6 +44,7 @@ public class SlideShowActivity extends BaseActivity {
 		autoPlay = getIntent().getExtras().getBoolean(MediaHolder.AUTO_PLAY_KEY);
 		bgColor = getIntent().getExtras().getInt(MediaHolder.BG_COLOR_KEY);
 		fullPath = getIntent().getExtras().getString(MediaHolder.FULL_PATH_KEY);
+		initialSlidePosition = getIntent().getExtras().getInt(MediaHolder.INITIAL_SLIDE_POSITION);
 
 		imagePager = new ImagePager(this, fullPath, transition, 100);
 		imagePager.post(new Runnable() {
@@ -66,6 +67,10 @@ public class SlideShowActivity extends BaseActivity {
 					imagePager.setCurrentPosition(imagePager.getCurrentPosition() + 1, transition);
 					autoPlayHandler.postDelayed(this, autoPlayDelay);
 				}}, autoPlayDelay);
+		}
+		
+		if (initialSlidePosition > 0){
+			imagePager.setCurrentPosition(initialSlidePosition, false);
 		}
 		
 		imagePager.setBackgroundColor(bgColor);

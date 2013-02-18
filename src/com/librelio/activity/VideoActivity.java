@@ -20,12 +20,10 @@
 package com.librelio.activity;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -42,7 +40,6 @@ import android.widget.MediaController;
 import android.widget.MediaController.MediaPlayerControl;
 
 import com.artifex.mupdf.MediaHolder;
-import com.librelio.base.BaseActivity;
 import com.niveales.wind.R;
 
 /**
@@ -111,15 +108,19 @@ public class VideoActivity extends AbstractLockRotationActivity implements Media
 			fis = new FileInputStream(videFile);
 	        mMediaPlayer.setDataSource(fis.getFD());
 	        mMediaPlayer.setDisplay(sHolder);
+	        
 	        mMediaPlayer.prepareAsync();
+	        
 	        mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					onCancel();
 					mMediaPlayer.start();
+					setSurfaceViewScale();
 					mMediaPlayer.seekTo(position);
 					mc.setMediaPlayer(getMediaPlayerControl());
 					mc.setAnchorView(video);
+					
 					Handler handler = new Handler();
 			        handler.post(new Runnable() {
 			            public void run() {
@@ -137,6 +138,28 @@ public class VideoActivity extends AbstractLockRotationActivity implements Media
 		} catch (Exception e) {
 			Log.e(TAG,"Problem with input stream!",e);
 		}
+	}
+	
+	private void setSurfaceViewScale(){
+		
+		int width = video.getWidth();
+		int height = video.getHeight();
+		float boxWidth = width;
+		float boxHeight = height;
+
+		float videoWidth = mMediaPlayer.getVideoWidth();
+		float videoHeight = mMediaPlayer.getVideoHeight();
+
+		float wr = boxWidth / videoWidth;
+		float hr = boxHeight / videoHeight;
+		float ar = videoWidth / videoHeight;
+
+		if (wr > hr)
+		    width = (int) (boxHeight * ar);
+		else
+		    height = (int) (boxWidth / ar);
+		
+		holder.setFixedSize(width, height);
 	}
 	
 	@Override
