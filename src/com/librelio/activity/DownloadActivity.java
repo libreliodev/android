@@ -27,7 +27,10 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import android.app.AlertDialog;
@@ -36,7 +39,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -46,13 +48,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.LinkInfoExternal;
 import com.librelio.LibrelioApplication;
-import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
+import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
 /**
@@ -89,6 +90,8 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 	private Magazine magazine;
 	private InputStream input;
 	private OutputStream output;
+	private MagazineManager magazineManager;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +102,10 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		isSample= getIntent().getExtras().getBoolean(IS_SAMPLE_KEY);
 		isTemp= getIntent().getExtras().getBoolean(IS_TEMP_KEY);
 		
+		magazineManager = new MagazineManager(this);
+		
 		magazine = new Magazine(fileName, title, subtitle, "", this);
+		magazine.setSample(isSample);
 		setContentView(R.layout.download);
 		preview = (ImageView)findViewById(R.id.download_preview_image);
 		text = (TextView)findViewById(R.id.download_progress_text);
@@ -281,9 +287,20 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			if(result == INTERRUPT){
 				return;
 			}
-			//
 			magazine.makeCompleteFile(isSample);
-			//
+			
+			Date date = Calendar.getInstance().getTime();
+			String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
+			magazine.setDownloadDate(downloadDate);
+			magazineManager.removeMagazine(
+					Magazine.TABLE_DOWNLOADED_MAGAZINES,
+					Magazine.FIELD_FILE_NAME,
+					"'" + magazine.getFileName() + "'");
+			magazineManager.addMagazine(
+					magazine, 
+					Magazine.TABLE_DOWNLOADED_MAGAZINES, 
+					true);
+			
 			Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 			sendBroadcast(intentInvalidate);
 			LibrelioApplication.startPDFActivity(getContext(),filePath);

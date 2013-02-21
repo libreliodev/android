@@ -14,12 +14,22 @@ import com.librelio.base.IBaseContext;
 import com.librelio.storage.MagazineManager;
 
 public class Magazine {
-	private static final String TAG = "Magazine";
+	protected static final String TAG = Magazine.class.getSimpleName();
 	private static final String COMPLETE_FILE = ".complete";
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
 	private static final String PAYED_FILE = ".payed";
 	
+	public static final String TABLE_MAGAZINES = "Magazines";
+	public static final String TABLE_DOWNLOADED_MAGAZINES = "DownloadedMagazines";
+	public static final String FIELD_ID = "_id";
+	public static final String FIELD_TITLE = "title";
+	public static final String FIELD_SUBTITLE = "subtitle";
+	public static final String FIELD_FILE_NAME = "filename";
+	public static final String FIELD_DOWNLOAD_DATE = "downloaddate";
+	public static final String FIELD_IS_SAMPLE = "sample";
+	
 	private Context context;
+	private int id;
 	private String title;
 	private String subtitle;
 	private String fileName;
@@ -34,6 +44,7 @@ public class Magazine {
 	private boolean isSampleDowloaded = false;
 	private String assetsDir;
 	private String downloadDate;
+	private boolean isSample;
 
 	public Magazine(String fileName, String title, String subtitle, String downloadDate, Context context) {
 		this.fileName = fileName;
@@ -46,15 +57,21 @@ public class Magazine {
 	}
 
 	public Magazine(Cursor cursor, Context context) {
-		int titleColumnId = cursor.getColumnIndex(MagazineManager.FIELD_TITLE);
-		int subitleColumnId = cursor.getColumnIndex(MagazineManager.FIELD_SUBTITLE);
-		int fileNameColumnId = cursor.getColumnIndex(MagazineManager.FIELD_FILE_NAME);
-		int dateColumnId = cursor.getColumnIndex(MagazineManager.FIELD_DOWNLOAD_DATE);
+		int idColumnId = cursor.getColumnIndex(FIELD_ID);
+		int titleColumnId = cursor.getColumnIndex(FIELD_TITLE);
+		int subitleColumnId = cursor.getColumnIndex(FIELD_SUBTITLE);
+		int fileNameColumnId = cursor.getColumnIndex(FIELD_FILE_NAME);
+		int dateColumnId = cursor.getColumnIndex(FIELD_DOWNLOAD_DATE);
+		int isSampleColumnId = cursor.getColumnIndex(FIELD_IS_SAMPLE);
 		
+		this.id = cursor.getInt(idColumnId);
 		this.fileName = cursor.getString(fileNameColumnId);
 		this.title = cursor.getString(titleColumnId);
 		this.subtitle = cursor.getString(subitleColumnId);
 		this.downloadDate = cursor.getString(dateColumnId);
+		if (isSampleColumnId > -1){
+			this.isSample = cursor.getInt(isSampleColumnId) == 0 ? false : true;  
+		}
 		this.context = context;
 
 		valuesInit(fileName);
@@ -143,6 +160,10 @@ public class Magazine {
 		}
 	}
 	
+	public int getId(){
+		return this.id;
+	}
+	
 	public String getAssetsDir(){
 		return this.assetsDir;
 	}
@@ -213,6 +234,10 @@ public class Magazine {
 	public void setPngPath(String pngName) {
 		this.pngPath = pngName;
 	}
+	
+	public void setSample(boolean isSample) {
+		this.isSample = isSample;
+	}
 
 	public String getPdfUrl() {
 		return pdfUrl;
@@ -241,5 +266,12 @@ public class Magazine {
 	public boolean isFake() {
 		return getFileName().equals(MagazineManager.TEST_FILE_NAME);
 	}
-
+	
+	public boolean isSample() {
+		return isSample;
+	}
+	
+	public int isSampleForBase() {
+		return isSample ? 1 : 0;
+	}
 }

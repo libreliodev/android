@@ -4,4 +4,5 @@
     <item android:id="@+id/options_menu_restore" android:title="@string/restore_purchise" android:visible="false"></item>
     <item android:id="@+id/options_menu_subscribe" android:title="@string/subscribe_year" android:visible="false"></item>
     <item android:id="@+id/options_menu_send_log" android:title="@string/send_log"></item>
+    <item android:id="@+id/options_menu_downloaded_magazines" android:title="@string/downloads"></item>
 </menu>

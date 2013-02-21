@@ -656,7 +656,7 @@ public class MuPDFActivity extends BaseActivity{
 	private void onBuy(String path) {
 		Log.d(TAG, "onBuy event path = " + path);
 		MagazineManager magazineManager = new MagazineManager(getContext());
-		Magazine magazine = magazineManager.findByFileName(path);
+		Magazine magazine = magazineManager.findByFileName(path, Magazine.TABLE_MAGAZINES);
 		if (null != magazine) {
 			Intent intent = new Intent(getContext(), BillingActivity.class);
 			intent

@@ -20,6 +20,7 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
 import com.librelio.model.Magazine;
+import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
@@ -28,12 +29,14 @@ public class MagazineAdapter extends BaseAdapter{
 	private Context context;
 	private ArrayList<Magazine> magazine;
 	private boolean hasTestMagazine;
-
+	private MagazineManager magazineManager;
 	
 	public MagazineAdapter(ArrayList<Magazine> magazine, Context context, boolean hasTestMagazine) {
 		this.context = context;
 		this.magazine = magazine;
 		this.hasTestMagazine = hasTestMagazine;
+		
+		magazineManager = new MagazineManager(context);
 	}
 
 	@Override
@@ -155,6 +158,10 @@ public class MagazineAdapter extends BaseAdapter{
 			@Override
 			public void onClick(View v) {
 				currentMagazine.delete();
+				magazineManager.removeMagazine(
+						Magazine.TABLE_DOWNLOADED_MAGAZINES,
+						Magazine.FIELD_FILE_NAME,
+						"'" + currentMagazine.getFileName() + "'");
 			}
 			});
 		} else {

@@ -6,10 +6,9 @@
     android:padding="5dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="5dp"
+        android:gravity="center_horizontal"
         android:text="@string/what_do_you_want_to_buy" />
 
     <Button
@@ -20,7 +19,7 @@
 
     <Button
         android:id="@+id/billing_subs_monthly"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/preview_button_text_size" />
 

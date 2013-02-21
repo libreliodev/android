@@ -140,7 +140,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					onPlayVideoInside(basePath);
 				}
 			}
-		} else if(linkInfo.hasVideoData()) {
+		} else if(linkInfo.hasVideoData() 
+				|| linkInfo.isMediaURI()) {
 			if (fullScreen) {
 				onPlayVideoOutsideLocal();
 			} else {
@@ -261,10 +262,33 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				cancelWaitDialog();
 				if(autoPlayFlagMP){
 					mMediaPlayer.start();
+					setSurfaceViewScale();
 				}
 			}
 		});
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+	}
+	
+	private void setSurfaceViewScale(){
+		
+		int width = videoView.getWidth();
+		int height = videoView.getHeight();
+		float boxWidth = width;
+		float boxHeight = height;
+
+		float videoWidth = mMediaPlayer.getVideoWidth();
+		float videoHeight = mMediaPlayer.getVideoHeight();
+
+		float wr = boxWidth / videoWidth;
+		float hr = boxHeight / videoHeight;
+		float ar = videoWidth / videoHeight;
+
+		if (wr > hr)
+		    width = (int) (boxHeight * ar);
+		else
+		    height = (int) (boxWidth / ar);
+		
+		holder.setFixedSize(width, height);
 	}
 
 	protected void onPlayVideoOutside(String path){
@@ -355,8 +379,18 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			   public void onProgressChanged(WebView view, int progress) {
 			     // Activities and WebViews measure progress with different scales.
 			     // The progress meter will automatically disappear when we reach 100%
-//				     activity.setProgress(progress * 1000);
+				 //	activity.setProgress(progress * 1000);
 			   }
+			   
+				@Override
+				public void onShowCustomView(View view, CustomViewCallback callback) {
+					super.onShowCustomView(view, callback);
+				}
+
+				@Override
+				public void onHideCustomView(){
+				}
+			   
 			 });
 		mWebView.setWebViewClient(new VideoWebViewClient());
 
