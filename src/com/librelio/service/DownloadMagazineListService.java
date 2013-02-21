@@ -88,7 +88,7 @@ public class DownloadMagazineListService extends BaseService {
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				magazineManager.cleanMagazines();
+				magazineManager.cleanMagazines(Magazine.TABLE_MAGAZINES);
 				//
 				plistUrl = LibrelioApplication.getAmazonServerUrl() + "Magazines.plist";
 				Log.d(TAG, "Downloading start path:" + getStoragePath() + ", mode = " + useStaticMagazines);
@@ -124,7 +124,7 @@ public class DownloadMagazineListService extends BaseService {
 					} else {
 						Log.d(TAG, magazine.getPngPath() + " already exist");
 					}
-					magazineManager.addMagazine(magazine);
+					magazineManager.addMagazine(magazine, Magazine.TABLE_MAGAZINES, false);
 				}
 
 				Log.d(TAG, "Downloading was finished");

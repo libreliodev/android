@@ -57,6 +57,7 @@
     <string name="try_again">Réessayer</string>
     <string name="downloads">Téléchargements</string>
     <string name="downloaded">Téléchargé</string>
+    <string name="downloaded_title">Téléchargé:</string>
     <string name="free_Download">Téléchargement gratuit</string>
     <string name="download">Télécharger ...</string>
     <string name="free_sample">Extrait gratuit</string>

@@ -72,11 +72,14 @@ public class LibrelioApplication extends Application {
 		return context.getResources().getString(R.string.magazine_name);
 	}
 	
+	public static String getUrlString(String fileName){
+		return PATH_SEPARATOR + fileName;
+	}
+	
 	public static String getUrlString(Context context, String fileName){
 		return LibrelioApplication.getClientName(context) + PATH_SEPARATOR 
 		+ LibrelioApplication.getMagazineName(context) + PATH_SEPARATOR + fileName;
 	}
-	
 
 	public static boolean isEnableYearlySubs(Context context){
 		String data = context.getResources().getString(R.string.enable_yearly_subs);

@@ -60,6 +60,7 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:name="com.librelio.base.BaseActivity" />
+        <activity android:name="com.librelio.activity.DownloadedMagazinesActivity" />
     </application>
 
 </manifest>
