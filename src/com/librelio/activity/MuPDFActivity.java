@@ -71,7 +71,7 @@ public class MuPDFActivity extends BaseActivity{
 	private String fileName;
 	private int mOrientation;
 
-	private int          mPageSliderRes;
+//	private int          mPageSliderRes;
 	private boolean      buttonsVisible;
 	private boolean      mTopBarIsSearch;
 
@@ -253,8 +253,8 @@ public class MuPDFActivity extends BaseActivity{
 		makeButtonsView();
 
 		// Set up the page slider
-		int smax = Math.max(core.countPages()-1,1);
-		mPageSliderRes = ((10 + smax - 1)/smax) * 2;
+//		int smax = Math.max(core.countPages()-1,1);
+//		mPageSliderRes = ((10 + smax - 1)/smax) * 2;
 
 		// Set the file-name text
 		mFilenameView.setText(fileName);

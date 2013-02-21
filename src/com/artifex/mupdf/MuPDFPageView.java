@@ -18,10 +18,10 @@ public class MuPDFPageView extends PageView {
 	private static final String TAG = "MuPDFPageView";
 	public static final String PATH_KEY = "path";
 	public static final String LINK_URI_KEY = "link_uri";
-	
+
 	private final MuPDFCore muPdfCore;
 	private HashMap<String, FrameLayout> mediaHolders = new HashMap<String, FrameLayout>();
-	
+
 	private ArrayList<String> runningLinks;
 
 	public MuPDFPageView(Context c, MuPDFCore muPdfCore, Point parentSize) {
@@ -35,11 +35,23 @@ public class MuPDFPageView extends PageView {
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
 		LinkInfo[] pageLinks = muPdfCore.getPageLinks(mPageNumber);
-		for(LinkInfo pageLink: pageLinks) {
-			if(pageLink instanceof LinkInfoInternal) {
+		for (LinkInfo pageLink : pageLinks) {
+			if (pageLink instanceof LinkInfoInternal) {
 				LinkInfoInternal internalLink = (LinkInfoInternal) pageLink;
-				if(internalLink.rect.contains(docRelX, docRelY))
-					return internalLink.pageNumber;
+				if (internalLink.rect.contains(docRelX, docRelY)) {
+					/*
+					 * Here we should check the screen number against the
+					 * dowble-page view and correctly recalculate it from the
+					 * page number
+					 */
+					int pageNumber = internalLink.pageNumber;
+					if (muPdfCore.getDisplayPages() != 1)
+						if (pageNumber > 0)
+							return (pageNumber + 1) / 2;
+						else
+							return 0;
+					return pageNumber;
+				}
 			}
 		}
 		return -1;
@@ -51,22 +63,24 @@ public class MuPDFPageView extends PageView {
 		float docRelY = (y - getTop()) / scale;
 
 		String uriString = null;
-		if(mLinks == null) 
+		if (mLinks == null)
 			return null;
-		for (LinkInfo l: mLinks)
-			if (l.rect.contains(docRelX, docRelY) && (l instanceof LinkInfoExternal))
-				uriString  = ((LinkInfoExternal) l).url;;
-		
+		for (LinkInfo l : mLinks)
+			if (l.rect.contains(docRelX, docRelY)
+					&& (l instanceof LinkInfoExternal))
+				uriString = ((LinkInfoExternal) l).url;
+		;
+
 		if (uriString == null)
 			return null;
-		
+
 		LinkInfo[] links = muPdfCore.getPageLinks(getPage());
 		if (links == null) {
 			return null;
 		}
 		LinkInfoExternal linkInfo = null;
 		for (int i = 0; i < links.length; i++) {
-			if( ! (links[i] instanceof LinkInfoExternal))
+			if (!(links[i] instanceof LinkInfoExternal))
 				continue;
 			LinkInfoExternal extLinkInfo = (LinkInfoExternal) links[i];
 			if (extLinkInfo.url != null && extLinkInfo.url.equals(uriString)) {
@@ -74,18 +88,19 @@ public class MuPDFPageView extends PageView {
 				break;
 			}
 		}
-		
-		if(runningLinks.contains(linkInfo.url)){
-			Log.d(TAG,"Already running link: "+linkInfo.url);
+
+		if (runningLinks.contains(linkInfo.url)) {
+			Log.d(TAG, "Already running link: " + linkInfo.url);
 			return linkInfo.url;
-		} else if(!linkInfo.isFullScreen()){
+		} else if (!linkInfo.isFullScreen()) {
 			runningLinks.add(linkInfo.url);
 		}
-		
+
 		if (linkInfo.isMediaURI()) {
 			try {
 				final String basePath = muPdfCore.getFileDirectory();
-				MediaHolder h = new MediaHolder(getContext(), linkInfo, basePath);
+				MediaHolder h = new MediaHolder(getContext(), linkInfo,
+						basePath);
 				h.setVisibility(View.VISIBLE);
 				this.mediaHolders.put(uriString, h);
 				addView(h);
@@ -176,13 +191,14 @@ public class MuPDFPageView extends PageView {
 		}
 	}
 
-	public void addMediaHolder(MediaHolder h,String uriString){
+	public void addMediaHolder(MediaHolder h, String uriString) {
 		this.mediaHolders.put(uriString, h);
 	}
-	
-	public void cleanRunningLinkList(){
+
+	public void cleanRunningLinkList() {
 		runningLinks.clear();
 	}
+
 	@Override
 	protected void drawPage(Bitmap bm, int sizeX, int sizeY, int patchX,
 			int patchY, int patchWidth, int patchHeight) {
@@ -200,7 +216,7 @@ public class MuPDFPageView extends PageView {
 		return muPdfCore.getPageLinks(mPageNumber);
 	}
 
-//	protected LinkInfo[] getExternalLinkInfo() {
-//		return muPdfCore.getPageURIs(mPageNumber);
-//	}	
+	// protected LinkInfo[] getExternalLinkInfo() {
+	// return muPdfCore.getPageURIs(mPageNumber);
+	// }
 }
