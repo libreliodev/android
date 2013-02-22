@@ -204,15 +204,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		}, 1000);
 	}
 	
-	protected void onChangeRotation() {
-		new Timer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				setContentView(R.layout.startup);
-			}
-		}, 1000);
-	}
-	
 	private String getAdvertisingImageURL() {
 		
 		return new StringBuilder(getString(R.string.get_advertising_image_url))
