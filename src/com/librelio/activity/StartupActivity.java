@@ -19,8 +19,11 @@
 
 package com.librelio.activity;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,9 +41,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
 import com.librelio.LibrelioApplication;
+import com.longevitysoft.android.xml.plist.PListXMLHandler;
+import com.longevitysoft.android.xml.plist.PListXMLParser;
+import com.longevitysoft.android.xml.plist.domain.Dict;
+import com.longevitysoft.android.xml.plist.domain.PList;
 import com.niveales.wind.R;
 
 /**
@@ -55,6 +64,11 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		
 	private static final String PARAM_CLIENT = "@client";
 	private static final String PARAM_APP = "@app";
+	
+	private static final String PLIST_DELAY = "Delay";
+	private static final String PLIST_LINK = "Link";
+	
+	private static int DEFAULT_ADV_DELAY = 5000;
 	
 	private ImageView startupImage;
 	
@@ -176,32 +190,84 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		}
 	}
 	
-	private class LoadAdvertisingLinkTask extends AsyncTask<Void, Void, Void>{
+	private class LoadAdvertisingLinkTask extends AsyncTask<Void, Void, Integer>{
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected Integer doInBackground(Void... params) {
 			String linkUrl = getAdvertisingLinkURL();
-			return null;
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpGet httpget = new HttpGet(linkUrl);
+			try {
+				HttpResponse response = httpclient.execute(httpget);
+				if (response != null){
+					HttpEntity entity = response.getEntity();
+					if (entity != null){
+						
+						InputStream is = entity.getContent();
+						InputStreamReader isReader = new InputStreamReader(is);
+						StringBuilder sb = new StringBuilder();
+						BufferedReader br = new BufferedReader(isReader);
+						String read = br.readLine();
+						while(read != null) {
+							sb.append(read);
+							read = br.readLine();
+						}
+						isReader.close();
+						
+						PListXMLHandler handler = new PListXMLHandler();
+						PListXMLParser parser = new PListXMLParser();
+						parser.setHandler(handler);
+						parser.parse(sb.toString());
+						PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
+						if (list != null){
+							Dict dict = (Dict) list.getRootElement();
+							String delay = dict.getConfiguration(PLIST_DELAY).getValue().toString();
+							String link = dict.getConfiguration(PLIST_LINK).getValue().toString();
+							setOnAdvertisingImageClickListener(link);
+							return Integer.valueOf(delay);
+						}
+					}
+				}
+			} catch (ClientProtocolException e) {
+				Log.e(TAG, "Loading advertising link failed.", e);
+			} catch (IOException e) {
+				Log.e(TAG, "Loading advertising link failed.", e);
+			}
+			return DEFAULT_ADV_DELAY;
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
-			onStartMagazine();
+		protected void onPostExecute(Integer delay) {
+			onStartMagazine(delay);
 		}
 	}
 
-	protected void onStartMagazine() {
-		if (advertisingClickPerfomed){
-			return;
-		}
-		
+	protected void onStartMagazine(int delay) {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				Intent intent = new Intent(getApplicationContext(), MainMagazineActivity.class);
-				startActivity(intent);
-				finish();
+				if (!advertisingClickPerfomed){
+					Intent intent = new Intent(self(), MainMagazineActivity.class);
+					startActivity(intent);
+					finish();
+				}
 			}
-		}, 1000);
+		}, delay);
+	}
+	
+	private void setOnAdvertisingImageClickListener(final String link){
+		if (startupImage != null){
+			startupImage.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					advertisingClickPerfomed = true;
+					
+					Intent intent = new Intent(self(), WebAdvertisingActivity.class);
+					intent.putExtra(WebAdvertisingActivity.PARAM_LINK, link);
+					startActivity(intent);
+					finish();
+				}
+			});
+		} 
 	}
 	
 	private String getAdvertisingImageURL() {
@@ -209,16 +275,20 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		return new StringBuilder(getString(R.string.get_advertising_image_url))
 							.append(getString(R.string.get_advertising_image_end))
 							.toString()
-							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(this)))
-							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(this)));
+							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(self())))
+							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(self())));
 	}
 	
 	private String getAdvertisingLinkURL() {
 		
 		return new StringBuilder(getString(R.string.get_advertising_link_url))
 							.toString()
-							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(this)))
-							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(this)));
+							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(self())))
+							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(self())));
+	}
+	
+	private StartupActivity self(){
+		return this;
 	}
 
 }

@@ -85,5 +85,6 @@
     <string name="week">semaine</string>
     <string name="ok">OK</string>
     <string name="loading">Chargement...</string>
+   	<string name="browser">Navigateur</string>
     
 </resources>

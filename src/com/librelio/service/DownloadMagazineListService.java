@@ -99,6 +99,7 @@ public class DownloadMagazineListService extends BaseService {
 				}
 				//Convert plist to String for parsing
 				pList = getStringFromFile(getStoragePath() + PLIST_FILE_NAME);
+				
 				//Parsing
 				PListXMLHandler handler = new PListXMLHandler();
 				PListXMLParser parser = new PListXMLParser();
