@@ -101,7 +101,8 @@ public class MainMagazineActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.issue_list_layout);
-
+		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
+		
 		hasTestMagazine = hasTestMagazine();
 
 		magazineManager = new MagazineManager(this);

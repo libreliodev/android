@@ -497,19 +497,20 @@ public class BillingActivity extends BaseActivity {
 		
 		@Override
 		protected void onPostExecute(HttpResponse response) {
-			
-			String responseStatus = response.getStatusLine().toString();
-			int responseCode = response.getStatusLine().getStatusCode();
-			
-			if (responseStatus.contains(UNAUTHORIZED_STRING) && 
-				responseCode == UNAUTHORIZED_CODE){
-				subscrPrefEd.remove(PARAM_SUBSCRIPTION_CODE).commit(); 
-			}else{
-				String prefSubscrCode = 
-						subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
-				if (prefSubscrCode == null){
-					subscrPrefEd.putString(
-							PARAM_SUBSCRIPTION_CODE, subscrCode).commit();
+			if (null != response) {
+				String responseStatus = response.getStatusLine().toString();
+				int responseCode = response.getStatusLine().getStatusCode();
+				
+				if (responseStatus.contains(UNAUTHORIZED_STRING) && 
+					responseCode == UNAUTHORIZED_CODE){
+					subscrPrefEd.remove(PARAM_SUBSCRIPTION_CODE).commit(); 
+				}else{
+					String prefSubscrCode = 
+							subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
+					if (prefSubscrCode == null){
+						subscrPrefEd.putString(
+								PARAM_SUBSCRIPTION_CODE, subscrCode).commit();
+					}
 				}
 			}
 			

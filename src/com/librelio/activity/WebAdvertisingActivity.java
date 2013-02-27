@@ -27,6 +27,8 @@ public class WebAdvertisingActivity extends BaseActivity {
 	
 		setContentView(R.layout.activity_web_advertising);
 		
+		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
+		
 		advertisingLink = getIntent().getStringExtra(PARAM_LINK);
 		
 		webView = (WebView) findViewById(R.id.activity_web_advertising_browser_view);

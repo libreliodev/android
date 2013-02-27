@@ -34,16 +34,22 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.ViewSwitcher;
 
 import com.librelio.LibrelioApplication;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
@@ -68,9 +74,11 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private static final String PLIST_DELAY = "Delay";
 	private static final String PLIST_LINK = "Link";
 	
-	private static int DEFAULT_ADV_DELAY = 5000;
-	
+	private static int DEFAULT_ADV_DELAY = 1000;
+
+	private ViewSwitcher imageSwitcher;
 	private ImageView startupImage;
+	private ImageView advertisingImage;
 	
 	private boolean advertisingClickPerfomed = false; 
 	
@@ -79,7 +87,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
 		
+		imageSwitcher = (ViewSwitcher) findViewById(R.id.sturtup_images_switcher);
 		startupImage = (ImageView) findViewById(R.id.sturtup_image);
+		advertisingImage = (ImageView) findViewById(R.id.advertising_image);
 		
 		if (hasTestMagazine()) {
 			initStorage(PARAM_TEST);
@@ -184,9 +194,13 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		@Override
 		protected void onPostExecute(Bitmap adImage) {
 			 if (adImage != null){
-				 startupImage.setImageBitmap(adImage);
-			 }
-			new LoadAdvertisingLinkTask().execute();
+				 advertisingImage.setImageBitmap(adImage);
+				 imageSwitcher.showNext();
+				 
+				 new LoadAdvertisingLinkTask().execute();
+			 }else{
+				onStartMagazine(DEFAULT_ADV_DELAY);
+ 			 }
 		}
 	}
 	
@@ -255,8 +269,8 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	}
 	
 	private void setOnAdvertisingImageClickListener(final String link){
-		if (startupImage != null){
-			startupImage.setOnClickListener(new OnClickListener() {
+		if (advertisingImage != null){
+			advertisingImage.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					advertisingClickPerfomed = true;
