@@ -34,24 +34,22 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.ViewSwitcher;
 
 import com.librelio.LibrelioApplication;
+import com.librelio.animation.ActivitySwitcher;
+import com.librelio.animation.DisplayNextView;
+import com.librelio.animation.Rotate3dAnimation;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Dict;
@@ -76,18 +74,18 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	
 	private static int DEFAULT_ADV_DELAY = 1000;
 
-	private ViewSwitcher imageSwitcher;
 	private ImageView startupImage;
 	private ImageView advertisingImage;
 	
 	private boolean advertisingClickPerfomed = false; 
+	
+	private boolean isFirstImage = true;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
 		
-		imageSwitcher = (ViewSwitcher) findViewById(R.id.sturtup_images_switcher);
 		startupImage = (ImageView) findViewById(R.id.sturtup_image);
 		advertisingImage = (ImageView) findViewById(R.id.advertising_image);
 		
@@ -195,14 +193,45 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		protected void onPostExecute(Bitmap adImage) {
 			 if (adImage != null){
 				 advertisingImage.setImageBitmap(adImage);
-				 imageSwitcher.showNext();
-				 
+				 rotate();
 				 new LoadAdvertisingLinkTask().execute();
 			 }else{
 				onStartMagazine(DEFAULT_ADV_DELAY);
  			 }
 		}
 	}
+	
+	private void rotate(){
+		if (isFirstImage) {      
+			applyRotation(0, 90);
+		} else {   
+			applyRotation(0, -90);
+		}
+		isFirstImage = !isFirstImage;
+	}
+	
+	private void applyRotation(float start, float end) {
+		
+		// Find the center of image
+		final float centerX = startupImage.getWidth() / 2.0f;
+		final float centerY = advertisingImage.getHeight() / 2.0f;
+		 
+		// Create a new 3D rotation with the supplied parameter
+		// The animation listener is used to trigger the next animation
+		final Rotate3dAnimation rotation =
+					new Rotate3dAnimation(start, end, centerX, centerY, 0, false);
+		rotation.setDuration(500);
+		rotation.setFillAfter(true);
+		rotation.setInterpolator(new AccelerateInterpolator());
+		rotation.setAnimationListener(new DisplayNextView(isFirstImage, startupImage, advertisingImage));
+		 
+		if (isFirstImage){
+			startupImage.startAnimation(rotation);
+		} else {
+			advertisingImage.startAnimation(rotation);
+		}
+	}
+	
 	
 	private class LoadAdvertisingLinkTask extends AsyncTask<Void, Void, Integer>{
 		@Override
@@ -304,5 +333,4 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private StartupActivity self(){
 		return this;
 	}
-
 }

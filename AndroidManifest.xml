@@ -61,7 +61,8 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:name="com.librelio.base.BaseActivity" />
         <activity android:name="com.librelio.activity.DownloadedMagazinesActivity" />
-        <activity android:name="com.librelio.activity.WebAdvertisingActivity" />
+        <activity android:name="com.librelio.activity.WebAdvertisingActivity"/>
+        
     </application>
 
 </manifest>

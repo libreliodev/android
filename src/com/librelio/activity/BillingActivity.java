@@ -575,10 +575,11 @@ public class BillingActivity extends BaseActivity {
 			}
 		}
 	}
-	
+
 	private OnEnterValueListener onEnterValueListener = new OnEnterValueListener() {
 		@Override
 		public void onEnterValue(String code) {
+			setContentView(R.layout.wait_bar);
 			new DownloadSubsrcFromTempURLTask().execute(buildPswdQuery(code), code);
 		}
 	};

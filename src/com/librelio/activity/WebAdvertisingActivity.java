@@ -24,9 +24,7 @@ public class WebAdvertisingActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	
 		setContentView(R.layout.activity_web_advertising);
-		
 		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
 		
 		advertisingLink = getIntent().getStringExtra(PARAM_LINK);
@@ -46,7 +44,6 @@ public class WebAdvertisingActivity extends BaseActivity {
 			public void onClick(View v) {
 				Intent intent = new Intent(self(), MainMagazineActivity.class);
 				startActivity(intent);
-				finish();
 			}
 		});
 		
@@ -58,7 +55,7 @@ public class WebAdvertisingActivity extends BaseActivity {
 				startActivity(browserIntent);
 			}
 		});
-	} 
+	}
 	
 	private void loadWebContent(){
 		if (advertisingLink != null){

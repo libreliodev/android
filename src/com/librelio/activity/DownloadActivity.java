@@ -22,6 +22,7 @@ package com.librelio.activity;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -174,17 +175,22 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 					}
 					output.write(data, 0, count);
 				}
-				output.flush();
-				output.close();
-				input.close();
+				return filePath;
+				
 			} catch (Exception e) {
 				// If download was interrupted then file delete
 				File f = new File(filePath);
 				f.delete();
 				Log.e(TAG, "Problem with download!", e);
-				return STOP;
+			}finally{
+				try {
+					output.flush();
+					output.close();
+					input.close();
+				} catch (IOException e) {}
 			}
-			return filePath;
+
+			return STOP;
 		}
 
 		@Override

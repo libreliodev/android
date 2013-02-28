@@ -4,25 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ViewSwitcher
-        android:id="@+id/sturtup_images_switcher"
+    <ImageView
+        android:id="@+id/sturtup_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:inAnimation="@anim/flip_right_in"
-        android:outAnimation="@anim/flip_left_out" >
+        android:scaleType="fitCenter"
+        android:src="@drawable/startup_background" />
 
-        <ImageView
-            android:id="@+id/sturtup_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/startup_background" />
-
-        <ImageView
-            android:id="@+id/advertising_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"/>
-    </ViewSwitcher>
+    <ImageView
+        android:id="@+id/advertising_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:visibility="gone"/>
 
 </FrameLayout>

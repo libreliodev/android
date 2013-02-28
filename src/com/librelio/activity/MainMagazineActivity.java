@@ -102,6 +102,10 @@ public class MainMagazineActivity extends BaseActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.issue_list_layout);
 		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
+		onCreatePreparations();
+	}
+	
+	private void onCreatePreparations(){
 		
 		hasTestMagazine = hasTestMagazine();
 
@@ -158,7 +162,7 @@ public class MainMagazineActivity extends BaseActivity {
 		billingService = new BillingService();
 		billingService.setContext(this);
 		handler = new Handler();
-		librelioPurchaseObserver = new LibrelioPurchaseObserver(handler);
+		librelioPurchaseObserver = new LibrelioPurchaseObserver(handler);		
 	}
 
 	@Override
@@ -190,7 +194,7 @@ public class MainMagazineActivity extends BaseActivity {
 		showProgress(false);
 		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
 		registerReceiver(updateProgressStop, filter);
-		ResponseHandler.register(librelioPurchaseObserver);
+		ResponseHandler.register(librelioPurchaseObserver);		
 	}
 
 	/**
@@ -339,4 +343,5 @@ public class MainMagazineActivity extends BaseActivity {
 	private void showProgress(boolean progress) {
 		setProgressBarIndeterminateVisibility(progress);
 	}
+	
 }
