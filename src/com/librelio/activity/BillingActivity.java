@@ -38,10 +38,10 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.IntentSender.SendIntentException;
-import android.content.SharedPreferences.Editor;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -575,7 +575,7 @@ public class BillingActivity extends BaseActivity {
 			}
 		}
 	}
-
+	
 	private OnEnterValueListener onEnterValueListener = new OnEnterValueListener() {
 		@Override
 		public void onEnterValue(String code) {

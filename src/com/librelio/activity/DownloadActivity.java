@@ -175,8 +175,9 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 					}
 					output.write(data, 0, count);
 				}
-				return filePath;
 				
+				return filePath;
+
 			} catch (Exception e) {
 				// If download was interrupted then file delete
 				File f = new File(filePath);

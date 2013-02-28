@@ -47,7 +47,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
 import com.librelio.LibrelioApplication;
-import com.librelio.animation.ActivitySwitcher;
 import com.librelio.animation.DisplayNextView;
 import com.librelio.animation.Rotate3dAnimation;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
@@ -77,7 +76,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private ImageView startupImage;
 	private ImageView advertisingImage;
 	
-	private boolean advertisingClickPerfomed = false; 
+	private boolean advertisingClickPerfomed = false;
 	
 	private boolean isFirstImage = true;
 	
@@ -193,7 +192,14 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		protected void onPostExecute(Bitmap adImage) {
 			 if (adImage != null){
 				 advertisingImage.setImageBitmap(adImage);
-				 rotate();
+				 if (isFirstImage) {      
+					 applyRotation(0, 90);
+					 isFirstImage = !isFirstImage;
+				 } else {   
+					 applyRotation(0, -90);
+					 isFirstImage = !isFirstImage;
+				 }
+				 
 				 new LoadAdvertisingLinkTask().execute();
 			 }else{
 				onStartMagazine(DEFAULT_ADV_DELAY);
@@ -201,25 +207,15 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		}
 	}
 	
-	private void rotate(){
-		if (isFirstImage) {      
-			applyRotation(0, 90);
-		} else {   
-			applyRotation(0, -90);
-		}
-		isFirstImage = !isFirstImage;
-	}
-	
 	private void applyRotation(float start, float end) {
-		
 		// Find the center of image
 		final float centerX = startupImage.getWidth() / 2.0f;
-		final float centerY = advertisingImage.getHeight() / 2.0f;
+		final float centerY = startupImage.getHeight() / 2.0f;
 		 
 		// Create a new 3D rotation with the supplied parameter
 		// The animation listener is used to trigger the next animation
 		final Rotate3dAnimation rotation =
-					new Rotate3dAnimation(start, end, centerX, centerY, 0, false);
+				new Rotate3dAnimation(start, end, centerX, centerY, 0, false);
 		rotation.setDuration(500);
 		rotation.setFillAfter(true);
 		rotation.setInterpolator(new AccelerateInterpolator());
@@ -231,7 +227,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			advertisingImage.startAnimation(rotation);
 		}
 	}
-	
 	
 	private class LoadAdvertisingLinkTask extends AsyncTask<Void, Void, Integer>{
 		@Override
@@ -333,4 +328,5 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private StartupActivity self(){
 		return this;
 	}
+
 }
