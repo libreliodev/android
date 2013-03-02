@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.niveales.wind"
     android:versionCode="12"
-    android:versionName="MuPDF 1.1 branch 1.0.15" >
+    android:versionName="1.0.15" >
 
     <uses-sdk
         android:minSdkVersion="14"
