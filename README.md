@@ -1,6 +1,6 @@
 ## About the Librelio Magazine Solution
 The Librelio Magazine Solution is intended mainly for magazine publishers. It consists in:
-- customizable mobile apps: a complete version has been developed on iOS, Android (here) and is under development on  Windows 8
+- customizable mobile apps: a complete version has been developed on iOS, Android (here) and is under development on  [Windows 8](https://github.com/libreliodev/windows8).
 - a cloud based server
 
 Examples of apps developed using this solution are listed on www.librelio.com . A good example of iOS app is the [Wind magazine app](https://itunes.apple.com/fr/app/wind-magazine/id433594605?mt=8). 
