@@ -36,11 +36,7 @@ public abstract class DocumentReaderView extends ReaderView {
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		if (e.getX() < TAP_PAGE_MARGIN) {
-			super.moveToPrevious();
-		} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
-			super.moveToNext();
-		} else if (!showButtonsDisabled) {
+		if (!showButtonsDisabled) {
 			int linkPage = -1;
 			String linkString = null;
 			if (linkState != LinkState.INHIBIT) {
@@ -59,6 +55,10 @@ public abstract class DocumentReaderView extends ReaderView {
 			} else {
 				onContextMenuClick();
 			}
+		} else if (e.getX() < TAP_PAGE_MARGIN) {
+			super.moveToPrevious();
+		} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
+			super.moveToNext();
 		}
 		return super.onSingleTapUp(e);
 	}

@@ -40,6 +40,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -76,6 +78,9 @@ public class BillingActivity extends BaseActivity {
 	 *	android.test.refunded
 	 *	android.test.item_unavailable
 	 */
+	public static final String SUBSCRIPTION_PREF = "SubscriptionPreferences";
+	public static final String PARAM_SUBSCRIPTION_CODE = "PARAM_SUBSCRIPTION_CODE";
+	
 	private static final String TEST_PRODUCT_ID = "android.test.purchased";
 	
 	private static final String PARAM_PRODUCT_ID = "@product_id";
@@ -86,7 +91,10 @@ public class BillingActivity extends BaseActivity {
 	private static final String PARAM_CLIENT = "@client";
 	private static final String PARAM_APP = "@app";
 	
+	private static final String UNAUTHORIZED_STRING = "Unauthorized";
+	
 	private static final int CALLBACK_CODE = 101;
+	private static final int UNAUTHORIZED_CODE = 401;
 	
 	private static final int BILLING_RESPONSE_RESULT_OK = 0;
 	private static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
@@ -107,10 +115,14 @@ public class BillingActivity extends BaseActivity {
 	private Button subsMonthly;
 	private Button subsCode;
 
-	private IInAppBillingService billingService;
-	
 	private String ownedItemSignature = "";
 	private String ownedItemPurshaseData = "";
+
+	private IInAppBillingService billingService;
+
+	private SharedPreferences subscrPref;
+	private Editor subscrPrefEd;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +131,7 @@ public class BillingActivity extends BaseActivity {
 		if(!isNetworkConnected()){
 			showAlertDialog(CONNECTION_ALERT);
 		} else {
+			getSubscriptionPreferences();
 			bindService(
 					new Intent(
 							"com.android.vending.billing.InAppBillingService.BIND"), 
@@ -131,8 +144,23 @@ public class BillingActivity extends BaseActivity {
 			productId = fileName.substring(0, finId);
 		}
 	}
-
+	
+	private void getSubscriptionPreferences(){
+		subscrPref = getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE);
+		subscrPrefEd = subscrPref.edit();
+	}
+	
 	private void initViews() {
+		
+		String prefSubscrCode = 
+				subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
+
+		if (prefSubscrCode != null){
+			new DownloadSubsrcFromTempURLTask().execute(
+					buildPswdQuery(prefSubscrCode), prefSubscrCode);
+			return;
+		}
+ 		
 		setContentView(R.layout.billing_activity);
 		buy = (Button)findViewById(R.id.billing_buy_button);
 		subsMonthly = (Button)findViewById(R.id.billing_subs_monthly);
@@ -363,20 +391,18 @@ public class BillingActivity extends BaseActivity {
 		return query.append(comand).toString();
 	}
 	
-	private String buildPswdQuery() {
+	private String buildPswdQuery(String code) {
 		
 		StringBuilder query = new StringBuilder(
 				LibrelioApplication.getServerUrl(getContext()));
 		
 		String comand = getString(R.string.command_pswd)
 				.replace(";", "&")
-				//TODO @Roman need insert code value
-				.replace(PARAM_CODE, "")
-				.replace(PARAM_URLSTRING, 
-						LibrelioApplication.getUrlString(getContext(), fileName))
-				//TODO @Roman need check correct values
-				.replace(PARAM_CLIENT, LibrelioApplication.getClientName(getContext()))
-				.replace(PARAM_APP, LibrelioApplication.getMagazineName(getContext()));
+				.replace(PARAM_CODE, Uri.encode(code))
+				.replace(PARAM_URLSTRING, Uri.encode(
+						LibrelioApplication.getUrlString(fileName)))
+				.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(getContext())))
+				.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(getContext())));
 		
 		return query.append(comand).toString();
 	}
@@ -454,8 +480,44 @@ public class BillingActivity extends BaseActivity {
 			intent.putExtra(DownloadActivity.IS_SAMPLE_KEY, false);
 			intent.putExtra(DownloadActivity.TEMP_URL_KEY, tempURL);
 			startActivity(intent);
+			
+			finish();
 		};
 	}
+	
+	private class DownloadSubsrcFromTempURLTask extends DownloadFromTempURLTask{
+		
+		private String subscrCode;
+		
+		@Override
+		protected HttpResponse doInBackground(String... params) {
+			subscrCode = params[1];
+			return super.doInBackground(params);		
+		}
+		
+		@Override
+		protected void onPostExecute(HttpResponse response) {
+			if (null != response) {
+				String responseStatus = response.getStatusLine().toString();
+				int responseCode = response.getStatusLine().getStatusCode();
+				
+				if (responseStatus.contains(UNAUTHORIZED_STRING) && 
+					responseCode == UNAUTHORIZED_CODE){
+					subscrPrefEd.remove(PARAM_SUBSCRIPTION_CODE).commit(); 
+				}else{
+					String prefSubscrCode = 
+							subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
+					if (prefSubscrCode == null){
+						subscrPrefEd.putString(
+								PARAM_SUBSCRIPTION_CODE, subscrCode).commit();
+					}
+				}
+			}
+			
+			super.onPostExecute(response);
+		}
+	}
+
 
 	private class PurchaseTask extends AsyncTask<String, String, Bundle>{
 		private Bundle ownedItems;
@@ -516,8 +578,9 @@ public class BillingActivity extends BaseActivity {
 	
 	private OnEnterValueListener onEnterValueListener = new OnEnterValueListener() {
 		@Override
-		public void onEnterValue(String value) {
-			Log.d(TAG, value);
+		public void onEnterValue(String code) {
+			setContentView(R.layout.wait_bar);
+			new DownloadSubsrcFromTempURLTask().execute(buildPswdQuery(code), code);
 		}
 	};
 	

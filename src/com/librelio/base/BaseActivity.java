@@ -38,8 +38,6 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	protected static final int DOWNLOAD_ALERT = 3;
 	protected static final int IO_EXEPTION = 4;
 
-
-
 	private SharedPreferences sharedPreferences;
 
 	/**

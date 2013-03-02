@@ -49,7 +49,6 @@ import com.librelio.LibrelioApplication;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.BillingService;
-import com.librelio.lib.utils.Consts;
 import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
@@ -102,7 +101,8 @@ public class MainMagazineActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.issue_list_layout);
-
+		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
+		
 		hasTestMagazine = hasTestMagazine();
 
 		magazineManager = new MagazineManager(this);
@@ -263,6 +263,11 @@ public class MainMagazineActivity extends BaseActivity {
 		case R.id.options_menu_send_log:
 			new CrashSend().execute();
 			return true;
+		case R.id.options_menu_downloaded_magazines:
+			Intent intent = new Intent(
+					getBaseContext(), DownloadedMagazinesActivity.class);
+			startActivity(intent);
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -280,7 +285,7 @@ public class MainMagazineActivity extends BaseActivity {
 
 	private void reloadMagazineData(ArrayList<Magazine> magazines) {
 		magazines.clear();
-		magazines.addAll(magazineManager.getMagazines(hasTestMagazine));
+		magazines.addAll(magazineManager.getMagazines(hasTestMagazine, Magazine.TABLE_MAGAZINES));
 	}
 
 	private void startRegularUpdate(){
@@ -297,7 +302,7 @@ public class MainMagazineActivity extends BaseActivity {
 			}
 		};
 		long startTime = 0;
-		if (magazineManager.getCount() > 0) {
+		if (magazineManager.getCount(Magazine.TABLE_MAGAZINES) > 0) {
 			startTime = period;
 		}
 		updateTimer.schedule(updateTask, startTime, period);

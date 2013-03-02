@@ -1,6 +1,5 @@
 package com.librelio.activity;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -12,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,7 +54,6 @@ import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
 import com.librelio.view.HorizontalListView;
-import com.librelio.view.ProgressDialogX;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
@@ -71,7 +68,7 @@ public class MuPDFActivity extends BaseActivity{
 	private String fileName;
 	private int mOrientation;
 
-	private int          mPageSliderRes;
+//	private int          mPageSliderRes;
 	private boolean      buttonsVisible;
 	private boolean      mTopBarIsSearch;
 
@@ -253,8 +250,8 @@ public class MuPDFActivity extends BaseActivity{
 		makeButtonsView();
 
 		// Set up the page slider
-		int smax = Math.max(core.countPages()-1,1);
-		mPageSliderRes = ((10 + smax - 1)/smax) * 2;
+//		int smax = Math.max(core.countPages()-1,1);
+//		mPageSliderRes = ((10 + smax - 1)/smax) * 2;
 
 		// Set the file-name text
 		mFilenameView.setText(fileName);
@@ -659,7 +656,7 @@ public class MuPDFActivity extends BaseActivity{
 	private void onBuy(String path) {
 		Log.d(TAG, "onBuy event path = " + path);
 		MagazineManager magazineManager = new MagazineManager(getContext());
-		Magazine magazine = magazineManager.findByFileName(path);
+		Magazine magazine = magazineManager.findByFileName(path, Magazine.TABLE_MAGAZINES);
 		if (null != magazine) {
 			Intent intent = new Intent(getContext(), BillingActivity.class);
 			intent

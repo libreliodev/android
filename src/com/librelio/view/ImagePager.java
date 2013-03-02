@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +24,7 @@ import android.widget.TextView;
 
 import com.niveales.wind.R;
 
-public class ImagePager extends RelativeLayout {
+public class ImagePager extends RelativeLayout{
 
 	protected static final String TAG = "ImagePager";
 
@@ -44,12 +45,10 @@ public class ImagePager extends RelativeLayout {
 	private SlidesInfo slidesInfo;
 	private View progressBar;
 
-
 	protected int countPhotos;
 	protected String projectId;
-	protected int minCountFromInfinityLoop = 12;
 	private int count = 0;
-
+	
 	public interface PhotoPagerListener {
 		void onClickItem(int photoId);
 	}
@@ -63,12 +62,19 @@ public class ImagePager extends RelativeLayout {
 		init();
 	}
 
+	public void setGestureDetector(final GestureDetector gestureDetector){
+		if (gestureDetector != null){
+			viewPager.setOnTouchListener(new OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return gestureDetector.onTouchEvent(event);
+				}
+			});
+		}
+	}
+	
 	public void setTitle(final String titleTable, final String titleUrl){
 		titleView.setText(titleTable);
-	}
-
-	public void setMinCountFromInfinityLoop(int minCountFromInfinityLoop){
-		this.minCountFromInfinityLoop = minCountFromInfinityLoop;
 	}
 
 	public int getCount(){
@@ -76,10 +82,10 @@ public class ImagePager extends RelativeLayout {
 	}
 	
 	public void setCurrentPosition(int position,boolean smoothScroll){
-		if(position>=getCount()){
-			position = getCount()-1;
+		if (position >= getCount()) {
+			position = getCount() - 1;
 		}
-		if(position<0){
+		if (position < 0) {
 			position = 0;
 		}
 		viewPager.setCurrentItem(position, smoothScroll);
@@ -111,6 +117,7 @@ public class ImagePager extends RelativeLayout {
 		} else {
 			initSingleImage();
 		}
+		Log.d(TAG, "Init: " + slidesInfo + ", transit = " + transition);
 	}
 	private void initGallery() {
 		if(transition){
@@ -160,7 +167,8 @@ public class ImagePager extends RelativeLayout {
 		viewPager.setHorizontalFadingEdgeEnabled(true);
 		viewPager.setFadingEdgeLength(0);
 		viewPager.setOffscreenPageLimit(getPageLimit());
-		viewPager.setCurrentItem(imageAdapter.getSlideCount()*MULTIPLIER, false);
+		jumpTo(0);
+		
 		addView(viewPager);
 	}
 
@@ -201,7 +209,7 @@ public class ImagePager extends RelativeLayout {
 					item = getCurrentPosition()+1;
 				}
 				setCurrentPosition(item,transition);
-				if(count<imageAdapter.getSlideCount()){
+				if(count < imageAdapter.getSlideCount()){
 					autoplayHandler.postDelayed(this, mAutoplayDelay);
 				}
 		}}, mAutoplayDelay);
@@ -209,7 +217,7 @@ public class ImagePager extends RelativeLayout {
 	
 	protected PagerAdapter getAdapter() {
 		if (null == imageAdapter) {
-			imageAdapter = new SimpleImageAdapter(context, minCountFromInfinityLoop, slidesInfo);
+			imageAdapter = new SimpleImageAdapter(context, slidesInfo);
 		}
 		return imageAdapter;
 	}
@@ -223,7 +231,6 @@ public class ImagePager extends RelativeLayout {
 		backgroungColor = color;
 		super.setBackgroundColor(color);
 	}
-
 
 	private class SlidesInfo {
 		public final String assetDir;
@@ -243,6 +250,17 @@ public class ImagePager extends RelativeLayout {
 		public String getFullPathToImage(int position) {
 			return this.assetDir + "/" + this.preffix + "_" + String.valueOf(position) + "." + this.suffix;
 		}
+
+		@Override
+		public String toString() {
+			return "SlidesInfo ["
+					+ "assetDir=" + assetDir 
+					+ ", count=" + count
+					+ ", preffix=" + preffix 
+					+ ", suffix=" + suffix 
+					+ "]";
+		}
+		
 	}
 
 	private class GetBitmapAsyncTask extends AsyncTask<String, Void, Bitmap> {
@@ -271,14 +289,12 @@ public class ImagePager extends RelativeLayout {
 
 		protected int imageViewId;
 
-		protected int minCountFromInfinityLoop;
 		private LayoutInflater inflater;
 		private final SlidesInfo slidesInfo;
 		
-		public SimpleImageAdapter(Context context, int minCountFromInfinityLoop, SlidesInfo slidesInfo) {
+		public SimpleImageAdapter(Context context, SlidesInfo slidesInfo) {
 			this.context = context;
 			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			this.minCountFromInfinityLoop = minCountFromInfinityLoop;
 			this.slidesInfo = slidesInfo;
 		}
 
@@ -292,14 +308,14 @@ public class ImagePager extends RelativeLayout {
 			return view == object;
 		}
 
-		public String getItem(int position) {
-			return slidesInfo.getFullPathToImage(position + 1);
+		public String getItem(int position){
+			//for reversive image showing
+			position = slidesInfo.count - position;
+			return slidesInfo.getFullPathToImage(position);
 		}
 
 		@Override
 		public View instantiateItem(ViewGroup container, int position) {
-			Log.d(TAG, "instantiateItem");
-			
 			String path = getItem(position % slidesInfo.count);
 			
 			final View view = inflater.inflate(R.layout.slideshow_item_layout, null);
@@ -319,36 +335,7 @@ public class ImagePager extends RelativeLayout {
 					super.onPostExecute(bmp);
 				}
 			}.execute(path);
-
-			/*new AsyncTask<String, Void, Bitmap>() {
-				ImageView img;
-				FrameLayout background;
-				@Override
-				protected Bitmap doInBackground(String... paths) {
-					String path = paths[0];
-					File file = new File(path);
-					int size = (int)(file.length()/1024);
-					img = (ImageView)view.findViewById(R.id.slideshow_item_image);
-					background = (FrameLayout)view.findViewById(R.id.slide_show_frame);
-					BitmapFactory.Options options = new BitmapFactory.Options();
-					if (size > 200) {
-						options.inSampleSize = 2;
-					} else {
-						options.inSampleSize = 1;
-					}
-					return BitmapFactory.decodeFile(path,options);
-				}
-				
-				@Override
-				protected void onPostExecute(Bitmap bmp) {
-					if (isCancelled()) {
-						return;
-					}
-					background.setBackgroundColor(backgroungColor);
-					img.setImageBitmap(bmp);
-				}
-			}.execute(path);*/
-
+			Log.d(TAG, "get " + position + " item from " + path);
 			//
 			container.addView(view);
 			return view;
@@ -363,5 +350,4 @@ public class ImagePager extends RelativeLayout {
 			return slidesInfo.count;
 		}
 	}
-
 }

@@ -58,6 +58,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	public static final String PLAY_DELAY_KEY = "play_delay_key";
 	public static final String PLAYBACK_POSITION_KEY = "playback_position_key";
 	public static final String VIDEO_PATH_KEY = "video_path_key";
+	public static final String INITIAL_SLIDE_POSITION = "initial_slide_position";
 	
 	private Context context;
 	private String basePath;
@@ -94,6 +95,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		this.linkInfo = linkInfo;
 		this.uriString = linkInfo.url;
 		this.videFilePath = getPathFromLocalhost(basePath, uriString);
+		
 		gestureDetector = new GestureDetector(new GestureListener());
 		mMediaPlayer = new MediaPlayer();
 		
@@ -138,7 +140,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 					onPlayVideoInside(basePath);
 				}
 			}
-		} else if(linkInfo.hasVideoData()) {
+		} else if(linkInfo.hasVideoData() 
+				|| linkInfo.isMediaURI()) {
 			if (fullScreen) {
 				onPlayVideoOutsideLocal();
 			} else {
@@ -154,21 +157,28 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
         }
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-        	if(mMediaPlayer.isPlaying()){					
-				mMediaPlayer.pause();
-			} else {
-				mMediaPlayer.start();
-			}
+        	if (linkInfo.hasVideoData()){
+        		if(mMediaPlayer.isPlaying()){					
+        			mMediaPlayer.pause();
+        		} else {
+        			mMediaPlayer.start();
+        		}
+        	} 
         	return super.onSingleTapConfirmed(e);
         }
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-        	showWaitDialog();
-        	currentPosition = mMediaPlayer.getCurrentPosition();
-        	onPlayVideoOutside(videFilePath);
-        	mMediaPlayer.release();
-        	autoPlayFlagMP = false;
-        	//initMediaPlayer(true);
+        	if (linkInfo.hasVideoData()){
+	        	showWaitDialog();
+	        	currentPosition = mMediaPlayer.getCurrentPosition();
+	        	onPlayVideoOutside(videFilePath);
+	        	mMediaPlayer.release();
+	        	autoPlayFlagMP = false;
+	        	//initMediaPlayer(true);
+        	}else if (linkInfo.isImageFormat()){
+        		onPlaySlideOutside(basePath,
+        				imagePager.getCurrentPosition());
+        	}
             return true;
         }
     }
@@ -252,10 +262,33 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				cancelWaitDialog();
 				if(autoPlayFlagMP){
 					mMediaPlayer.start();
+					setSurfaceViewScale();
 				}
 			}
 		});
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+	}
+	
+	private void setSurfaceViewScale(){
+		
+		int width = videoView.getWidth();
+		int height = videoView.getHeight();
+		float boxWidth = width;
+		float boxHeight = height;
+
+		float videoWidth = mMediaPlayer.getVideoWidth();
+		float videoHeight = mMediaPlayer.getVideoHeight();
+
+		float wr = boxWidth / videoWidth;
+		float hr = boxHeight / videoHeight;
+		float ar = videoWidth / videoHeight;
+
+		if (wr > hr)
+		    width = (int) (boxHeight * ar);
+		else
+		    height = (int) (boxWidth / ar);
+		
+		holder.setFixedSize(width, height);
 	}
 
 	protected void onPlayVideoOutside(String path){
@@ -266,6 +299,10 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	}
 	
 	protected void onPlaySlideOutside(String basePath) {
+		onPlaySlideOutside(basePath, 0);
+	}
+	
+	protected void onPlaySlideOutside(String basePath, int position) {
 		Log.d(TAG, "onPlaySlideOutside " + basePath + ", linkInfo = " + linkInfo);
 		Intent intent = new Intent(getContext(), SlideShowActivity.class);
 		intent.putExtra(AUTO_PLAY_KEY, autoPlay);
@@ -273,6 +310,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		intent.putExtra(BG_COLOR_KEY,bgColor);
 		intent.putExtra(PLAY_DELAY_KEY,autoPlayDelay);
 		intent.putExtra(FULL_PATH_KEY,fullPath);
+		intent.putExtra(INITIAL_SLIDE_POSITION, position);
 		getContext().startActivity(intent);
 	}
 
@@ -290,6 +328,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.gravity = Gravity.CENTER;
 		imagePager.setLayoutParams(lp);
+		
+		imagePager.setGestureDetector(gestureDetector);
 		
 		if(autoPlay) {
 			autoPlayHandler = new Handler();
@@ -339,8 +379,18 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			   public void onProgressChanged(WebView view, int progress) {
 			     // Activities and WebViews measure progress with different scales.
 			     // The progress meter will automatically disappear when we reach 100%
-//				     activity.setProgress(progress * 1000);
+				 //	activity.setProgress(progress * 1000);
 			   }
+			   
+				@Override
+				public void onShowCustomView(View view, CustomViewCallback callback) {
+					super.onShowCustomView(view, callback);
+				}
+
+				@Override
+				public void onHideCustomView(){
+				}
+			   
 			 });
 		mWebView.setWebViewClient(new VideoWebViewClient());
 

@@ -34,7 +34,7 @@
 
         <activity
             android:name="com.librelio.activity.StartupActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,6 +60,8 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity android:name="com.librelio.base.BaseActivity" />
+        <activity android:name="com.librelio.activity.DownloadedMagazinesActivity" />
+        <activity android:name="com.librelio.activity.WebAdvertisingActivity" />
     </application>
 
 </manifest>

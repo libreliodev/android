@@ -60,6 +60,7 @@
     <string name="try_again">Try again</string>
     <string name="downloads">Downloads</string>
     <string name="downloaded">Downloaded</string>
+    <string name="downloaded_title">Downloaded:</string>
     <string name="free_Download">Free Download</string>
     <string name="download">Download ...</string>
     <string name="free_sample">Free sample</string>
@@ -92,4 +93,5 @@
     <string name="download_service_already_running">Download service already running</string>
     <string name="loading">Loading...</string>
     <string name="no_space_on_device">Not enough space in your internal storage</string>
+    <string name="browser">Browser</string>
 </resources>
