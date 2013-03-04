@@ -22,7 +22,6 @@ package com.librelio.activity;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -53,7 +52,6 @@ import com.artifex.mupdf.LinkInfoExternal;
 import com.librelio.LibrelioApplication;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
-import com.librelio.service.DownloadMagazineListService;
 import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
@@ -140,7 +138,10 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 	}
 
 	private class DownloadTask extends AsyncTask<String, Double, String> {
+		
 		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
+		private static final int BREAK_AFTER_FAILED_ATTEMP = 5000;
+		private static final int DOWNLOADING_ATTEMPS = 50;
 
 		@Override
 		protected void onPreExecute() {
@@ -152,19 +153,20 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			int count;
+			int lengthOfFile = 0;
+			long total = 0;
 			try {
 				URL url = new URL(fileUrl);
-				URLConnection conexion = url.openConnection();
-				conexion.connect();	
-				int lengthOfFile = conexion.getContentLength();
+				URLConnection connection = url.openConnection();
+				connection.connect();	
+				lengthOfFile = connection.getContentLength();
 				Log.d(TAG, "Length of file: " + lengthOfFile);
 				input = new BufferedInputStream(url.openStream());
 				output = new FileOutputStream(filePath);
 				byte data[] = new byte[1024];
-				long total = 0;
 				while ((count = input.read(data)) != -1) {
 					total += count;
-					final double progress = total / (lengthOfFile * 1.0);
+					final double progress = total/(lengthOfFile * 1.0);
 					publishProgress(progress);
 					if(isCancelled()){
 						output.flush();
@@ -175,23 +177,19 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 					}
 					output.write(data, 0, count);
 				}
-				
-				return filePath;
-
-			} catch (Exception e) {
-				// If download was interrupted then file delete
-				File f = new File(filePath);
-				f.delete();
-				Log.e(TAG, "Problem with download!", e);
+			} catch (Exception ex) {
+				Log.e(TAG, "Problem with download!", ex);
+				// If download was interrupted try downloading again
+				return makeDownloadingAttemps(lengthOfFile, total);
 			}finally{
 				try {
 					output.flush();
 					output.close();
 					input.close();
-				} catch (IOException e) {}
+				} catch (Exception e) {}
 			}
 
-			return STOP;
+			return filePath;
 		}
 
 		@Override
@@ -208,18 +206,95 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		@Override
 		protected void onPostExecute(String result) {
 			if(isCancelled() || result.equals(STOP)){
-				closeDownloadScreen();
+				showAlertDialog(DOWNLOAD_ALERT);
 				return;
 			}
 			downloadLinks = new DownloadLinksTask();
 			downloadLinks.execute();
 			super.onPostExecute(result);
 		}
+		
+		private String makeDownloadingAttemps(int lengthOfFile, long total){
+			String action = STOP;
+			int attemps = 0;
+			while (action == STOP){
+				if (attemps >= DOWNLOADING_ATTEMPS){
+					return STOP;
+				}
+
+				Object[] result = getFileAgain(lengthOfFile, total);
+				action = (String) result[0]; //Downloading result.
+				long bytes = (Long) result[1]; //Quantity of bytes were downloaded.
+				boolean wereSomeBytes = bytes > total ? true : false; //Were downloaded some bytes.
+				total = bytes;
+				
+				if (action == STOP){
+					if (wereSomeBytes){
+						attemps = 0;
+					}
+					attemps++;
+					try {
+						Thread.sleep(BREAK_AFTER_FAILED_ATTEMP);
+					} catch (InterruptedException e) {}
+				}
+			};
+			return filePath;
+		}
+		
+		private Object[] getFileAgain(int lengthOfFile, long total){
+			int count;
+			Object[] result = new Object[2];
+			try {
+				URL url = new URL(fileUrl);
+				URLConnection connection = url.openConnection();
+		        File file=new File(filePath);
+		        if(file.exists()){
+		             connection.setRequestProperty("Range", "bytes="+(file.length())+"-");
+		        }
+		        connection.connect();
+				input = new BufferedInputStream(connection.getInputStream());
+				output = new FileOutputStream(filePath, true);
+				byte data[] = new byte[1024];
+				while ((count = input.read(data)) != -1) {
+					total += count;
+					final double progress = total / (lengthOfFile * 1.0);
+					publishProgress(progress);
+					if(isCancelled()){
+						output.flush();
+						output.close();
+						input.close();
+						Log.d(TAG, "DownloadTask was stop");
+					}
+					output.write(data, 0, count);
+				}
+
+		        //It tells, downloading success finished.
+				result[0] = filePath;
+			} catch (Exception e) {
+				Log.e(TAG, "Problem with download!", e);
+		        //It tells, downloading failed.
+				result[0] = STOP;
+			}finally{
+				try {
+					output.flush();
+					output.close();
+					input.close();
+				} catch (Exception e) {}
+			}
+			
+	        //It tells quantity of bytes were downloaded.
+			result[1] = total;
+			return result;
+		}
 	}
 
 	private class DownloadLinksTask extends AsyncTask<String, String, Integer> {
 		private ArrayList<String> links;
 		private ArrayList<String> assetsNames;
+		
+		private static final int BREAK_AFTER_FAILED_ATTEMP = 5000;
+		private static final int DOWNLOADING_ATTEMPS = 50;
+		
 		@Override
 		protected void onPreExecute() {
 			magazine.makeMagazineDir();
@@ -275,10 +350,85 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				}
 				String assetUrl = links.get(i);
 				String assetPath = magazine.getMagazineDir()+assetsNames.get(i);
-				DownloadMagazineListService.downloadFromUrl(assetUrl, assetPath);
+				Object[] result = downloadFromUrl(assetUrl, assetPath, false);
+				if ((Integer) result[0] == INTERRUPT){
+					Log.d(TAG, "DownloadLinkTask failed");
+					magazine.clearMagazineDir();
+					return INTERRUPT;
+				}
 				publishProgress("");
 			}
 			return FINISH;
+		}
+		
+		public Object[] downloadFromUrl(String sUrl, String filePath, boolean resume){
+			Object[] result = new Object[2];
+			int count = -1;
+			try{
+				URL url = new URL(sUrl);
+				URLConnection connection = url.openConnection();
+		        File file=new File(filePath);
+		        if(file.exists()){
+		             connection.setRequestProperty("Range", "bytes="+(file.length())+"-");
+		        }
+				connection.connect();
+				int lenghtOfFile = connection.getContentLength();
+				Log.d(TAG, "downloadFromUrl Lenght of file: " + lenghtOfFile);
+		
+				input = new BufferedInputStream(connection.getInputStream());
+				output = new FileOutputStream(filePath, true);
+		
+				byte data[] = new byte[1024];
+				while ((count = input.read(data)) != -1) {
+					output.write(data, 0, count);
+				}
+				
+		        //It tells, downloading success finished.
+				result[0] = FINISH;
+			} catch (Exception e) {
+				Log.e(TAG, "Problem with download: " + filePath, e);
+		        //It tells, downloading failed.
+				result[0] = INTERRUPT;
+				
+				//Recursive calling. Only one level down always.
+				if (!resume){
+					result[0] = makeDownloadingAttemps(sUrl, filePath);
+				}
+			}finally{
+				try {
+					output.flush();
+					output.close();
+					input.close();
+				} catch (Exception e) {}
+			}
+			
+	        //It tells quantity of bytes were downloaded.
+			result[1] = count;
+			return result;
+		}
+		
+		private int makeDownloadingAttemps(String sUrl, String filePath){
+			int action = INTERRUPT;
+			int attemps = 0;
+			while(action == INTERRUPT){
+				if (attemps >= DOWNLOADING_ATTEMPS){
+					break;
+				}
+				Object[] resumeResult = downloadFromUrl(sUrl, filePath, true);
+				action = (Integer) resumeResult[0]; //Downloading result.
+				boolean wereSomeBytes = (Integer) resumeResult[1] > -1 ? true : false; //Were downloaded some bytes.
+				
+				if (action == INTERRUPT){
+					if (wereSomeBytes){
+						attemps = 0;
+					}
+					attemps++;
+					try {
+						Thread.sleep(BREAK_AFTER_FAILED_ATTEMP);
+					} catch (InterruptedException ex) {}
+				}
+			}
+			return action;
 		}
 
 		@Override
@@ -292,6 +442,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		@Override
 		protected void onPostExecute(Integer result) {
 			if(result == INTERRUPT){
+				showAlertDialog(DOWNLOAD_ALERT);
 				return;
 			}
 			magazine.makeCompleteFile(isSample);
