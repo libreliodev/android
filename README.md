@@ -33,6 +33,11 @@ The use of the Google Analytics library is governed by the following terms: http
 As explained on [Stack Overflow](http://stackoverflow.com/questions/3697899/package-renaming-in-eclipse-android-project), press F2 on package name. 
 
 
-
 #### 3- Update AndroidManifest.xml:
 Enter the new package name.
+
+how to install OSMBONUSPACK lib in spotty-app for draw routes on maps
+
+#### 4- How to install libGoogleAnalyticsV2 maven dependency:
+mvn install:install-file -Dfile=libs/libGoogleAnalyticsV2.jar -DgroupId=com.google.analytics -DartifactId=libGoogleAnalytics -Dversion=V2 -Dpackaging=jar
+
