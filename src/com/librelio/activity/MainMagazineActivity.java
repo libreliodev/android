@@ -261,7 +261,7 @@ public class MainMagazineActivity extends BaseActivity {
 			restorePurchises();
 			return true;
 		case R.id.options_menu_send_log:
-			new CrashSend().execute();
+			onSendLog();
 			return true;
 		case R.id.options_menu_downloaded_magazines:
 			Intent intent = new Intent(
