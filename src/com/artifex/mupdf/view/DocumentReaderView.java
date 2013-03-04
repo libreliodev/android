@@ -48,6 +48,7 @@ public abstract class DocumentReaderView extends ReaderView {
 			}
 
 			if (linkPage != -1) {
+				Log.d(TAG,"linkPage ="+ linkPage);
 				setDisplayedViewIndex(linkPage);
 			} else if (linkString != null) {
 				// start intent with url as linkString

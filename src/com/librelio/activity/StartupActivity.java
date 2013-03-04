@@ -46,6 +46,7 @@ import android.view.View.OnClickListener;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.animation.DisplayNextView;
 import com.librelio.animation.Rotate3dAnimation;
@@ -99,6 +100,21 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		new LoadAdvertisingImageTask().execute();
 	}
 	
+	@Override
+	public void onStart(){
+		super.onStart();
+		EasyTracker.getInstance().activityStart(this);
+		
+	}
+	
+	@Override
+	public void onStop(){
+		super.onStop();
+		EasyTracker.getInstance().activityStop(this);
+	}
+
+	
+	
 	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
 
 		@Override
@@ -125,6 +141,8 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			}
 			return -1;
 		}
+		
+
 
 		@Override
 		protected void onPostExecute(Integer result) {
