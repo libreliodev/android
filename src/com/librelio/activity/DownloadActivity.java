@@ -141,7 +141,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		
 		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
 		private static final int BREAK_AFTER_FAILED_ATTEMP = 5000;
-		private static final int DOWNLOADING_ATTEMPS = 50;
+		private static final int DOWNLOADING_ATTEMPS = 4;
 
 		@Override
 		protected void onPreExecute() {
@@ -198,7 +198,9 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				return;
 			}
 			final double curProgress = p[0];
-			final String msg = String.format(Locale.getDefault(), "Downloading %s", formater.format(curProgress));
+			final String msg = (curProgress > 0) ?
+					String.format(Locale.getDefault(), "Downloading %s", formater.format(curProgress)) 
+					: getString(R.string.download);
 			text.setText(msg);
 			progress.setProgress((int)(curProgress * 100));
 		}
@@ -218,10 +220,10 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			String action = STOP;
 			int attemps = 0;
 			while (action == STOP){
-				if (attemps >= DOWNLOADING_ATTEMPS){
+				if (attemps >= DOWNLOADING_ATTEMPS || isCancelled()){
 					return STOP;
 				}
-
+				
 				Object[] result = getFileAgain(lengthOfFile, total);
 				action = (String) result[0]; //Downloading result.
 				long bytes = (Long) result[1]; //Quantity of bytes were downloaded.
@@ -242,8 +244,11 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		}
 		
 		private Object[] getFileAgain(int lengthOfFile, long total){
-			int count;
 			Object[] result = new Object[2];
+			//It tells, downloading failed.
+			result[0] = STOP;
+			
+			int count;
 			try {
 				URL url = new URL(fileUrl);
 				URLConnection connection = url.openConnection();
@@ -260,10 +265,11 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 					final double progress = total / (lengthOfFile * 1.0);
 					publishProgress(progress);
 					if(isCancelled()){
+						Log.d(TAG, "DownloadTask was stop");
 						output.flush();
 						output.close();
 						input.close();
-						Log.d(TAG, "DownloadTask was stop");
+						return result;
 					}
 					output.write(data, 0, count);
 				}
@@ -272,8 +278,6 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				result[0] = filePath;
 			} catch (Exception e) {
 				Log.e(TAG, "Problem with download!", e);
-		        //It tells, downloading failed.
-				result[0] = STOP;
 			}finally{
 				try {
 					output.flush();
@@ -293,7 +297,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		private ArrayList<String> assetsNames;
 		
 		private static final int BREAK_AFTER_FAILED_ATTEMP = 5000;
-		private static final int DOWNLOADING_ATTEMPS = 50;
+		private static final int DOWNLOADING_ATTEMPS = 4;
 		
 		@Override
 		protected void onPreExecute() {
@@ -411,7 +415,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			int action = INTERRUPT;
 			int attemps = 0;
 			while(action == INTERRUPT){
-				if (attemps >= DOWNLOADING_ATTEMPS){
+				if (attemps >= DOWNLOADING_ATTEMPS  || isCancelled()){
 					break;
 				}
 				Object[] resumeResult = downloadFromUrl(sUrl, filePath, true);

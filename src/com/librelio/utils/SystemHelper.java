@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 
@@ -21,11 +19,7 @@ public class SystemHelper {
 	 * otherwise false
 	 */
 	public static boolean isEmulator(Context context) {
-		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-		final String deviceId = telephonyManager.getDeviceId();
-		if (deviceId == null) return true; 
-		if (CommonHelper.isNotNull(deviceId)
-				&& deviceId.equals(NULL_IMEI)) {
+		if (android.os.Build.MODEL.equals("google_sdk")){
 			return true;
 		} else {
 			return false;
