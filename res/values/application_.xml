@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
 
     <string name="app_name">Wind</string>
     <string name="enable_yearly_subs">false</string>
@@ -8,5 +8,6 @@
     <bool name="enable_code_subs">true</bool>
     <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>
+    <string name="google_analytics">UA-1732003-23</string>
 
 </resources>
