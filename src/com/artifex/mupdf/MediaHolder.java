@@ -352,16 +352,15 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 
 	protected void onPlayVideoOutsideLocal() {
 		Log.d(TAG, "onPlayVideoOutsideLocal linkInfo = " + linkInfo);
-		mediaPlayer = getMediaPlayer(uriString);
 		videoFileName = uriString;
 		SurfaceView sv = new SurfaceView(getContext());
+		sv.setLayoutParams(new FrameLayout.LayoutParams(
+				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
-		sv.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		holder = sv.getHolder();
 		holder.addCallback(this);
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		addView(sv);
-		mediaPlayer.setDisplay(sv.getHolder());
 	}
 
 	protected void onPlayVideoInsideLocal() {
@@ -435,7 +434,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 			mediaPlayer = new MediaPlayer();
 			mediaPlayer.setDataSource(MediaFilePath);
 			mediaPlayer.setDisplay(holder);
-			mediaPlayer.prepare();
+			mediaPlayer.prepareAsync();
 			mediaPlayer.setOnBufferingUpdateListener(this);
 			mediaPlayer.setOnCompletionListener(this);
 			mediaPlayer.setOnPreparedListener(this);
