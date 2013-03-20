@@ -214,8 +214,8 @@ public class MuPDFActivity extends BaseActivity{
 				if(pageView!=null){
 					pageView.cleanRunningLinkList();
 				}
-				new ActivateAutoLinks().safeExecute(i);
 				super.onMoveToChild(view, i);
+				new ActivateAutoLinks(pageView).safeExecute(i);
 			}
 
 			@Override
@@ -672,7 +672,16 @@ public class MuPDFActivity extends BaseActivity{
 	}
 
 	private class ActivateAutoLinks extends TinySafeAsyncTask<Integer, Void, ArrayList<LinkInfoExternal>> {
-
+		private MuPDFPageView pageView;// = (MuPDFPageView) docView.getDisplayedView();
+		
+		public ActivateAutoLinks(MuPDFPageView pParent) {
+			pageView = pParent;
+		}
+		
+		@Deprecated
+		public ActivateAutoLinks() {
+			
+		}
 		@Override
 		protected ArrayList<LinkInfoExternal> doInBackground(Integer... params) {
 			int page = params[0].intValue();
@@ -712,7 +721,6 @@ public class MuPDFActivity extends BaseActivity{
 			docView.post(new Runnable() {
 				public void run() {
 					for(LinkInfoExternal link : autoLinks){
-						MuPDFPageView pageView = (MuPDFPageView) docView.getDisplayedView();
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
 							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);

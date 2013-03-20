@@ -57,8 +57,10 @@ public abstract class DocumentReaderView extends ReaderView {
 				onContextMenuClick();
 			}
 		} else if (e.getX() < TAP_PAGE_MARGIN) {
+			Log.d(TAG, "moveToPrevious");
 			super.moveToPrevious();
 		} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
+			Log.d(TAG, "moveToNext");
 			super.moveToNext();
 		}
 		return super.onSingleTapUp(e);
@@ -111,7 +113,7 @@ public abstract class DocumentReaderView extends ReaderView {
 
 	@Override
 	protected void onSettle(View v) {
-		((PageView)v).addHq();
+		((PageView)v).addHq(true);
 	}
 
 	@Override

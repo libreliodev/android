@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +91,15 @@ public class MagazineAdapter extends BaseAdapter{
 		
 		String imagePath = currentMagazine.getPngPath();
 
+
+		if(holder.thumbnail.getDrawable() instanceof BitmapDrawable) {
+			BitmapDrawable d = (BitmapDrawable) holder.thumbnail.getDrawable();
+			Bitmap b = d.getBitmap();
+			Log.d(TAG, "Freeing bitmap size "+b.getRowBytes());
+			b.recycle();
+			
+		}
+		
 		holder.thumbnail.setImageBitmap(
 				SystemHelper.decodeSampledBitmapFromFile(imagePath,
 						(int) context.getResources().getDimension(R.dimen.preview_image_height), 

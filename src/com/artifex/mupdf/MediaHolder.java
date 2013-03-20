@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -362,8 +363,10 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		addView(sv);
 		mediaPlayer.setDisplay(sv.getHolder());
+		Log.d(TAG, "onPlayVideoOutsideLocal exit");
 	}
 
+	@SuppressLint("SetJavaScriptEnabled")
 	protected void onPlayVideoInsideLocal() {
 		Log.d(TAG, "onPlayVideoInsideLocal linkInfo = " + linkInfo);
 		mWebView = new WebView(getContext());
@@ -407,6 +410,8 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		} else {
 			setVisibility(View.GONE);
 		}
+		Log.d(TAG, "onPlayVideoInsideLocal exit");
+
 	}
 
 	private MediaPlayer geMediaPlayer(String uri, String basePath) {

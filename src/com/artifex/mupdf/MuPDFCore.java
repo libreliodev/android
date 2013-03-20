@@ -136,6 +136,7 @@ public class MuPDFCore {
 
 	public synchronized void onDestroy() {
 		destroying();
+		globals = 0;
 	}
 	
 	public synchronized PointF getSinglePageSize(int page) {
@@ -155,6 +156,208 @@ public class MuPDFCore {
 
 				drawPageSynchrinized(page, bitmap, pageW, pageH, 0, 0, pageW, pageH);
 	}
+
+	public synchronized Bitmap drawPage(int page,
+			int pageW, int pageH,
+			int patchX, int patchY,
+			int patchW, int patchH) {
+		
+		Canvas canvas = null;
+		Bitmap bitmap = null;
+		try {
+			bitmap = Bitmap.createBitmap(patchW, patchH, Config.ARGB_8888);
+			canvas = new Canvas(bitmap);
+			canvas.drawColor(Color.TRANSPARENT);
+			Log.d(TAG,"canvas: "+canvas);
+			if (displayPages == 1) {
+				gotoPage(page);
+				drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
+				return bitmap;
+			} else {
+				page = (page == 0) ? 0 : page * 2 - 1;
+				int leftPageW = pageW / 2;
+				int rightPageW = pageW - leftPageW;
+
+				// If patch overlaps both bitmaps (left and right) - return the
+				// width of overlapping left bitpam part of the patch
+				// or return full patch width if it's fully inside left bitmap
+				int leftBmWidth = Math.min(leftPageW, leftPageW - patchX);
+
+				// set left Bitmap width to zero if patch is fully overlay right
+				// Bitmap
+				leftBmWidth = (leftBmWidth < 0) ? 0 : leftBmWidth;
+
+				// set the right part of the patch width, as a rest of the patch
+				int rightBmWidth = patchW - leftBmWidth;
+
+				if (page == numPages - 1) {
+					// draw only left page
+					canvas.drawColor(Color.BLACK);
+					if (leftBmWidth > 0) {
+						Bitmap leftBm = Bitmap.createBitmap(leftBmWidth, patchH,
+								getBitmapConfig());
+						gotoPage(page);
+						drawPage(leftBm, leftPageW, pageH,
+								(leftBmWidth == 0) ? patchX - leftPageW : 0,
+								patchY, leftBmWidth, patchH);
+						Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+						canvas.drawBitmap(leftBm, 0, 0, paint);
+						leftBm.recycle();
+					}
+				} else if (page == 0) {
+					// draw only right page
+					canvas.drawColor(Color.BLACK);
+					if (rightBmWidth > 0) {
+						Bitmap rightBm = Bitmap.createBitmap(rightBmWidth, patchH,
+								getBitmapConfig());
+						gotoPage(page);
+						drawPage(rightBm, rightPageW, pageH,
+								(leftBmWidth == 0) ? patchX - leftPageW : 0,
+								patchY, rightBmWidth, patchH);
+						Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+						canvas.drawBitmap(rightBm, leftBmWidth, 0, paint);
+						rightBm.recycle();
+					}
+				} else {
+					// Need to draw two pages one by one: left and right
+					Log.d("bitmap width", "" + bitmap.getWidth());
+//					canvas.drawColor(Color.BLACK);
+					Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+					if (leftBmWidth > 0) {
+						Bitmap leftBm = Bitmap.createBitmap(leftBmWidth,
+								patchH, getBitmapConfig());
+						gotoPage(page);
+						drawPage(leftBm, leftPageW, pageH, patchX, patchY,
+								leftBmWidth, patchH);
+						canvas.drawBitmap(leftBm, 0, 0, paint);
+						leftBm.recycle();
+					}
+					if (rightBmWidth > 0) {
+						Bitmap rightBm = Bitmap.createBitmap(rightBmWidth,
+								patchH, getBitmapConfig());
+						gotoPage(page+1);
+						drawPage(rightBm, rightPageW, pageH,
+								(leftBmWidth == 0) ? patchX - leftPageW : 0,
+								patchY, rightBmWidth, patchH);
+
+						canvas.drawBitmap(rightBm, (float) leftBmWidth, 0,
+								paint);
+						rightBm.recycle();
+					}
+
+				}
+				return bitmap;
+			}
+		} catch (OutOfMemoryError e) {
+			Log.e(TAG, "draw page " + page + "failed", e);
+			if(canvas != null) canvas.drawColor(Color.TRANSPARENT);
+			return bitmap;
+		}
+	}
+	
+	public synchronized Bitmap updatePage(BitmapHolder h, int page,
+			int pageW, int pageH,
+			int patchX, int patchY,
+			int patchW, int patchH) {
+		Bitmap bitmap = null;
+		Bitmap old_bm = h.getBm();
+
+		Log.d(TAG, "updatePage " + h.getBm());
+		if (old_bm == null || old_bm.isRecycled())
+			return null;
+
+		bitmap = old_bm.copy(Bitmap.Config.ARGB_8888, true);
+		old_bm = null;
+		
+		// updatePageInternal(bitmap, page, pageW, pageH, patchX, patchY, patchW, patchH);
+		Canvas canvas = null;
+		
+		try {
+			canvas = new Canvas(bitmap);
+			canvas.drawColor(Color.TRANSPARENT);
+			Log.d(TAG,"canvas: "+canvas);
+			if (displayPages == 1) {
+				
+				updatePageInternal(bitmap, page, pageW, pageH, patchX, patchY, patchW, patchH);
+				return bitmap;
+			} else {
+				page = (page == 0) ? 0 : page * 2 - 1;
+				int leftPageW = pageW / 2;
+				int rightPageW = pageW - leftPageW;
+
+				// If patch overlaps both bitmaps (left and right) - return the
+				// width of overlapping left bitpam part of the patch
+				// or return full patch width if it's fully inside left bitmap
+				int leftBmWidth = Math.min(leftPageW, leftPageW - patchX);
+
+				// set left Bitmap width to zero if patch is fully overlay right
+				// Bitmap
+				leftBmWidth = (leftBmWidth < 0) ? 0 : leftBmWidth;
+
+				// set the right part of the patch width, as a rest of the patch
+				int rightBmWidth = patchW - leftBmWidth;
+
+				if (page == numPages - 1) {
+					// draw only left page
+//					canvas.drawColor(Color.BLACK);
+					if (leftBmWidth > 0) {
+						Bitmap leftBm = Bitmap.createBitmap(bitmap, 0, 0, leftBmWidth, patchH);
+						updatePageInternal(leftBm, page, leftPageW, pageH,
+								(leftBmWidth == 0) ? patchX - leftPageW : 0,
+								patchY, leftBmWidth, patchH);
+						Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+						canvas.drawBitmap(leftBm, 0, 0, paint);
+						leftBm.recycle();
+					}
+				} else if (page == 0) {
+					// draw only right page
+//					canvas.drawColor(Color.BLACK);
+					if (rightBmWidth > 0) {
+						Bitmap rightBm = Bitmap.createBitmap(bitmap, leftBmWidth, 0, rightBmWidth, patchH);
+						gotoPage(page);
+						updatePageInternal(rightBm, page, rightPageW, pageH,
+								(leftBmWidth == 0) ? patchX - leftPageW : 0,
+								patchY, rightBmWidth, patchH);
+						Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+						canvas.drawBitmap(rightBm, leftBmWidth, 0, paint);
+						rightBm.recycle();
+					}
+				} else {
+					// Need to draw two pages one by one: left and right
+					Log.d("bitmap width", "" + bitmap.getWidth());
+//					canvas.drawColor(Color.BLACK);
+					Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+					if (leftBmWidth > 0) {
+						Bitmap leftBm = Bitmap.createBitmap(bitmap, 0, 0, (leftBmWidth < bitmap.getWidth()) ? leftBmWidth : bitmap.getWidth(),
+								patchH);
+						updatePageInternal(leftBm, page, leftPageW, pageH, patchX, patchY,
+								leftBmWidth, patchH);
+						canvas.drawBitmap(leftBm, 0, 0, paint);
+						leftBm.recycle();
+					}
+					if (rightBmWidth > 0) {
+						Bitmap rightBm = Bitmap.createBitmap(bitmap, leftBmWidth, 0, rightBmWidth,
+								patchH);
+						updatePageInternal(rightBm, page, rightPageW, pageH,
+								(leftBmWidth == 0) ? patchX - leftPageW : 0,
+								patchY, rightBmWidth, patchH);
+
+						canvas.drawBitmap(rightBm, (float) leftBmWidth, 0,
+								paint);
+						rightBm.recycle();
+					}
+
+				}
+				return bitmap;
+			}
+		} catch (OutOfMemoryError e) {
+			Log.e(TAG, "update page " + page + "failed", e);
+			if(canvas != null) canvas.drawColor(Color.TRANSPARENT);
+			return bitmap;
+		}
+	}
+	
+	/*
 
 	public synchronized void drawPage(int page, Bitmap bitmap, int pageW, int pageH, int patchX, int patchY, int patchW, int patchH) {
 		Canvas canvas = new Canvas(bitmap);
@@ -237,6 +440,8 @@ public class MuPDFCore {
 		System.gc();
 	}
 
+	 */
+	
 	public synchronized int hitLinkPage(int page, float x, float y) {
 		LinkInfo[] pageLinks = getPageLinks(page);
 		for(LinkInfo pageLink: pageLinks) {

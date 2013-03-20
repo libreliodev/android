@@ -6,35 +6,109 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+
+abstract class PassClickResultVisitor {
+	public abstract void visitText(PassClickResultText result);
+	public abstract void visitChoice(PassClickResultChoice result);
+}
+
+class PassClickResult {
+	public final boolean changed;
+
+	public PassClickResult(boolean _changed) {
+		changed = _changed;
+	}
+
+	public void acceptVisitor(PassClickResultVisitor visitor) {
+	}
+}
+
+class PassClickResultText extends PassClickResult {
+	public final String text;
+
+	public PassClickResultText(boolean _changed, String _text) {
+		super(_changed);
+		text = _text;
+	}
+
+	public void acceptVisitor(PassClickResultVisitor visitor) {
+		visitor.visitText(this);
+	}
+}
+
+class PassClickResultChoice extends PassClickResult {
+	public final String [] options;
+	public final String [] selected;
+
+	public PassClickResultChoice(boolean _changed, String [] _options, String [] _selected) {
+		super(_changed);
+		options = _options;
+		selected = _selected;
+	}
+
+	public void acceptVisitor(PassClickResultVisitor visitor) {
+		visitor.visitChoice(this);
+	}
+}
 
 public class MuPDFPageView extends PageView {
 	private static final String TAG = "MuPDFPageView";
 	public static final String PATH_KEY = "path";
 	public static final String LINK_URI_KEY = "link_uri";
 
-	private final MuPDFCore muPdfCore;
+	private final MuPDFCore mCore;
+	private AsyncTask<Void,Void,PassClickResult> mPassClick;
+	private RectF mWidgetAreas[];
+	private AsyncTask<Void,Void,RectF[]> mLoadWidgetAreas;
+//	private AlertDialog.Builder mTextEntryBuilder;
+//	private AlertDialog.Builder mChoiceEntryBuilder;
+//	private AlertDialog mTextEntry;
+	private EditText mEditText;
+	private AsyncTask<String,Void,Boolean> mSetWidgetText;
+	private AsyncTask<String,Void,Void> mSetWidgetChoice;
+	private Runnable changeReporter;
+	
+	// Wind customization
 	private HashMap<String, FrameLayout> mediaHolders = new HashMap<String, FrameLayout>();
-
 	private ArrayList<String> runningLinks;
 
 	public MuPDFPageView(Context c, MuPDFCore muPdfCore, Point parentSize) {
 		super(c, parentSize);
-		this.muPdfCore = muPdfCore;
+		this.mCore = muPdfCore;
 		runningLinks = new ArrayList<String>();
 	}
 
+	public LinkInfo hitLink(float x, float y) {
+		// Since link highlighting was implemented, the super class
+		// PageView has had sufficient information to be able to
+		// perform this method directly. Making that change would
+		// make MuPDFCore.hitLinkPage superfluous.
+		float scale = mSourceScale*(float)getWidth()/(float)mSize.x;
+		float docRelX = (x - getLeft())/scale;
+		float docRelY = (y - getTop())/scale;
+
+		for (LinkInfo l: mLinks)
+			if (l.rect.contains(docRelX, docRelY))
+				return l;
+
+		return null;
+	}
+	
 	public int hitLinkPage(float x, float y) {
 		float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
 		float docRelX = (x - getLeft()) / scale;
 		float docRelY = (y - getTop()) / scale;
-		LinkInfo[] pageLinks = muPdfCore.getPageLinks(mPageNumber);
+		LinkInfo[] pageLinks = mCore.getPageLinks(mPageNumber);
 		for (LinkInfo pageLink : pageLinks) {
 			if (pageLink instanceof LinkInfoInternal) {
 				LinkInfoInternal internalLink = (LinkInfoInternal) pageLink;
@@ -45,7 +119,8 @@ public class MuPDFPageView extends PageView {
 					 * page number
 					 */
 					int pageNumber = internalLink.pageNumber;
-					if (muPdfCore.getDisplayPages() != 1)
+					Log.d(TAG, "hitLinkPage with page = " + internalLink.pageNumber);
+					if (mCore.getDisplayPages() != 1)
 						if (pageNumber > 0)
 							return (pageNumber + 1) / 2;
 						else
@@ -74,7 +149,7 @@ public class MuPDFPageView extends PageView {
 		if (uriString == null)
 			return null;
 
-		LinkInfo[] links = muPdfCore.getPageLinks(getPage());
+		LinkInfo[] links = mCore.getPageLinks(getPage());
 		if (links == null) {
 			return null;
 		}
@@ -98,7 +173,7 @@ public class MuPDFPageView extends PageView {
 
 		if (linkInfo.isMediaURI()) {
 			try {
-				final String basePath = muPdfCore.getFileDirectory();
+				final String basePath = mCore.getFileDirectory();
 				MediaHolder h = new MediaHolder(getContext(), linkInfo,
 						basePath);
 				h.setVisibility(View.VISIBLE);
@@ -182,8 +257,8 @@ public class MuPDFPageView extends PageView {
 	}
 
 	@Override
-	public void addHq() {
-		super.addHq();
+	public void addHq(boolean b) {
+		super.addHq(b);
 		for (Map.Entry<String, FrameLayout> entry : mediaHolders.entrySet()) {
 			MediaHolder mLinkHolder = (MediaHolder) entry.getValue();
 
@@ -200,20 +275,20 @@ public class MuPDFPageView extends PageView {
 	}
 
 	@Override
-	protected void drawPage(Bitmap bm, int sizeX, int sizeY, int patchX,
+	protected Bitmap drawPage(int sizeX, int sizeY, int patchX,
 			int patchY, int patchWidth, int patchHeight) {
-		if (null != bm) {
-			muPdfCore.drawPage(mPageNumber, bm, sizeX, sizeY, patchX, patchY,
-					patchWidth, patchHeight);
-		} else {
-			Log.w(TAG, "IGNORED drawPage");
-		}
+		return mCore.drawPage(mPageNumber, sizeX, sizeY, patchX, patchY, patchWidth, patchHeight);
+	}
 
+	@Override
+	protected Bitmap updatePage(BitmapHolder h, int sizeX, int sizeY,
+			int patchX, int patchY, int patchWidth, int patchHeight) {
+		return mCore.updatePage(h, mPageNumber, sizeX, sizeY, patchX, patchY, patchWidth, patchHeight);
 	}
 
 	@Override
 	protected LinkInfo[] getLinkInfo() {
-		return muPdfCore.getPageLinks(mPageNumber);
+		return mCore.getPageLinks(mPageNumber);
 	}
 
 	// protected LinkInfo[] getExternalLinkInfo() {

@@ -26,6 +26,7 @@ public class ReaderView extends AdapterView<Adapter>
                         		   GestureDetector.OnDoubleTapListener,
                                    ScaleGestureDetector.OnScaleGestureListener,
                                    Runnable {
+	private static final String TAG = ReaderView.class.getSimpleName();
 	private static final int  MOVING_DIAGONALLY = 0;
 	private static final int  MOVING_LEFT       = 1;
 	private static final int  MOVING_RIGHT      = 2;
@@ -330,6 +331,7 @@ public class ReaderView extends AdapterView<Adapter>
 					// If, at the end of user interaction, there is no
 					// current inertial scroll in operation then animate
 					// the view onto screen if necessary
+					Log.d(TAG, "SLIDE");
 					slideViewOntoScreen(v);
 				}
 
@@ -340,7 +342,6 @@ public class ReaderView extends AdapterView<Adapter>
 				}
 			}
 		}
-
 		requestLayout();
 		return true;
 	}
