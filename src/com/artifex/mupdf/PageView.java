@@ -188,12 +188,16 @@ public abstract class PageView extends ViewGroup {
 		}
 	}
 	public void setPage(int page, PointF size) {
-		// Cancel pending render task
+		// Cancel pending tasks
 		if (mDrawEntire != null) {
 			mDrawEntire.cancel(true);
 			mDrawEntire = null;
 		}
-
+		if(mGetLinkInfo != null) {
+			mGetLinkInfo.cancel(true);
+			mGetLinkInfo = null;
+		}
+			
 		mIsBlank = false;
 
 		mPageNumber = page;
@@ -212,6 +216,7 @@ public abstract class PageView extends ViewGroup {
 		mEntireBmh.setBm(null);
 
 		// Get the link info in the background
+		
 		mGetLinkInfo = new AsyncTask<Void,Void,LinkInfo[]>() {
 			protected LinkInfo[] doInBackground(Void... v) {
 				return getLinkInfo();
