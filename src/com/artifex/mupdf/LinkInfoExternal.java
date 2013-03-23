@@ -15,11 +15,7 @@ public class LinkInfoExternal extends LinkInfo {
 	}
 	
 	public boolean isMediaURI() {
-		return url.startsWith("http") 
-				&& (url.contains("youtube") 
-						|| url.contains("vimeo") 
-						|| url.contains("localhost")
-				);
+		return hasVideoData()||isImageFormat();
 	}
 
 	public boolean isAutoPlay() {
@@ -37,7 +33,8 @@ public class LinkInfoExternal extends LinkInfo {
 	}
 
 	public boolean hasVideoData() {
-		return url.contains("mp4");
+		final String path = Uri.parse(url).getPath();
+		return path.endsWith("mp4");
 	}
 
 	public boolean isImageFormat() {
