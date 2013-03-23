@@ -202,7 +202,8 @@ public class MuPDFActivity extends BaseActivity{
 		// First create the document view making use of the ReaderView's internal
 		// gesture recognition
 		docView = new DocumentReaderView(this, linkOfDocument) {
-
+			ActivateAutoLinks mLinksActivator = null;
+			
 			@Override
 			protected void onMoveToChild(View view, int i) {
 				Log.d(TAG,"onMoveToChild id = "+i);
@@ -215,7 +216,10 @@ public class MuPDFActivity extends BaseActivity{
 					pageView.cleanRunningLinkList();
 				}
 				super.onMoveToChild(view, i);
-				new ActivateAutoLinks(pageView).safeExecute(i);
+				if(mLinksActivator != null)
+					mLinksActivator.cancel(true);
+				mLinksActivator = new ActivateAutoLinks(pageView);
+				mLinksActivator.safeExecute(i);
 			}
 
 			@Override
@@ -249,92 +253,8 @@ public class MuPDFActivity extends BaseActivity{
 		// controls in variables
 		makeButtonsView();
 
-		// Set up the page slider
-//		int smax = Math.max(core.countPages()-1,1);
-//		mPageSliderRes = ((10 + smax - 1)/smax) * 2;
-
 		// Set the file-name text
 		mFilenameView.setText(fileName);
-
-		// Activate the seekbar
-//		mPageSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//			public void onStopTrackingTouch(SeekBar seekBar) {
-//				mDocView.setDisplayedViewIndex((seekBar.getProgress()+mPageSliderRes/2)/mPageSliderRes);
-//			}
-//
-//			public void onStartTrackingTouch(SeekBar seekBar) {}
-//
-//			public void onProgressChanged(SeekBar seekBar, int progress,
-//					boolean fromUser) {
-//				updatePageNumView((progress+mPageSliderRes/2)/mPageSliderRes);
-//			}
-//		});
-
-		// Activate the search-preparing button
-		mSearchButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				searchModeOn();
-			}
-		});
-
-		mCancelButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				searchModeOff();
-			}
-		});
-
-		// Search invoking buttons are disabled while there is no text specified
-		mSearchBack.setEnabled(false);
-		mSearchFwd.setEnabled(false);
-
-		// React to interaction with the text widget
-		mSearchText.addTextChangedListener(new TextWatcher() {
-
-			public void afterTextChanged(Editable s) {
-				boolean haveText = s.toString().length() > 0;
-				mSearchBack.setEnabled(haveText);
-				mSearchFwd.setEnabled(haveText);
-
-				// Remove any previous search results
-				if (SearchTaskResult.get() != null && !mSearchText.getText().toString().equals(SearchTaskResult.get().txt)) {
-					SearchTaskResult.recycle();
-					docView.resetupChildren();
-				}
-			}
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {}
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {}
-		});
-
-		//React to Done button on keyboard
-		mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE)
-					search(1);
-				return false;
-			}
-		});
-
-		mSearchText.setOnKeyListener(new View.OnKeyListener() {
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER)
-					search(1);
-				return false;
-			}
-		});
-
-		// Activate search invoking buttons
-		mSearchBack.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				search(-1);
-			}
-		});
-		mSearchFwd.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				search(1);
-			}
-		});
 
 		if (core.hasOutline()) {
 			mOutlineButton.setOnClickListener(new View.OnClickListener() {
@@ -367,10 +287,6 @@ public class MuPDFActivity extends BaseActivity{
 
 		if (savedInstanceState == null || !savedInstanceState.getBoolean("ButtonsHidden", false)) {
 			showButtons();
-		}
-
-		if(savedInstanceState != null && savedInstanceState.getBoolean("SearchMode", false)) {
-			searchModeOn();
 		}
 
 		// Stick the document view and the buttons overlay into a parent view
