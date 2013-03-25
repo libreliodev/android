@@ -107,8 +107,8 @@ public class MuPDFCore {
 			page = numPages - 1;
 		else if (page < 0)
 			page = 0;
-		if (this.pageNum == page)
-			return;
+//		if (this.pageNum == page)
+//			return;
 		gotoPageInternal(page);
 		this.pageNum = page;
 		this.pageWidth = getPageWidth();
@@ -157,7 +157,7 @@ public class MuPDFCore {
 				drawPageSynchrinized(page, bitmap, pageW, pageH, 0, 0, pageW, pageH);
 	}
 
-	public synchronized Bitmap drawPage(int page,
+	public synchronized Bitmap drawPage(final int page,
 			int pageW, int pageH,
 			int patchX, int patchY,
 			int patchW, int patchH) {
@@ -168,13 +168,15 @@ public class MuPDFCore {
 			bitmap = Bitmap.createBitmap(patchW, patchH, Config.ARGB_8888);
 			canvas = new Canvas(bitmap);
 			canvas.drawColor(Color.TRANSPARENT);
+			Log.d(TAG, "drawPage "+page);
+			
 			Log.d(TAG,"canvas: "+canvas);
 			if (displayPages == 1) {
 				gotoPage(page);
 				drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
 				return bitmap;
 			} else {
-				page = (page == 0) ? 0 : page * 2 - 1;
+				final int drawPage = (page == 0) ? 0 : page * 2 - 1;
 				int leftPageW = pageW / 2;
 				int rightPageW = pageW - leftPageW;
 
@@ -190,13 +192,13 @@ public class MuPDFCore {
 				// set the right part of the patch width, as a rest of the patch
 				int rightBmWidth = patchW - leftBmWidth;
 
-				if (page == numPages - 1) {
+				if (drawPage == numPages - 1) {
 					// draw only left page
 					canvas.drawColor(Color.BLACK);
 					if (leftBmWidth > 0) {
 						Bitmap leftBm = Bitmap.createBitmap(leftBmWidth, patchH,
 								getBitmapConfig());
-						gotoPage(page);
+						gotoPage(drawPage);
 						drawPage(leftBm, leftPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, leftBmWidth, patchH);
@@ -204,13 +206,13 @@ public class MuPDFCore {
 						canvas.drawBitmap(leftBm, 0, 0, paint);
 						leftBm.recycle();
 					}
-				} else if (page == 0) {
+				} else if (drawPage == 0) {
 					// draw only right page
 					canvas.drawColor(Color.BLACK);
 					if (rightBmWidth > 0) {
 						Bitmap rightBm = Bitmap.createBitmap(rightBmWidth, patchH,
 								getBitmapConfig());
-						gotoPage(page);
+						gotoPage(drawPage);
 						drawPage(rightBm, rightPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, rightBmWidth, patchH);
@@ -226,7 +228,7 @@ public class MuPDFCore {
 					if (leftBmWidth > 0) {
 						Bitmap leftBm = Bitmap.createBitmap(leftBmWidth,
 								patchH, getBitmapConfig());
-						gotoPage(page);
+						gotoPage(drawPage);
 						drawPage(leftBm, leftPageW, pageH, patchX, patchY,
 								leftBmWidth, patchH);
 						canvas.drawBitmap(leftBm, 0, 0, paint);
@@ -235,7 +237,7 @@ public class MuPDFCore {
 					if (rightBmWidth > 0) {
 						Bitmap rightBm = Bitmap.createBitmap(rightBmWidth,
 								patchH, getBitmapConfig());
-						gotoPage(page+1);
+						gotoPage(drawPage+1);
 						drawPage(rightBm, rightPageW, pageH,
 								(leftBmWidth == 0) ? patchX - leftPageW : 0,
 								patchY, rightBmWidth, patchH);
