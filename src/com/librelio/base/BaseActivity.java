@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
-import java.util.Random;
 
 import org.netcook.android.tools.CrashCatcherActivity;
 
@@ -160,7 +159,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 
 	@Override
 	public String getStoragePath(){
-		if (USE_INTERNAL_STORAGE) {
+		if (getResources().getBoolean(R.bool.use_internal_storage)) {
 			return getInternalPath();
 		} else {
 			return getExternalPath();

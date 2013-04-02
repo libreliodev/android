@@ -41,8 +41,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 
@@ -80,6 +82,8 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private boolean advertisingClickPerfomed = false;
 	
 	private boolean isFirstImage = true;
+	
+	private Timer mStartupAdsTimer;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -298,13 +302,12 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	}
 
 	protected void onStartMagazine(int delay) {
-		new Timer().schedule(new TimerTask() {
+		mStartupAdsTimer = new Timer();
+		mStartupAdsTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				if (!advertisingClickPerfomed){
-					Intent intent = new Intent(self(), MainMagazineActivity.class);
-					startActivity(intent);
-					finish();
+					startMagazineActivity();
 				}
 			}
 		}, delay);
@@ -312,15 +315,33 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	
 	private void setOnAdvertisingImageClickListener(final String link){
 		if (advertisingImage != null){
-			advertisingImage.setOnClickListener(new OnClickListener() {
+			advertisingImage.setOnTouchListener(new OnTouchListener() {
+//				@Override
+//				public void onClick(View v) {
+//					advertisingClickPerfomed = true;
+//					
+//					startAdsActivity(link);
+//				}
+
 				@Override
-				public void onClick(View v) {
-					advertisingClickPerfomed = true;
-					
-					Intent intent = new Intent(self(), WebAdvertisingActivity.class);
-					intent.putExtra(WebAdvertisingActivity.PARAM_LINK, link);
-					startActivity(intent);
-					finish();
+				public boolean onTouch(View pView, MotionEvent pEvent) {
+					if(pEvent.getAction() == MotionEvent.ACTION_DOWN) {
+						// check the Y coordinates of the touch event
+						float pY = pEvent.getY();
+						int   pHeight = pView.getHeight();
+						if(Math.round(pY/0.2) <= pHeight) {
+							// Skip ads
+							if(mStartupAdsTimer != null)
+								mStartupAdsTimer.cancel();
+							startMagazineActivity();
+						} else {
+							// Show ads
+							if(mStartupAdsTimer != null)
+								mStartupAdsTimer.cancel();
+							startAdsActivity(link);
+						}
+					}
+					return false;
 				}
 			});
 		} 
@@ -345,6 +366,25 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	
 	private StartupActivity self(){
 		return this;
+	}
+
+	/**
+	 * starts Magazine activity to display list of magazines
+	 */
+	void startMagazineActivity() {
+		Intent intent = new Intent(self(), MainMagazineActivity.class);
+		startActivity(intent);
+		finish();
+	}
+
+	/**
+	 * @param pLink - URL to display
+	 */
+	void startAdsActivity(final String pLink) {
+		Intent intent = new Intent(self(), WebAdvertisingActivity.class);
+		intent.putExtra(WebAdvertisingActivity.PARAM_LINK, pLink);
+		startActivity(intent);
+		finish();
 	}
 
 }

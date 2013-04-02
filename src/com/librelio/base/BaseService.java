@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 
 import com.librelio.LibrelioApplication;
+import com.niveales.wind.R;
 
 abstract public class BaseService extends Service implements IBaseContext {
 
@@ -24,7 +25,7 @@ abstract public class BaseService extends Service implements IBaseContext {
 
 	@Override
 	public String getStoragePath() {
-		if (USE_INTERNAL_STORAGE) {
+		if (getResources().getBoolean(R.bool.use_internal_storage)) {
 			return getInternalPath();
 		} else {
 			return getExternalPath();

@@ -594,10 +594,6 @@ public class MuPDFActivity extends BaseActivity{
 			pageView = pParent;
 		}
 		
-		@Deprecated
-		public ActivateAutoLinks() {
-			
-		}
 		@Override
 		protected ArrayList<LinkInfoExternal> doInBackground(Integer... params) {
 			int page = params[0].intValue();

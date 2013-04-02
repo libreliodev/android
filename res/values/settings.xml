@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="get_advertising_image_url">
-	    http://librelio-europe.s3.amazonaws.com/@client/@app/AAD/</string>
-	<string name="get_advertising_link_url">
-	    http://librelio-europe.s3.amazonaws.com/@client/@app/AAD/Ad.plist</string>
+
+    <string name="get_advertising_image_url">http://librelio-europe.s3.amazonaws.com/@client/@app/AAD/</string>
+    <string name="get_advertising_link_url">http://librelio-europe.s3.amazonaws.com/@client/@app/AAD/Ad.plist</string>
+    <bool name="use_internal_storage">true</bool>
+
 </resources>
