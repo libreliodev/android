@@ -1,6 +1,7 @@
 package com.artifex.mupdf;
 
 import android.net.Uri;
+import android.util.Log;
 
 public class LinkInfoExternal extends LinkInfo {
 	final public String url;
@@ -34,19 +35,21 @@ public class LinkInfoExternal extends LinkInfo {
 
 	public boolean hasVideoData() {
 		final String path = Uri.parse(url).getPath();
-		return path.endsWith("mp4");
+
+		return path != null && path.endsWith("mp4");
 	}
 
 	public boolean isImageFormat() {
 		final String path = Uri.parse(url).getPath();
-		return path.endsWith("jpg") 
+		return (path != null)&&
+				(path.endsWith("jpg") 
 				|| path.endsWith("png") 
-				|| path.endsWith("bmp");
+				|| path.endsWith("bmp"));
 	}
 
 	public boolean isVideoFormat() {
 		final String path = Uri.parse(url).getPath();
-		return path.endsWith("mp4");
+		return path != null && path.endsWith("mp4");
 	}
 
 	@Override

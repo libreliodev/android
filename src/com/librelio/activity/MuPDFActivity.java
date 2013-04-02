@@ -615,13 +615,14 @@ public class MuPDFActivity extends BaseActivity{
 						if (null == currentLink.url) {
 							continue;
 						}
-						Log.d(TAG, "activateAutoLinks link: " + currentLink.url);
+						Log.d(TAG, "checking link for autoplay: " + currentLink.url);
 	
 						if (currentLink.isMediaURI()) {
 							if (currentLink.isAutoPlay()) {
 								autoLinks.add(currentLink);
 							}
 						}
+
 					}
 				}
 				return autoLinks;
