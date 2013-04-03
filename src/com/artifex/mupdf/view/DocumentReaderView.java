@@ -23,7 +23,7 @@ public abstract class DocumentReaderView extends ReaderView {
 		DEFAULT, HIGHLIGHT, INHIBIT
 	};
 
-	private static final int TAP_PAGE_MARGIN = 70;
+	private static int tapPageMargin = 70;
 
 	private LinkState linkState = LinkState.DEFAULT;
 
@@ -32,6 +32,12 @@ public abstract class DocumentReaderView extends ReaderView {
 	public DocumentReaderView(Context context, 
 			SparseArray<LinkInfoExternal[]> pLinkOfDocument) {
 		super(context, pLinkOfDocument);
+	}
+	
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		tapPageMargin = (int) (getWidth() * .1);
 	}
 
 	@Override
@@ -54,14 +60,16 @@ public abstract class DocumentReaderView extends ReaderView {
 				// start intent with url as linkString
 				openLink(linkString);
 			} else {
-				onContextMenuClick();
+				if (e.getX() < tapPageMargin) {
+						Log.d(TAG, "moveToPrevious");
+						super.moveToPrevious();
+					} else if (e.getX() > super.getWidth() - tapPageMargin) {
+						Log.d(TAG, "moveToNext");
+						super.moveToNext();
+					} else {
+						onContextMenuClick();
+					}
 			}
-		} else if (e.getX() < TAP_PAGE_MARGIN) {
-			Log.d(TAG, "moveToPrevious");
-			super.moveToPrevious();
-		} else if (e.getX() > super.getWidth() - TAP_PAGE_MARGIN) {
-			Log.d(TAG, "moveToNext");
-			super.moveToNext();
 		}
 		return super.onSingleTapUp(e);
 	}
