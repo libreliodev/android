@@ -313,15 +313,20 @@ public class ReaderView extends AdapterView<Adapter>
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		Log.d(TAG, "onTouchEvent");
+
 		mScaleGestureDetector.onTouchEvent(event);
 
 		if (!mScaling)
 			mGestureDetector.onTouchEvent(event);
 
 		if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			Log.d(TAG, "event.getActionMasked() == MotionEvent.ACTION_DOWN");
 			mUserInteracting = true;
 		}
 		if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+			Log.d(TAG, "event.getActionMasked() == MotionEvent.ACTION_UP");
+
 			mScrollDisabled = false;
 			mUserInteracting = false;
 
