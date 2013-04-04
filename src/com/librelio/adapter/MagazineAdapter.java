@@ -95,8 +95,10 @@ public class MagazineAdapter extends BaseAdapter{
 		if(holder.thumbnail.getDrawable() instanceof BitmapDrawable) {
 			BitmapDrawable d = (BitmapDrawable) holder.thumbnail.getDrawable();
 			Bitmap b = d.getBitmap();
-			Log.d(TAG, "Freeing bitmap size "+b.getRowBytes());
-			b.recycle();
+			if (b != null) {
+				Log.d(TAG, "Freeing bitmap size "+b.getRowBytes());
+				b.recycle();
+			}
 			
 		}
 		
