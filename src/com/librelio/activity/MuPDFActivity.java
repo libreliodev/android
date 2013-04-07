@@ -303,6 +303,9 @@ public class MuPDFActivity extends BaseActivity{
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode >= 0)
+			if (core.getDisplayPages() == 2) {
+				resultCode = (resultCode + 1) / 2;
+			}
 			docView.setDisplayedViewIndex(resultCode);
 		super.onActivityResult(requestCode, resultCode, data);
 	}
