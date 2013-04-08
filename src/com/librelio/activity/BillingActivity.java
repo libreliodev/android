@@ -254,11 +254,6 @@ public class BillingActivity extends BaseActivity {
 
 
 						
-
-
-
-
-						
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
 						
@@ -322,16 +317,18 @@ public class BillingActivity extends BaseActivity {
 							JSONObject object = null;
 							String sku = "";
 							String price = "";
+							String title = "";
 							try {
 								object = new JSONObject(detail);
 								sku = object.getString("productId");
 								price = object.getString("price");
-								productTitle = object.getString("title");
+								title = object.getString("title");
 							} catch (JSONException e) {
 								Log.e(TAG, "getSKU details failed", e);
 							}
 							if (sku.equals(productId)) {
 								productPrice = price;
+								productTitle = title;
 							}
 						}
 					}
