@@ -8,10 +8,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/page"
-        android:singleLine="true"
         android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/page"
+        android:gravity="center_vertical"
+        android:minHeight="48dp"
         android:paddingLeft="10dp"
+        android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -21,6 +23,7 @@
         android:layout_alignBaseline="@+id/title"
         android:layout_alignBottom="@+id/title"
         android:layout_alignParentRight="true"
+        android:gravity="center_vertical"
         android:paddingRight="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
