@@ -185,7 +185,8 @@ public class BillingActivity extends BaseActivity {
 		String abonnement = getResources().getString(R.string.abonnement_wind);
 		String year = getResources().getString(R.string.year);
 		String month = getResources().getString(R.string.month);
-		if(LibrelioApplication.isEnableYearlySubs(getContext())){
+		
+		if(LibrelioApplication.getYearlySubsCode(getContext()) != null){
 			subsYear.setText("   " + abonnement + " 1 " + year + "   ");
 			subsYear.setOnClickListener(new OnClickListener() {
 				@Override
@@ -198,7 +199,7 @@ public class BillingActivity extends BaseActivity {
 		} else {
 			subsYear.setVisibility(View.GONE);
 		}
-		if(LibrelioApplication.isEnableMonthlySubs(getContext())){
+		if(LibrelioApplication.getMonthlySubsCode(getContext()) != null){
 			subsMonthly.setText("   " + abonnement + " 1 " + month + "   ");
 			subsMonthly.setOnClickListener(new OnClickListener() {
 				@Override
@@ -246,9 +247,33 @@ public class BillingActivity extends BaseActivity {
 					try {
 						ArrayList<String> skuList = new ArrayList<String>();
 						skuList.add(productId);
+
+						//Add  subscription codes
+						skuList.add(LibrelioApplication.getYearlySubsCode(getContext()));
+						skuList.add(LibrelioApplication.getMonthlySubsCode(getContext()));
+
+
+						
+
+
+
+
+						
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
+						
+						//Retrieve relevant in app items
 						skuDetails = billingService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
+						ArrayList<String> details = skuDetails.getStringArrayList("DETAILS_LIST");
+	
+						//Retrieve relevant subscriptions
+						skuDetails = billingService.getSkuDetails(3, getPackageName(), "subs", querySkus);
+						ArrayList<String> subsDetails = skuDetails.getStringArrayList("DETAILS_LIST");
+						
+						//Combine in app and subscriptions
+						details.addAll(subsDetails);
+						skuDetails.putStringArrayList("DETAILS_LIST",details);
+						
 						ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 					} catch (RemoteException e) {
 						Log.d(TAG, "InAppBillingService failed", e);
