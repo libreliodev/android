@@ -45,6 +45,7 @@ import android.view.Window;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
@@ -53,6 +54,7 @@ import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.librelio.storage.MagazineManager;
+import com.librelio.utils.FilenameUtils;
 import com.niveales.wind.R;
 
 /**
@@ -201,6 +203,12 @@ public class MainMagazineActivity extends BaseActivity {
 		unregisterReceiver(updateProgressStop);
 		ResponseHandler.unregister(librelioPurchaseObserver);
 		super.onStop();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		EasyTracker.getTracker().sendView("Library/Magazines");
 	}
 
 	@Override

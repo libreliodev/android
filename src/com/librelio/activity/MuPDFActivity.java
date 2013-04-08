@@ -45,11 +45,13 @@ import com.artifex.mupdf.domain.OutlineActivityData;
 import com.artifex.mupdf.domain.SearchTaskResult;
 import com.artifex.mupdf.view.DocumentReaderView;
 import com.artifex.mupdf.view.ReaderView;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
+import com.librelio.utils.FilenameUtils;
 import com.librelio.view.TwoWayView;
 import com.librelio.view.TwoWayView.Orientation;
 import com.niveales.wind.R;
@@ -226,6 +228,23 @@ public class MuPDFActivity extends BaseActivity{
 				mLinksActivator = new ActivateAutoLinks(pageView);
 				mLinksActivator.safeExecute(i);
 				setCurrentlyViewedPreview();
+				
+				if (core.getDisplayPages() == 2) {
+					int actualPageNumber = (i * 2) - 1;
+					if (i > 0) {
+					EasyTracker.getTracker().sendView(
+							"PDFReader/" + FilenameUtils.getBaseName(fileName) + "/page"
+									+ (actualPageNumber + 1));
+					}
+					if (i + 1 < docView.getAdapter().getCount()) {
+					EasyTracker.getTracker().sendView(
+							"PDFReader/" + FilenameUtils.getBaseName(fileName) + "/page"
+									+ (actualPageNumber + 2));
+					}
+				} else {
+					EasyTracker.getTracker().sendView(
+							"PDFReader/" + FilenameUtils.getBaseName(fileName) + "/page" + (i + 1));
+				}
 			}
 
 			@Override

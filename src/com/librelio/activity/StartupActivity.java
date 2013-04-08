@@ -52,6 +52,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.animation.DisplayNextView;
 import com.librelio.animation.Rotate3dAnimation;
+import com.librelio.utils.FilenameUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Dict;
@@ -103,21 +104,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		
 		new LoadAdvertisingImageTask().execute();
 	}
-	
-	@Override
-	public void onStart(){
-		super.onStart();
-		EasyTracker.getInstance().activityStart(this);
-		
-	}
-	
-	@Override
-	public void onStop(){
-		super.onStop();
-		EasyTracker.getInstance().activityStop(this);
-	}
-
-	
 	
 	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
 
@@ -198,6 +184,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 				if (response != null){
 					HttpEntity entity = response.getEntity();
 					if (entity != null){
+						EasyTracker.getTracker().sendView("Interstitial/" + FilenameUtils.getName(imageUrl));
 						Bitmap adImage = BitmapFactory.decodeStream(entity.getContent());
 						return adImage;
 					}
