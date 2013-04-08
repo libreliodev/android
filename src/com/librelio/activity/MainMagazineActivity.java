@@ -277,8 +277,6 @@ public class MainMagazineActivity extends BaseActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu, menu);
-		MenuItem item = menu.getItem(0);
-		item.setIcon(R.drawable.ic_menu_refresh);
 		MenuItemCompat.setShowAsAction(menu.getItem(0), MenuItem.SHOW_AS_ACTION_ALWAYS);
 		return true;
 	}

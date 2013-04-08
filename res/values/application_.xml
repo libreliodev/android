@@ -9,5 +9,9 @@
     <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>
     <string name="google_analytics">UA-1732003-23</string>
+    <bool name="enable_send_log_in_menu">true</bool>
+    <bool name="enable_downloads_in_menu">true</bool>
+    <bool name="enable_refresh_in_menu">true</bool>
+    <bool name="enable_subscribe_in_menu">false</bool>
 
 </resources>
