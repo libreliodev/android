@@ -208,6 +208,11 @@ public class MuPDFActivity extends BaseActivity{
 			protected void onMoveToChild(View view, int i) {
 				Log.d(TAG,"onMoveToChild id = "+i);
 
+				if(core.getDisplayPages() == 1)
+					mPreview.scrollToPosition(i);
+				else
+					mPreview.scrollToPosition(((i == 0) ? 0 : i * 2 - 1));
+
 				if (core == null){
 					return;
 				} 
@@ -367,11 +372,11 @@ public class MuPDFActivity extends BaseActivity{
 		if (core == null) {
 			return;
 		}
+
 		if (!buttonsVisible) {
 			buttonsVisible = true;
 			// Update page number text and slider
-			int index = docView.getDisplayedViewIndex();
-			updatePageNumView(index);
+			final int index = docView.getDisplayedViewIndex();
 //			mPageSlider.setMax((core.countPages()-1)*mPageSliderRes);
 //			mPageSlider.setProgress(index*mPageSliderRes);
 			if (mTopBarIsSearch) {
@@ -386,7 +391,10 @@ public class MuPDFActivity extends BaseActivity{
 					mTopBarSwitcher.setVisibility(View.VISIBLE);
 				}
 				public void onAnimationRepeat(Animation animation) {}
-				public void onAnimationEnd(Animation animation) {}
+				public void onAnimationEnd(Animation animation) {
+					updatePageNumView(index);
+
+				}
 			});
 			mTopBarSwitcher.startAnimation(anim);
 			// Update listView position
@@ -399,6 +407,11 @@ public class MuPDFActivity extends BaseActivity{
 				}
 				public void onAnimationRepeat(Animation animation) {}
 				public void onAnimationEnd(Animation animation) {
+					int page = docView.getCurrentPage();
+					if(core.getDisplayPages() == 1)
+						mPreview.scrollToPosition(docView.getCurrentPage());
+					else
+						mPreview.scrollToPosition((page == 0) ? 0 : page * 2 - 1);
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
@@ -461,6 +474,7 @@ public class MuPDFActivity extends BaseActivity{
 		if (core == null)
 			return;
 //		mPageNumberView.setText(String.format("%d/%d", index+1, core.countPages()));
+		mPreview.setSelection(docView.getCurrentPage());
 	}
 
 	void makeButtonsView() {
