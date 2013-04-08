@@ -165,18 +165,19 @@ public class MagazineAdapter extends BaseAdapter{
 			holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 		} else if (currentMagazine.isDownloaded()) {
 				// delete case
-			holder.sampleOrDeleteButton.setText(context.getResources().getString(
-						R.string.delete));
-			holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				currentMagazine.delete();
-				magazineManager.removeMagazine(
-						Magazine.TABLE_DOWNLOADED_MAGAZINES,
-						Magazine.FIELD_FILE_NAME,
-						"'" + currentMagazine.getFileName() + "'");
-			}
-			});
+			holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
+//			holder.sampleOrDeleteButton.setText(context.getResources().getString(
+//						R.string.delete));
+//			holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				currentMagazine.delete();
+//				magazineManager.removeMagazine(
+//						Magazine.TABLE_DOWNLOADED_MAGAZINES,
+//						Magazine.FIELD_FILE_NAME,
+//						"'" + currentMagazine.getFileName() + "'");
+//			}
+//			});
 		} else {
 			// Sample case
 			holder.sampleOrDeleteButton.setText(context.getResources().getString(
