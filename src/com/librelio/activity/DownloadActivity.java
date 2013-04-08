@@ -140,8 +140,8 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 	private class DownloadTask extends AsyncTask<String, Double, String> {
 		
 		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
-		private static final int BREAK_AFTER_FAILED_ATTEMP = 5000;
-		private static final int DOWNLOADING_ATTEMPS = 4;
+		private static final int BREAK_AFTER_FAILED_ATTEMPT = 5000;
+		private static final int DOWNLOADING_ATTEMPTS = 4;
 
 		@Override
 		protected void onPreExecute() {
@@ -180,7 +180,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			} catch (Exception ex) {
 				Log.e(TAG, "Problem with download!", ex);
 				// If download was interrupted try downloading again
-				return makeDownloadingAttemps(lengthOfFile, total);
+				return makeDownloadingAttempts(lengthOfFile, total);
 			}finally{
 				try {
 					output.flush();
@@ -216,11 +216,11 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			super.onPostExecute(result);
 		}
 		
-		private String makeDownloadingAttemps(int lengthOfFile, long total){
+		private String makeDownloadingAttempts(int lengthOfFile, long total){
 			String action = STOP;
-			int attemps = 0;
+			int attempts = 0;
 			while (action == STOP){
-				if (attemps >= DOWNLOADING_ATTEMPS || isCancelled()){
+				if (attempts >= DOWNLOADING_ATTEMPTS || isCancelled()){
 					return STOP;
 				}
 				
@@ -232,11 +232,11 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				
 				if (action == STOP){
 					if (wereSomeBytes){
-						attemps = 0;
+						attempts = 0;
 					}
-					attemps++;
+					attempts++;
 					try {
-						Thread.sleep(BREAK_AFTER_FAILED_ATTEMP);
+						Thread.sleep(BREAK_AFTER_FAILED_ATTEMPT);
 					} catch (InterruptedException e) {}
 				}
 			};
@@ -296,8 +296,8 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		private ArrayList<String> links;
 		private ArrayList<String> assetsNames;
 		
-		private static final int BREAK_AFTER_FAILED_ATTEMP = 5000;
-		private static final int DOWNLOADING_ATTEMPS = 4;
+		private static final int BREAK_AFTER_FAILED_ATTEMPT = 5000;
+		private static final int DOWNLOADING_ATTEMPTS = 4;
 		
 		@Override
 		protected void onPreExecute() {
@@ -396,7 +396,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				
 				//Recursive calling. Only one level down always.
 				if (!resume){
-					result[0] = makeDownloadingAttemps(sUrl, filePath);
+					result[0] = makeDownloadingAttempts(sUrl, filePath);
 				}
 			}finally{
 				try {
@@ -411,11 +411,11 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			return result;
 		}
 		
-		private int makeDownloadingAttemps(String sUrl, String filePath){
+		private int makeDownloadingAttempts(String sUrl, String filePath){
 			int action = INTERRUPT;
-			int attemps = 0;
+			int attempts = 0;
 			while(action == INTERRUPT){
-				if (attemps >= DOWNLOADING_ATTEMPS  || isCancelled()){
+				if (attempts >= DOWNLOADING_ATTEMPTS  || isCancelled()){
 					break;
 				}
 				Object[] resumeResult = downloadFromUrl(sUrl, filePath, true);
@@ -424,11 +424,11 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				
 				if (action == INTERRUPT){
 					if (wereSomeBytes){
-						attemps = 0;
+						attempts = 0;
 					}
-					attemps++;
+					attempts++;
 					try {
-						Thread.sleep(BREAK_AFTER_FAILED_ATTEMP);
+						Thread.sleep(BREAK_AFTER_FAILED_ATTEMPT);
 					} catch (InterruptedException ex) {}
 				}
 			}

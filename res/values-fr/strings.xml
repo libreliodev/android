@@ -14,6 +14,7 @@
     <string name="reload">Recharger</string>
     <string name="not_connected">Non connecté à internet&#8230;</string>
     <string name="restore_purchise">Restaurer les achats</string>
+    <string name="subscribe">Abonnement</string>
     <string name="subscription_monthly">Abonnement mensuel</string>
     <string name="subscription_yearly">Abonnement annuel</string>
     <string name="android_purchased">Achat terminé</string>

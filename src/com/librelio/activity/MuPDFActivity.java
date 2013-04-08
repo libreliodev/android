@@ -14,12 +14,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -53,7 +50,8 @@ import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
-import com.librelio.view.HorizontalListView;
+import com.librelio.view.TwoWayView;
+import com.librelio.view.TwoWayView.Orientation;
 import com.niveales.wind.R;
 
 //TODO: remove preffix mXXXX from all properties this class
@@ -93,9 +91,11 @@ public class MuPDFActivity extends BaseActivity{
 	//private SearchTaskResult mSearchTaskResult;
 	private final Handler mHandler = new Handler();
 	private FrameLayout mPreviewBarHolder;
-	private HorizontalListView mPreview;
+	private TwoWayView mPreview;
+	private PDFPreviewPagerAdapter pdfPreviewPagerAdapter;
 	private MuPDFPageAdapter mDocViewAdapter;
 	private SparseArray<LinkInfoExternal[]> linkOfDocument;
+
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -208,10 +208,10 @@ public class MuPDFActivity extends BaseActivity{
 			protected void onMoveToChild(View view, int i) {
 				Log.d(TAG,"onMoveToChild id = "+i);
 
-				if(core.getDisplayPages() == 1)
-					mPreview.scrollToPosition(i);
-				else
-					mPreview.scrollToPosition(((i == 0) ? 0 : i * 2 - 1));
+//				if(core.getDisplayPages() == 1)
+//					mPreview.scrollToPosition(i);
+//				else
+//					mPreview.scrollToPosition(((i == 0) ? 0 : i * 2 - 1));
 
 				if (core == null){
 					return;
@@ -225,6 +225,7 @@ public class MuPDFActivity extends BaseActivity{
 					mLinksActivator.cancel(true);
 				mLinksActivator = new ActivateAutoLinks(pageView);
 				mLinksActivator.safeExecute(i);
+				setCurrentlyViewedPreview();
 			}
 
 			@Override
@@ -290,8 +291,20 @@ public class MuPDFActivity extends BaseActivity{
 			}
 		}
 
-		if (savedInstanceState == null || !savedInstanceState.getBoolean("ButtonsHidden", false)) {
-			showButtons();
+		// Give preview thumbnails time to appear before showing bottom bar
+		if (savedInstanceState == null
+				|| !savedInstanceState.getBoolean("ButtonsHidden", false)) {
+			mPreview.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							showButtons();
+						}
+					});
+				}
+			}, 250);
 		}
 
 		// Stick the document view and the buttons overlay into a parent view
@@ -308,6 +321,9 @@ public class MuPDFActivity extends BaseActivity{
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode >= 0)
+			if (core.getDisplayPages() == 2) {
+				resultCode = (resultCode + 1) / 2;
+			}
 			docView.setDisplayedViewIndex(resultCode);
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -398,7 +414,7 @@ public class MuPDFActivity extends BaseActivity{
 			});
 			mTopBarSwitcher.startAnimation(anim);
 			// Update listView position
-			mPreview.setSelection(docView.getDisplayedViewIndex());
+			setCurrentlyViewedPreview();
 			anim = new TranslateAnimation(0, 0, mPreviewBarHolder.getHeight(), 0);
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
@@ -407,11 +423,11 @@ public class MuPDFActivity extends BaseActivity{
 				}
 				public void onAnimationRepeat(Animation animation) {}
 				public void onAnimationEnd(Animation animation) {
-					int page = docView.getCurrentPage();
-					if(core.getDisplayPages() == 1)
-						mPreview.scrollToPosition(docView.getCurrentPage());
-					else
-						mPreview.scrollToPosition((page == 0) ? 0 : page * 2 - 1);
+//					int page = docView.getCurrentPage();
+//					if(core.getDisplayPages() == 1)
+//						mPreview.scrollToPosition(docView.getCurrentPage());
+//					else
+//						mPreview.scrollToPosition((page == 0) ? 0 : page * 2 - 1);
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
@@ -482,20 +498,19 @@ public class MuPDFActivity extends BaseActivity{
 		mFilenameView = (TextView)buttonsView.findViewById(R.id.docNameText);
 //		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
 		mPreviewBarHolder = (FrameLayout) buttonsView.findViewById(R.id.PreviewBarHolder);
-		mPreview = new HorizontalListView(this);
+		mPreview = new TwoWayView(this);
+		mPreview.setOrientation(Orientation.HORIZONTAL);
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -1);
 		mPreview.setLayoutParams(lp);
-		mPreview.setAdapter(new PDFPreviewPagerAdapter(this, core));
+		pdfPreviewPagerAdapter = new PDFPreviewPagerAdapter(this, core);
+		mPreview.setAdapter(pdfPreviewPagerAdapter);
 		mPreview.setOnItemClickListener(new OnItemClickListener() {
-
 			@Override
 			public void onItemClick(AdapterView<?> pArg0, View pArg1,
 					int position, long id) {
-				// TODO Auto-generated method stub
 				hideButtons();
 				docView.setDisplayedViewIndex((int)id);
 			}
-
 		});
 		mPreviewBarHolder.addView(mPreview);
 //		Gallery mGallery = (Gallery) mButtonsView.findViewById(R.id.PreviewGallery);
@@ -601,6 +616,38 @@ public class MuPDFActivity extends BaseActivity{
 		return this;
 	}
 
+	private void setCurrentlyViewedPreview() {
+		int i = docView.getDisplayedViewIndex();
+		if (core.getDisplayPages() == 2) {
+			i = (i * 2) - 1;
+		}
+		pdfPreviewPagerAdapter.setCurrentlyViewing(i);
+		centerPreviewAtPosition(i);
+	}
+
+	public void centerPreviewAtPosition(int position) {
+		if (mPreview.getChildCount() > 0) {
+			View child = mPreview.getChildAt(0);
+			// assume all children the same width
+			int childmeasuredwidth = child.getMeasuredWidth();
+
+			if (childmeasuredwidth > 0) {
+				if (core.getDisplayPages() == 2) {
+					mPreview.setSelectionFromOffset(position,
+							(mPreview.getWidth() / 2) - (childmeasuredwidth));
+				} else {
+					mPreview.setSelectionFromOffset(position,
+							(mPreview.getWidth() / 2)
+									- (childmeasuredwidth / 2));
+				}
+			} else {
+				Log.e("centerOnPosition", "childmeasuredwidth = 0");
+			}
+		} else {
+			Log.e("centerOnPosition", "childcount = 0");
+		}
+	}
+
 	private class ActivateAutoLinks extends TinySafeAsyncTask<Integer, Void, ArrayList<LinkInfoExternal>> {
 		private MuPDFPageView pageView;// = (MuPDFPageView) docView.getDisplayedView();
 		
@@ -625,13 +672,14 @@ public class MuPDFActivity extends BaseActivity{
 						if (null == currentLink.url) {
 							continue;
 						}
-						Log.d(TAG, "activateAutoLinks link: " + currentLink.url);
+						Log.d(TAG, "checking link for autoplay: " + currentLink.url);
 	
 						if (currentLink.isMediaURI()) {
 							if (currentLink.isAutoPlay()) {
 								autoLinks.add(currentLink);
 							}
 						}
+
 					}
 				}
 				return autoLinks;
