@@ -16,6 +16,7 @@ import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.v4.view.PagerAdapter;
@@ -46,6 +47,8 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	private Point mPreviewSize;
 	private final SparseArray<Bitmap> mBitmapCache = new SparseArray<Bitmap>();
 	private String mPath;
+	
+	private int currentlyViewing;
 
 	public PDFPreviewPagerAdapter(Context context, MuPDFCore core) {
 		mContext = context;
@@ -109,10 +112,21 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 		final ImageView mPreviewPageImageView = (ImageView) pageView
 				.findViewById(R.id.PreviewPageImageView);
 		mPreviewPageImageView.setImageResource(R.drawable.darkdenim3);
+
 		TextView mPageNumber = (TextView) pageView
 				.findViewById(R.id.PreviewPageNumber);
 		mPageNumber.setText(String.valueOf(position + 1));
 		drawPageImageView(mPreviewPageImageView, position);
+		LinearLayout ll = (LinearLayout) pageView
+				.findViewById(R.id.PreviewPageLinearLayout);
+		if (getCurrentlyViewing() == position
+				|| (mCore.getDisplayPages() == 2 && getCurrentlyViewing() == position - 1)) {
+			ll.setBackgroundColor(Color.YELLOW);
+			mPageNumber.setTextColor(Color.BLACK);
+		} else {
+			ll.setBackgroundColor(Color.TRANSPARENT);
+			mPageNumber.setTextColor(Color.WHITE);
+		}
 		return pageView;
 	}
 
@@ -187,5 +201,14 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 			}
 		}
 		return lq;
+	}
+
+	public int getCurrentlyViewing() {
+		return currentlyViewing;
+	}
+
+	public void setCurrentlyViewing(int currentlyViewing) {
+		this.currentlyViewing = currentlyViewing;
+		notifyDataSetChanged();
 	}
 }
