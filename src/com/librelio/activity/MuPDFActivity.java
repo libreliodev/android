@@ -407,10 +407,7 @@ public class MuPDFActivity extends BaseActivity{
 					mTopBarSwitcher.setVisibility(View.VISIBLE);
 				}
 				public void onAnimationRepeat(Animation animation) {}
-				public void onAnimationEnd(Animation animation) {
-					updatePageNumView(index);
-
-				}
+				public void onAnimationEnd(Animation animation) {}
 			});
 			mTopBarSwitcher.startAnimation(anim);
 			// Update listView position
@@ -484,13 +481,6 @@ public class MuPDFActivity extends BaseActivity{
 			// via overridden onChildSetup method.
 			docView.resetupChildren();
 		}
-	}
-
-	void updatePageNumView(int index) {
-		if (core == null)
-			return;
-//		mPageNumberView.setText(String.format("%d/%d", index+1, core.countPages()));
-		mPreview.setSelection(docView.getCurrentPage());
 	}
 
 	void makeButtonsView() {
