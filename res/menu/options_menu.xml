@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/options_menu_reload" android:showAsAction="always|withText" android:title="@string/reload"></item>
-    <item android:id="@+id/options_menu_restore" android:title="@string/restore_purchise" android:visible="false"></item>
-    <item android:id="@+id/options_menu_subscribe" android:title="@string/subscribe_year" android:visible="false"></item>
-    <item android:id="@+id/options_menu_send_log" android:title="@string/send_log"></item>
-    <item android:id="@+id/options_menu_downloaded_magazines" android:title="@string/downloads"></item>
+
+    <item
+        android:id="@+id/options_menu_reload"
+        android:showAsAction="always"
+        android:title="@string/reload"
+        android:icon="@drawable/ic_menu_refresh"
+        android:visible="@bool/enable_refresh_in_menu">
+    </item>
+    <item
+        android:id="@+id/options_menu_restore"
+        android:title="@string/restore_purchise"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/options_menu_subscribe"
+        android:title="@string/subscribe"
+        android:visible="@bool/enable_subscribe_in_menu">
+    </item>
+    <item
+        android:id="@+id/options_menu_send_log"
+        android:title="@string/send_log"
+        android:visible="@bool/enable_send_log_in_menu">
+    </item>
+    <item
+        android:id="@+id/options_menu_downloaded_magazines"
+        android:title="@string/downloads"
+        android:visible="@bool/enable_downloads_in_menu">
+    </item>
+
 </menu>
