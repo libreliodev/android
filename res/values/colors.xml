@@ -6,5 +6,6 @@
     <color name="white">#ffffff</color>
     <color name="error_message">#ffc00000</color>
     <color name="black">#000000</color>
+    <color name="thumbnail_selected_background">#bba8a8a8</color>
 
 </resources>

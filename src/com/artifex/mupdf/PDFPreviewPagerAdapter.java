@@ -121,11 +121,10 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 				.findViewById(R.id.PreviewPageLinearLayout);
 		if (getCurrentlyViewing() == position
 				|| (mCore.getDisplayPages() == 2 && getCurrentlyViewing() == position - 1)) {
-			ll.setBackgroundColor(Color.YELLOW);
-			mPageNumber.setTextColor(Color.BLACK);
+			ll.setBackgroundColor(mContext.getResources().getColor(
+					R.color.thumbnail_selected_background));
 		} else {
 			ll.setBackgroundColor(Color.TRANSPARENT);
-			mPageNumber.setTextColor(Color.WHITE);
 		}
 		return pageView;
 	}
