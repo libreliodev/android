@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.librelio.activity.MuPDFActivity;
+import com.librelio.base.IBaseContext;
+import com.librelio.service.DownloadMagazineListService;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
@@ -28,6 +30,8 @@ public class LibrelioApplication extends Application {
 		String clientName = getClientName(this);
 		String magazineName = getMagazineName(this);
 		baseUrl = "http://librelio-europe.s3.amazonaws.com/" + clientName + PATH_SEPARATOR + magazineName + PATH_SEPARATOR;
+		getSharedPreferences(IBaseContext.LIBRELIO_SHARED_PREFERENCES, MODE_PRIVATE)
+			.edit().putBoolean(DownloadMagazineListService.ALREADY_RUNNING, false).commit();
 		super.onCreate();
 	}
 

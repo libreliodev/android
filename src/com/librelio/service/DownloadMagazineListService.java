@@ -32,6 +32,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -67,11 +76,13 @@ public class DownloadMagazineListService extends BaseService {
 	private static final String FILE_NAME_KEY = "FileName";
 	private static final String TITLE_KEY = "Title";
 	private static final String SUBTITLE_KEY = "Subtitle";
+	private static final String IF_MODIFIED_SINCE_HEADER = "If-Modified-Since";
 
 	private String plistUrl;
 	private String pList;
 	private Calendar calendar;
 	private SimpleDateFormat dateFormat;
+	private SimpleDateFormat updateDateFormat;
 	private MagazineManager magazineManager;
 	private boolean useStaticMagazines;
 
@@ -81,21 +92,44 @@ public class DownloadMagazineListService extends BaseService {
 			return;
 		}
 		getPreferences().edit().putBoolean(ALREADY_RUNNING, true).commit();
-		calendar = Calendar.getInstance();
+		calendar = Calendar.getInstance();		
 		dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		updateDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		magazineManager = new MagazineManager(this);
 		new AsyncTask<Void, Void, Void>() {
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				magazineManager.cleanMagazines(Magazine.TABLE_MAGAZINES);
-				//
 				plistUrl = LibrelioApplication.getAmazonServerUrl() + "Magazines.plist";
 				Log.d(TAG, "Downloading start path:" + getStoragePath() + ", mode = " + useStaticMagazines);
-
+				
+				//Checking for updates
+				HttpClient httpclient = new DefaultHttpClient();
+				HttpGet httpget = new HttpGet(plistUrl);
+				String lastUdate = getLastUdateDate();
+				httpget.addHeader(IF_MODIFIED_SINCE_HEADER,lastUdate);
+				
+				int responseCode = 0;
+				try {
+					HttpResponse response = httpclient.execute(httpget);
+					responseCode = response.getStatusLine().getStatusCode();
+				} catch (ClientProtocolException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+				if(responseCode == 304){
+					Log.d(TAG,"There is NO updates, code "+responseCode+" (current update date : "+lastUdate+")");
+					finishDownloading();
+					return null;
+				}
+				
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
 					downloadFromUrl(plistUrl, getStoragePath() + PLIST_FILE_NAME);
+					saveUpadteDate();
+					Log.d(TAG,"There is updates (current update date : "+lastUdate+")");
 				}
 				//Convert plist to String for parsing
 				pList = getStringFromFile(getStoragePath() + PLIST_FILE_NAME);
@@ -107,6 +141,9 @@ public class DownloadMagazineListService extends BaseService {
 				parser.parse(pList);
 				PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
 				Array arr = (Array) list.getRootElement();
+				if(arr.size() > 0){
+					magazineManager.cleanMagazines(Magazine.TABLE_MAGAZINES);
+				}
 				for (int i = 0; i < arr.size(); i++) {
 					Dict dict = (Dict) arr.get(i);
 					String fileName = dict.getConfiguration(FILE_NAME_KEY).getValue().toString();
@@ -128,30 +165,34 @@ public class DownloadMagazineListService extends BaseService {
 					magazineManager.addMagazine(magazine, Magazine.TABLE_MAGAZINES, false);
 				}
 
-				Log.d(TAG, "Downloading was finished");
-				//
-				try {
-					Intent intent = new Intent(BaseActivity.BROADCAST_ACTION);
-					sendBroadcast(intent);
-					Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
-					sendBroadcast(intentInvalidate);
-					Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
-					sendBroadcast(updateProgressStop);
-				//
-				} catch (IllegalArgumentException e) {
-					Log.e(TAG, "sendBroadcast failed", e);
-				}
-				stopSelf();
-				getPreferences().edit().putBoolean(ALREADY_RUNNING, false).commit();
-				if (useStaticMagazines) {
-					startSelf();
-				}
+				finishDownloading();
 				return null;
 			}
+			
+			
 		}.execute();
 		super.onCreate();
 	}
 
+	private void finishDownloading(){
+		Log.d(TAG, "Downloading was finished");
+		try {
+			Intent intent = new Intent(BaseActivity.BROADCAST_ACTION);
+			sendBroadcast(intent);
+			Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
+			sendBroadcast(intentInvalidate);
+			Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
+			sendBroadcast(updateProgressStop);
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, "sendBroadcast failed", e);
+		}
+		stopSelf();
+		getPreferences().edit().putBoolean(ALREADY_RUNNING, false).commit();
+		if (useStaticMagazines) {
+			startSelf();
+		}
+	}
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -227,5 +268,17 @@ public class DownloadMagazineListService extends BaseService {
 	
 	private Context getContext() {
 		return this;
+	}
+	
+	private void saveUpadteDate(){
+		Date date = (Date) calendar.getTime();
+		Log.d(TAG, "saveUpadteDate, date : "+updateDateFormat.format(date));
+		getPreferences().edit().putString(LAST_UPDATE_PREFERENCES_KEY, updateDateFormat.format(date)).commit(); 
+	}
+	
+	private String getLastUdateDate(){
+		String date = getPreferences().getString(LAST_UPDATE_PREFERENCES_KEY, "");
+		Log.d(TAG, "getLastUdateDate, date : "+date);
+		return date;
 	}
 }
