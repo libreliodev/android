@@ -65,6 +65,7 @@ public class ReaderView extends AdapterView<Adapter>
 	private int               mScrollerLastY;
 	private boolean           mScrollDisabled;
 	private SparseArray<LinkInfoExternal[]> linkOfDocument;
+	protected boolean noAutomaticSlide;
 
 	public ReaderView(Context context,SparseArray<LinkInfoExternal[]> pLinkOfDocument) {
 		super(context);
@@ -332,14 +333,14 @@ public class ReaderView extends AdapterView<Adapter>
 
 			View v = mChildViews.get(mCurrent);
 			if (v != null) {
-				if (mScroller.isFinished()) {
+				if (mScroller.isFinished() && !noAutomaticSlide) {
 					// If, at the end of user interaction, there is no
 					// current inertial scroll in operation then animate
 					// the view onto screen if necessary
 					Log.d(TAG, "SLIDE");
 					slideViewOntoScreen(v);
 				}
-
+				noAutomaticSlide = false;
 				if (mScroller.isFinished()) {
 					// If still there is no inertial scroll in operation
 					// then the layout is stable

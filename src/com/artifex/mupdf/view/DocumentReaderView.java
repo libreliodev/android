@@ -54,6 +54,8 @@ public abstract class DocumentReaderView extends ReaderView {
 			}
 
 			if (linkPage != -1) {
+				// block pageView from sliding to next page
+				noAutomaticSlide = true;
 				Log.d(TAG,"linkPage ="+ linkPage);
 				setDisplayedViewIndex(linkPage);
 			} else if (linkString != null) {
