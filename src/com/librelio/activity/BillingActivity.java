@@ -108,6 +108,10 @@ public class BillingActivity extends BaseActivity {
 	private String productId;
 	private String productPrice;
 	private String productTitle;
+	private String yearlySubPrice;
+	private String yearlySubTitle;
+	private String monthlySubPrice;
+	private String monthlySubTitle;
 
 	private Button buy;
 	private Button cancel;
@@ -171,6 +175,7 @@ public class BillingActivity extends BaseActivity {
 		cancel.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
 				finish();
 			}
 		});
@@ -179,40 +184,43 @@ public class BillingActivity extends BaseActivity {
 			buy.setVisibility(View.GONE);
 		} else {
 			buy.setText(productTitle + ": "+ productPrice);
-			buy.setOnClickListener(getBuyOnClick());
+			buy.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					purchaseItem();
+				}
+
+			});
 		}
 		//
-		String abonnement = getResources().getString(R.string.abonnement_wind);
-		String year = getResources().getString(R.string.year);
-		String month = getResources().getString(R.string.month);
-		
-		if(LibrelioApplication.getYearlySubsCode(getContext()) != null){
-			subsYear.setText("   " + abonnement + " 1 " + year + "   ");
-			subsYear.setOnClickListener(new OnClickListener() {
+		if(yearlySubPrice == null){
+			subsYear.setVisibility(View.GONE);;
+		} else {
+			subsYear.setText(yearlySubTitle + ": "+ yearlySubPrice);
+			subsYear.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(MainMagazineActivity.REQUEST_SUBS);
-					sendBroadcast(intent);
-					finish();
+					purchaseYearlySub();
 				}
+
 			});
-		} else {
-			subsYear.setVisibility(View.GONE);
-		}
-		if(LibrelioApplication.getMonthlySubsCode(getContext()) != null){
-			subsMonthly.setText("   " + abonnement + " 1 " + month + "   ");
-			subsMonthly.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(MainMagazineActivity.REQUEST_SUBS);
-					sendBroadcast(intent);
-					finish();
-				}
-			});
-		} else {
-			subsMonthly.setVisibility(View.GONE);
 		}
 		
+		if(monthlySubPrice == null){
+			subsMonthly.setVisibility(View.GONE);;
+		} else {
+			subsMonthly.setText(monthlySubTitle + ": "+ monthlySubPrice);
+			subsMonthly.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					purchaseMonthlySub();
+				}
+
+			});
+		}
+
+
+	
 		if (LibrelioApplication.isEnableCodeSubs(getContext())){
 			subsCode.setOnClickListener(new OnClickListener() {
 				@Override
@@ -240,6 +248,8 @@ public class BillingActivity extends BaseActivity {
 			billingService = IInAppBillingService.Stub.asInterface(service);
 			new AsyncTask<String, String, Bundle>() {
 				private Bundle ownedItems = null;
+				private Bundle ownedSubs = null;
+
 
 				@Override
 				protected Bundle doInBackground(String... params) {
@@ -269,7 +279,13 @@ public class BillingActivity extends BaseActivity {
 						details.addAll(subsDetails);
 						skuDetails.putStringArrayList("DETAILS_LIST",details);
 						
+						//Retrieve owned in app items
 						ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
+						//Retrieve owned AND current subscriptions 
+						ownedSubs = billingService.getPurchases(3, getPackageName(), "subs", null);
+						
+						
+						
 					} catch (RemoteException e) {
 						Log.d(TAG, "InAppBillingService failed", e);
 						return null;
@@ -290,22 +306,26 @@ public class BillingActivity extends BaseActivity {
 							Log.d(TAG, productId + " already purchased? " + s);
 						}
 						if(ownedSkus.contains(productId)){
-							int idx = ownedSkus.indexOf(productId);
-							ArrayList<String> purchaseDataList = 
-									ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
-							ArrayList<String> signatureList = 
-								    ownedItems.getStringArrayList("INAPP_DATA_SIGNATURE_LIST");
-							Log.d(TAG,"[getPurchases] purchaseDataList: "+purchaseDataList);
-							Log.d(TAG,"[getPurchases] signatureList: "+signatureList);
-							if(purchaseDataList!=null){
-								ownedItemPurshaseData = purchaseDataList.get(idx);
-							}
-							if(signatureList!=null){
-								ownedItemSignature = signatureList.get(idx);
-							}
-							onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
+							prepareDownloadWithOwnedItem(ownedItems,productId);
 							return;
 						}
+						ownedSkus = ownedSubs.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+						for(String s : ownedSkus){
+							Log.d(TAG, productId + " already purchased? " + s);
+						}
+
+						
+						if(ownedSkus.contains(LibrelioApplication.getYearlySubsCode(getContext()))){
+							prepareDownloadWithOwnedItem(ownedSubs,LibrelioApplication.getYearlySubsCode(getContext()));
+							return;
+						}
+						if(ownedSkus.contains(LibrelioApplication.getMonthlySubsCode(getContext()))){
+							prepareDownloadWithOwnedItem(ownedSubs,LibrelioApplication.getMonthlySubsCode(getContext()));
+							return;
+						}
+
+
+						
 					}
 					//
 					int response = skuDetails.getInt("RESPONSE_CODE");
@@ -330,11 +350,42 @@ public class BillingActivity extends BaseActivity {
 								productPrice = price;
 								productTitle = title;
 							}
+							else if (sku.equals(LibrelioApplication.getYearlySubsCode(getContext()))){
+								yearlySubPrice = price;
+								yearlySubTitle = title;
+								
+							}
+							else if (sku.equals(LibrelioApplication.getMonthlySubsCode(getContext()))){
+								monthlySubPrice = price;
+								monthlySubTitle = title;
+								
+							}
+
 						}
 					}
 					initViews();
 					super.onPostExecute(skuDetails);
 				}
+				protected void prepareDownloadWithOwnedItem(Bundle ownedBundle, String subsoritemID) {
+					ArrayList<String> ownedSkus = ownedBundle.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+					int idx = ownedSkus.indexOf(subsoritemID);
+					ArrayList<String> purchaseDataList = 
+							ownedBundle.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
+					ArrayList<String> signatureList = 
+							ownedBundle.getStringArrayList("INAPP_DATA_SIGNATURE_LIST");
+					Log.d(TAG,"[getPurchases] purchaseDataList: "+purchaseDataList);
+					Log.d(TAG,"[getPurchases] signatureList: "+signatureList);
+					if(purchaseDataList!=null){
+						ownedItemPurshaseData = purchaseDataList.get(idx);
+					}
+					if(signatureList!=null){
+						ownedItemSignature = signatureList.get(idx);
+					}
+					onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
+					return;
+
+				}
+ 
 				
 			}.execute();
 		}
@@ -380,14 +431,16 @@ public class BillingActivity extends BaseActivity {
 		new DownloadFromTempURLTask().execute(buildVerifyQuery(dataResponse, signatureResponse));
 	}
 	
-	private OnClickListener getBuyOnClick(){
-		return new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new PurchaseTask().execute();
-			}
-		};
+	private void purchaseItem(){
+				new PurchaseTask().execute(productId);
 	}
+	private void purchaseMonthlySub(){
+		new PurchaseTask().execute(LibrelioApplication.getMonthlySubsCode(getContext()));
+	}
+	private void purchaseYearlySub(){
+		new PurchaseTask().execute(LibrelioApplication.getYearlySubsCode(getContext()));
+	}
+
 
 	private boolean isNetworkConnected() {
 		return LibrelioApplication.thereIsConnection(this);
@@ -453,7 +506,6 @@ public class BillingActivity extends BaseActivity {
 		protected void onPostExecute(HttpResponse response) {
 			String tempURL = null;
 			if (null == response) {
-				//TODO: @Niko need check for this situation
 				showAlertDialog(DOWNLOAD_ALERT);
 				Log.w(TAG, "download response was null");
 				return;
@@ -546,12 +598,23 @@ public class BillingActivity extends BaseActivity {
 		
 		@Override
 		protected Bundle doInBackground(String... params) {
+			String itemToBuyId = params[0];
+			Log.d(TAG, "id: " + itemToBuyId);
 			try {
 				ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 				if (TEST_MODE) {
 					productId = TEST_PRODUCT_ID;
 				}
-				return billingService.getBuyIntent(3, getPackageName(), productId, "inapp", null);
+				if (itemToBuyId == productId){
+					Log.d(TAG, "let us buy a product " + itemToBuyId);
+					return billingService.getBuyIntent(3, getPackageName(), productId, "inapp", null);
+				}
+				else{
+					Log.d(TAG, "let us buy a subscription " + itemToBuyId);
+					return billingService.getBuyIntent(3, getPackageName(), itemToBuyId, "subs", null);
+					
+				}
+				
 			} catch (RemoteException e) {
 				Log.e(TAG, "Problem with getBuyIntent", e);
 			}
@@ -562,7 +625,6 @@ public class BillingActivity extends BaseActivity {
 			super.onPostExecute(result);
 
 			if (null == result) {
-				//TODO: @Niko need check for this situation
 				return;
 			}
 			int response = result.getInt("RESPONSE_CODE");
