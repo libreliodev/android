@@ -85,22 +85,12 @@ public class LibrelioApplication extends Application {
 		+ LibrelioApplication.getMagazineName(context) + PATH_SEPARATOR + fileName;
 	}
 
-	public static boolean isEnableYearlySubs(Context context){
-		String data = context.getResources().getString(R.string.enable_yearly_subs);
-		if(data.equalsIgnoreCase("true")){
-			return true;
-		} else {
-			return false;
-		}
+	public static String getYearlySubsCode(Context context){
+		return context.getResources().getString(R.string.yearly_subs_code);
 	}
 
-	public static boolean isEnableMonthlySubs(Context context){
-		String data = context.getResources().getString(R.string.enable_monthly_subs);
-		if(data.equalsIgnoreCase("true")){
-			return true;
-		} else {
-			return false;
-		}
+	public static String getMonthlySubsCode(Context context){
+		return context.getResources().getString(R.string.monthly_subs_code);
 	}
 	
 	public static boolean isEnableCodeSubs(Context context){

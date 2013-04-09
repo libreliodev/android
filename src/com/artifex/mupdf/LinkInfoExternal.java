@@ -25,8 +25,12 @@ public class LinkInfoExternal extends LinkInfo {
 	}
 
 	public boolean isFullScreen() {
-		return Uri.parse(url).getQueryParameter("warect") != null 
-				&& Uri.parse(url).getQueryParameter("warect").equals("full");
+		Uri uri = Uri.parse(url);
+		// Suppress UnsupoprtedOperationException 
+		if(uri.isHierarchical())
+			return uri.getQueryParameter("warect") != null 
+				&& uri.getQueryParameter("warect").equals("full");
+		return false;
 	}
 
 	public boolean isExternal() {

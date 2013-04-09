@@ -49,10 +49,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.artifex.mupdf.LinkInfoExternal;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
+import com.librelio.utils.FilenameUtils;
 import com.niveales.wind.R;
 
 /**
@@ -157,8 +159,10 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			long total = 0;
 			try {
 				URL url = new URL(fileUrl);
+				EasyTracker.getTracker().sendView(
+						"Downloading/" + FilenameUtils.getBaseName(filePath));
 				URLConnection connection = url.openConnection();
-				connection.connect();	
+				connection.connect();
 				lengthOfFile = connection.getContentLength();
 				Log.d(TAG, "Length of file: " + lengthOfFile);
 				input = new BufferedInputStream(url.openStream());

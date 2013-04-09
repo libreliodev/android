@@ -6,7 +6,7 @@ tools:ignore="TypographyDashes">
   <string name="ga_trackingId">@string/google_analytics</string>
 
   <!--Enable automatic activity tracking-->
-  <bool name="ga_autoActivityTracking">true</bool>
+  <bool name="ga_autoActivityTracking">false</bool>
 
   <!--Enable automatic exception tracking-->
   <bool name="ga_reportUncaughtExceptions">true</bool>

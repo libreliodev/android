@@ -15,6 +15,7 @@
     <string name="reload">Reload</string>
     <string name="not_connected">Not connected to Internet&#8230;</string>
     <string name="restore_purchise">Restore purchises</string>
+    <string name="subscribe">Subscribe</string>
     <string name="subscription_monthly">Subscribe month</string>
     <string name="subscription_yearly">Subscribe year</string>
     <string name="android_purchased">Purchase finished</string>

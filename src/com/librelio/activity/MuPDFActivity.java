@@ -45,11 +45,13 @@ import com.artifex.mupdf.domain.OutlineActivityData;
 import com.artifex.mupdf.domain.SearchTaskResult;
 import com.artifex.mupdf.view.DocumentReaderView;
 import com.artifex.mupdf.view.ReaderView;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
+import com.librelio.utils.FilenameUtils;
 import com.librelio.view.TwoWayView;
 import com.librelio.view.TwoWayView.Orientation;
 import com.niveales.wind.R;
@@ -208,6 +210,11 @@ public class MuPDFActivity extends BaseActivity{
 			protected void onMoveToChild(View view, int i) {
 				Log.d(TAG,"onMoveToChild id = "+i);
 
+//				if(core.getDisplayPages() == 1)
+//					mPreview.scrollToPosition(i);
+//				else
+//					mPreview.scrollToPosition(((i == 0) ? 0 : i * 2 - 1));
+
 				if (core == null){
 					return;
 				} 
@@ -221,6 +228,23 @@ public class MuPDFActivity extends BaseActivity{
 				mLinksActivator = new ActivateAutoLinks(pageView);
 				mLinksActivator.safeExecute(i);
 				setCurrentlyViewedPreview();
+				
+				if (core.getDisplayPages() == 2) {
+					int actualPageNumber = (i * 2) - 1;
+					if (i > 0) {
+					EasyTracker.getTracker().sendView(
+							"PDFReader/" + FilenameUtils.getBaseName(fileName) + "/page"
+									+ (actualPageNumber + 1));
+					}
+					if (i + 1 < docView.getAdapter().getCount()) {
+					EasyTracker.getTracker().sendView(
+							"PDFReader/" + FilenameUtils.getBaseName(fileName) + "/page"
+									+ (actualPageNumber + 2));
+					}
+				} else {
+					EasyTracker.getTracker().sendView(
+							"PDFReader/" + FilenameUtils.getBaseName(fileName) + "/page" + (i + 1));
+				}
 			}
 
 			@Override
@@ -383,11 +407,11 @@ public class MuPDFActivity extends BaseActivity{
 		if (core == null) {
 			return;
 		}
+
 		if (!buttonsVisible) {
 			buttonsVisible = true;
 			// Update page number text and slider
-			int index = docView.getDisplayedViewIndex();
-			updatePageNumView(index);
+			final int index = docView.getDisplayedViewIndex();
 //			mPageSlider.setMax((core.countPages()-1)*mPageSliderRes);
 //			mPageSlider.setProgress(index*mPageSliderRes);
 			if (mTopBarIsSearch) {
@@ -415,6 +439,11 @@ public class MuPDFActivity extends BaseActivity{
 				}
 				public void onAnimationRepeat(Animation animation) {}
 				public void onAnimationEnd(Animation animation) {
+//					int page = docView.getCurrentPage();
+//					if(core.getDisplayPages() == 1)
+//						mPreview.scrollToPosition(docView.getCurrentPage());
+//					else
+//						mPreview.scrollToPosition((page == 0) ? 0 : page * 2 - 1);
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
@@ -471,12 +500,6 @@ public class MuPDFActivity extends BaseActivity{
 			// via overridden onChildSetup method.
 			docView.resetupChildren();
 		}
-	}
-
-	void updatePageNumView(int index) {
-		if (core == null)
-			return;
-//		mPageNumberView.setText(String.format("%d/%d", index+1, core.countPages()));
 	}
 
 	void makeButtonsView() {
