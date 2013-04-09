@@ -44,6 +44,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -84,8 +85,10 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 	private boolean isSample;
 	private boolean isTemp;
 	private ImageView preview;
-	private TextView text;
+	private TextView progressText;
 	private ProgressBar progress;
+	private TextView assetProgressText;
+	private ProgressBar assetProgress;
 	private DownloadTask download;
 	private DownloadLinksTask downloadLinks;
 	private Magazine magazine;
@@ -109,8 +112,10 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		magazine.setSample(isSample);
 		setContentView(R.layout.download);
 		preview = (ImageView)findViewById(R.id.download_preview_image);
-		text = (TextView)findViewById(R.id.download_progress_text);
+		progressText = (TextView)findViewById(R.id.download_progress_text);
 		progress = (ProgressBar)findViewById(R.id.download_progress);
+		assetProgressText = (TextView)findViewById(R.id.download_asset_progress_text);
+		assetProgress = (ProgressBar)findViewById(R.id.download_asset_progress);
 		progress.setProgress(0);
 		
 		fileUrl = magazine.getPdfUrl();
@@ -122,7 +127,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			fileUrl = getIntent().getExtras().getString(TEMP_URL_KEY);
 		}
 		preview.setImageBitmap(BitmapFactory.decodeFile(magazine.getPngPath()));
-		text.setText(getResources().getString(R.string.download));
+		progressText.setText(getResources().getString(R.string.download));
 		//
 		if(!LibrelioApplication.thereIsConnection(this)){
 			showDialog(CONNECTION_ALERT);
@@ -205,7 +210,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			final String msg = (curProgress > 0) ?
 					String.format(Locale.getDefault(), "Downloading %s", formater.format(curProgress)) 
 					: getString(R.string.download);
-			text.setText(msg);
+			progressText.setText(msg);
 			progress.setProgress((int)(curProgress * 100));
 		}
 
@@ -300,13 +305,16 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		private ArrayList<String> links;
 		private ArrayList<String> assetsNames;
 		
+		private NumberFormat formater = NumberFormat.getPercentInstance(Locale.getDefault());
 		private static final int BREAK_AFTER_FAILED_ATTEMPT = 5000;
 		private static final int DOWNLOADING_ATTEMPTS = 4;
 		
 		@Override
 		protected void onPreExecute() {
 			magazine.makeMagazineDir();
-			text.setText("Getting assets...");
+			progressText.setText("Getting assets...");
+			assetProgressText.setVisibility(View.VISIBLE);
+			assetProgress.setVisibility(View.VISIBLE);
 			Log.d(TAG,"Start DownloadLinksTask");
 			links = new ArrayList<String>();
 			assetsNames = new ArrayList<String>();
@@ -341,7 +349,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 					}
 				}
 			}
-			text.setText("Download assets 0/"+links.size());
+			progressText.setText("Download assets 0/"+links.size());
 			progress.setProgress(0);
 			progress.setMax(links.size());
 			super.onPreExecute();
@@ -380,15 +388,28 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		             connection.setRequestProperty("Range", "bytes="+(file.length())+"-");
 		        }
 				connection.connect();
-				int lenghtOfFile = connection.getContentLength();
-				Log.d(TAG, "downloadFromUrl Lenght of file: " + lenghtOfFile);
+				int lengthOfFile = connection.getContentLength();
+				Log.d(TAG, "downloadFromUrl Lenght of file: " + lengthOfFile);
 		
 				input = new BufferedInputStream(connection.getInputStream());
 				output = new FileOutputStream(filePath, true);
-		
+				int total = 0;
 				byte data[] = new byte[1024];
 				while ((count = input.read(data)) != -1) {
 					output.write(data, 0, count);
+					total += count;
+					final double progress = total / (lengthOfFile * 1.0);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							final String msg = (progress > 0) ? String.format(
+									Locale.getDefault(), "Downloading %s",
+									formater.format(progress))
+									: getString(R.string.download);
+							assetProgressText.setText(msg);
+							assetProgress.setProgress((int) (progress * 100));
+						}
+		});
 				}
 				
 		        //It tells, downloading success finished.
@@ -442,7 +463,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 		@Override
 		protected void onProgressUpdate(String... values) {
 			count++;
-			text.setText("Download assets "+count+"/"+links.size());
+			progressText.setText("Download assets "+count+"/"+links.size());
 			progress.setProgress(count);
 			super.onProgressUpdate(values);
 		}
