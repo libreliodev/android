@@ -29,9 +29,16 @@ The use of the Google Analytics library is governed by the following terms: http
 *  in res directory, all subdirectories ending with -port or -land
 *  in res/values directory, application_.xml
 
-#### 2- Rename the package in Eclipse:
+#### 2- Replace ic_launcher.png with your own icon, in different sizes:
+* drawable-mdpi - 48 x 48px
+* drawable-hdpi - 72 x 72px
+* drawable-xhdpi - 96 x 96px
+* drawable-xxhdpi - 144 x 144px
+
+
+#### 3- Rename the package in Eclipse:
 As explained on [Stack Overflow](http://stackoverflow.com/questions/3697899/package-renaming-in-eclipse-android-project), press F2 on package name. 
 
 
-#### 3- Update AndroidManifest.xml:
+#### 4- Update AndroidManifest.xml:
 Enter the new package name.

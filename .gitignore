@@ -11,3 +11,8 @@ bin/*
 .project
 .classpath
 .settings/*
+
+# Mac OS X Finder
+.DS_Store
+
+proguard-project.txt
