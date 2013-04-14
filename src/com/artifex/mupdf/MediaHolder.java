@@ -318,11 +318,14 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	protected void onPlaySlideInside(String basePath) {
 		Log.d(TAG, "onPlaySlideInside " + basePath + ", linkInfo = " + linkInfo);
 		
-		imagePager = new ImagePager(getContext(), fullPath, transition, (linkInfo.rect.right - linkInfo.rect.left));
-		post(new Runnable() {
+		imagePager = new ImagePager(getContext(), fullPath, transition,
+				(linkInfo.rect.right - linkInfo.rect.left),
+				(linkInfo.rect.bottom - linkInfo.rect.top));
+	post(new Runnable() {
 			@Override
 			public void run() {
 				imagePager.setViewWidth(getWidth());
+				imagePager.setViewHeight(getHeight());
 			}
 		});
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(

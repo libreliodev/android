@@ -38,6 +38,7 @@ public class ImagePager extends RelativeLayout{
 	private int backgroungColor = Color.BLACK;
 	private boolean transition = true;
 	private float viewWidth;
+	private float viewHeight;
 
 	protected PhotoPagerListener listener;
 	private SimpleImageAdapter imageAdapter;
@@ -53,11 +54,13 @@ public class ImagePager extends RelativeLayout{
 		void onClickItem(int photoId);
 	}
 
-	public ImagePager(Context context, String basePath, boolean transition, float viewWidth) {
+	public ImagePager(Context context, String basePath, boolean transition,
+			float viewWidth, float viewHeight) {
 		super(context);
+		this.viewWidth = viewWidth;
+		this.viewHeight = viewHeight;
 		this.basePath = basePath;
 		this.transition = transition;
-		this.viewWidth = viewWidth;
 		this.context = context;
 		init();
 	}
@@ -191,6 +194,10 @@ public class ImagePager extends RelativeLayout{
 
 	public void setViewWidth(int viewWidth){
 		this.viewWidth = viewWidth;
+	}
+	
+	public void setViewHeight(int viewHeight){
+		this.viewHeight = viewHeight;
 	}
 
 	private void flipSlides(final float dx){
