@@ -4,10 +4,10 @@ import java.io.File;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.FrameLayout;
@@ -124,44 +125,50 @@ public class ImagePager extends RelativeLayout{
 		Log.d(TAG, "Init: " + slidesInfo + ", transit = " + transition);
 	}
 	private void initGallery() {
+
+		ViewConfiguration vc = ViewConfiguration.get(getContext());
+	    final int touchSlop = vc.getScaledTouchSlop() * 3;
 		if(transition){
 			viewPager = new ViewPager(getContext());
 		} else {
 			viewPager = new ViewPager(getContext()){
 				float x1 = 0, x2, y1 = 0, y2, dx, dy;
+				
+				private float lastImageX;
+				
+				// keep track of time since last image to give enough time for
+				// each image to be created without seeing the progress spinnger
+				private long lastImageTime = SystemClock.elapsedRealtime();;
+
 				@Override
 				public boolean onTouchEvent(MotionEvent event) {
-					Log.d(TAG, "viewWidth = " + viewWidth);
 					switch (event.getAction()) {
 					case (MotionEvent.ACTION_DOWN):
 						x1 = event.getX();
 						y1 = event.getY();
+						lastImageX = event.getX();
 						break;
-					case (MotionEvent.ACTION_UP): {
+					case (MotionEvent.ACTION_MOVE):
 						x2 = event.getX();
 						y2 = event.getY();
-						dx = x2 - x1;
+						dx = x2 - lastImageX;
 						dy = y2 - y1;
 						if (Math.abs(dx) > Math.abs(dy)) {
 							float move = Math.abs(dx);
-							Log.d(TAG, "move = " + move);
-							if (dx > 0) {
-								// "right";
-								if (move < (viewWidth / 3)) {
-									setCurrentPosition(getCurrentPosition() - 1, transition);
-								} else {
-									flipSlides(dx);
-								}
-							} else {
-								// "left";
-								if (move < (viewWidth / 3)) {
-									setCurrentPosition(getCurrentPosition() + 1, transition);
-								} else {
-									flipSlides(dx);
-								}
+							if (dx > touchSlop
+									& SystemClock.elapsedRealtime() > lastImageTime + 100) {
+								setCurrentPosition(getCurrentPosition() + 1,
+										transition);
+								lastImageX += touchSlop;
+								lastImageTime = SystemClock.elapsedRealtime();
+							} else if (dx < -touchSlop
+									& SystemClock.elapsedRealtime() > lastImageTime + 100) {
+								setCurrentPosition(getCurrentPosition() - 1,
+										transition);
+								lastImageX -= touchSlop;
+								lastImageTime = SystemClock.elapsedRealtime();
 							}
 						}
-					}
 					}
 					return true;
 				}
