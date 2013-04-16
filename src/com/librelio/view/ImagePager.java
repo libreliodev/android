@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.librelio.utils.ImageResizer;
 import com.niveales.wind.R;
 
 public class ImagePager extends RelativeLayout{
@@ -278,9 +279,9 @@ public class ImagePager extends RelativeLayout{
 
 		@Override
 		protected Bitmap doInBackground(String... paths) {
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inSampleSize = 1;
-			return BitmapFactory.decodeFile(paths[0], options);
+			Log.d(TAG, "start doInBackground GetBitmapAsyncTask " + paths[0]);
+			return ImageResizer.decodeSampledBitmapFromFile(paths[0],
+					(int) viewWidth, (int) viewHeight, null);
 		}
 
 		@Override
