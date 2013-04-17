@@ -46,14 +46,14 @@ public class SlideShowActivity extends BaseActivity {
 		fullPath = getIntent().getExtras().getString(MediaHolder.FULL_PATH_KEY);
 		initialSlidePosition = getIntent().getExtras().getInt(MediaHolder.INITIAL_SLIDE_POSITION);
 
-		imagePager = new ImagePager(this, fullPath, transition, 100, 100);
-		imagePager.post(new Runnable() {
+		imagePager = new ImagePager(this, fullPath, transition, 0, 0);
+		imagePager.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				imagePager.setViewWidth(imagePager.getWidth());
 				imagePager.setViewHeight(imagePager.getHeight());
 			}
-		});
+		}, 250);
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.gravity = Gravity.CENTER;
