@@ -49,8 +49,6 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
-import com.librelio.lib.utils.BillingService;
-import com.librelio.lib.utils.ResponseHandler;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.librelio.storage.MagazineManager;
@@ -87,12 +85,10 @@ public class MainMagazineActivity extends BaseActivity {
 	private BroadcastReceiver subscriptionMonthly;
 
 	private Timer updateTimer;
-	private BillingService billingService;
 
 	private GridView grid;
 	private ArrayList<Magazine> magazines;
 	private MagazineAdapter adapter;
-	private LibrelioPurchaseObserver librelioPurchaseObserver;
 	private Handler handler;
 	private MagazineManager magazineManager;
 	
@@ -128,25 +124,6 @@ public class MainMagazineActivity extends BaseActivity {
 				}
 			}
 		};
-		subscriptionYear = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				Log.d(TAG,"onReceive subscription year");
-				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_YEAR_KEY, GooglePlayActivity.ITEM_TYPE_SUBSCRIPTION, null)) {
-					//Note: mManagedType == Managed.SUBSCRIPTION
-					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-				}
-			}
-		};
-		subscriptionMonthly = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				Log.d(TAG,"onReceive subscription monthly");
-				if (!billingService.requestPurchase(LibrelioApplication.SUBSCRIPTION_MONTHLY_KEY, GooglePlayActivity.ITEM_TYPE_SUBSCRIPTION, null)) {
-					showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
-				}
-			}
-		};
 
 		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
 		IntentFilter subsFilter = new IntentFilter(REQUEST_SUBS);
@@ -157,10 +134,6 @@ public class MainMagazineActivity extends BaseActivity {
 
 		startRegularUpdate();
 
-		billingService = new BillingService();
-		billingService.setContext(this);
-		handler = new Handler();
-		librelioPurchaseObserver = new LibrelioPurchaseObserver(handler);
 	}
 
 	@Override
@@ -192,7 +165,6 @@ public class MainMagazineActivity extends BaseActivity {
 		showProgress(false);
 		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
 		registerReceiver(updateProgressStop, filter);
-		ResponseHandler.register(librelioPurchaseObserver);
 	}
 
 	/**
@@ -201,7 +173,6 @@ public class MainMagazineActivity extends BaseActivity {
 	@Override
 	protected void onStop() {
 		unregisterReceiver(updateProgressStop);
-		ResponseHandler.unregister(librelioPurchaseObserver);
 		super.onStop();
 	}
 	
