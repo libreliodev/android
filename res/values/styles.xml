@@ -1,8 +1,16 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="android:Theme.Light" />
-	
-    <style name="Theme.Billing" parent="@android:style/Theme.Dialog">
+    <style name="AppTheme" parent="android:Theme.Holo.Light" />
+
+    <style name="Theme.Billing" parent="@android:style/Theme.Holo.Dialog">
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <style name="Theme.NoBackground.NoTitle" parent="android:Theme.Holo">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Fullscreen" parent="android:Theme.Holo.NoActionBar.Fullscreen"></style>
+
 </resources>
