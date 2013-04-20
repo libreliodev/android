@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.librelio.activity;
 
 import android.os.Bundle;
@@ -13,7 +10,7 @@ import android.widget.LinearLayout;
 
 import com.artifex.mupdf.MediaHolder;
 import com.librelio.base.BaseActivity;
-import com.librelio.view.ImagePager;
+import com.librelio.view.ImageLayout;
 import com.niveales.wind.R;
 
 /**
@@ -22,13 +19,13 @@ import com.niveales.wind.R;
 public class SlideShowActivity extends BaseActivity {
 	private static final String TAG = "SlideShowActivity";
 	
-	private ImagePager imagePager;
+	private ImageLayout imageLayout;
 	private Handler autoPlayHandler;
 	
 	private String fullPath;
 	private int autoPlayDelay;
 	private int bgColor;
-	private int initialSlidePosition;	
+	private int initialSlidePosition = 0;
 	private boolean transition = true;
 	private boolean autoPlay;
 	
@@ -46,18 +43,18 @@ public class SlideShowActivity extends BaseActivity {
 		fullPath = getIntent().getExtras().getString(MediaHolder.FULL_PATH_KEY);
 		initialSlidePosition = getIntent().getExtras().getInt(MediaHolder.INITIAL_SLIDE_POSITION);
 
-		imagePager = new ImagePager(this, fullPath, transition, 0, 0);
-		imagePager.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				imagePager.setViewWidth(imagePager.getWidth());
-				imagePager.setViewHeight(imagePager.getHeight());
-			}
-		}, 250);
+		imageLayout = new ImageLayout(this, fullPath, transition);
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.gravity = Gravity.CENTER;
-		imagePager.setLayoutParams(lp);
+		imageLayout.setLayoutParams(lp);
+
+		imageLayout.post(new Runnable() {
+			@Override
+			public void run() {
+				imageLayout.setCurrentPosition(initialSlidePosition, false);
+			}
+		});
 		
 		if(autoPlay) {
 			autoPlayHandler = new Handler();
@@ -65,17 +62,13 @@ public class SlideShowActivity extends BaseActivity {
 				@Override
 				public void run() {
 					Log.d(TAG, "autoPlayHandler start");
-					imagePager.setCurrentPosition(imagePager.getCurrentPosition() + 1, transition);
+					imageLayout.setCurrentPosition(imageLayout.getCurrentPosition() + 1, transition);
 					autoPlayHandler.postDelayed(this, autoPlayDelay);
 				}}, autoPlayDelay);
 		}
 		
-		if (initialSlidePosition > 0){
-			imagePager.setCurrentPosition(initialSlidePosition, false);
-		}
+		imageLayout.setBackgroundColor(bgColor);
 		
-		imagePager.setBackgroundColor(bgColor);
-		
-		frame.addView(imagePager);
+		frame.addView(imageLayout);
 	}
 }

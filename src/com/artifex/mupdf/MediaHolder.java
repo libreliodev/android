@@ -37,7 +37,7 @@ import android.widget.FrameLayout;
 
 import com.librelio.activity.SlideShowActivity;
 import com.librelio.activity.VideoActivity;
-import com.librelio.view.ImagePager;
+import com.librelio.view.ImageLayout;
 import com.niveales.wind.R;
 
 /**
@@ -71,7 +71,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	
 	private SurfaceView videoView;
 	private WebView mWebView;
-	private ImagePager imagePager;
+	private ImageLayout imageLayout;
 	private MediaPlayer mediaPlayer;
 
 	private String uriString;
@@ -178,7 +178,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	        	//initMediaPlayer(true);
         	}else if (linkInfo.isImageFormat()){
         		onPlaySlideOutside(basePath,
-        				imagePager.getCurrentPosition());
+        				imageLayout.getCurrentPosition());
         	}
             return true;
         }
@@ -318,22 +318,19 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	protected void onPlaySlideInside(String basePath) {
 		Log.d(TAG, "onPlaySlideInside " + basePath + ", linkInfo = " + linkInfo);
 		
-		imagePager = new ImagePager(getContext(), fullPath, transition,
-				(linkInfo.rect.right - linkInfo.rect.left),
-				(linkInfo.rect.bottom - linkInfo.rect.top));
-	post(new Runnable() {
+		imageLayout = new ImageLayout(getContext(), fullPath, transition);
+		post(new Runnable() {
 			@Override
 			public void run() {
-				imagePager.setViewWidth(getWidth());
-				imagePager.setViewHeight(getHeight());
+				imageLayout.setCurrentPosition(0, false);
 			}
 		});
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.gravity = Gravity.CENTER;
-		imagePager.setLayoutParams(lp);
+		imageLayout.setLayoutParams(lp);
 		
-		imagePager.setGestureDetector(gestureDetector);
+		imageLayout.setGestureDetector(gestureDetector);
 		
 		if(autoPlay) {
 			autoPlayHandler = new Handler();
@@ -341,16 +338,16 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 				@Override
 				public void run() {
 					Log.d(TAG, "autoPlayHandler start");
-					imagePager.setCurrentPosition(imagePager.getCurrentPosition() + 1, transition);
+					imageLayout.setCurrentPosition(imageLayout.getCurrentPosition() + 1, transition);
 					autoPlayHandler.postDelayed(this, autoPlayDelay);
 				}}, autoPlayDelay);
 		} else {
 			setVisibility(View.GONE);
 		}
 		
-		imagePager.setBackgroundColor(bgColor);
+		imageLayout.setBackgroundColor(bgColor);
 		
-		addView(imagePager);
+		addView(imageLayout);
 		requestLayout();
 	}
 
