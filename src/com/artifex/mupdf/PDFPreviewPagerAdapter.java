@@ -43,6 +43,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	private String mPath;
 	
 	private int currentlyViewing;
+	private Bitmap mLoadingBitmap;
 
 	public PDFPreviewPagerAdapter(Context context, MuPDFCore core) {
 		mContext = context;
@@ -51,6 +52,9 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 		File mCacheDirectory = new File(mPath);
 		if (!mCacheDirectory.exists())
 			mCacheDirectory.mkdirs();
+
+		mLoadingBitmap = BitmapFactory.decodeResource(
+				mContext.getResources(), R.drawable.darkdenim3);
 	}
 
 	@Override
@@ -116,8 +120,6 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	private void drawPageImageView(ViewHolder holder, int position) {
 		if (cancelPotentialWork(holder, position)) {
 			final BitmapWorkerTask task = new BitmapWorkerTask(holder, position);
-			Bitmap mLoadingBitmap = BitmapFactory.decodeResource(
-					mContext.getResources(), R.drawable.darkdenim3);
 			final AsyncDrawable asyncDrawable = new AsyncDrawable(
 					mContext.getResources(), mLoadingBitmap, task);
 			holder.previewPageImageView.setImageDrawable(asyncDrawable);
@@ -178,21 +180,23 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 
 			if (viewHolderReference != null && bitmap != null) {
 				final ViewHolder holder = viewHolderReference.get();
-				final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(holder.previewPageImageView);
-				if (this == bitmapWorkerTask && holder != null) {
-					holder.previewPageImageView.setImageBitmap(bitmap);
-					holder.previewPageNumber.setText(String
-							.valueOf(position + 1));
-					if (getCurrentlyViewing() == position
-							|| (mCore.getDisplayPages() == 2 && getCurrentlyViewing() == position - 1)) {
-						holder.previewPageLinearLayout
-								.setBackgroundColor(mContext
-										.getResources()
-										.getColor(
-												R.color.thumbnail_selected_background));
-					} else {
-						holder.previewPageLinearLayout
-								.setBackgroundColor(Color.TRANSPARENT);
+				if (holder != null) {
+					final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(holder.previewPageImageView);
+					if (this == bitmapWorkerTask && holder != null) {
+						holder.previewPageImageView.setImageBitmap(bitmap);
+						holder.previewPageNumber.setText(String
+								.valueOf(position + 1));
+						if (getCurrentlyViewing() == position
+								|| (mCore.getDisplayPages() == 2 && getCurrentlyViewing() == position - 1)) {
+							holder.previewPageLinearLayout
+									.setBackgroundColor(mContext
+											.getResources()
+											.getColor(
+													R.color.thumbnail_selected_background));
+						} else {
+							holder.previewPageLinearLayout
+									.setBackgroundColor(Color.TRANSPARENT);
+						}
 					}
 				}
 			}
