@@ -35,7 +35,6 @@ public class ImageLayout extends RelativeLayout {
 
 	protected Context context;
 	private LayoutInflater inflater;
-	private String basePath;
 	private int backgroundColor = Color.BLACK;
 	private boolean transition = true;
 
@@ -53,7 +52,6 @@ public class ImageLayout extends RelativeLayout {
 
 	public ImageLayout(Context context, String basePath, boolean transition) {
 		super(context);
-		this.basePath = basePath;
 		this.transition = transition;
 		this.context = context;
 		slidesInfo = new SlidesInfo(basePath);
@@ -71,19 +69,9 @@ public class ImageLayout extends RelativeLayout {
 		});
 	}
 	
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		super.onSizeChanged(w, h, oldw, oldh);
-		Log.d(TAG, "onsizechanged " + w + " " + h + " " + oldw + " " + oldh);
-		
-	}
-
 	public void setGestureDetector(final GestureDetector gestureDetector) {
 		if (gestureDetector != null) {
-//			if (viewPager != null) {
-//			} else {
 				this.gestureDetector = gestureDetector;
-//			}
 		}
 	}
 
@@ -103,7 +91,6 @@ public class ImageLayout extends RelativeLayout {
 			if (position < 0) {
 				position = slidesInfo.count - 1;
 			}
-			Log.d(TAG, "" + position);
 			setCurrentImageViewPosition(position);
 		}
 	}
@@ -126,7 +113,6 @@ public class ImageLayout extends RelativeLayout {
 		} else {
 			initSingleImage();
 		}
-		Log.d(TAG, "Init: " + slidesInfo + ", transit = " + transition);
 	}
 
 	private void initSwipeGallery() {
@@ -136,8 +122,6 @@ public class ImageLayout extends RelativeLayout {
 			viewPager.setHorizontalFadingEdgeEnabled(true);
 			viewPager.setFadingEdgeLength(0);
 			viewPager.setOffscreenPageLimit(1);
-//			viewPager.setCurrentItem(getCount(), false);
-
 			viewPager.setOnTouchListener(new OnTouchListener() {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
@@ -148,7 +132,6 @@ public class ImageLayout extends RelativeLayout {
 					}
 				}
 			});
-
 			addView(viewPager);
 	}
 
@@ -158,20 +141,13 @@ public class ImageLayout extends RelativeLayout {
 		imageView = (ImageView) view.findViewById(R.id.slideshow_item_image);
 		imageView.setBackgroundColor(backgroundColor);
 		imageView.setOnTouchListener(new OnTouchListener() {
-			float x2, dx;
-
-			private float lastImageX;
+			private float lastImageX, dx;
 
 			ViewConfiguration vc = ViewConfiguration.get(getContext());
 			final int touchSlop = vc.getScaledTouchSlop() * 3;
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				if (gestureDetector != null) {
-					if (gestureDetector.onTouchEvent(event)) {
-						return true;
-					}
-				}
 				switch (event.getAction()) {
 				case (MotionEvent.ACTION_DOWN):
 					lastImageX = event.getX();
@@ -179,9 +155,7 @@ public class ImageLayout extends RelativeLayout {
 					break;
 				case (MotionEvent.ACTION_MOVE):
 					getBitmapAsyncTaskCancelled = false;
-					x2 = event.getX();
-					dx = x2 - lastImageX;
-					Log.d(TAG, "" + dx + " " + touchSlop);
+					dx = event.getX() - lastImageX;
 					if (dx > touchSlop) {
 						setCurrentPosition(currentImageViewPosition + 1, false);
 						lastImageX += touchSlop;
@@ -193,6 +167,9 @@ public class ImageLayout extends RelativeLayout {
 				case (MotionEvent.ACTION_UP):
 					getBitmapAsyncTaskCancelled = true;
 					break;
+				}
+				if (gestureDetector != null) {
+					return gestureDetector.onTouchEvent(event);
 				}
 				return true;
 
@@ -315,7 +292,7 @@ public class ImageLayout extends RelativeLayout {
 
 		@Override
 		public int getCount() {
-			return Integer.MAX_VALUE;
+			return slidesInfo.count;
 		}
 
 		@Override
@@ -353,7 +330,6 @@ public class ImageLayout extends RelativeLayout {
 					super.onPostExecute(bmp);
 				}
 			}.execute(path);
-			Log.d(TAG, "get " + position + " item from " + path);
 			container.addView(view);
 			return view;
 		}
