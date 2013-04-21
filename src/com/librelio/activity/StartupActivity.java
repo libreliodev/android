@@ -102,7 +102,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			new InitPredefinedMagazinesTask().execute();
 		}
 		
-		new LoadAdvertisingImageTask().execute();
+		new LoadAdvertisingImageTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 	
 	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
@@ -140,7 +140,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 				return;
 			}
 			getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, result == 0).commit();
-			new InitPredefinedMagazinesTask().execute();
+			new InitPredefinedMagazinesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}
 	};
 
@@ -209,7 +209,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 					 isFirstImage = !isFirstImage;
 				 }
 				 
-				 new LoadAdvertisingLinkTask().execute();
+				 new LoadAdvertisingLinkTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			 }else{
 				onStartMagazine(DEFAULT_ADV_DELAY);
  			 }

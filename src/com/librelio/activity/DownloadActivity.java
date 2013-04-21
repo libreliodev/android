@@ -135,7 +135,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			Log.d(TAG, "isSample: "+isSample+"\nfileUrl: "+fileUrl+"\nfilePath: "+filePath);
 			download = new DownloadTask();
 			try{
-				download.execute();
+				download.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} catch (Exception e) {
 				Log.e(TAG,"File download failed ("+fileUrl+")",e);
 				download.cancel(true);
