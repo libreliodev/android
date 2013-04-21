@@ -66,7 +66,7 @@ public class MainMagazineActivity extends BaseActivity {
 	 */
 	private static final String TAG = "MainMagazineActivity";
 	public static final String REQUEST_SUBS = "request_subs";
-	public static final String UPDATE_PROGRESS_STOP = "updeta_pregress_stop";
+	public static final String UPDATE_PROGRESS = "update_progress";
 	public static final String BROADCAST_ACTION_IVALIDATE = "com.librelio.lib.service.broadcast.invalidate";
 	private static final String START_FIRST_TIME = "START_FIRST_TIME";
 
@@ -163,8 +163,8 @@ public class MainMagazineActivity extends BaseActivity {
 	protected void onStart() {
 		super.onStart();
 		showProgress(false);
-		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS_STOP);
-		registerReceiver(updateProgressStop, filter);
+		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS);
+		registerReceiver(updateProgress, filter);
 	}
 
 	/**
@@ -172,8 +172,8 @@ public class MainMagazineActivity extends BaseActivity {
 	 */
 	@Override
 	protected void onStop() {
-		if (updateProgressStop != null) {
-			unregisterReceiver(updateProgressStop);
+		if (updateProgress != null) {
+			unregisterReceiver(updateProgress);
 		}
 		super.onStop();
 	}

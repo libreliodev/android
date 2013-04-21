@@ -85,6 +85,7 @@ public class DownloadMagazineListService extends BaseService {
 	private SimpleDateFormat updateDateFormat;
 	private MagazineManager magazineManager;
 	private boolean useStaticMagazines;
+	private Intent intentInvalidateUI;
 
 	@Override
 	public void onCreate() {
@@ -92,9 +93,11 @@ public class DownloadMagazineListService extends BaseService {
 			return;
 		}
 		getPreferences().edit().putBoolean(ALREADY_RUNNING, true).commit();
-		calendar = Calendar.getInstance();		
+		calendar = Calendar.getInstance();
 		dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		updateDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+
+		intentInvalidateUI = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 		magazineManager = new MagazineManager(this);
 		new AsyncTask<Void, Void, Void>() {
 
@@ -125,6 +128,7 @@ public class DownloadMagazineListService extends BaseService {
 					return null;
 				}
 				
+				sendProgressUpdateIntent(true);
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
 					downloadFromUrl(plistUrl, getStoragePath() + PLIST_FILE_NAME);
@@ -152,6 +156,10 @@ public class DownloadMagazineListService extends BaseService {
 					String downloadDate = getCurrentDate();
 					
 					Magazine magazine = new Magazine(fileName, title, subtitle, downloadDate, getContext());
+					magazineManager.addMagazine(magazine, Magazine.TABLE_MAGAZINES, false);
+				}
+				sendBroadcast(intentInvalidateUI);
+				for (Magazine magazine : magazineManager.getMagazines(false, Magazine.TABLE_MAGAZINES)) {
 					//saving png
 					File png = new File(magazine.getPngPath());
 					if (!png.exists()) {
@@ -159,12 +167,11 @@ public class DownloadMagazineListService extends BaseService {
 							downloadFromUrl(magazine.getPngUrl(), magazine.getPngPath());
 						}
 						Log.d(TAG, "Image download: " + magazine.getPngPath());
+						sendBroadcast(intentInvalidateUI);
 					} else {
 						Log.d(TAG, magazine.getPngPath() + " already exist");
 					}
-					magazineManager.addMagazine(magazine, Magazine.TABLE_MAGAZINES, false);
 				}
-
 				finishDownloading();
 				return null;
 			}
@@ -177,12 +184,8 @@ public class DownloadMagazineListService extends BaseService {
 	private void finishDownloading(){
 		Log.d(TAG, "Downloading was finished");
 		try {
-			Intent intent = new Intent(BaseActivity.BROADCAST_ACTION);
-			sendBroadcast(intent);
-			Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
-			sendBroadcast(intentInvalidate);
-			Intent updateProgressStop = new Intent(MainMagazineActivity.UPDATE_PROGRESS_STOP);
-			sendBroadcast(updateProgressStop);
+			sendBroadcast(intentInvalidateUI);
+			sendProgressUpdateIntent(false);
 		} catch (IllegalArgumentException e) {
 			Log.e(TAG, "sendBroadcast failed", e);
 		}
@@ -191,6 +194,14 @@ public class DownloadMagazineListService extends BaseService {
 		if (useStaticMagazines) {
 			startSelf();
 		}
+	}
+
+	private void sendProgressUpdateIntent(boolean show) {
+		Intent updateProgress = new Intent(
+				MainMagazineActivity.UPDATE_PROGRESS);
+		updateProgress
+				.putExtra(MainMagazineActivity.UPDATE_PROGRESS, show);
+		sendBroadcast(updateProgress);
 	}
 	
 	@Override

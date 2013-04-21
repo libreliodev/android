@@ -21,12 +21,12 @@ import android.util.Log;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
+import com.librelio.activity.MainMagazineActivity;
 import com.niveales.wind.R;
 
 public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
 
-	public static final String BROADCAST_ACTION = "com.librelio.lib.service.broadcast";
 	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
 	protected static final int CONNECTION_ALERT = 1;
 	protected static final int SERVER_ALERT = 2;
@@ -36,12 +36,13 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	private SharedPreferences sharedPreferences;
 
 	/**
-	 * The receiver for stop progress in action bar
+	 * The receiver for progress in action bar
 	 */
-	protected BroadcastReceiver updateProgressStop = new BroadcastReceiver() {
+	protected BroadcastReceiver updateProgress = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			setProgressBarIndeterminateVisibility(false);
+			setProgressBarIndeterminateVisibility(intent.getBooleanExtra(
+					MainMagazineActivity.UPDATE_PROGRESS, false));
 		}
 	};
 
