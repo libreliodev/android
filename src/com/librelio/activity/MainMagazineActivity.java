@@ -172,7 +172,9 @@ public class MainMagazineActivity extends BaseActivity {
 	 */
 	@Override
 	protected void onStop() {
-		unregisterReceiver(updateProgressStop);
+		if (updateProgressStop != null) {
+			unregisterReceiver(updateProgressStop);
+		}
 		super.onStop();
 	}
 	
@@ -185,9 +187,15 @@ public class MainMagazineActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		stopRegularUpdate();
-		unregisterReceiver(subscriptionYear);
-		unregisterReceiver(subscriptionMonthly);
-		unregisterReceiver(gridInvalidate);
+		if (subscriptionYear != null) {
+			unregisterReceiver(subscriptionYear);
+		}
+		if (subscriptionMonthly != null) {
+			unregisterReceiver(subscriptionMonthly);
+		}
+		if (gridInvalidate != null) {
+			unregisterReceiver(gridInvalidate);
+		}
 		super.onDestroy();
 	}
 
