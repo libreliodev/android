@@ -137,8 +137,13 @@ public class MagazineAdapter extends BaseAdapter{
 			//
 		} else {
 			// download case
-			holder.downloadOrReadButton.setText(context.getResources().getString(
-					R.string.download));
+			if (currentMagazine.isPaid()) {
+				holder.downloadOrReadButton.setText(context.getResources()
+						.getString(R.string.download));
+			} else {
+				holder.downloadOrReadButton.setText(context.getResources()
+						.getString(R.string.free_Download));
+			}
 			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
