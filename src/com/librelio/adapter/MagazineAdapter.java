@@ -114,8 +114,10 @@ public class MagazineAdapter extends BaseAdapter{
 				@Override
 				public void onClick(View v) {
 					if(new File(currentMagazine.getPdfPath()).exists()){
-						LibrelioApplication.startPDFActivity(context, currentMagazine.getPdfPath());
-					} else {
+								LibrelioApplication.startPDFActivity(context,
+										currentMagazine.getPdfPath(),
+										currentMagazine.getTitle());
+							} else {
 						Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
 					}
 				}
@@ -125,15 +127,17 @@ public class MagazineAdapter extends BaseAdapter{
 		
 		if (currentMagazine.isDownloaded()) {
 			// Read case
-			holder.downloadOrReadButton.setText(context.getResources().getString(
-					R.string.read));
-			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					LibrelioApplication.startPDFActivity(context,
-							currentMagazine.getPdfPath());
-				}
-			});
+			holder.downloadOrReadButton.setText(context.getResources()
+					.getString(R.string.read));
+			holder.downloadOrReadButton
+					.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							LibrelioApplication.startPDFActivity(context,
+									currentMagazine.getPdfPath(),
+									currentMagazine.getTitle());
+						}
+					});
 			//
 		} else {
 			// download case
@@ -195,7 +199,8 @@ public class MagazineAdapter extends BaseAdapter{
 							+ currentMagazine.isSampleDownloaded());
 					if (currentMagazine.isSampleDownloaded()) {
 						LibrelioApplication.startPDFActivity(context,
-								currentMagazine.getSamplePath());
+							currentMagazine.getSamplePath(),
+							currentMagazine.getTitle());
 					} else {
 						Intent intent = new Intent(context,
 								DownloadActivity.class);

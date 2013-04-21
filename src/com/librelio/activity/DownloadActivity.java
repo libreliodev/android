@@ -490,7 +490,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 			
 			Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 			sendBroadcast(intentInvalidate);
-			LibrelioApplication.startPDFActivity(getContext(),filePath);
+			LibrelioApplication.startPDFActivity(getContext(), filePath, magazine.getTitle());
 			closeDownloadScreen();
 			super.onPostExecute(result);
 		}

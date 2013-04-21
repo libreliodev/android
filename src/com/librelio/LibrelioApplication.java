@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
+import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
@@ -35,12 +36,13 @@ public class LibrelioApplication extends Application {
 		super.onCreate();
 	}
 
-	public static void startPDFActivity(Context context, String filePath){
+	public static void startPDFActivity(Context context, String filePath, String title){
 		try{
 			Uri uri = Uri.parse(filePath);
 			Intent intent = new Intent(context,MuPDFActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
 			intent.setData(uri);
+			intent.putExtra(Magazine.FIELD_TITLE, title);
 			context.startActivity(intent);
 		} catch (Exception e) {
 			Log.e(TAG,"Problem with starting PDF-activity, path: "+filePath,e);

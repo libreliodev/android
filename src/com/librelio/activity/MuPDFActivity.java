@@ -278,9 +278,14 @@ public class MuPDFActivity extends BaseActivity{
 		// controls in variables
 		makeButtonsView();
 
-		// Set the file-name text
-		mFilenameView.setText(fileName);
-
+		// Set the magazine title text
+		String title = getIntent().getStringExtra(Magazine.FIELD_TITLE);
+		if (title != null) {
+			mFilenameView.setText(title);
+		} else {
+			mFilenameView.setText(fileName);
+		}
+		
 		if (core.hasOutline()) {
 			mOutlineButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {

@@ -46,11 +46,11 @@ public class DownloadedMagazinesListView extends ListView {
 					LibrelioApplication.startPDFActivity(context,
 							downloadedMagazine.isSample() ?
 							downloadedMagazine.getSamplePath() :		
-							downloadedMagazine.getPdfPath());
-				} 
+							downloadedMagazine.getPdfPath(), downloadedMagazine.getTitle());
+				}
 			}
 		});
-	} 
+	}
 
 	public DownloadedMagazinesListView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
