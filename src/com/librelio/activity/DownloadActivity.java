@@ -221,7 +221,7 @@ public class DownloadActivity extends AbstractLockRotationActivity {
 				return;
 			}
 			downloadLinks = new DownloadLinksTask();
-			downloadLinks.execute();
+			downloadLinks.executeOnExecutor(THREAD_POOL_EXECUTOR);
 			super.onPostExecute(result);
 		}
 		
