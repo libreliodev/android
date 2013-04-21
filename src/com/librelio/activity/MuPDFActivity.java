@@ -228,7 +228,7 @@ public class MuPDFActivity extends BaseActivity{
 				mLinksActivator = new ActivateAutoLinks(pageView);
 				mLinksActivator.safeExecute(i);
 				setCurrentlyViewedPreview();
-				
+				EasyTracker.getInstance().setContext(MuPDFActivity.this);
 				if (core.getDisplayPages() == 2) {
 					int actualPageNumber = (i * 2) - 1;
 					if (i > 0) {
