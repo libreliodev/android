@@ -1,6 +1,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light" />
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar" />
 
     <style name="Theme.Billing" parent="@android:style/Theme.Holo.Dialog">
         <item name="android:windowNoTitle">true</item>

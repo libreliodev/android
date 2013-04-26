@@ -25,7 +25,9 @@
     </item>
     <item
         android:id="@+id/options_menu_downloaded_magazines"
+        android:showAsAction="ifRoom|withText"
         android:title="@string/downloads"
+        android:icon="@drawable/ic_action_download"
         android:visible="@bool/enable_downloads_in_menu">
     </item>
 
