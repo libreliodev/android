@@ -373,9 +373,14 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	 * @param pLink - URL to display
 	 */
 	void startAdsActivity(final String pLink) {
-		Intent intent = new Intent(self(), WebAdvertisingActivity.class);
-		intent.putExtra(WebAdvertisingActivity.PARAM_LINK, pLink);
-		startActivity(intent);
+		Intent mainMagazineActivityntent = new Intent(self(),
+				MainMagazineActivity.class);
+		Intent webAdvertisingActivityIntent = new Intent(self(),
+				WebAdvertisingActivity.class);
+		webAdvertisingActivityIntent.putExtra(
+				WebAdvertisingActivity.PARAM_LINK, pLink);
+		startActivities(new Intent[] { mainMagazineActivityntent,
+				webAdvertisingActivityIntent });
 		finish();
 	}
 
