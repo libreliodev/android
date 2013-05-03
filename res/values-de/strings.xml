@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connecting"> Verbindung...</string>
+    <string name="download_failed_please_check_your_connection"> Download fehlgeschlagen, bitte überprüfen Sie Ihre Internetverbindung</string>
+    <string name="please_check_your_connection"> Bitte überprüfen Sie Ihre Internetverbindung</string>
+    <string name="download_in_progress"> Download läuft</string>
+    <string name="caching_operation_in_progress"> Caching laüft</string>
+    <string name="what_do_you_want_to_buy"> Was möchten Sie kaufen?</string>
+    <string name="cancel"> Abbrechen</string>
+    <string name="done"> OK</string>
+    <string name="the_order_failed"> Bestellung fehlgeschlagen</string>
+    <string name="buy_and_download">Kaufen und download</string>
+    <string name="try_again">Wiederholen</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloaded">Heruntergeladen</string>
+    <string name="free_Download"> Gratis Download</string>
+    <string name="download"> Download ...</string>
+    <string name="free_sample"> Gratis probelesen</string>
+    <string name="read">Lesen</string>
+    <string name="magazines"> Magazine</string>
+    <string name="do_you_really_want_to_quit_this_app">Möchten Sie wirklich diese Applikation beeden?</string>
+    <string name="yes"> Ja</string>
+    <string name="i_have_a_subscriber_code"> Ich habe einen Abo- Code</string>
+    <string name="i_have_a_promo_code"> Ich habe einen Promo- Code</string>
+    <string name="subscriber_code"> Abo- Code</string>
+    <string name="please_enter_your_code"> Bitte geben Sie den Code</string>
+    <string name="invalid_code"> Ungültiger Code</string>
+    <string name="share_on_facebook">Auf Facebook teilen</string>
+    <string name="share_on_twitter">Auf Twitter teilen</string>
+    <string name="share_by_mail">Auf E-Mail teilen</string>
+    <string name="languages">Sprachen</string>
+    <string name="month">Monat</string>
+    <string name="months">Monate</string>
+    <string name="week">Woche</string>
+    <string name="year">Jahr</string>
+    <string name="sample"> Probelesen</string>
+</resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connecting"> Connessione in corso...</string>
+    <string name="download_failed_please_check_your_connection"> Download non riuscito, controlla la tua connessione</string>
+    <string name="please_check_your_connection"> Controlla la tua connessione</string>
+    <string name="download_in_progress"> Download in corso</string>
+    <string name="caching_operation_in_progress"> Caching in corso</string>
+    <string name="what_do_you_want_to_buy"> Cosa vuoi comprare?</string>
+    <string name="cancel"> Annulla</string>
+    <string name="done"> OK</string>
+    <string name="the_order_failed"> Ordine non riuscita</string>
+    <string name="buy_and_download"> Download</string>
+    <string name="try_again"> Prova di nuovo</string>
+    <string name="downloads"> Downloads</string>
+    <string name="downloaded">Scaritato</string>
+    <string name="free_Download"> Download gratuito</string>
+    <string name="download"> Download ...</string>
+    <string name="free_sample"> Anteprima gratuita</string>
+    <string name="read">Leggi</string>
+    <string name="magazines"> Periodici</string>
+    <string name="do_you_really_want_to_quit_this_app">Vuoi davvero uscire da questa app?</string>
+    <string name="yes"> Si</string>
+    <string name="i_have_a_subscriber_code"> Ho un codice abbonato</string>
+    <string name="i_have_a_promo_code"> Ho un codice promo</string>
+    <string name="subscriber_code"> Codice abbonato</string>
+    <string name="please_enter_your_code"> Inserisci il tuo codice</string>
+    <string name="invalid_code"> Codice non valido</string>
+    <string name="share_on_facebook">Share on Facebook</string>
+    <string name="share_on_twitter">Share on Twitter</string>
+    <string name="share_by_mail">Share by Mail</string>
+    <string name="languages">Lingue</string>
+    <string name="month">mese</string>
+    <string name="months">mesi</string>
+    <string name="week">settimana</string>
+    <string name="year">anno</string>
+    <string name="sample"> Anteprima</string>
+    <string name="open_failed">ggg</string>
+</resources>

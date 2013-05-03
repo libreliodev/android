@@ -10,7 +10,7 @@
     </item>
     <item
         android:id="@+id/options_menu_restore"
-        android:title="@string/restore_purchise"
+        android:title="@string/restore_my_purchases"
         android:visible="false">
     </item>
     <item

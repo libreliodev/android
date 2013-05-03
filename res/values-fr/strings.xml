@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="no_media_warning">No media</string>
-    <string name="no_media_hint">Disconnect from PC</string>
     <string name="search_backwards">Search back</string>
     <string name="search_forwards">Search forward</string>
     <string name="search_document">Search in document</string>
@@ -12,8 +10,6 @@
     <string name="link_control">Link highlight</string>
     <string name="exit">Sortir</string>
     <string name="reload">Recharger</string>
-    <string name="not_connected">Non connecté à internet&#8230;</string>
-    <string name="restore_purchise">Restaurer les achats</string>
     <string name="subscribe">Abonnement</string>
     <string name="subscription_monthly">Abonnement mensuel</string>
     <string name="subscription_yearly">Abonnement annuel</string>
@@ -27,10 +23,6 @@
     <string name="subscriptions_not_supported_title">Abonnements non supportés</string>
     <string name="subscriptions_not_supported_message">Abonnements non supportés sur votre appareil</string>
     <string name="billing_not_supported_title">Billing not supported.</string>
-        <string name="android_test_canceled">android.test.canceled</string>
-    <string name="android_test_purchased">android.test.purchased</string>
-    <string name="android_test_item_unavailable">android.test.item unavailable</string>
-    <string name="android_test_refunded">android.test.refunded</string>
     <string name="edit_subscriptions">Edit Subscriptions</string>
     <string name="help_url" formatted="false">http://market.android.com/support/bin/answer.py?answer=1050566&amp;hl=%lang%&amp;dl=%region%</string>
 	    <string name="restoring_transactions">Restauration des transactions</string>
@@ -79,7 +71,6 @@
     <string name="share_on_twitter">Partager sur Twitter</string>
     <string name="share_by_mail">Partager par mail</string>
     <string name="languages">Langues</string>  
-    <string name="ios_6_required">Désolé, iOS 6 est requis pour cette opération</string>
     <string name="month">mois</string>
     <string name="months">mois</string>
     <string name="year">an</string>

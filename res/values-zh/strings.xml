@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connecting"> 链接</string>
+    <string name="download_failed_please_check_your_connection"> 下载失败，请检查你的网络链接是否正常</string>
+    <string name="please_check_your_connection"> 请检查你的网络链接</string>
+    <string name="download_in_progress"> 下载进行中</string>
+    <string name="caching_operation_in_progress"> 高速缓存进行中</string>
+    <string name="what_do_you_want_to_buy">你想要买什么？</string>
+    <string name="cancel"> 操作取消</string>
+    <string name="done"> 操作完成</string>
+    <string name="the_order_failed"> 指令出错</string>
+    <string name="buy_and_download">购买并下载</string>
+    <string name="try_again">重试</string>
+    <string name="downloads"> 下载中心</string>
+    <string name="downloaded"> 下载完成</string>
+    <string name="free_Download">免费下载</string>
+    <string name="download">下载中...</string>
+    <string name="free_sample"> 免费样本</string>
+    <string name="read">阅读</string>
+    <string name="magazines"> 杂志</string>
+    <string name="do_you_really_want_to_quit_this_app">你确定要退出此次操作？</string>
+    <string name="yes">是</string>
+    <string name="i_have_a_subscriber_code"> 我有订阅密码</string>
+    <string name="i_have_a_promo_code">我有优惠密码</string>
+    <string name="restore_my_purchases">恢复我的购买</string>
+    <string name="restore_completed"> 恢复完成</string>
+    <string name="subscriber_code"> 订阅密码</string>
+    <string name="please_enter_your_code">请输入你的密码</string>
+    <string name="invalid_code"> 无效的密码</string>
+    <string name="share_on_facebook">共享到Facebook</string>
+    <string name="share_on_twitter">共享到Twitter</string>
+    <string name="share_by_mail">共享到邮件</string>
+    <string name="languages">语言</string>
+    <string name="month">个月</string>
+    <string name="months">个月</string>
+    <string name="week">周</string>
+    <string name="year">年</string>
+    <string name="sample"> 样本</string>
+</resources>
