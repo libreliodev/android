@@ -80,7 +80,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private ImageView startupImage;
 	private ImageView advertisingImage;
 	
-	private boolean advertisingClickPerfomed = false;
+	private boolean advertisingClickPerformed = false;
 	
 	private boolean isFirstImage = true;
 	
@@ -293,7 +293,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		mStartupAdsTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (!advertisingClickPerfomed){
+				if (!advertisingClickPerformed){
 					startMagazineActivity();
 				}
 			}
@@ -305,7 +305,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			advertisingImage.setOnTouchListener(new OnTouchListener() {
 //				@Override
 //				public void onClick(View v) {
-//					advertisingClickPerfomed = true;
+//					advertisingClickPerformed = true;
 //					
 //					startAdsActivity(link);
 //				}
@@ -335,7 +335,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	}
 	
 	private String getAdvertisingImageURL() {
-		Log.d(TAG, "Will get advertsing image");
+		Log.d(TAG, "Will get advertising image");
 		Log.d(TAG, "Advertising url"+ getString(R.string.get_advertising_image_url));
 		Log.d(TAG, "Client name"+ Uri.encode(LibrelioApplication.getClientName(self())));
 
@@ -373,13 +373,13 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	 * @param pLink - URL to display
 	 */
 	void startAdsActivity(final String pLink) {
-		Intent mainMagazineActivityntent = new Intent(self(),
+		Intent mainMagazineActivityIntent = new Intent(self(),
 				MainMagazineActivity.class);
 		Intent webAdvertisingActivityIntent = new Intent(self(),
 				WebAdvertisingActivity.class);
 		webAdvertisingActivityIntent.putExtra(
 				WebAdvertisingActivity.PARAM_LINK, pLink);
-		startActivities(new Intent[] { mainMagazineActivityntent,
+		startActivities(new Intent[] { mainMagazineActivityIntent,
 				webAdvertisingActivityIntent });
 		finish();
 	}

@@ -31,7 +31,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	protected static final int CONNECTION_ALERT = 1;
 	protected static final int SERVER_ALERT = 2;
 	protected static final int DOWNLOAD_ALERT = 3;
-	protected static final int IO_EXEPTION = 4;
+	protected static final int IO_EXCEPTION = 4;
 
 	private SharedPreferences sharedPreferences;
 
@@ -199,7 +199,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 			msg_id = R.string.download_failed_please_check_your_connection;
 			break;
 		}
-		case IO_EXEPTION:{
+		case IO_EXCEPTION:{
 			msg_id = R.string.no_space_on_device;
 			break;
 		}
@@ -212,7 +212,7 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 			.setPositiveButton(R.string.ok, new android.content.DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					if(fId!=IO_EXEPTION){
+					if(fId!= IO_EXCEPTION){
 						finish();
 					}
 				}

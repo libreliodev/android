@@ -245,7 +245,7 @@ public class MainMagazineActivity extends BaseActivity {
 			return true;
 
 		case R.id.options_menu_restore:
-			restorePurchises();
+			restorePurchases();
 			return true;
 		case R.id.options_menu_send_log:
 			onSendLog();
@@ -318,7 +318,7 @@ public class MainMagazineActivity extends BaseActivity {
 		return builder.create();
 	}
 
-	private void restorePurchises() {
+	private void restorePurchases() {
 	}
 
 	private void showProgress(boolean progress) {
