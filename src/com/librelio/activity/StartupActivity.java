@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.librelio.utils.StorageUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -111,9 +112,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		protected Integer doInBackground(String... params) {
 			try {
 				final String name = params[0];
-				final String testDir = getStoragePath() + name + "/";
+				final String testDir = StorageUtils.getStoragePath(StartupActivity.this) + name + "/";
 				final String testImage = name + ".png";
-				final String testImagePath = getStoragePath() + testImage;
+				final String testImagePath = StorageUtils.getStoragePath(StartupActivity.this) + testImage;
 				String[] assetsList = getResources().getAssets().list(name);
 				File file = new File(testImagePath);
 				if (!file.exists()) {
@@ -152,7 +153,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 				assetsList = getResources().getAssets().list("");
 				for (String file : assetsList) {
 					if (file.contains(".plist") || file.contains(".png")) {
-						copyFromAssets(file, getStoragePath() + file);
+						copyFromAssets(file, StorageUtils.getStoragePath(StartupActivity.this) + file);
 					}
 				}
 				return 0;

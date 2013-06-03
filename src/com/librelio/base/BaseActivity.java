@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+import com.librelio.utils.StorageUtils;
 import org.netcook.android.tools.CrashCatcherActivity;
 
 import android.app.AlertDialog;
@@ -15,8 +16,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Environment;
-import android.os.Handler;
 import android.util.Log;
 
 import com.google.analytics.tracking.android.EasyTracker;
@@ -50,31 +49,6 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	 * A {@link PurchaseObserver} is used to get callbacks when Android Market
 	 * sends messages to this application so that we can update the UI.
 	 */
-
-	@Override
-	public String getInternalPath() {
-		return getDir("librelio", MODE_PRIVATE).getAbsolutePath() + "/";
-	}
-
-	@Override
-	public String getExternalPath() {
-		return Environment.getExternalStorageDirectory() + "/librelio/";
-	}
-
-	@Override
-	public String getStoragePath(){
-		if (getResources().getBoolean(R.bool.use_internal_storage)) {
-			return getInternalPath();
-		} else {
-			return getExternalPath();
-		}
-	}
-
-	@Override
-	public String getVideoTempPath() {
-		//return getExternalPath() + ".f" + new Random().nextLong() + "-video.mp4";
-		return getExternalPath() + ".video.mp4";
-	}
 
 	/**
 	 * Replaces the language and/or country of the device into the given string.
@@ -126,19 +100,20 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	 * Creates storage directories if necessary
 	 */
 	protected void initStorage(String... folders) {
-		File f = new File(getStoragePath());
+        final String storagePath = StorageUtils.getStoragePath(this);
+        File f = new File(storagePath);
 		if (!f.exists()) {
-			Log.d(TAG, getStoragePath() + " was create");
+			Log.d(TAG, storagePath + " was create");
 			f.mkdirs();
 		}
-		f = new File(getExternalPath());
+		f = new File(StorageUtils.getExternalPath(this));
 		if (!f.exists()) {
-			Log.d(TAG, getExternalPath() + " was create");
+			Log.d(TAG, StorageUtils.getExternalPath(this) + " was create");
 			f.mkdirs();
 		}
 		if (null != folders && folders.length != 0) {
 			for (String folder : folders) {
-				File dir = new File(getStoragePath() + folder);
+				File dir = new File(storagePath + folder);
 				if (!dir.exists()) {
 					dir.mkdir();
 				}

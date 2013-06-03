@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.librelio.utils.StorageUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -104,7 +105,7 @@ public class DownloadMagazineListService extends BaseService {
 			@Override
 			protected Void doInBackground(Void... params) {
 				plistUrl = LibrelioApplication.getAmazonServerUrl() + "Magazines.plist";
-				Log.d(TAG, "Downloading start path:" + getStoragePath() + ", mode = " + useStaticMagazines);
+				Log.d(TAG, "Downloading start path:" + StorageUtils.getStoragePath(getContext()) + ", mode = " + useStaticMagazines);
 				
 				//Checking for updates
 				HttpClient httpclient = new DefaultHttpClient();
@@ -131,12 +132,12 @@ public class DownloadMagazineListService extends BaseService {
 				sendProgressUpdateIntent(true);
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
-					downloadFromUrl(plistUrl, getStoragePath() + PLIST_FILE_NAME);
+					downloadFromUrl(plistUrl, StorageUtils.getStoragePath(getContext()) + PLIST_FILE_NAME);
 					saveUpadteDate();
 					Log.d(TAG,"There is updates (current update date : "+lastUdate+")");
 				}
 				//Convert plist to String for parsing
-				pList = getStringFromFile(getStoragePath() + PLIST_FILE_NAME);
+				pList = getStringFromFile(StorageUtils.getStoragePath(getContext()) + PLIST_FILE_NAME);
 				
 				//Parsing
 				PListXMLHandler handler = new PListXMLHandler();

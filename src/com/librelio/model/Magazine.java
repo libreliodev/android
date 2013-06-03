@@ -12,6 +12,7 @@ import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.storage.MagazineManager;
+import com.librelio.utils.StorageUtils;
 
 public class Magazine {
 	protected static final String TAG = Magazine.class.getSimpleName();
@@ -79,7 +80,7 @@ public class Magazine {
 	
 	public String getMagazineDir(){
 		int finishNameIndex = fileName.indexOf("/");
-		return ((IBaseContext)context).getStoragePath() + fileName.substring(0,finishNameIndex)+"/";
+		return StorageUtils.getStoragePath(context) + fileName.substring(0,finishNameIndex)+"/";
 	}
 	
 	public static String getAssetsBaseURL(String fileName){
@@ -114,7 +115,7 @@ public class Magazine {
 	private void valuesInit(String fileName) {
 		isPaid = fileName.contains("_.");
 		int startNameIndex = fileName.indexOf("/")+1;
-		String png = ((IBaseContext)context).getStoragePath()+fileName.substring(startNameIndex, fileName.length()); 
+		String png = StorageUtils.getStoragePath(context)+fileName.substring(startNameIndex, fileName.length());
 		pdfUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
 		pdfPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
