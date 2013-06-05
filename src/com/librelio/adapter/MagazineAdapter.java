@@ -29,13 +29,13 @@ import com.niveales.wind.R;
 public class MagazineAdapter extends BaseAdapter{
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
-	private ArrayList<Magazine> magazine;
+	private ArrayList<Magazine> magazines;
 	private boolean hasTestMagazine;
 	private MagazineManager magazineManager;
 	
-	public MagazineAdapter(ArrayList<Magazine> magazine, Context context, boolean hasTestMagazine) {
+	public MagazineAdapter(ArrayList<Magazine> magazines, Context context, boolean hasTestMagazine) {
 		this.context = context;
-		this.magazine = magazine;
+		this.magazines = magazines;
 		this.hasTestMagazine = hasTestMagazine;
 		
 		magazineManager = new MagazineManager(context);
@@ -43,7 +43,7 @@ public class MagazineAdapter extends BaseAdapter{
 
 	@Override
 	public int getCount() {
-		return magazine.size();
+		return magazines.size();
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class MagazineAdapter extends BaseAdapter{
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final Magazine currentMagazine = magazine.get(position);
+		final Magazine currentMagazine = magazines.get(position);
 		MagazineItemHolder holder = new MagazineItemHolder();
 		
 		if(convertView == null){
