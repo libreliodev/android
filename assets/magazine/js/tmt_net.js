@@ -1,4 +1,4 @@
-/** 
+/**
 * Copyright 2006-2009 massimocorner.com
 * License: http://www.massimocorner.com/license.htm
 * @author      Massimo Foti (massimo@massimocorner.com)
@@ -230,7 +230,7 @@ tmt.net.httpRequest = function(url, loadCallback, errback, method, params){
 		request.send();
 	}
 	catch(err){
-		alert(err.message);
+//		alert(err.message);
 	}
 	return request;
 }
