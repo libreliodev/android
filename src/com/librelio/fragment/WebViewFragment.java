@@ -67,32 +67,32 @@ public class WebViewFragment extends Fragment {
         settings.setJavaScriptEnabled(true);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         mWebView.setBackgroundColor(Color.BLACK);
-        mWebView.setOnTouchListener(new View.OnTouchListener() {
-            float oldX = 0, newX = 0, sens = 5;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        oldX = event.getX();
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        newX = event.getX();
-                        if (Math.abs(oldX - newX) < sens) {
-                            if (onWebViewClickListener != null) {
-                                onWebViewClickListener.onWebViewClick();
-                            }
-                            return true;
-                        }
-                        oldX = 0;
-                        newX = 0;
-                        break;
-                }
-
-                return false;
-            }
-        });
+//        mWebView.setOnTouchListener(new View.OnTouchListener() {
+//            float oldX = 0, newX = 0, sens = 5;
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        oldX = event.getX();
+//                        break;
+//
+//                    case MotionEvent.ACTION_UP:
+//                        newX = event.getX();
+//                        if (Math.abs(oldX - newX) < sens) {
+//                            if (onWebViewClickListener != null) {
+//                                onWebViewClickListener.onWebViewClick();
+//                            }
+//                            return true;
+//                        }
+//                        oldX = 0;
+//                        newX = 0;
+//                        break;
+//                }
+//
+//                return false;
+//            }
+//        });
         return mWebView;
     }
 
