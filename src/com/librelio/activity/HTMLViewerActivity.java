@@ -68,7 +68,7 @@ public class HTMLViewerActivity extends FragmentActivity {
 //            if ((mOrientation == Configuration.ORIENTATION_LANDSCAPE) && (position == 0 || position == getCount() - 1)) {
 //                return new Fragment();
 //            } else {
-                webViewFragment = WebViewFragment.newInstance("file:///android_asset/magazine/Page_" + position + ".html");
+                webViewFragment = WebViewFragment.newInstance(position);
 //            }
 //            webViewFragment.setOnWebViewClickListener(new OnWebViewClickListener() {
 //

@@ -26,7 +26,9 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import com.librelio.activity.HTMLViewerActivity;
+import com.niveales.wind.R;
 
 /**
  * A fragment that displays a WebView.
@@ -37,14 +39,15 @@ public class WebViewFragment extends Fragment {
     private WebView mWebView;
     private boolean mIsWebViewAvailable;
     private HTMLViewerActivity.OnWebViewClickListener onWebViewClickListener;
+    private ProgressBar mProgressBar;
 
     public WebViewFragment() {
     }
 
-    public static WebViewFragment newInstance(String url) {
+    public static WebViewFragment newInstance(int position) {
         WebViewFragment f = new WebViewFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("url", url);
+        bundle.putInt("position", position);
         f.setArguments(bundle);
         return f;
     }
@@ -58,15 +61,22 @@ public class WebViewFragment extends Fragment {
         if (mWebView != null) {
             mWebView.destroy();
         }
-        mWebView = new WebView(getActivity());
+        View view = inflater.inflate(R.layout.fragment_web_view, container, false);
+        mWebView = (WebView) view.findViewById(R.id.web_view);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         mIsWebViewAvailable = true;
         mWebView.setWebViewClient(new InnerWebViewClient()); // forces it to open in app
 
-        mWebView.loadUrl(getArguments().getString("url"));
+        int position = getArguments().getInt("position");
+        mWebView.loadUrl("file:///android_asset/magazine/Page_" + position + ".html");
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
         mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        mWebView.setBackgroundColor(Color.BLACK);
+        if (position == 0) {
+           mWebView.setBackgroundColor(Color.BLACK);
+        } else {
+            mWebView.setBackgroundColor(Color.WHITE);
+        }
 //        mWebView.setOnTouchListener(new View.OnTouchListener() {
 //            float oldX = 0, newX = 0, sens = 5;
 //
@@ -93,7 +103,7 @@ public class WebViewFragment extends Fragment {
 //                return false;
 //            }
 //        });
-        return mWebView;
+        return view;
     }
 
     /**
@@ -153,6 +163,13 @@ public class WebViewFragment extends Fragment {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            mProgressBar.setVisibility(View.GONE);
+            mWebView.setVisibility(View.VISIBLE);
         }
     }
 }
