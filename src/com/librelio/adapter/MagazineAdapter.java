@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.DownloadActivity;
+import com.librelio.activity.HTMLViewerActivity;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
@@ -113,13 +114,14 @@ public class MagazineAdapter extends BaseAdapter{
 			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					if(new File(currentMagazine.getPdfPath()).exists()){
-								LibrelioApplication.startPDFActivity(context,
-										currentMagazine.getPdfPath(),
-										currentMagazine.getTitle());
-							} else {
-						Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
-					}
+//					if(new File(currentMagazine.getPdfPath()).exists()){
+//								LibrelioApplication.startPDFActivity(context,
+//										currentMagazine.getPdfPath(),
+//										currentMagazine.getTitle());
+//							} else {
+//						Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
+//					}
+                context.startActivity(new Intent(context, HTMLViewerActivity.class));
 				}
 			});
 			return convertView;

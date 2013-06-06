@@ -4,7 +4,7 @@
     <string name="app_name">Wind</string>
     <string name="yearly_subs_code">yearlysubscription</string>
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
-    <bool name="enable_test_magazine">false</bool>
+    <bool name="enable_test_magazine">true</bool>
     <bool name="enable_code_subs">true</bool>
     <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>

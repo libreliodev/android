@@ -24,7 +24,7 @@ public class MagazineManager extends BaseManager {
 	public List<Magazine> getMagazines(boolean hasTestMagazine, String tableName) {
 		List<Magazine> magazines = new ArrayList<Magazine>();
 		if (hasTestMagazine) {
-			magazines.add(new Magazine(TEST_FILE_NAME, "TEST", "test", "", getContext()));
+			magazines.add(new Magazine(TEST_FILE_NAME, "Ski Magazine", "", "", getContext()));
 		}
 		DataBaseHelper dbhelp = new DataBaseHelper(getContext());
 		SQLiteDatabase db = dbhelp.getReadableDatabase();
