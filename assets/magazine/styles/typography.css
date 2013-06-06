@@ -1,0 +1,426 @@
+/*
+#####################################################################
+LAKER Version 1.1 – http://www.lakercompendium.com
+#####################################################################
+#####################################################################
+This file contains a modified version of the LESS CSS Framework
+(http://www.lessframework.com). 
+
+See www.lakercompendium.com for more details.
+#####################################################################
+#####################################################################
+#####################################################################
+*/
+@charset "UTF-8";
+
+
+/*
+##########################################################################
+##########################################################################
+		Default Layout: 952px.
+		Content-Element width: 952px.
+		Gutters: 24px.
+		Outer content margins: 28px.
+		Leftover space for scrollbars @1024px: 32px.
+##########################################################################
+cols    1     2      3      4      5      6      7      8      9      10
+px      68    160    252    344    436    528    620    712    804    896    
+##########################################################################
+##########################################################################
+*/
+
+h1,
+h2,
+h4,
+p,
+body {
+    margin: 0px; padding: 0px;
+    font-weight: normal;
+    font-family:arial;
+}
+
+h3{
+	font-weight:bold;  
+	margin: 0px; 
+	padding: 0px;
+    font-family:arial;
+}
+
+ 
+.content-element h1 {
+    margin-bottom: 30px;
+	margin-top:20px;
+    color:#ffffff;
+    font-size: 3em;
+    font-family: 'Oswald';
+    line-height: 1.1em;
+	clear:both;
+}
+
+.content-element h1.black {
+    margin-bottom:20px;
+	margin-top:20px;
+    color:#000000;
+    font-size:36px;
+    font-family: 'Oswald';
+    line-height: 1.1em;
+	clear:both;
+}
+
+.content-element h2 {
+    margin-bottom: 10px;
+	margin-top:10px;
+    color: #1c1c1c;
+    font-size: 1.8em;
+    font-family: 'Oswald';
+    line-height: 1.1em;
+	}
+	
+	.content-element h3 {
+    margin-bottom: 10px;
+	margin-top:10px;
+    color: #1c1c1c;
+    font-size:18px;
+    font-family: 'Oswald';
+    line-height: 1.1em;
+	}
+	
+	.content-element h4 {
+    margin-bottom: 10px;
+	margin-top:10px;
+    color: #1c1c1c;
+    font-size:16px;
+    font-family: 'Oswald';
+    line-height: 1.1em;
+	}
+
+.tetieres{
+		float:left;
+	width:auto;
+	height:auto;
+	padding:5px;
+	margin-top:20px;
+	text-transform:uppercase;
+	background-color:#C30;
+	color:#FFF;
+	font-weight:bold;
+	}
+
+#titres-cover{
+	float:left;
+	width:300px;
+	margin-top:-200px;
+	margin-left:50px;
+	}
+#logo{
+	float:left;
+	width:386px;
+	height:203px;
+	margin-bottom:100px;
+}
+	
+
+h1.titres-cover {
+	clear:both;
+	float:left;
+	width:auto;
+	text-align:left;
+	text-transform:uppercase;
+	line-height:21px;
+	}
+	
+h1.titres-cover a{
+	float:left;
+	width:auto;
+	padding:5px;
+	color:#000;
+	text-decoration:none;
+	font-weight:bold;
+	outline:none;
+	font-size:24px;
+	background-color:#FFF;
+	margin-top:5px;
+	filter:alpha(opacity=50);-moz-opacity:0.5;opacity: 0.5;
+	}
+
+	
+h1.titres-cover a:hover{
+	color:#C30;
+	text-decoration:none;
+	font-weight:bold;
+	filter:alpha(opacity=100);-moz-opacity:1;opacity:1;
+	}
+	 
+	
+h2.sstitres-cover{
+	float:left;
+	text-transform:uppercase;
+	color:#666;
+	width:auto;
+	text-align:left;
+	font-size:16px;
+	font-weight:bold;
+	padding:5px;
+	background-color:#FFF;
+	filter:alpha(opacity=50);-moz-opacity:0.5;opacity: 0.5;
+	}
+	
+p {
+    display: block;
+    margin-bottom: 15px;
+    color: #555555;
+    font-size:14px;
+   font-size: 1.15em;
+    line-height: 1.50em;
+	text-align:justify;
+	}
+
+li {
+    color: #555555;
+    font-size: 1.188em;
+    line-height: 1.50em !important
+	}
+
+a:link, a:visited, a:hover {
+	color:#77f9ae;
+	}
+	
+.content-element a {
+	color:#000;
+	text-decoration:none;
+	}
+	
+.bouton a{
+	color:#000;
+	text-decoration:none;
+	width:auto;
+	height:auto;
+	padding:5px;
+	background-color:#000;
+	color:#fff;
+	font-weight:bold;
+}
+.dossier-number {
+    position: absolute;
+    width: 82px; height: 138px;
+    margin-top: 0px; margin-left: 28px;
+    text-align: center;
+    background-image: url(../images/dossier-number-bg.png);
+    z-index: 1000;
+    opacity: 1;
+}
+.dossier-number p {
+    margin-left:15px;
+    padding-top: 48px;
+    color: #fff;
+    font-size: 2.6em;
+    font-family: 'Oswald'
+	}
+	
+.footer p {
+    color: #c7c7c7;
+    font-size: 0.9em
+}
+.encadre{
+	float:left;
+	width:95%;
+	height:auto;
+	padding:20px;
+	margin-top:40px;
+	background-color:#f2f2f2;
+}
+
+/*accordion*/
+.accordion {
+ 	background:#cc3300;
+	padding: 0 1em 24px;
+	width:auto;
+	margin:10px 0px 10px 0px;
+}
+
+.accordion h2 {
+	margin: 12px 0;
+}
+ 
+.accordion .section {
+ 	border-bottom: 1px solid #ccc;
+	padding: 0 1em;
+	background: #fff;
+}
+ 
+.accordion h3 a {
+	display: block;
+	font-weight: normal;
+	padding: 1em 0;
+}
+
+.accordion h3 a:hover {
+	text-decoration: none;
+}
+ 
+.accordion h3 + div {
+	height: 0;
+	overflow:hidden;
+	-webkit-transition: height 0.3s ease-in;
+}
+
+.accordion :target h3 a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.accordion :target h3 + div {
+	height:auto;
+}
+
+.accordion .section.large:target h3 + div {
+	overflow: auto;
+}
+
+/*fin accordion*/
+
+a.btn-infos{
+	width:auto;
+	padding:5px;
+	background-color:#C30;
+	color:#fff;
+	margin-top:5px;
+}
+
+
+
+/*
+##########################################################################
+##########################################################################
+		Tablet Layout: 768px.
+		Content-Element width: 712px.
+		Gutters: 24px.
+		Outer content margins: 28px.
+		Inherits styles from: Default Layout.
+##########################################################################
+cols    1     2      3      4      5      6      7      8
+px      68    160    252    344    436    528    620    712    
+##########################################################################
+##########################################################################
+*/
+
+
+@media only screen and (min-width: 768px) and (max-width: 991px) { 
+
+}
+
+
+/*
+##########################################################################
+##########################################################################
+		iPad Layout Portrait: 768px.
+		Content-Element width: 712px.
+		Gutters: 24px.
+		Outer content margins: 28px.
+		Inherits styles from: Default Layout.
+##########################################################################
+cols    1     2      3      4      5      6      7      8
+px      68    160    252    344    436    528    620    712   
+##########################################################################
+##########################################################################
+ */
+ 
+@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait) { 
+	
+}
+
+
+/*
+##########################################################################
+##########################################################################
+		iPad Layout Landscape: 1024px.
+		Content-Element width: 896px.
+		Gutters: 24px.
+		Outer content margins: 64px.
+		Inherits styles from: Default Layout.
+##########################################################################
+cols    1     2      3      4      5      6      7      8      9      10
+px      68    160    252    344    436    528    620    712    804    896    
+##########################################################################
+##########################################################################
+*/
+
+
+@media only screen and (max-device-width: 1024px) and (orientation:landscape) { 
+	.dossier-number {    margin-left: 64px }
+}
+
+
+/*
+##########################################################################
+##########################################################################
+		Mobile Layout: 320px.
+		Content-Element width: 292px.
+		Gutters: 24px.
+		Outer content margins: 14px.
+		Inherits styles from: Default Layout.
+##########################################################################
+cols    1     2      3
+px      68    160    252    
+##########################################################################
+##########################################################################
+*/
+
+
+@media only screen and (max-width: 767px) { 
+	.content-element h1 {
+	    margin-bottom: 20px;
+	    font-size: 2.2em
+	}
+	p { line-height: 1.40em }
+	.dossier-number {
+	    width: 60px; height: 100px;
+	    margin-top: -8px; margin-left: 14px;
+	    background-size: 60px 100px
+	}
+	.dossier-number p {
+	    margin-left: -7px;
+	    padding-top: 30px;
+	    font-size: 2em
+	}
+}
+
+
+/*		
+##########################################################################
+##########################################################################
+		Wide Mobile Layout: 480px.
+		Content-Element width: 436px.
+		Gutters: 24px.
+		Outer content margins: 22px.
+		Inherits styles from: Default Layout, Mobile Layout.
+#########################################################################
+cols    1     2      3      4      5
+px      68    160    252    344    436    
+##########################################################################
+##########################################################################
+*/
+
+@media only screen and (min-width: 480px) and (max-width: 767px) { 
+	.dossier-number {
+	    width: 60px; height: 100px;
+	    margin-top: -8px; margin-left: 22px;
+	    background-size: 60px 100px
+	}
+}
+
+
+/*		
+##########################################################################
+##########################################################################
+	Retina media query.
+	Overrides styles for devices with a 
+	device-pixel-ratio of 2+, such as iPhone 4.
+######################################################################### 
+##########################################################################
+*/
+
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) { 
+	
+}
