@@ -452,6 +452,7 @@ public class MuPDFActivity extends BaseActivity{
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
+            buttonsView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 		}
 	}
 
@@ -482,6 +483,7 @@ public class MuPDFActivity extends BaseActivity{
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
+            buttonsView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 		}
 	}
 
