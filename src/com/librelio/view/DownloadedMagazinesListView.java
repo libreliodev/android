@@ -3,6 +3,7 @@ package com.librelio.view;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -45,7 +46,7 @@ public class DownloadedMagazinesListView extends ListView {
 					Magazine downloadedMagazine = downloads.get(position);
 					LibrelioApplication.startPDFActivity(context,
 							downloadedMagazine.isSample() ?
-							downloadedMagazine.getSamplePath() :		
+							downloadedMagazine.getSamplePdfPath() :
 							downloadedMagazine.getPdfPath(), downloadedMagazine.getTitle());
 				}
 			}
@@ -146,10 +147,7 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 			@Override
 			public void onClick(View v) {
 				downloadedMagazine.delete();
-				magazineManager.removeMagazine(
-						Magazine.TABLE_DOWNLOADED_MAGAZINES,
-						Magazine.FIELD_ID,
-						Integer.toString(downloadedMagazine.getId()));
+				magazineManager.removeDownloadedMagazine(downloadedMagazine);
 
 				getAdapter().remove(downloadedMagazine);
 				getAdapter().notifyDataSetChanged();

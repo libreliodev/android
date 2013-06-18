@@ -160,7 +160,7 @@ public class DownloadMagazineListService extends BaseService {
 					magazineManager.addMagazine(magazine, Magazine.TABLE_MAGAZINES, false);
 				}
 				sendBroadcast(intentInvalidateUI);
-				for (Magazine magazine : magazineManager.getMagazines(false, Magazine.TABLE_MAGAZINES)) {
+				for (Magazine magazine : magazineManager.getMagazines(false)) {
 					//saving png
 					File png = new File(magazine.getPngPath());
 					if (!png.exists()) {

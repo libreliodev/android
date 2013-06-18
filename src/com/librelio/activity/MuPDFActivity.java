@@ -621,9 +621,9 @@ public class MuPDFActivity extends BaseActivity{
 		if (null != magazine) {
 			Intent intent = new Intent(getContext(), BillingActivity.class);
 			intent
-				.putExtra(DownloadActivity.FILE_NAME_KEY, magazine.getFileName())
-				.putExtra(DownloadActivity.TITLE_KEY, magazine.getTitle())
-				.putExtra(DownloadActivity.SUBTITLE_KEY, magazine.getSubtitle());
+				.putExtra(BillingActivity.FILE_NAME_KEY, magazine.getFileName())
+				.putExtra(BillingActivity.TITLE_KEY, magazine.getTitle())
+				.putExtra(BillingActivity.SUBTITLE_KEY, magazine.getSubtitle());
 			getContext().startActivity(intent);
 		}
 	}

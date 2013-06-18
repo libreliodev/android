@@ -29,8 +29,7 @@ public class DownloadedMagazinesActivity extends BaseActivity {
 
 		downloadsList = (DownloadedMagazinesListView) findViewById(R.id.activity_downloaded_magazines_list);
 
-		List<Magazine> downloads = magazineManager.getMagazines(false,
-				Magazine.TABLE_DOWNLOADED_MAGAZINES);
+		List<Magazine> downloads = magazineManager.getDownloadedMagazines(false);
 
 		downloadsList.setMagazines(downloads);
 	}

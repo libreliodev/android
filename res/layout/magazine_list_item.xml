@@ -28,10 +28,43 @@
         android:layout_gravity="center_horizontal"
         android:orientation="vertical" >
 
-        <ImageView
-            android:id="@+id/item_thumbnail"
+        <RelativeLayout
             android:layout_width="@dimen/preview_image_width"
-            android:layout_height="@dimen/preview_image_height" />
+            android:layout_height="@dimen/preview_image_height">
+
+            <ImageView
+                android:id="@+id/item_thumbnail"
+                android:layout_width="@dimen/preview_image_width"
+                android:layout_height="@dimen/preview_image_height" />
+
+            <LinearLayout
+                android:id="@+id/item_progress_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/transparent_gray"
+                android:layout_alignParentBottom="true"
+                android:paddingTop="5dp"
+                android:paddingBottom="20dp">
+
+                <TextView
+                    android:id="@+id/item_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="sdhgfdfgsd" android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:paddingBottom="5dp"/>
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/progress_bar"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <Button
             android:id="@+id/item_button_one"

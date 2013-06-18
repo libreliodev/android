@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
-import com.librelio.base.IBaseContext;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 
@@ -22,32 +21,41 @@ public class Magazine {
 	
 	public static final String TABLE_MAGAZINES = "Magazines";
 	public static final String TABLE_DOWNLOADED_MAGAZINES = "DownloadedMagazines";
+    public static final String TABLE_ASSETS = "Assets";
 	public static final String FIELD_ID = "_id";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_SUBTITLE = "subtitle";
 	public static final String FIELD_FILE_NAME = "filename";
+    public static final String FIELD_ASSET_FILE_NAME = "assetfilename";
+    public static final String FIELD_ASSET_IS_DOWNLOADED = "assetisdownloaded";
 	public static final String FIELD_DOWNLOAD_DATE = "downloaddate";
 	public static final String FIELD_IS_SAMPLE = "sample";
-	
-	private Context context;
-	private int id;
+    public static final String FIELD_DOWNLOAD_MANAGER_ID = "downloadmanagerid";
+
+    private Context context;
+	private long id;
 	private String title;
 	private String subtitle;
 	private String fileName;
 	private String pdfPath;
 	private String pngPath;
-	private String samplePath;
+	private String samplePdfPath;
 	private String pdfUrl;
 	private String pngUrl;
-	private String sampleUrl;
+	private String samplePdfUrl;
 	private boolean isPaid;
 	private boolean isDowloaded;
 	private boolean isSampleDowloaded = false;
 	private String assetsDir;
 	private String downloadDate;
 	private boolean isSample;
+    private int downloadStatus = -1;
+    private long downloadManagerId;
+    private int downloadProgress;
+    private int totalAssetCount;
+    private int totalDownloadedCount;
 
-	public Magazine(String fileName, String title, String subtitle, String downloadDate, Context context) {
+    public Magazine(String fileName, String title, String subtitle, String downloadDate, Context context) {
 		this.fileName = fileName;
 		this.title = title;
 		this.subtitle = subtitle;
@@ -64,6 +72,7 @@ public class Magazine {
 		int fileNameColumnId = cursor.getColumnIndex(FIELD_FILE_NAME);
 		int dateColumnId = cursor.getColumnIndex(FIELD_DOWNLOAD_DATE);
 		int isSampleColumnId = cursor.getColumnIndex(FIELD_IS_SAMPLE);
+        int downloadManagerId = cursor.getColumnIndex(FIELD_DOWNLOAD_MANAGER_ID);
 		
 		this.id = cursor.getInt(idColumnId);
 		this.fileName = cursor.getString(fileNameColumnId);
@@ -71,7 +80,8 @@ public class Magazine {
 		this.subtitle = cursor.getString(subitleColumnId);
 		this.downloadDate = cursor.getString(dateColumnId);
 		if (isSampleColumnId > -1){
-			this.isSample = cursor.getInt(isSampleColumnId) == 0 ? false : true;  
+			this.isSample = cursor.getInt(isSampleColumnId) == 0 ? false : true;
+            this.downloadManagerId = cursor.getLong(downloadManagerId);
 		}
 		this.context = context;
 
@@ -121,8 +131,8 @@ public class Magazine {
 		if(isPaid){
 			pngUrl = pdfUrl.replace("_.pdf", ".png");
 			pngPath = png.replace("_.pdf", ".png");
-			sampleUrl = pdfUrl.replace("_.", ".");
-			samplePath = pdfPath.replace("_.", ".");
+			samplePdfUrl = pdfUrl.replace("_.", ".");
+			samplePdfPath = pdfPath.replace("_.", ".");
 			File sample = new File(getMagazineDir()+COMPLETE_SAMPLE_FILE);
 			isSampleDowloaded = sample.exists();
 		} else {
@@ -161,9 +171,13 @@ public class Magazine {
 		}
 	}
 	
-	public int getId(){
+	public long getId(){
 		return this.id;
 	}
+
+    public void setId(long id){
+        this.id = id;
+    }
 	
 	public String getAssetsDir(){
 		return this.assetsDir;
@@ -204,20 +218,20 @@ public class Magazine {
 		this.fileName = fileName;
 	}
 
-	public String getSamplePath() {
-		return samplePath;
+	public String getSamplePdfPath() {
+		return samplePdfPath;
 	}
 
-	public void setSamplePath(String samplePath) {
-		this.samplePath = samplePath;
+	public void setSamplePdfPath(String samplePdfPath) {
+		this.samplePdfPath = samplePdfPath;
 	}
 
-	public String getSampleUrl() {
-		return sampleUrl;
+	public String getSamplePdfUrl() {
+		return samplePdfUrl;
 	}
 
-	public void setSampleUrl(String sampleUrl) {
-		this.sampleUrl = sampleUrl;
+	public void setSamplePdfUrl(String samplePdfUrl) {
+		this.samplePdfUrl = samplePdfUrl;
 	}
 
 	public String getPdfPath() {
@@ -275,4 +289,44 @@ public class Magazine {
 	public int isSampleForBase() {
 		return isSample ? 1 : 0;
 	}
+
+    public int getDownloadStatus() {
+        return downloadStatus;
+    }
+
+    public void setDownloadStatus(int downloadStatus) {
+        this.downloadStatus = downloadStatus;
+    }
+
+    public long getDownloadManagerId() {
+        return downloadManagerId;
+    }
+
+    public void setDownloadManagerId(long downloadManagerId) {
+        this.downloadManagerId = downloadManagerId;
+    }
+
+    public void setDownloadProgress(int downloadProgress) {
+        this.downloadProgress = downloadProgress;
+    }
+
+    public int getDownloadProgress() {
+        return downloadProgress;
+    }
+
+    public void setDownloadedAssetCount(int totalDownloadedCount) {
+        this.totalDownloadedCount = totalDownloadedCount;
+    }
+
+    public int getDownloadedAssetCount() {
+        return totalDownloadedCount;
+    }
+
+    public void setTotalAssetCount(int totalAssetCount) {
+        this.totalAssetCount = totalAssetCount;
+    }
+
+    public int getTotalAssetCount() {
+        return totalAssetCount;
+    }
 }

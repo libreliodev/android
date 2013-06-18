@@ -23,6 +23,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.librelio.model.Magazine;
+import com.librelio.service.DownloadMagazineService;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -67,7 +69,10 @@ import com.niveales.wind.R;
  * 
  */
 public class BillingActivity extends BaseActivity {
-	private static final String TAG = "BillingActivity";
+    public static final String FILE_NAME_KEY = "file_name_key";
+    public static final String TITLE_KEY = "title_key";
+    public static final String SUBTITLE_KEY = "subtitle_key";
+    private static final String TAG = "BillingActivity";
 
 	// Only for test. Must always be FALSE!
 	private static final boolean TEST_MODE = false;
@@ -141,9 +146,9 @@ public class BillingActivity extends BaseActivity {
 							"com.android.vending.billing.InAppBillingService.BIND"), 
 							mServiceConn, 
 							Context.BIND_AUTO_CREATE);
-			fileName = getIntent().getExtras().getString(DownloadActivity.FILE_NAME_KEY);
-			title = getIntent().getExtras().getString(DownloadActivity.TITLE_KEY);
-			subtitle = getIntent().getExtras().getString(DownloadActivity.SUBTITLE_KEY);
+			fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
+			title = getIntent().getExtras().getString(TITLE_KEY);
+			subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
 			int finId = fileName.indexOf("/");
 			productId = fileName.substring(0, finId);
 		}
@@ -546,15 +551,8 @@ public class BillingActivity extends BaseActivity {
 				
 				return;
 			}
-			Intent intent = new Intent(getContext(), DownloadActivity.class);
-			intent.putExtra(DownloadActivity.FILE_NAME_KEY, fileName);
-			intent.putExtra(DownloadActivity.SUBTITLE_KEY, subtitle);
-			intent.putExtra(DownloadActivity.TITLE_KEY, title);
-			intent.putExtra(DownloadActivity.IS_TEMP_KEY, true);
-			intent.putExtra(DownloadActivity.IS_SAMPLE_KEY, false);
-			intent.putExtra(DownloadActivity.TEMP_URL_KEY, tempURL);
-			startActivity(intent);
-			
+            DownloadMagazineService.startDownload(BillingActivity.this, new Magazine(fileName, title, subtitle, null,
+                    BillingActivity.this), true, tempURL);
 			finish();
 		};
 	}

@@ -20,23 +20,23 @@
 package com.librelio.activity;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,13 +46,11 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
-import com.librelio.LibrelioApplication;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.librelio.storage.MagazineManager;
-import com.librelio.utils.FilenameUtils;
 import com.niveales.wind.R;
 
 /**
@@ -93,8 +91,9 @@ public class MainMagazineActivity extends BaseActivity {
 	private MagazineManager magazineManager;
 	
 	private boolean hasTestMagazine;
+    private Timer timer;
 
-	@Override
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -182,9 +181,25 @@ public class MainMagazineActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		EasyTracker.getTracker().sendView("Library/Magazines");
-	}
+        int delay = 0; // delay for 1 sec.
+        int period = 2000; // repeat every 10 sec.
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask()
+        {
+            public void run()
+            {
+                reloadMagazineData(magazines);
+            }
+        }, delay, period);
+    }
 
-	@Override
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timer.cancel();
+    }
+
+    @Override
 	protected void onDestroy() {
 		stopRegularUpdate();
 		if (subscriptionYear != null) {
@@ -268,9 +283,26 @@ public class MainMagazineActivity extends BaseActivity {
 		return true;
 	}
 
-	private void reloadMagazineData(ArrayList<Magazine> magazines) {
-		magazines.clear();
-		magazines.addAll(magazineManager.getMagazines(hasTestMagazine, Magazine.TABLE_MAGAZINES));
+	private void reloadMagazineData(final ArrayList<Magazine> magazines) {
+        //run off main thread
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Magazine> newMagazines = magazineManager.getMagazines(hasTestMagazine);
+                magazines.clear();
+                magazines.addAll(newMagazines);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (grid != null) {
+                            grid.invalidate();
+                            grid.invalidateViews();
+                        }
+                    }
+                });
+            }
+        });
+        thread.start();
 	}
 
 	private void startRegularUpdate(){
