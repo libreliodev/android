@@ -6,10 +6,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -44,13 +42,14 @@ public class ImageLayout extends RelativeLayout {
 
 	private int currentImageViewPosition;
 
-	private ImageView imageView;
+	private ImageView flipBookImageView;
+    private TextView flipBookText;
 
 	public boolean getBitmapAsyncTaskCancelled;
 
 	private GestureDetector gestureDetector;
 
-	public ImageLayout(Context context, String basePath, boolean transition) {
+    public ImageLayout(Context context, String basePath, boolean transition) {
 		super(context);
 		this.transition = transition;
 		this.context = context;
@@ -84,7 +83,7 @@ public class ImageLayout extends RelativeLayout {
 				position = 0;
 			}
 			viewPager.setCurrentItem(position, smoothScroll);
-		} else if (imageView != null) {
+		} else if (flipBookImageView != null) {
 			if (position >= slidesInfo.count) {
 				position = 0;
 			}
@@ -138,43 +137,44 @@ public class ImageLayout extends RelativeLayout {
 	private void initFlipBookGallery() {
 		ViewStub viewStub = (ViewStub) findViewById(R.id.image_pager_image_stub);
 		final View view = viewStub.inflate();
-		imageView = (ImageView) view.findViewById(R.id.slideshow_item_image);
-		imageView.setBackgroundColor(backgroundColor);
-		imageView.setOnTouchListener(new OnTouchListener() {
-			private float lastImageX, dx;
+        flipBookText = (TextView) view.findViewById(R.id.slideshow_item_text);
+		flipBookImageView = (ImageView) view.findViewById(R.id.slideshow_item_image);
+		flipBookImageView.setBackgroundColor(backgroundColor);
+		flipBookImageView.setOnTouchListener(new OnTouchListener() {
+            private float lastImageX, dx;
 
-			ViewConfiguration vc = ViewConfiguration.get(getContext());
-			final int touchSlop = vc.getScaledTouchSlop() * 3;
+            ViewConfiguration vc = ViewConfiguration.get(getContext());
+            final int touchSlop = vc.getScaledTouchSlop() * 3;
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				switch (event.getAction()) {
-				case (MotionEvent.ACTION_DOWN):
-					lastImageX = event.getX();
-					getBitmapAsyncTaskCancelled = false;
-					break;
-				case (MotionEvent.ACTION_MOVE):
-					getBitmapAsyncTaskCancelled = false;
-					dx = event.getX() - lastImageX;
-					if (dx > touchSlop) {
-						setCurrentPosition(currentImageViewPosition + 1, false);
-						lastImageX += touchSlop;
-					} else if (dx < -touchSlop) {
-						setCurrentPosition(currentImageViewPosition - 1, false);
-						lastImageX -= touchSlop;
-					}
-					break;
-				case (MotionEvent.ACTION_UP):
-					getBitmapAsyncTaskCancelled = true;
-					break;
-				}
-				if (gestureDetector != null) {
-					return gestureDetector.onTouchEvent(event);
-				}
-				return true;
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case (MotionEvent.ACTION_DOWN):
+                        lastImageX = event.getX();
+                        getBitmapAsyncTaskCancelled = false;
+                        break;
+                    case (MotionEvent.ACTION_MOVE):
+                        getBitmapAsyncTaskCancelled = false;
+                        dx = event.getX() - lastImageX;
+                        if (dx > touchSlop) {
+                            setCurrentPosition(currentImageViewPosition + 1, false);
+                            lastImageX += touchSlop;
+                        } else if (dx < -touchSlop) {
+                            setCurrentPosition(currentImageViewPosition - 1, false);
+                            lastImageX -= touchSlop;
+                        }
+                        break;
+                    case (MotionEvent.ACTION_UP):
+                        getBitmapAsyncTaskCancelled = true;
+                        break;
+                }
+                if (gestureDetector != null) {
+                    return gestureDetector.onTouchEvent(event);
+                }
+                return true;
 
-			}
-		});
+            }
+        });
 	}
 
 	private void setCurrentImageViewPosition(int position) {
@@ -187,9 +187,12 @@ public class ImageLayout extends RelativeLayout {
 				if (isCancelled()) {
 					return;
 				}
-				if (imageView != null && bmp != null) {
-					imageView.setImageBitmap(bmp);
-				}
+				if (flipBookImageView != null && bmp != null) {
+					flipBookImageView.setImageBitmap(bmp);
+				} else {
+                    flipBookImageView.setVisibility(View.GONE);
+                    flipBookText.setVisibility(View.VISIBLE);
+                }
 				super.onPostExecute(bmp);
 			}
 		}.execute(path);
@@ -200,6 +203,7 @@ public class ImageLayout extends RelativeLayout {
 		final View view = viewStub.inflate();
 		final ImageView imageView = (ImageView) view
 				.findViewById(R.id.slideshow_item_image);
+        final TextView text = (TextView) view.findViewById(R.id.slideshow_item_text);
 		new GetBitmapAsyncTask(true) {
 			@Override
 			protected void onPostExecute(Bitmap bmp) {
@@ -207,7 +211,12 @@ public class ImageLayout extends RelativeLayout {
 					return;
 				}
 				view.setBackgroundColor(backgroundColor);
-				imageView.setImageBitmap(bmp);
+                if (bmp == null) {
+                    imageView.setVisibility(View.GONE);
+                    text.setVisibility(View.VISIBLE);
+                } else {
+				    imageView.setImageBitmap(bmp);
+                }
 				super.onPostExecute(bmp);
 			}
 		}.execute(slidesInfo.getFullPathToImage(1));
@@ -316,17 +325,22 @@ public class ImageLayout extends RelativeLayout {
 
 			final ImageView img = (ImageView) view
 					.findViewById(R.id.slideshow_item_image);
+            final TextView text = (TextView) view.findViewById(R.id.slideshow_item_text);
 			final FrameLayout background = (FrameLayout) view
 					.findViewById(R.id.slide_show_frame);
-
+            background.setBackgroundColor(backgroundColor);
 			new GetBitmapAsyncTask(true) {
 				@Override
 				protected void onPostExecute(Bitmap bmp) {
 					if (isCancelled()) {
 						return;
 					}
-					background.setBackgroundColor(backgroundColor);
-					img.setImageBitmap(bmp);
+                    if (bmp == null) {
+                        img.setVisibility(View.GONE);
+                        text.setVisibility(View.VISIBLE);
+                    } else {
+					    img.setImageBitmap(bmp);
+                    }
 					super.onPostExecute(bmp);
 				}
 			}.execute(path);

@@ -12,4 +12,13 @@
         android:scaleType="fitCenter"
         android:src="@drawable/busy" />
 
+    <TextView
+        android:id="@+id/slideshow_item_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="32sp"
+        android:text="@string/asset_downloading"
+        android:visibility="gone" />
+
 </FrameLayout>

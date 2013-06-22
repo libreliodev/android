@@ -35,6 +35,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import android.widget.TextView;
+import android.widget.Toast;
 import com.librelio.activity.SlideShowActivity;
 import com.librelio.activity.VideoActivity;
 import com.librelio.view.ImageLayout;
@@ -70,6 +72,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	private ProgressDialog dialog;
 	
 	private SurfaceView videoView;
+    private TextView errorTextView;
 	private WebView mWebView;
 	private ImageLayout imageLayout;
 	private MediaPlayer mediaPlayer;
@@ -89,7 +92,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	
 	private MediaPlayer mMediaPlayer;
 
-	public MediaHolder(Context context, LinkInfoExternal linkInfo, String basePath) throws IllegalStateException{
+    public MediaHolder(Context context, LinkInfoExternal linkInfo, String basePath) throws IllegalStateException{
 		super(context);
 		this.basePath = basePath;
 		this.context = context;
@@ -213,6 +216,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		Log.d(TAG, "onPlayVideoInside " + basePath + ", linkInfo = " + linkInfo);
 		LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.video_activity_layout, this, true);
+        errorTextView = (TextView)findViewById(R.id.error_text);
 		videoView = (SurfaceView)findViewById(R.id.surface_frame);
 		videoView.setOnTouchListener(new OnTouchListener() {
 			@Override
@@ -253,21 +257,23 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		try {
 			fis = new FileInputStream(videoFile);
 			mMediaPlayer.setDataSource(fis.getFD());
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    cancelWaitDialog();
+                    if(autoPlayFlagMP){
+                        mMediaPlayer.start();
+                        setSurfaceViewScale();
+                    }
+                }
+            });
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		} catch (IOException e) {
 			Log.e(TAG,"Problem with input stream!",e);
+            videoView.setVisibility(View.GONE);
+            errorTextView.setVisibility(View.VISIBLE);
 		}
-        mMediaPlayer.prepareAsync();
-        mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
-			@Override
-			public void onPrepared(MediaPlayer mp) {
-				cancelWaitDialog();
-				if(autoPlayFlagMP){
-					mMediaPlayer.start();
-					setSurfaceViewScale();
-				}
-			}
-		});
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 	}
 	
 	private void setSurfaceViewScale(){
