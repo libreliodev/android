@@ -41,7 +41,7 @@ public abstract class DocumentReaderView extends ReaderView {
 	}
 
 	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
+	public boolean onSingleTapConfirmed(MotionEvent e) {
 		if (!showButtonsDisabled) {
 			int linkPage = -1;
 			String linkString = null;
