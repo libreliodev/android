@@ -146,12 +146,14 @@ public class BillingActivity extends BaseActivity {
 							"com.android.vending.billing.InAppBillingService.BIND"), 
 							mServiceConn, 
 							Context.BIND_AUTO_CREATE);
-			fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
-			title = getIntent().getExtras().getString(TITLE_KEY);
-			subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
-			int finId = fileName.indexOf("/");
-			productId = fileName.substring(0, finId);
-		}
+            if (getIntent().getExtras() != null) {
+                fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
+                title = getIntent().getExtras().getString(TITLE_KEY);
+                subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
+                int finId = fileName.indexOf("/");
+                productId = fileName.substring(0, finId);
+            }
+        }
 	}
 	
 	private void getSubscriptionPreferences(){
@@ -412,7 +414,12 @@ public class BillingActivity extends BaseActivity {
 					String dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
 					String signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
 					Log.d(TAG, "You have bought the " + sku + ". Excellent choice, adventurer!");
-					onDownloadAction(dataResponse, signatureResponse);
+                    if (getIntent().getExtras() != null) {
+					    onDownloadAction(dataResponse, signatureResponse);
+                    } else {
+                        Toast.makeText(this, "Purchase successful",
+                                Toast.LENGTH_LONG).show();
+                    }
 				} catch (JSONException e) {
 					Log.e(TAG, "Failed to parse purchase data.", e);
 				}
@@ -551,8 +558,12 @@ public class BillingActivity extends BaseActivity {
 				
 				return;
 			}
+            if (getIntent().getExtras() != null) {
             DownloadMagazineService.startDownload(BillingActivity.this, new Magazine(fileName, title, subtitle, null,
                     BillingActivity.this), true, tempURL);
+            } else {
+                Toast.makeText(BillingActivity.this, "Purchase successful", Toast.LENGTH_LONG).show();
+            }
 			finish();
 		};
 	}

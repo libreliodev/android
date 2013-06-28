@@ -270,6 +270,11 @@ public class MainMagazineActivity extends BaseActivity {
 					getBaseContext(), DownloadedMagazinesActivity.class);
 			startActivity(intent);
 			return true;
+            case R.id.options_menu_subscribe:
+                Intent subscribeIntent = new Intent(
+                        getBaseContext(), BillingActivity.class);
+                startActivity(subscribeIntent);
+                return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
