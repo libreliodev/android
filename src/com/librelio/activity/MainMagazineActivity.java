@@ -231,12 +231,6 @@ public class MainMagazineActivity extends BaseActivity {
 		}
 	}
 
-
-	/**
-	 * An adapter used for displaying a catalog of products. If a product is
-	 * managed by Android Market and already purchased, then it will be
-	 * "grayed-out" in the list and not selectable.
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
