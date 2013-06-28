@@ -5,6 +5,8 @@ import java.util.List;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,12 +97,13 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 		public TextView editionDate;
 		public TextView downloadDate;
 		public Button deleteButton;
+        public int position = -1;
 	}
 	
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 
-		ViewHolder holder;
+		final ViewHolder holder;
 		final Magazine downloadedMagazine = this.downloads.get(position);
 		
 		if ((convertView == null) || (null == convertView.getTag())){
@@ -131,11 +134,6 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		
-		holder.image.setImageBitmap(
-				SystemHelper.decodeSampledBitmapFromFile(downloadedMagazine.getPngPath(),
-						(int) context.getResources().getDimension(R.dimen.preview_image_height), 
-						(int) context.getResources().getDimension(R.dimen.preview_image_width)));
 
 		holder.title.setText(downloadedMagazine.getTitle() 
 				+ (downloadedMagazine.isSample() ? samplePostfix : ""));
@@ -153,6 +151,28 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 				getAdapter().notifyDataSetChanged();
 			}
 		});
+        holder.position = position;
+
+        // Using an AsyncTask to load the slow images in a background thread
+        new AsyncTask<ViewHolder, Void, Bitmap>() {
+            private ViewHolder v;
+
+            @Override
+            protected Bitmap doInBackground(ViewHolder... params) {
+                v = params[0];
+                return SystemHelper.decodeSampledBitmapFromFile(downloadedMagazine.getPngPath(),
+                                (int) context.getResources().getDimension(R.dimen.preview_image_height),
+                                (int) context.getResources().getDimension(R.dimen.preview_image_width));
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                super.onPostExecute(result);
+                if (v.position == position) {
+                    v.image.setImageBitmap(result);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
 		
 		return convertView;
 	}

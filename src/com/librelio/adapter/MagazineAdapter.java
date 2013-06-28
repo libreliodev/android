@@ -7,7 +7,10 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,10 +71,11 @@ public class MagazineAdapter extends BaseAdapter {
         public ProgressBar progressBar;
 		public Button downloadOrReadButton;
 		public Button sampleOrDeleteButton;
+        public int position;
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		final Magazine currentMagazine = magazines.get(position);
 		MagazineItemHolder holder = new MagazineItemHolder();
 		
@@ -98,30 +102,50 @@ public class MagazineAdapter extends BaseAdapter {
 		holder.title.setText(currentMagazine.getTitle());
 		holder.subtitle.setText(currentMagazine.getSubtitle());
 		
-		String imagePath = currentMagazine.getPngPath();
+		final String imagePath = currentMagazine.getPngPath();
 
 
-		if(holder.thumbnail.getDrawable() instanceof BitmapDrawable) {
-			BitmapDrawable d = (BitmapDrawable) holder.thumbnail.getDrawable();
-			Bitmap b = d.getBitmap();
-			if (b != null) {
-				Log.d(TAG, "Freeing bitmap size "+b.getRowBytes());
-				b.recycle();
-			}
-			
-		}
-		
-		holder.thumbnail.setImageBitmap(
-				SystemHelper.decodeSampledBitmapFromFile(imagePath,
-						(int) context.getResources().getDimension(R.dimen.preview_image_height), 
-						(int) context.getResources().getDimension(R.dimen.preview_image_width)));
+//		if(holder.thumbnail.getDrawable() instanceof BitmapDrawable) {
+//			BitmapDrawable d = (BitmapDrawable) holder.thumbnail.getDrawable();
+//			Bitmap b = d.getBitmap();
+//			if (b != null) {
+//				Log.d(TAG, "Freeing bitmap size "+b.getRowBytes());
+//				b.recycle();
+//			}
+//
+//		}
+        if (holder.position != position) {
+            holder.position = position;
+            holder.thumbnail.setImageDrawable(null);
+        }
+
+        // Using an AsyncTask to load the slow images in a background thread
+        new AsyncTask<MagazineItemHolder, Void, Bitmap>() {
+            private MagazineItemHolder v;
+
+            @Override
+            protected Bitmap doInBackground(MagazineItemHolder... params) {
+                v = params[0];
+                return SystemHelper.decodeSampledBitmapFromFile(imagePath,
+                        (int) context.getResources().getDimension(R.dimen.preview_image_height),
+                        (int) context.getResources().getDimension(R.dimen.preview_image_width));
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                super.onPostExecute(result);
+                if (v.position == position) {
+                    v.thumbnail.setImageBitmap(result);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
 
         // reset the visibilities
         holder.progressLayout.setVisibility(View.GONE);
         holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
         holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 
-		if(hasTestMagazine && currentMagazine.isFake()){
+        if(hasTestMagazine && currentMagazine.isFake()){
             holder.downloadOrReadButton.setVisibility(View.VISIBLE);
 			holder.downloadOrReadButton.setText(context.getResources().getString(R.string.read));
 			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
