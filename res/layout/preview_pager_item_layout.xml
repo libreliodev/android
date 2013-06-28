@@ -14,8 +14,7 @@
         android:layout_width="@dimen/page_preview_size"
         android:layout_height="@dimen/page_preview_size"
         android:layout_gravity="fill_horizontal"
-        android:scaleType="fitCenter"
-        android:src="@drawable/icon" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/PreviewPageNumber"
