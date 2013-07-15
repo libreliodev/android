@@ -116,7 +116,8 @@ public class MuPDFCore {
 	}
 
 	public synchronized PointF getPageSize(int page) {
-		if (displayPages == 1) {
+		// If we have only one page (portrait), or if is the first or the last page, we show only one page (centered).
+		if (displayPages == 1 || page==0 || (displayPages==2 && page == numPages/2)) {
 			gotoPage(page);
 			return new PointF(pageWidth, pageHeight);
 		} else {
@@ -171,8 +172,14 @@ public class MuPDFCore {
 			Log.d(TAG, "drawPage "+page);
 			
 			Log.d(TAG,"canvas: "+canvas);
-			if (displayPages == 1) {
+			// If we have only one page (portrait), or if is the first, we show only one page (centered).
+			if (displayPages == 1 || page==0) {
 				gotoPage(page);
+				drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
+				return bitmap;
+				// If we are on two pages mode (landscape), and at the last page, we show only one page (centered).
+			} else if (displayPages==2 && page == numPages/2) {
+				gotoPage(page*2+1); // need to multiply per 2, because page counting is being divided by 2 (landscape mode)
 				drawPage(bitmap, pageW, pageH, patchX, patchY, patchW, patchH);
 				return bitmap;
 			} else {
