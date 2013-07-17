@@ -91,4 +91,5 @@
     <string name="no_space_on_device">Not enough space in your internal storage</string>
     <string name="browser">Browser</string>
     <string name="asset_downloading">Asset\nDownloading…</string>
+    <string name="read_sample">Read Sample</string>
 </resources>

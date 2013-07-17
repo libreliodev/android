@@ -68,4 +68,6 @@
     <string name="loading">Chargement...</string>
     <string name="no_space_on_device">Pas assez d\'espace sur votre stockage interne</string>
     <string name="browser">Navigateur</string>
+    <string name="read_sample">Lire extrait</string>
+    
 </resources>

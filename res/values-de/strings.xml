@@ -34,4 +34,6 @@
     <string name="week">Woche</string>
     <string name="year">Jahr</string>
     <string name="sample"> Probelesen</string>
+    <string name="read_sample">Probelesen lesen</string>
+    
 </resources>

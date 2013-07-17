@@ -35,4 +35,6 @@
     <string name="year">anno</string>
     <string name="sample"> Anteprima</string>
     <string name="open_failed">ggg</string>
+    <string name="read_sample">Leggi anteprima</string>
+    
 </resources>

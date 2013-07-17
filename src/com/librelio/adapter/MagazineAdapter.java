@@ -171,13 +171,15 @@ public class MagazineAdapter extends BaseAdapter {
             holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
             if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING || currentMagazine
                     .getDownloadStatus() == DownloadManager.STATUS_PENDING) {
-                holder.info.setText("Downloading" + (currentMagazine.isSample() ? " Sample" : ""));
+                holder.info.setText(context.getResources()
+                        .getString(R.string.download_in_progress));
             } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_PAUSED) {
                 holder.info.setText("Queued");
             } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_FAILED) {
                 holder.info.setText("ERROR");
             } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_SUCCESSFUL) {
-                holder.info.setText("Downloading" + (currentMagazine.isSample() ? " Sample" : ""));
+                holder.info.setText(context.getResources()
+                        .getString(R.string.download_in_progress));
             }
 
             if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING && currentMagazine
@@ -188,7 +190,7 @@ public class MagazineAdapter extends BaseAdapter {
                 holder.progressBar.setIndeterminate(true);
             }
 
-            holder.sampleOrDeleteButton.setText("Cancel");
+            holder.sampleOrDeleteButton.setText(context.getResources().getString(R.string.cancel));
             holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -225,7 +227,8 @@ public class MagazineAdapter extends BaseAdapter {
             if (currentMagazine.isPaid()) {
                 holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
                 if (currentMagazine.isSampleDownloaded()) {
-                    holder.sampleOrDeleteButton.setText("Read Sample");
+                    holder.sampleOrDeleteButton.setText(context.getResources().getString(
+                            R.string.read_sample));
                 } else {
                     holder.sampleOrDeleteButton.setText(context.getResources().getString(
                             R.string.sample));
@@ -268,7 +271,8 @@ public class MagazineAdapter extends BaseAdapter {
             holder.progressLayout.setVisibility(View.VISIBLE);
             holder.progressBar.setIndeterminate(false);
             holder.progressBar.setProgress((int)((downloadedAssetCount * 100.0f) / totalAssetCount));
-            holder.info.setText("Downloading Assets\n" + downloadedAssetCount + "/" + totalAssetCount);
+            holder.info.setText(context.getResources()
+                    .getString(R.string.download_in_progress)+"\n" + downloadedAssetCount + "/" + totalAssetCount);
         }
 		return convertView;
 	}
