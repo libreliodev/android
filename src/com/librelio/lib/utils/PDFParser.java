@@ -55,11 +55,13 @@ public class PDFParser {
 									.valueOf(path.split("_")[1].split("\\.")[0]);
 							String mSlideshowPreffix = path.split("_")[0];
 							String mSlideshowSuffix = path.split("_")[1].split("\\.")[1];
-							for(int j = 1; j <= mSlideshowCount; j ++) {
-								LinkInfoExternal newLink = new LinkInfoExternal(current.rect.left, current.rect.top, current.rect.right, current.rect.bottom, "http://localhost"+mSlideshowPreffix+"_"+String.valueOf(j)+"."+mSlideshowSuffix);
-								fixedLinkInfo.add(newLink);
-							}
-						} else {
+                            for (int j = 1; j <= mSlideshowCount; j++) {
+                                LinkInfoExternal newLink = new LinkInfoExternal(current.rect.left, current.rect.top,
+                                        current.rect.right, current.rect.bottom, "http://localhost" +
+                                        mSlideshowPreffix + "_" + String.valueOf(j) + "." + mSlideshowSuffix);
+                                fixedLinkInfo.add(newLink);
+                            }
+                        } else {
 							fixedLinkInfo.add(current);
 						}
 					}else {

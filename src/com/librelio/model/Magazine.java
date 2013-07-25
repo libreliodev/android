@@ -17,7 +17,7 @@ public class Magazine {
 	protected static final String TAG = Magazine.class.getSimpleName();
 	private static final String COMPLETE_FILE = ".complete";
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
-	private static final String PAYED_FILE = ".payed";
+	private static final String PAID_FILE = ".payed";
 	
 	public static final String TABLE_MAGAZINES = "Magazines";
 	public static final String TABLE_DOWNLOADED_MAGAZINES = "DownloadedMagazines";
@@ -44,8 +44,8 @@ public class Magazine {
 	private String pngUrl;
 	private String samplePdfUrl;
 	private boolean isPaid;
-	private boolean isDowloaded;
-	private boolean isSampleDowloaded = false;
+	private boolean isDownloaded;
+	private boolean isSampleDownloaded = false;
 	private String assetsDir;
 	private String downloadDate;
 	private boolean isSample;
@@ -134,13 +134,13 @@ public class Magazine {
 			samplePdfUrl = pdfUrl.replace("_.", ".");
 			samplePdfPath = pdfPath.replace("_.", ".");
 			File sample = new File(getMagazineDir()+COMPLETE_SAMPLE_FILE);
-			isSampleDowloaded = sample.exists();
+			isSampleDownloaded = sample.exists();
 		} else {
 			pngUrl = pdfUrl.replace(".pdf", ".png");
 			pngPath = png.replace(".pdf", ".png");
 		}
 		File complete = new File(getMagazineDir()+COMPLETE_FILE);
-		isDowloaded = complete.exists();
+		isDownloaded = complete.exists();
 		
 		assetsDir = getMagazineDir();
 	}
@@ -158,8 +158,8 @@ public class Magazine {
 			Log.d(TAG,"Problem with create "+completeModificator+", createNewFile() return "+create,e);
 		}
 	}
-	public void makePayedFile(){
-		File file = new File(getMagazineDir()+PAYED_FILE);
+	public void makePaidFile(){
+		File file = new File(getMagazineDir()+ PAID_FILE);
 		boolean create = false;
 		if(file.exists()){
 			return;
@@ -167,7 +167,7 @@ public class Magazine {
 		try {
 			create = file.createNewFile();
 		} catch (IOException e) {
-			Log.d(TAG,"Problem with create "+PAYED_FILE+", createNewFile() return "+create,e);
+			Log.d(TAG,"Problem with create "+ PAID_FILE +", createNewFile() return "+create,e);
 		}
 	}
 	
@@ -188,10 +188,10 @@ public class Magazine {
 	}
 
 	public boolean isDownloaded(){
-		return this.isDowloaded;
+		return this.isDownloaded;
 	}
 	public boolean isSampleDownloaded(){
-		return this.isSampleDowloaded;
+		return this.isSampleDownloaded;
 	}
 	
 	public String getTitle() {

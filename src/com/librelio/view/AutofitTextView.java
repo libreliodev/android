@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
-import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -19,6 +18,7 @@ import com.niveales.wind.R;
  */
 
 // From https://github.com/rburgst/android-autofittextview
+
 public class AutofitTextView extends TextView {
 
     private static final String TAG = "me.grantland.widget.AutoFitTextView";

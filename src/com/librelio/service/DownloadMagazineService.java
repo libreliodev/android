@@ -25,8 +25,8 @@ import com.librelio.model.Magazine;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.FilenameUtils;
-import com.librelio.utils.ImageResizer;
 import com.librelio.utils.StorageUtils;
+import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
 import java.text.SimpleDateFormat;
@@ -85,7 +85,7 @@ public class DownloadMagazineService extends IntentService {
             Resources res = getResources();
             int height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
             int width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
-            mBuilder.setLargeIcon(ImageResizer.decodeSampledBitmapFromFile(magazine.getPngPath(), height, width, null));
+            mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(magazine.getPngPath(), height, width));
 
             //TODO show magazine cover as large image
 

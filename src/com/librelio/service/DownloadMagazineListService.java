@@ -35,13 +35,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.librelio.utils.StorageUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -51,7 +49,6 @@ import android.util.Log;
 
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MainMagazineActivity;
-import com.librelio.base.BaseActivity;
 import com.librelio.base.BaseService;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
@@ -110,7 +107,7 @@ public class DownloadMagazineListService extends BaseService {
 				//Checking for updates
 				HttpClient httpclient = new DefaultHttpClient();
 				HttpGet httpget = new HttpGet(plistUrl);
-				String lastUdate = getLastUdateDate();
+				String lastUdate = getLastUpdateDate();
 				httpget.addHeader(IF_MODIFIED_SINCE_HEADER,lastUdate);
 				
 				int responseCode = 0;
@@ -133,7 +130,7 @@ public class DownloadMagazineListService extends BaseService {
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
 					downloadFromUrl(plistUrl, StorageUtils.getStoragePath(getContext()) + PLIST_FILE_NAME);
-					saveUpadteDate();
+					saveUpdateDate();
 					Log.d(TAG,"There is updates (current update date : "+lastUdate+")");
 				}
 				//Convert plist to String for parsing
@@ -282,15 +279,15 @@ public class DownloadMagazineListService extends BaseService {
 		return this;
 	}
 	
-	private void saveUpadteDate(){
+	private void saveUpdateDate(){
 		Date date = (Date) calendar.getTime();
-		Log.d(TAG, "saveUpadteDate, date : "+updateDateFormat.format(date));
+		Log.d(TAG, "saveUpdateDate, date : "+updateDateFormat.format(date));
 		getPreferences().edit().putString(LAST_UPDATE_PREFERENCES_KEY, updateDateFormat.format(date)).commit(); 
 	}
 	
-	private String getLastUdateDate(){
+	private String getLastUpdateDate(){
 		String date = getPreferences().getString(LAST_UPDATE_PREFERENCES_KEY, "");
-		Log.d(TAG, "getLastUdateDate, date : "+date);
+		Log.d(TAG, "getLastUpdateDate, date : "+date);
 		return date;
 	}
 }

@@ -132,8 +132,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			}
 			return -1;
 		}
-		
-
 
 		@Override
 		protected void onPostExecute(Integer result) {
@@ -340,14 +338,12 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		Log.d(TAG, "Advertising url"+ getString(R.string.get_advertising_image_url));
 		Log.d(TAG, "Client name"+ Uri.encode(LibrelioApplication.getClientName(self())));
 
-		
 		return new StringBuilder(getString(R.string.get_advertising_image_url))
 							.append(getString(R.string.get_advertising_image_end))
 							.toString()
 							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(self())))
 							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(self())));
 	}
-	
 	
 	private String getAdvertisingLinkURL() {
 		

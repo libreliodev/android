@@ -10,8 +10,9 @@ import android.view.View;
 import android.widget.ListView;
 
 public class OutlineActivity extends ListActivity {
+
 	OutlineItem mItems[];
-	/** Called when the activity is first created. */
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);

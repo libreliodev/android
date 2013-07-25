@@ -7,9 +7,6 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +30,7 @@ import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
 public class MagazineAdapter extends BaseAdapter {
+
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
 	private ArrayList<Magazine> magazines;
@@ -87,13 +85,7 @@ public class MagazineAdapter extends BaseAdapter {
             holder.progressLayout = (LinearLayout)convertView.findViewById(R.id.item_progress_layout);
             holder.info = (TextView)convertView.findViewById(R.id.item_info);
             holder.progressBar = (ProgressBar)convertView.findViewById(R.id.progress_bar);
-			/**
-			 * downloadOrReadButton - this button can be "Download button" or "Read button"
-			 */
 			holder.downloadOrReadButton = (Button)convertView.findViewById(R.id.item_button_one);
-			/**
-			 * sampleOrDeleteButton - this button can be "Delete button" or "Sample button"
-			 */
 			holder.sampleOrDeleteButton = (Button)convertView.findViewById(R.id.item_button_two);
 			convertView.setTag(holder);
 		} else {
@@ -103,7 +95,6 @@ public class MagazineAdapter extends BaseAdapter {
 		holder.subtitle.setText(currentMagazine.getSubtitle());
 		
 		final String imagePath = currentMagazine.getPngPath();
-
 
 //		if(holder.thumbnail.getDrawable() instanceof BitmapDrawable) {
 //			BitmapDrawable d = (BitmapDrawable) holder.thumbnail.getDrawable();

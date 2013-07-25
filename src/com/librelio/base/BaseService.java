@@ -3,9 +3,6 @@ package com.librelio.base;
 import android.app.Service;
 import android.content.SharedPreferences;
 import com.librelio.LibrelioApplication;
-import com.niveales.wind.R;
-
-import java.util.Random;
 
 abstract public class BaseService extends Service implements IBaseContext {
 

@@ -71,7 +71,7 @@ public class VideoActivity extends AbstractLockRotationActivity implements Media
 		} else {
 			position = 0;
 		}
-		//
+
 		mMediaPlayer = new MediaPlayer();
 		mc = new MediaController(this);
 		video = (SurfaceView)findViewById(R.id.surface_frame);
@@ -102,10 +102,10 @@ public class VideoActivity extends AbstractLockRotationActivity implements Media
 	
 	private void initMediaPlayer(SurfaceHolder sHolder){
 		Log.d(TAG, "Play video on full, path: " + path);
-		File videFile = new File(path);
+		File videoFile = new File(path);
         FileInputStream fis;
 		try {
-			fis = new FileInputStream(videFile);
+			fis = new FileInputStream(videoFile);
 	        mMediaPlayer.setDataSource(fis.getFD());
 	        mMediaPlayer.setDisplay(sHolder);
 	        

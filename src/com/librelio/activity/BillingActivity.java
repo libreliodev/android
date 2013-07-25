@@ -178,16 +178,14 @@ public class BillingActivity extends BaseActivity {
 		subsYear = (Button)findViewById(R.id.billing_subs_year);
 		subsCode = (Button)findViewById(R.id.billing_subs_code_button);
 		cancel = (Button)findViewById(R.id.billing_cancel_button);
-		//
 		cancel.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
 				finish();
 			}
 		});
-		//
-		if(productPrice == null){
+
+        if (productPrice == null){
 			buy.setVisibility(View.GONE);
 		} else {
 			buy.setText(productTitle + ": "+ productPrice);
@@ -199,8 +197,8 @@ public class BillingActivity extends BaseActivity {
 
 			});
 		}
-		//
-		if(yearlySubPrice == null){
+
+		if (yearlySubPrice == null){
 			subsYear.setVisibility(View.GONE);;
 		} else {
 			subsYear.setText(yearlySubTitle + ": "+ yearlySubPrice);
@@ -212,8 +210,8 @@ public class BillingActivity extends BaseActivity {
 
 			});
 		}
-		
-		if(monthlySubPrice == null){
+
+		if (monthlySubPrice == null){
 			subsMonthly.setVisibility(View.GONE);;
 		} else {
 			subsMonthly.setText(monthlySubTitle + ": "+ monthlySubPrice);
@@ -225,8 +223,6 @@ public class BillingActivity extends BaseActivity {
 
 			});
 		}
-
-
 	
 		if (LibrelioApplication.isEnableCodeSubs(getContext())){
 			subsCode.setOnClickListener(new OnClickListener() {
@@ -257,7 +253,6 @@ public class BillingActivity extends BaseActivity {
 				private Bundle ownedItems = null;
 				private Bundle ownedSubs = null;
 
-
 				@Override
 				protected Bundle doInBackground(String... params) {
 					Bundle skuDetails = null;
@@ -268,8 +263,6 @@ public class BillingActivity extends BaseActivity {
 						//Add  subscription codes
 						skuList.add(LibrelioApplication.getYearlySubsCode(getContext()));
 						skuList.add(LibrelioApplication.getMonthlySubsCode(getContext()));
-
-
 						
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
@@ -290,8 +283,6 @@ public class BillingActivity extends BaseActivity {
 						ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
 						//Retrieve owned AND current subscriptions 
 						ownedSubs = billingService.getPurchases(3, getPackageName(), "subs", null);
-						
-						
 						
 					} catch (RemoteException e) {
 						Log.d(TAG, "InAppBillingService failed", e);
@@ -321,7 +312,6 @@ public class BillingActivity extends BaseActivity {
 							Log.d(TAG, productId + " already purchased? " + s);
 						}
 
-						
 						if(ownedSkus.contains(LibrelioApplication.getYearlySubsCode(getContext()))){
 							prepareDownloadWithOwnedItem(ownedSubs,LibrelioApplication.getYearlySubsCode(getContext()));
 							return;
@@ -330,11 +320,8 @@ public class BillingActivity extends BaseActivity {
 							prepareDownloadWithOwnedItem(ownedSubs,LibrelioApplication.getMonthlySubsCode(getContext()));
 							return;
 						}
-
-
-						
 					}
-					//
+
 					int response = skuDetails.getInt("RESPONSE_CODE");
 					if (response == 0) {
 						Log.d(TAG, "response code was success");
@@ -365,14 +352,13 @@ public class BillingActivity extends BaseActivity {
 							else if (sku.equals(LibrelioApplication.getMonthlySubsCode(getContext()))){
 								monthlySubPrice = price;
 								monthlySubTitle = title;
-								
 							}
-
 						}
 					}
 					initViews();
 					super.onPostExecute(skuDetails);
 				}
+
 				protected void prepareDownloadWithOwnedItem(Bundle ownedBundle, String subsoritemID) {
 					ArrayList<String> ownedSkus = ownedBundle.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
 					int idx = ownedSkus.indexOf(subsoritemID);
@@ -390,10 +376,7 @@ public class BillingActivity extends BaseActivity {
 					}
 					onDownloadAction(ownedItemPurshaseData,ownedItemSignature);
 					return;
-
 				}
- 
-				
 			}.execute();
 		}
 	};
@@ -452,7 +435,6 @@ public class BillingActivity extends BaseActivity {
 	private void purchaseYearlySub(){
 		new PurchaseTask().execute(LibrelioApplication.getYearlySubsCode(getContext()));
 	}
-
 
 	private boolean isNetworkConnected() {
 		return LibrelioApplication.thereIsConnection(this);

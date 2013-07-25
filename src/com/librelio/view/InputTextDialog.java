@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
-public class InputTextDialog{
+public class InputTextDialog {
 
 	private static String OK = "OK";
 	private static String Cancel = "Cancel";

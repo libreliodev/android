@@ -21,14 +21,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.librelio.utils.ImageResizer;
+import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
 public class ImageLayout extends RelativeLayout {
 
 	protected static final String TAG = "ImageLayout";
 
-	protected static final int MULTIPLIER = 100000;
 	protected ViewPager viewPager;
 
 	protected Context context;
@@ -275,8 +274,8 @@ public class ImageLayout extends RelativeLayout {
 		@Override
 		protected Bitmap doInBackground(String... paths) {
 			if (!getBitmapAsyncTaskCancelled) {
-				return ImageResizer.decodeSampledBitmapFromFile(paths[0],
-						getWidth(), getHeight(), null);
+				return SystemHelper.decodeSampledBitmapFromFile(paths[0],
+                        getWidth(), getHeight());
 			} else {
 				return null;
 			}

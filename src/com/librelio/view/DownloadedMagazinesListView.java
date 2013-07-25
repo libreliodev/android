@@ -3,7 +3,6 @@ package com.librelio.view;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -110,8 +109,8 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 
 			holder = new ViewHolder();
 
-			LayoutInflater linflater = ((Activity) context).getLayoutInflater();
-			convertView = linflater.inflate(R.layout.downloaded_magazines_item, null);
+			LayoutInflater inflater = LayoutInflater.from(context);
+			convertView = inflater.inflate(R.layout.downloaded_magazines_item, null);
 
 			ImageView image = (ImageView) convertView.findViewById(R.id.downloaded_magasines_item_image);
 			holder.image = image;

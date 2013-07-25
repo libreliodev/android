@@ -80,13 +80,10 @@ public class MuPDFActivity extends BaseActivity{
 	private View         buttonsView;
 	private EditText     mPasswordView;
 	private TextView     mFilenameView;
-//	private SeekBar      mPageSlider;
-//	private TextView     mPageNumberView;
 	private ImageButton  mSearchButton;
 	private ImageButton  mCancelButton;
 	private ImageButton  mOutlineButton;
 	private ViewSwitcher mTopBarSwitcher;
-// XXX	private ImageButton  mLinkButton;
 	private ImageButton  mSearchBack;
 	private ImageButton  mSearchFwd;
 	private EditText     mSearchText;
@@ -301,7 +298,7 @@ public class MuPDFActivity extends BaseActivity{
 			mOutlineButton.setVisibility(View.GONE);
 		}
 
-		// Reenstate last state if it was recorded
+		// Reinstate last state if it was recorded
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 		int orientation = prefs.getInt("orientation", mOrientation);
 		int pageNum = prefs.getInt("page"+fileName, 0);
@@ -512,7 +509,6 @@ public class MuPDFActivity extends BaseActivity{
 	void makeButtonsView() {
 		buttonsView = getLayoutInflater().inflate(R.layout.buttons,null);
 		mFilenameView = (TextView)buttonsView.findViewById(R.id.docNameText);
-//		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
 		mPreviewBarHolder = (FrameLayout) buttonsView.findViewById(R.id.PreviewBarHolder);
 		mPreview = new TwoWayView(this);
 		mPreview.setOrientation(Orientation.HORIZONTAL);
@@ -529,10 +525,6 @@ public class MuPDFActivity extends BaseActivity{
 			}
 		});
 		mPreviewBarHolder.addView(mPreview);
-//		Gallery mGallery = (Gallery) mButtonsView.findViewById(R.id.PreviewGallery);
-//		mGallery.setAdapter(new PDFPreviewPagerAdapter(this, core));
-
-//		mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
 		mSearchButton = (ImageButton)buttonsView.findViewById(R.id.searchButton);
 		mCancelButton = (ImageButton)buttonsView.findViewById(R.id.cancel);
 		mOutlineButton = (ImageButton)buttonsView.findViewById(R.id.outlineButton);
@@ -540,10 +532,7 @@ public class MuPDFActivity extends BaseActivity{
 		mSearchBack = (ImageButton)buttonsView.findViewById(R.id.searchBack);
 		mSearchFwd = (ImageButton)buttonsView.findViewById(R.id.searchForward);
 		mSearchText = (EditText)buttonsView.findViewById(R.id.searchText);
-// XXX		mLinkButton = (ImageButton)mButtonsView.findViewById(R.id.linkButton);
 		mTopBarSwitcher.setVisibility(View.INVISIBLE);
-//		mPageNumberView.setVisibility(View.INVISIBLE);
-//		mPageSlider.setVisibility(View.INVISIBLE);
 		mPreviewBarHolder.setVisibility(View.INVISIBLE);
 	}
 
@@ -645,19 +634,19 @@ public class MuPDFActivity extends BaseActivity{
 		if (mPreview.getChildCount() > 0) {
 			View child = mPreview.getChildAt(0);
 			// assume all children the same width
-			int childmeasuredwidth = child.getMeasuredWidth();
+			int childMeasuredWidth = child.getMeasuredWidth();
 
-			if (childmeasuredwidth > 0) {
+			if (childMeasuredWidth > 0) {
 				if (core.getDisplayPages() == 2) {
 					mPreview.setSelectionFromOffset(position,
-							(mPreview.getWidth() / 2) - (childmeasuredwidth));
+							(mPreview.getWidth() / 2) - (childMeasuredWidth));
 				} else {
 					mPreview.setSelectionFromOffset(position,
 							(mPreview.getWidth() / 2)
-									- (childmeasuredwidth / 2));
+									- (childMeasuredWidth / 2));
 				}
 			} else {
-				Log.e("centerOnPosition", "childmeasuredwidth = 0");
+				Log.e("centerOnPosition", "childMeasuredWidth = 0");
 			}
 		} else {
 			Log.e("centerOnPosition", "childcount = 0");
@@ -695,7 +684,6 @@ public class MuPDFActivity extends BaseActivity{
 								autoLinks.add(currentLink);
 							}
 						}
-
 					}
 				}
 				return autoLinks;
