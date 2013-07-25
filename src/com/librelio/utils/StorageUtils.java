@@ -1,7 +1,6 @@
 package com.librelio.utils;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 import com.niveales.wind.R;
 
@@ -21,8 +20,7 @@ public class StorageUtils {
     }
 
     public static String getExternalPath(Context context) {
-//        return context.getExternalFilesDir(null).getAbsolutePath();
-        return Environment.getExternalStorageDirectory() + "/librelio/";
+        return context.getExternalFilesDir(null).getAbsolutePath();
     }
 
     public static String getExternalCachePath(Context context) {
