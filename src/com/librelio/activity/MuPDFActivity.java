@@ -561,16 +561,16 @@ public class MuPDFActivity extends BaseActivity{
 		final int startIndex = SearchTaskResult.get() == null ? docView.getDisplayedViewIndex() : SearchTaskResult.get().pageNumber + increment;
 	}
 
-	@Override
-	public boolean onSearchRequested() {
-		if (buttonsVisible && mTopBarIsSearch) {
-			hideButtons();
-		} else {
-			showButtons();
-			searchModeOn();
-		}
-		return super.onSearchRequested();
-	}
+//	@Override
+//	public boolean onSearchRequested() {
+//		if (buttonsVisible && mTopBarIsSearch) {
+//			hideButtons();
+//		} else {
+//			showButtons();
+//			searchModeOn();
+//		}
+//		return super.onSearchRequested();
+//	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
