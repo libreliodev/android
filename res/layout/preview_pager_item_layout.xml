@@ -23,6 +23,6 @@
         android:layout_gravity="center_horizontal"
         android:text="Small Text"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
+        android:textColor="@android:color/white" />
 
 </LinearLayout>
