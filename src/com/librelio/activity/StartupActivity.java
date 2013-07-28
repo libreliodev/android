@@ -105,8 +105,16 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		
 		new LoadAdvertisingImageTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
-	
-	private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mStartupAdsTimer != null) {
+            mStartupAdsTimer.cancel();
+        }
+    }
+
+    private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
 
 		@Override
 		protected Integer doInBackground(String... params) {
