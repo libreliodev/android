@@ -240,7 +240,7 @@ public class MainMagazineActivity extends BaseActivity {
 			restorePurchases();
 			return true;
 		case R.id.options_menu_send_log:
-			onSendLog();
+//			onSendLog();
 			return true;
 		case R.id.options_menu_downloaded_magazines:
 			Intent intent = new Intent(

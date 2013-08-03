@@ -7,25 +7,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+import android.app.Activity;
 import com.librelio.event.UpdateProgressEvent;
 import com.librelio.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
-import org.netcook.android.tools.CrashCatcherActivity;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
-import com.librelio.activity.MainMagazineActivity;
 import com.niveales.wind.R;
 
-public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
+public class BaseActivity extends Activity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
 
 	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
@@ -62,16 +58,6 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	
 	protected int getUpdatePeriod() {
 		return 1800000;
-	}
-
-	@Override
-	protected String getRecipient() {
-		return "android@netcook.org";
-	}
-
-	@Override
-	protected Class<?> getStartActivityAfterCrached() {
-		return BaseActivity.class;
 	}
 
 	@Override
