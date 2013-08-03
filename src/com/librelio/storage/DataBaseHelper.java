@@ -30,21 +30,30 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		createTable(db, Magazine.TABLE_MAGAZINES, false);
-		createTable(db, Magazine.TABLE_DOWNLOADED_MAGAZINES, true);
+		createMagazinesTable(db);
+		createDownloadedMagazinesTable(db);
         createAssetsTable(db);
 	}
 	
-	private void createTable(SQLiteDatabase db, String tableName, boolean columnSample){
-		db.execSQL("CREATE TABLE "+tableName+ "("
+	private void createMagazinesTable(SQLiteDatabase db){
+		db.execSQL("CREATE TABLE " + Magazine.TABLE_MAGAZINES + "("
 				+ Magazine.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 				+ Magazine.FIELD_FILE_NAME + " TEXT, "
 				+ Magazine.FIELD_TITLE + " TEXT, "
 				+ Magazine.FIELD_DOWNLOAD_DATE + " TEXT, "
-				+ Magazine.FIELD_SUBTITLE + " TEXT"
-				+ (columnSample ? ", " + Magazine.FIELD_IS_SAMPLE + " INTEGER, "
-                + Magazine.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER);" : ");"));
+				+ Magazine.FIELD_SUBTITLE + " TEXT);");
 	}
+
+    private void createDownloadedMagazinesTable(SQLiteDatabase db){
+        db.execSQL("CREATE TABLE " + Magazine.TABLE_DOWNLOADED_MAGAZINES + "("
+                + Magazine.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + Magazine.FIELD_FILE_NAME + " TEXT, "
+                + Magazine.FIELD_TITLE + " TEXT, "
+                + Magazine.FIELD_DOWNLOAD_DATE + " TEXT, "
+                + Magazine.FIELD_SUBTITLE + " TEXT, "
+                + Magazine.FIELD_IS_SAMPLE + " INTEGER, "
+                + Magazine.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER);");
+    }
 
     private void createAssetsTable(SQLiteDatabase db){
         db.execSQL("CREATE TABLE "+Magazine.TABLE_ASSETS+ "("
