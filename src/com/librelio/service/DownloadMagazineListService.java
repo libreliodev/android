@@ -102,13 +102,14 @@ public class DownloadMagazineListService extends BaseService {
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				plistUrl = LibrelioApplication.getAmazonServerUrl() + "Magazines.plist";
+                String plistName = "Magazines.plist";
+                plistUrl = LibrelioApplication.getAmazonServerUrl() + plistName;
 				Log.d(TAG, "Downloading start path:" + StorageUtils.getStoragePath(getContext()) + ", mode = " + useStaticMagazines);
 				
 				//Checking for updates
 				HttpClient httpclient = new DefaultHttpClient();
 				HttpGet httpget = new HttpGet(plistUrl);
-				String lastUdate = getLastUpdateDate();
+				String lastUdate = getLastUpdateDate(plistName);
 				httpget.addHeader(IF_MODIFIED_SINCE_HEADER,lastUdate);
 				
 				int responseCode = 0;
@@ -131,7 +132,7 @@ public class DownloadMagazineListService extends BaseService {
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
 					downloadFromUrl(plistUrl, StorageUtils.getStoragePath(getContext()) + PLIST_FILE_NAME);
-					saveUpdateDate();
+					saveUpdateDate(plistName);
 					Log.d(TAG,"There is updates (current update date : "+lastUdate+")");
 				}
 				//Convert plist to String for parsing
@@ -272,15 +273,15 @@ public class DownloadMagazineListService extends BaseService {
 		return this;
 	}
 	
-	private void saveUpdateDate(){
-		Date date = (Date) calendar.getTime();
-		Log.d(TAG, "saveUpdateDate, date : "+updateDateFormat.format(date));
-		getPreferences().edit().putString(LAST_UPDATE_PREFERENCES_KEY, updateDateFormat.format(date)).commit(); 
+	private void saveUpdateDate(String plistName) {
+		Date date = calendar.getTime();
+//		Log.d(TAG, "saveUpdateDate, date : "+updateDateFormat.format(date));
+		getPreferences().edit().putString(LAST_UPDATE_PREFERENCES_KEY + plistName, updateDateFormat.format(date)).commit();
 	}
 	
-	private String getLastUpdateDate(){
-		String date = getPreferences().getString(LAST_UPDATE_PREFERENCES_KEY, "");
-		Log.d(TAG, "getLastUpdateDate, date : "+date);
+	private String getLastUpdateDate(String plistName) {
+		String date = getPreferences().getString(LAST_UPDATE_PREFERENCES_KEY + plistName, "");
+//		Log.d(TAG, "getLastUpdateDate, date : "+date);
 		return date;
 	}
 }
