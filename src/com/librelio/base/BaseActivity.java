@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
+import com.librelio.event.UpdateProgressEvent;
 import com.librelio.utils.StorageUtils;
+import de.greenrobot.event.EventBus;
 import org.netcook.android.tools.CrashCatcherActivity;
 
 import android.app.AlertDialog;
@@ -33,17 +35,6 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 	protected static final int IO_EXCEPTION = 4;
 
 	private SharedPreferences sharedPreferences;
-
-	/**
-	 * The receiver for progress in action bar
-	 */
-	protected BroadcastReceiver updateProgress = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			setProgressBarIndeterminateVisibility(intent.getBooleanExtra(
-					MainMagazineActivity.UPDATE_PROGRESS, false));
-		}
-	};
 
 	/**
 	 * A {@link PurchaseObserver} is used to get callbacks when Android Market
@@ -208,5 +199,21 @@ public class BaseActivity extends CrashCatcherActivity implements IBaseContext {
 		super.onStop();
 		EasyTracker.getInstance().activityStop(this);
 	}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    public void onEventMainThread(UpdateProgressEvent event) {
+        setProgressBarIndeterminateVisibility(event.isShowProgress());
+    }
 
 }

@@ -34,7 +34,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.librelio.event.UpdateGridViewEvent;
+import com.librelio.event.UpdateProgressEvent;
 import com.librelio.utils.StorageUtils;
+import de.greenrobot.event.EventBus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -83,7 +86,6 @@ public class DownloadMagazineListService extends BaseService {
 	private SimpleDateFormat updateDateFormat;
 	private MagazineManager magazineManager;
 	private boolean useStaticMagazines;
-	private Intent intentInvalidateUI;
 
 	@Override
 	public void onCreate() {
@@ -95,7 +97,6 @@ public class DownloadMagazineListService extends BaseService {
 		dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		updateDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
-		intentInvalidateUI = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
 		magazineManager = new MagazineManager(this);
 		new AsyncTask<Void, Void, Void>() {
 
@@ -125,8 +126,8 @@ public class DownloadMagazineListService extends BaseService {
 					finishDownloading();
 					return null;
 				}
-				
-				sendProgressUpdateIntent(true);
+
+                EventBus.getDefault().post(new UpdateProgressEvent(true));
 				// Plist downloading
 				if (isOnline() && !useStaticMagazines) {
 					downloadFromUrl(plistUrl, StorageUtils.getStoragePath(getContext()) + PLIST_FILE_NAME);
@@ -156,7 +157,7 @@ public class DownloadMagazineListService extends BaseService {
 					Magazine magazine = new Magazine(fileName, title, subtitle, downloadDate, getContext());
 					magazineManager.addMagazine(magazine, Magazine.TABLE_MAGAZINES, false);
 				}
-				sendBroadcast(intentInvalidateUI);
+                EventBus.getDefault().post(new UpdateGridViewEvent());
 				for (Magazine magazine : magazineManager.getMagazines(false)) {
 					//saving png
 					File png = new File(magazine.getPngPath());
@@ -165,7 +166,7 @@ public class DownloadMagazineListService extends BaseService {
 							downloadFromUrl(magazine.getPngUrl(), magazine.getPngPath());
 						}
 						Log.d(TAG, "Image download: " + magazine.getPngPath());
-						sendBroadcast(intentInvalidateUI);
+                        EventBus.getDefault().post(new UpdateGridViewEvent());
 					} else {
 						Log.d(TAG, magazine.getPngPath() + " already exist");
 					}
@@ -182,8 +183,8 @@ public class DownloadMagazineListService extends BaseService {
 	private void finishDownloading(){
 		Log.d(TAG, "Downloading was finished");
 		try {
-			sendBroadcast(intentInvalidateUI);
-			sendProgressUpdateIntent(false);
+            EventBus.getDefault().post(new UpdateGridViewEvent());
+            EventBus.getDefault().post(new UpdateProgressEvent(false));
 		} catch (IllegalArgumentException e) {
 			Log.e(TAG, "sendBroadcast failed", e);
 		}
@@ -192,14 +193,6 @@ public class DownloadMagazineListService extends BaseService {
 		if (useStaticMagazines) {
 			startSelf();
 		}
-	}
-
-	private void sendProgressUpdateIntent(boolean show) {
-		Intent updateProgress = new Intent(
-				MainMagazineActivity.UPDATE_PROGRESS);
-		updateProgress
-				.putExtra(MainMagazineActivity.UPDATE_PROGRESS, show);
-		sendBroadcast(updateProgress);
 	}
 	
 	@Override

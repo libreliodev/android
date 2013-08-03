@@ -23,11 +23,13 @@ import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.MainMagazineActivity;
+import com.librelio.event.UpdateGridViewEvent;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
+import de.greenrobot.event.EventBus;
 
 public class MagazineAdapter extends BaseAdapter {
 
@@ -187,8 +189,7 @@ public class MagazineAdapter extends BaseAdapter {
                 public void onClick(View view) {
                     currentMagazine.delete();
                     magazineManager.removeDownloadedMagazine(currentMagazine);
-                    Intent intentInvalidate = new Intent(MainMagazineActivity.BROADCAST_ACTION_IVALIDATE);
-                    context.sendBroadcast(intentInvalidate);
+                    EventBus.getDefault().post(new UpdateGridViewEvent());
                 }
             });
         } else if (!currentMagazine.isDownloaded()) {

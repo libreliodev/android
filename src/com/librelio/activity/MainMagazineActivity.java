@@ -29,6 +29,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import com.librelio.event.UpdateGridViewEvent;
+import de.greenrobot.event.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,18 +66,12 @@ public class MainMagazineActivity extends BaseActivity {
 	 */
 	private static final String TAG = "MainMagazineActivity";
 	public static final String REQUEST_SUBS = "request_subs";
-	public static final String UPDATE_PROGRESS = "update_progress";
-	public static final String BROADCAST_ACTION_IVALIDATE = "com.librelio.lib.service.broadcast.invalidate";
 	private static final String START_FIRST_TIME = "START_FIRST_TIME";
 
 	private static final int DIALOG_CANNOT_CONNECT_ID = 1;
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 	private static final int DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID = 3;
 
-	/**
-	 * Receiver for magazines view refresh
-	 */
-	private BroadcastReceiver gridInvalidate;
 	/**
 	 * The Purchase receivers
 	 */
@@ -107,33 +103,28 @@ public class MainMagazineActivity extends BaseActivity {
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
 
 		magazines = new ArrayList<Magazine>();
-		reloadMagazineData(magazines);
+		reloadMagazineData();
 
 		adapter = new MagazineAdapter(magazines, this, hasTestMagazine);
 		grid.setAdapter(adapter);
 
-		gridInvalidate = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if (grid != null) {
-					Log.d(TAG, "onReceive: grid was invalidate");
-					reloadMagazineData(magazines);
-					grid.invalidate();
-					grid.invalidateViews();
-				}
-			}
-		};
-
-		IntentFilter filter = new IntentFilter(BROADCAST_ACTION_IVALIDATE);
 		IntentFilter subsFilter = new IntentFilter(REQUEST_SUBS);
 
-		registerReceiver(gridInvalidate, filter);
 		registerReceiver(subscriptionYear, subsFilter);
 		registerReceiver(subscriptionMonthly, subsFilter);
 
 		startRegularUpdate();
 
 	}
+
+    public void onEventMainThread(UpdateGridViewEvent event) {
+        if (grid != null) {
+            Log.d(TAG, "onReceive: grid was invalidate");
+            reloadMagazineData();
+            grid.invalidate();
+            grid.invalidateViews();
+        }
+    }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -162,8 +153,6 @@ public class MainMagazineActivity extends BaseActivity {
 	protected void onStart() {
 		super.onStart();
 		showProgress(false);
-		IntentFilter filter = new IntentFilter(UPDATE_PROGRESS);
-		registerReceiver(updateProgress, filter);
 	}
 
 	/**
@@ -171,9 +160,6 @@ public class MainMagazineActivity extends BaseActivity {
 	 */
 	@Override
 	protected void onStop() {
-		if (updateProgress != null) {
-			unregisterReceiver(updateProgress);
-		}
 		super.onStop();
 	}
 	
@@ -182,13 +168,13 @@ public class MainMagazineActivity extends BaseActivity {
 		super.onResume();
 		EasyTracker.getTracker().sendView("Library/Magazines");
         int delay = 0; // delay for 1 sec.
-        int period = 2000; // repeat every 10 sec.
+        int period = 2000; // repeat every 2 sec.
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask()
         {
             public void run()
             {
-                reloadMagazineData(magazines);
+                reloadMagazineData();
             }
         }, delay, period);
     }
@@ -207,9 +193,6 @@ public class MainMagazineActivity extends BaseActivity {
 		}
 		if (subscriptionMonthly != null) {
 			unregisterReceiver(subscriptionMonthly);
-		}
-		if (gridInvalidate != null) {
-			unregisterReceiver(gridInvalidate);
 		}
 		super.onDestroy();
 	}
@@ -242,7 +225,7 @@ public class MainMagazineActivity extends BaseActivity {
 					Intent intent = new Intent(this, DownloadMagazineListService.class);
 					startService(intent);
 					showProgress(true);
-					reloadMagazineData(magazines);
+					reloadMagazineData();
 //					stopRegularUpdate();
 //					startRegularUpdate();
 				} else {
@@ -281,7 +264,7 @@ public class MainMagazineActivity extends BaseActivity {
 		return true;
 	}
 
-	private void reloadMagazineData(final ArrayList<Magazine> magazines) {
+	private void reloadMagazineData() {
         //run off main thread
         Thread thread = new Thread(new Runnable() {
             @Override
