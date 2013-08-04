@@ -25,11 +25,11 @@ import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
-import com.librelio.utils.FilenameUtils;
 import com.librelio.utils.StorageUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 import de.greenrobot.event.EventBus;
+import org.apache.commons.io.FilenameUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -51,10 +51,10 @@ import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
-import com.librelio.utils.FilenameUtils;
 import com.librelio.view.TwoWayView;
 import com.librelio.view.TwoWayView.Orientation;
 import com.niveales.wind.R;
+import org.apache.commons.io.FilenameUtils;
 
 //TODO: remove preffix mXXXX from all properties this class
 public class MuPDFActivity extends BaseActivity{
