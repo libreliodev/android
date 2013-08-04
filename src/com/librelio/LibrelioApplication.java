@@ -8,13 +8,25 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
+import android.widget.Toast;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineListService;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
+import org.acra.ACRA;
+import org.acra.ReportField;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
 
+@ReportsCrashes(formKey = "",
+        mailTo = "android@librelio.com",
+        customReportContent = { ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME,
+                ReportField.ANDROID_VERSION,
+                ReportField.PHONE_MODEL, ReportField.CUSTOM_DATA, ReportField.STACK_TRACE, ReportField.LOGCAT },
+        mode = ReportingInteractionMode.TOAST,
+        resToastText = R.string.crash_toast_text)
 public class LibrelioApplication extends Application {
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
@@ -33,7 +45,9 @@ public class LibrelioApplication extends Application {
 		baseUrl = "http://librelio-europe.s3.amazonaws.com/" + clientName + PATH_SEPARATOR + magazineName + PATH_SEPARATOR;
 		getSharedPreferences(IBaseContext.LIBRELIO_SHARED_PREFERENCES, MODE_PRIVATE)
 			.edit().putBoolean(DownloadMagazineListService.ALREADY_RUNNING, false).commit();
-		super.onCreate();
+
+        ACRA.init(this);
+        super.onCreate();
 	}
 
 	public static void startPDFActivity(Context context, String filePath, String title){
