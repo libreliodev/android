@@ -64,7 +64,10 @@ public class MuPDFActivity extends BaseActivity{
 	private static final int WAIT_DIALOG = 0;
 	private static final String FILE_NAME = "FileName";
 
-	private MuPDFCore core;
+    private static final int START_BILLING_ACTIVITY = 100;
+    private static final int START_OUTLINE_ACTIVITY = 101;
+
+    private MuPDFCore core;
 	private String fileName;
 	private int mOrientation;
 
@@ -290,7 +293,7 @@ public class MuPDFActivity extends BaseActivity{
 					if (outline != null) {
 						OutlineActivityData.get().items = outline;
 						Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
-						startActivityForResult(intent, 0);
+						startActivityForResult(intent, START_OUTLINE_ACTIVITY);
 					}
 				}
 			});
@@ -341,11 +344,17 @@ public class MuPDFActivity extends BaseActivity{
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode >= 0)
+        if (requestCode == START_BILLING_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
+		if (requestCode == START_OUTLINE_ACTIVITY && resultCode >= 0) {
 			if (core.getDisplayPages() == 2) {
 				resultCode = (resultCode + 1) / 2;
 			}
 			docView.setDisplayedViewIndex(resultCode);
+        }
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
@@ -613,7 +622,7 @@ public class MuPDFActivity extends BaseActivity{
 				.putExtra(BillingActivity.FILE_NAME_KEY, magazine.getFileName())
 				.putExtra(BillingActivity.TITLE_KEY, magazine.getTitle())
 				.putExtra(BillingActivity.SUBTITLE_KEY, magazine.getSubtitle());
-			getContext().startActivity(intent);
+			startActivityForResult(intent, START_BILLING_ACTIVITY);
 		}
 	}
 

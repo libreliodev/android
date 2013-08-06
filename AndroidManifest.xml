@@ -52,6 +52,7 @@
             android:name="com.librelio.activity.OutlineActivity"
             android:label="@string/outline_title" />
         <activity android:name="com.librelio.activity.MainMagazineActivity" />
+        <activity android:name="com.librelio.activity.DownloadMagazineActivity" />
         <activity
             android:name="com.librelio.activity.SlideShowActivity"
             android:theme="@style/Theme.Fullscreen" />

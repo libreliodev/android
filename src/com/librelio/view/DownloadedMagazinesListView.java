@@ -144,7 +144,7 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 			@Override
 			public void onClick(View v) {
 				downloadedMagazine.delete();
-				magazineManager.removeDownloadedMagazine(downloadedMagazine);
+				magazineManager.removeDownloadedMagazine(context, downloadedMagazine);
 
 				getAdapter().remove(downloadedMagazine);
 				getAdapter().notifyDataSetChanged();

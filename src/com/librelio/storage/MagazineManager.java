@@ -94,16 +94,16 @@ public class MagazineManager extends BaseManager {
 		magazine.setId(db.insert(tableName, null, cv));
 	}
 	
-	public synchronized void removeDownloadedMagazine(Magazine magazine) {
-        DownloadManager dm = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getWritableDatabase();
+	public static synchronized void removeDownloadedMagazine(Context context, Magazine magazine) {
+        DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        SQLiteDatabase db = DataBaseHelper.getInstance(context).getWritableDatabase();
 
         // cancel any download and notification for this magazine
         Cursor c = db.query(Magazine.TABLE_DOWNLOADED_MAGAZINES, new String[] {Magazine.FIELD_DOWNLOAD_MANAGER_ID}, 
                 Magazine.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()}, null, null, null);
         while (c.moveToNext()) {
             int downloadManagerID = c.getInt(c.getColumnIndex(Magazine.FIELD_DOWNLOAD_MANAGER_ID));
-            removeNotification(downloadManagerID);
+            removeNotification(context, downloadManagerID);
             dm.remove(downloadManagerID);
         }
         c.close();
@@ -122,10 +122,10 @@ public class MagazineManager extends BaseManager {
         db.delete(Magazine.TABLE_ASSETS, Magazine.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()});
 	}
 
-    public void removeNotification(int notificationId) {
+    public static void removeNotification(Context context, int notificationId) {
         // Clear downloaded notification for magazine if visible
         NotificationManager mNotificationManager =
-                (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(notificationId);
     }
 
@@ -196,20 +196,48 @@ public class MagazineManager extends BaseManager {
         return assetFilename;
     }
 
-    public int getTotalAssetCount(Magazine magazine) {
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
+    public static void updateMagazineDetails(Context context, Magazine magazine) {
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        SQLiteDatabase db = DataBaseHelper.getInstance(context).getReadableDatabase();
+        Cursor c = db.query(Magazine.TABLE_DOWNLOADED_MAGAZINES, new String[]{Magazine.FIELD_IS_SAMPLE,
+                Magazine.FIELD_DOWNLOAD_MANAGER_ID}, Magazine.FIELD_FILE_NAME + "=?", new String[]{magazine.getFileName()},
+                null, null, null);
+        while (c.moveToNext()) {
+            magazine.setSample(c.getInt(c.getColumnIndex(Magazine.FIELD_IS_SAMPLE)) == 0 ? false : true);
+            magazine.setDownloadManagerId(c.getLong(c.getColumnIndex(Magazine.FIELD_DOWNLOAD_MANAGER_ID)));
+            DownloadManager.Query q = new DownloadManager.Query();
+            q.setFilterById(magazine.getDownloadManagerId());
+            Cursor cursor = downloadManager.query(q);
+            if (cursor.moveToFirst()) {
+                magazine.setDownloadStatus(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+                long fileSize = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                long bytesDL = cursor.getLong(cursor.getColumnIndex(DownloadManager
+                        .COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                magazine.setDownloadProgress((int) ((bytesDL * 100.0f) / fileSize));
+            } else {
+                magazine.setDownloadProgress(0);
+                magazine.setDownloadStatus(-1);
+            }
+            cursor.close();
+            magazine.setTotalAssetCount(getTotalAssetCount(context, magazine));
+            magazine.setDownloadedAssetCount(getDownloadedAssetCount(context, magazine));
+        }
+    }
+
+    public static int getTotalAssetCount(Context context, Magazine magazine) {
+        SQLiteDatabase db = DataBaseHelper.getInstance(context).getReadableDatabase();
         int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + Magazine.FIELD_ID + ") from " + Magazine
                 .TABLE_ASSETS + " WHERE " + Magazine.FIELD_FILE_NAME + "=?",
-                new String[] {magazine.getFileName()});
+                new String[]{magazine.getFileName()});
         return count;
     }
 
-    public int getDownloadedAssetCount(Magazine magazine) {
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
+    public static int getDownloadedAssetCount(Context context, Magazine magazine) {
+        SQLiteDatabase db = DataBaseHelper.getInstance(context).getReadableDatabase();
         int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + Magazine.FIELD_ID + ") from " + Magazine
                 .TABLE_ASSETS + " WHERE " + Magazine.FIELD_FILE_NAME + "=? AND " + Magazine.FIELD_ASSET_IS_DOWNLOADED
                 + "='1'",
-                new String[] {magazine.getFileName()});
+                new String[]{magazine.getFileName()});
         return count;
     }
 

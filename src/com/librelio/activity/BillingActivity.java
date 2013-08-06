@@ -23,6 +23,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.app.Activity;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import org.apache.http.Header;
@@ -72,6 +73,7 @@ public class BillingActivity extends BaseActivity {
     public static final String FILE_NAME_KEY = "file_name_key";
     public static final String TITLE_KEY = "title_key";
     public static final String SUBTITLE_KEY = "subtitle_key";
+    public static final String IS_SAMPLE_KEY = "is_sample_key";
     private static final String TAG = "BillingActivity";
 
 	// Only for test. Must always be FALSE!
@@ -137,6 +139,9 @@ public class BillingActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wait_bar);
+
+        setResult(RESULT_CANCELED);
+
 		if(!isNetworkConnected()){
 			showAlertDialog(CONNECTION_ALERT);
 		} else {
@@ -543,6 +548,14 @@ public class BillingActivity extends BaseActivity {
             if (getIntent().getExtras() != null) {
             DownloadMagazineService.startDownload(BillingActivity.this, new Magazine(fileName, title, subtitle, null,
                     BillingActivity.this), true, tempURL);
+                Intent intent = new Intent(getContext(), DownloadMagazineActivity.class);
+                intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);
+                intent.putExtra(BillingActivity.SUBTITLE_KEY, subtitle);
+                intent.putExtra(BillingActivity.TITLE_KEY, title);
+                intent.putExtra(BillingActivity.IS_SAMPLE_KEY, false);
+                startActivity(intent);
+                setResult(RESULT_OK);
+                finish();
             } else {
                 Toast.makeText(BillingActivity.this, "Purchase successful", Toast.LENGTH_LONG).show();
             }

@@ -36,13 +36,11 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<Magazine>> {
     private static final String TAG = "PlistParserLoader";
     private final String plistName;
     private final boolean hasTestMagazine;
-    private final DownloadManager downloadManager;
 
     public PlistParserLoader(Context context, String plistName, boolean hasTestMagazine) {
         super(context);
         this.plistName = plistName;
         this.hasTestMagazine = hasTestMagazine;
-        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
         setUpdateThrottle(2000);
         onContentChanged();
     }
@@ -115,30 +113,7 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<Magazine>> {
         }
 
         for (Magazine magazine : magazines) {
-            SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
-            Cursor c = db.query(Magazine.TABLE_DOWNLOADED_MAGAZINES, new String[]{Magazine.FIELD_IS_SAMPLE,
-                    Magazine.FIELD_DOWNLOAD_MANAGER_ID}, Magazine.FIELD_FILE_NAME + "=?", new String[]{magazine.getFileName()},
-                    null, null, null);
-            while (c.moveToNext()) {
-                magazine.setSample(c.getInt(c.getColumnIndex(Magazine.FIELD_IS_SAMPLE)) == 0 ? false : true);
-                magazine.setDownloadManagerId(c.getLong(c.getColumnIndex(Magazine.FIELD_DOWNLOAD_MANAGER_ID)));
-                DownloadManager.Query q = new DownloadManager.Query();
-                q.setFilterById(magazine.getDownloadManagerId());
-                Cursor cursor = downloadManager.query(q);
-                if (cursor.moveToFirst()) {
-                    magazine.setDownloadStatus(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
-                    long fileSize = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                    long bytesDL = cursor.getLong(cursor.getColumnIndex(DownloadManager
-                            .COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                    magazine.setDownloadProgress((int) ((bytesDL * 100.0f) / fileSize));
-                } else {
-                    magazine.setDownloadProgress(0);
-                    magazine.setDownloadStatus(-1);
-                }
-                cursor.close();
-                magazine.setTotalAssetCount(getTotalAssetCount(magazine));
-                magazine.setDownloadedAssetCount(getDownloadedAssetCount(magazine));
-            }
+            MagazineManager.updateMagazineDetails(getContext(), magazine);
         }
         Log.d("time", (System.currentTimeMillis() - startTime) + " ");
 //        EventBus.getDefault().post(new InvalidateGridViewEvent());
@@ -156,23 +131,6 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<Magazine>> {
             }
         }
         return magazines;
-    }
-
-    public int getTotalAssetCount(Magazine magazine) {
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
-        int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + Magazine.FIELD_ID + ") from " + Magazine
-                .TABLE_ASSETS + " WHERE " + Magazine.FIELD_FILE_NAME + "=?",
-                new String[]{magazine.getFileName()});
-        return count;
-    }
-
-    public int getDownloadedAssetCount(Magazine magazine) {
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
-        int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + Magazine.FIELD_ID + ") from " + Magazine
-                .TABLE_ASSETS + " WHERE " + Magazine.FIELD_FILE_NAME + "=? AND " + Magazine.FIELD_ASSET_IS_DOWNLOADED
-                + "='1'",
-                new String[]{magazine.getFileName()});
-        return count;
     }
 
     @Override

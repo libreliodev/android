@@ -20,6 +20,7 @@ import com.artifex.mupdf.LinkInfoExternal;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.event.LoadPlistEvent;
+import com.librelio.event.MagazineDownloadedEvent;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.DataBaseHelper;
@@ -115,12 +116,13 @@ public class DownloadMagazineService extends IntentService {
             Date date = Calendar.getInstance().getTime();
             String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
             magazine.setDownloadDate(downloadDate);
-            manager.removeDownloadedMagazine(magazine);
+            manager.removeDownloadedMagazine(this, magazine);
             manager.addMagazine(
                     magazine,
                     Magazine.TABLE_DOWNLOADED_MAGAZINES,
                     true);
             EventBus.getDefault().post(new LoadPlistEvent());
+            EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
             startLinksDownload(this, magazine);
             magazine.makeCompleteFile(magazine.isSample());
         } else {
@@ -228,7 +230,7 @@ public class DownloadMagazineService extends IntentService {
         magazine.setDownloadManagerId(dm.enqueue(request));
 
         MagazineManager magazineManager = new MagazineManager(context);
-        magazineManager.removeDownloadedMagazine(magazine);
+        magazineManager.removeDownloadedMagazine(context, magazine);
         magazineManager.addMagazine(
                 magazine,
                 Magazine.TABLE_DOWNLOADED_MAGAZINES,

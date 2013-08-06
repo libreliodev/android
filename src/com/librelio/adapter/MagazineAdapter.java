@@ -36,14 +36,12 @@ public class MagazineAdapter extends BaseAdapter {
 	private Context context;
 	private ArrayList<Magazine> magazines;
 	private boolean hasTestMagazine;
-	private MagazineManager magazineManager;
+//	private MagazineManager magazineManager;
 	
 	public MagazineAdapter(ArrayList<Magazine> magazines, Context context, boolean hasTestMagazine) {
 		this.context = context;
 		this.magazines = magazines;
 		this.hasTestMagazine = hasTestMagazine;
-		
-		magazineManager = new MagazineManager(context);
 	}
 
 	@Override
@@ -187,7 +185,7 @@ public class MagazineAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     currentMagazine.delete();
-                    magazineManager.removeDownloadedMagazine(currentMagazine);
+                    MagazineManager.removeDownloadedMagazine(context, currentMagazine);
                     EventBus.getDefault().post(new LoadPlistEvent());
                 }
             });
