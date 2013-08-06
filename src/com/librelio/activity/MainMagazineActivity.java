@@ -20,16 +20,17 @@
 package com.librelio.activity;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
+import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import com.librelio.event.UpdateGridViewEvent;
+import android.content.Loader;
+import com.librelio.event.InvalidateGridViewEvent;
+import com.librelio.event.UpdatedPlistEvent;
+import com.librelio.utils.PlistDownloader;
+import com.librelio.loader.PlistParserLoader;
 import de.greenrobot.event.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,14 +46,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
 import com.librelio.model.Magazine;
-import com.librelio.service.DownloadMagazineListService;
-import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 
 /**
@@ -60,7 +58,7 @@ import com.niveales.wind.R;
  * 
  * @author Nikolay Moskvin <moskvin@netcook.org>
  */
-public class MainMagazineActivity extends BaseActivity {
+public class MainMagazineActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<ArrayList<Magazine>> {
 	/**
 	 * The static
 	 */
@@ -71,23 +69,36 @@ public class MainMagazineActivity extends BaseActivity {
 	private static final int DIALOG_CANNOT_CONNECT_ID = 1;
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 	private static final int DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID = 3;
+    private static final int PLIST_PARSER_LOADER = 0;
+//    private static final String PLIST_NAME = "plist_name";
 
-	/**
+    /**
 	 * The Purchase receivers
 	 */
 	private BroadcastReceiver subscriptionYear;
 	private BroadcastReceiver subscriptionMonthly;
 
-	private Timer updateTimer;
-
 	private GridView grid;
 	private ArrayList<Magazine> magazines;
 	private MagazineAdapter adapter;
-	private Handler handler;
-	private MagazineManager magazineManager;
-	
+
 	private boolean hasTestMagazine;
-    private Timer timer;
+
+    private String plistName;
+
+    private Runnable loadPlistTask = new Runnable() {
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getLoaderManager().restartLoader(PLIST_PARSER_LOADER, null, MainMagazineActivity.this);
+                }
+            });
+        }
+    };
+
+    private Handler handler = new Handler();
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,15 +106,14 @@ public class MainMagazineActivity extends BaseActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.issue_list_layout);
 		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
+
+        plistName = getString(R.string.root_view);
 		
 		hasTestMagazine = hasTestMagazine();
-
-		magazineManager = new MagazineManager(this);
 
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
 
 		magazines = new ArrayList<Magazine>();
-		reloadMagazineData();
 
 		adapter = new MagazineAdapter(magazines, this, hasTestMagazine);
 		grid.setAdapter(adapter);
@@ -113,17 +123,18 @@ public class MainMagazineActivity extends BaseActivity {
 		registerReceiver(subscriptionYear, subsFilter);
 		registerReceiver(subscriptionMonthly, subsFilter);
 
-		startRegularUpdate();
+        getLoaderManager().initLoader(PLIST_PARSER_LOADER, null, this);
+
+        PlistDownloader.doLoad(this, plistName, false);
 
 	}
 
-    public void onEventMainThread(UpdateGridViewEvent event) {
-        if (grid != null) {
-            Log.d(TAG, "onReceive: grid was invalidate");
-            reloadMagazineData();
-            grid.invalidate();
-            grid.invalidateViews();
-        }
+    public void onEventMainThread(InvalidateGridViewEvent event) {
+            reloadGrid();
+    }
+
+    public void onEvent(UpdatedPlistEvent event) {
+        startLoadPlistTask(0);
     }
 
 	@Override
@@ -155,39 +166,21 @@ public class MainMagazineActivity extends BaseActivity {
 		showProgress(false);
 	}
 
-	/**
-	 * Called when this activity is no longer visible.
-	 */
-	@Override
-	protected void onStop() {
-		super.onStop();
-	}
-	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		EasyTracker.getTracker().sendView("Library/Magazines");
-        int delay = 0; // delay for 1 sec.
-        int period = 2000; // repeat every 2 sec.
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask()
-        {
-            public void run()
-            {
-                reloadMagazineData();
-            }
-        }, delay, period);
+        startLoadPlistTask(0);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        timer.cancel();
+        handler.removeCallbacks(loadPlistTask);
     }
 
     @Override
 	protected void onDestroy() {
-		stopRegularUpdate();
 		if (subscriptionYear != null) {
 			unregisterReceiver(subscriptionYear);
 		}
@@ -220,20 +213,8 @@ public class MainMagazineActivity extends BaseActivity {
 		switch (item.getItemId()) {
 
 		case R.id.options_menu_reload:
-			if (isOnline()) {
-				if (!getPreferences().getBoolean(DownloadMagazineListService.ALREADY_RUNNING, false)) {
-					Intent intent = new Intent(this, DownloadMagazineListService.class);
-					startService(intent);
-					showProgress(true);
-					reloadMagazineData();
-//					stopRegularUpdate();
-//					startRegularUpdate();
-				} else {
-					Toast.makeText(this, getResources().getString(R.string.download_service_already_running), Toast.LENGTH_LONG).show();
-				}
-			} else {
-				Toast.makeText(this, getResources().getString(R.string.connection_failed), Toast.LENGTH_LONG).show();
-			}
+            // force a redownload of the plist
+            PlistDownloader.doLoad(this, plistName, true);
 			return true;
 
 		case R.id.options_menu_restore:
@@ -264,51 +245,34 @@ public class MainMagazineActivity extends BaseActivity {
 		return true;
 	}
 
-	private void reloadMagazineData() {
-        //run off main thread
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<Magazine> newMagazines = magazineManager.getMagazines(hasTestMagazine);
-                magazines.clear();
-                magazines.addAll(newMagazines);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (grid != null) {
-                            grid.invalidate();
-                            grid.invalidateViews();
-                        }
-                    }
-                });
-            }
-        });
-        thread.start();
+	private void reloadGrid() {
+        grid.invalidate();
+        grid.invalidateViews();
 	}
 
-	private void startRegularUpdate(){
-		long period = getUpdatePeriod();
-		updateTimer = new Timer();
-		TimerTask updateTask = new TimerTask() {
-			@Override
-			public void run() {
-				boolean isFirst = getPreferences().getBoolean(START_FIRST_TIME, true);
-				Intent intent = new Intent(getBaseContext(), DownloadMagazineListService.class);
-				intent.putExtra(DownloadMagazineListService.USE_STATIC_MAGAZINES, isFirst);
-				startService(intent);
-				getPreferences().edit().putBoolean(START_FIRST_TIME, false).commit();
-			}
-		};
-		long startTime = 0;
-		if (magazineManager.getCount(Magazine.TABLE_MAGAZINES) > 0) {
-			startTime = period;
-		}
-		updateTimer.schedule(updateTask, startTime, period);
-	}
-
-	private void stopRegularUpdate(){
-		updateTimer.cancel();
-	}
+//	private void startRegularUpdate(){
+//		long period = getUpdatePeriod();
+//		updateTimer = new Timer();
+//		TimerTask updateTask = new TimerTask() {
+//			@Override
+//			public void run() {
+//				boolean isFirst = getPreferences().getBoolean(START_FIRST_TIME, true);
+////				Intent intent = new Intent(getBaseContext(), DownloadMagazineListService.class);
+////				intent.putExtra(DownloadMagazineListService.USE_STATIC_MAGAZINES, isFirst);
+////				startService(intent);
+//				getPreferences().edit().putBoolean(START_FIRST_TIME, false).commit();
+//			}
+//		};
+//		long startTime = 0;
+////		if (magazineManager.getCount(Magazine.TABLE_MAGAZINES) > 0) {
+////			startTime = period;
+////		}
+//		updateTimer.schedule(updateTask, startTime, period);
+//	}
+//
+//	private void stopRegularUpdate(){
+////		updateTimer.cancel();
+//	}
 
 	private Dialog createDialog(int titleId, int messageId) {
 		String helpUrl = replaceLanguageAndRegion(getString(R.string.help_url));
@@ -337,4 +301,30 @@ public class MainMagazineActivity extends BaseActivity {
 	private void showProgress(boolean progress) {
 		setProgressBarIndeterminateVisibility(progress);
 	}
+
+    @Override
+    public Loader<ArrayList<Magazine>> onCreateLoader(int id, Bundle args) {
+//        return new PlistParserLoader(getApplicationContext(), args.getString(PLIST_NAME));
+
+        return new PlistParserLoader(getApplicationContext(), plistName, hasTestMagazine());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<Magazine>> loader, ArrayList<Magazine> data) {
+        magazines.clear();
+        magazines.addAll(data);
+        EventBus.getDefault().post(new InvalidateGridViewEvent());
+        startLoadPlistTask(2000);
+    }
+
+    private void startLoadPlistTask(int delay) {
+        handler.removeCallbacks(loadPlistTask);
+        handler.postDelayed(loadPlistTask, delay);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<Magazine>> loader) {
+        magazines.clear();
+        EventBus.getDefault().post(new InvalidateGridViewEvent());
+    }
 }

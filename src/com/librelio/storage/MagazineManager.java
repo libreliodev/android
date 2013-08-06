@@ -26,41 +26,41 @@ public class MagazineManager extends BaseManager {
         downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
 	}
 
-	public List<Magazine> getMagazines(boolean hasTestMagazine) {
-		List<Magazine> magazines = new ArrayList<Magazine>();
-		if (hasTestMagazine) {
-			magazines.add(new Magazine(TEST_FILE_NAME, "TEST", "test", "", getContext()));
-		}
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
-        Cursor c = db.rawQuery("select Magazines._id,Magazines.filename,Magazines.title," +
-                "DownloadedMagazines.downloaddate,Magazines.subtitle,DownloadedMagazines.sample," +
-                "DownloadedMagazines.downloadmanagerid from " + Magazine
-                .TABLE_MAGAZINES + " LEFT JOIN " + Magazine
-                .TABLE_DOWNLOADED_MAGAZINES + " ON " +
-                Magazine.TABLE_MAGAZINES + "." + Magazine.FIELD_FILE_NAME + "=" + Magazine
-                .TABLE_DOWNLOADED_MAGAZINES + "." + Magazine.FIELD_FILE_NAME,
-                null);
-        while (c.moveToNext()) {
-            Magazine magazine = new Magazine(c, getContext());
-            // Update download status from DownloadManager
-            DownloadManager.Query q = new DownloadManager.Query();
-            q.setFilterById(magazine.getDownloadManagerId());
-            Cursor cursor = downloadManager.query(q);
-            if (cursor.moveToFirst()) {
-                magazine.setDownloadStatus(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
-                long fileSize = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                long bytesDL = cursor.getLong(cursor.getColumnIndex(DownloadManager
-                        .COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                magazine.setDownloadProgress((int) ((bytesDL * 100.0f) / fileSize));
-            }
-            cursor.close();
-            magazine.setTotalAssetCount(getTotalAssetCount(magazine));
-            magazine.setDownloadedAssetCount(getDownloadedAssetCount(magazine));
-            magazines.add(magazine);
-        }
-        c.close();
-		return magazines;
-	}
+//	public List<Magazine> getMagazines(boolean hasTestMagazine) {
+//		List<Magazine> magazines = new ArrayList<Magazine>();
+//		if (hasTestMagazine) {
+//			magazines.add(new Magazine(TEST_FILE_NAME, "TEST", "test", "", getContext()));
+//		}
+//        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
+//        Cursor c = db.rawQuery("select Magazines._id,Magazines.filename,Magazines.title," +
+//                "DownloadedMagazines.downloaddate,Magazines.subtitle,DownloadedMagazines.sample," +
+//                "DownloadedMagazines.downloadmanagerid from " + Magazine
+//                .TABLE_MAGAZINES + " LEFT JOIN " + Magazine
+//                .TABLE_DOWNLOADED_MAGAZINES + " ON " +
+//                Magazine.TABLE_MAGAZINES + "." + Magazine.FIELD_FILE_NAME + "=" + Magazine
+//                .TABLE_DOWNLOADED_MAGAZINES + "." + Magazine.FIELD_FILE_NAME,
+//                null);
+//        while (c.moveToNext()) {
+//            Magazine magazine = new Magazine(c, getContext());
+//            // Update download status from DownloadManager
+//            DownloadManager.Query q = new DownloadManager.Query();
+//            q.setFilterById(magazine.getDownloadManagerId());
+//            Cursor cursor = downloadManager.query(q);
+//            if (cursor.moveToFirst()) {
+//                magazine.setDownloadStatus(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+//                long fileSize = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+//                long bytesDL = cursor.getLong(cursor.getColumnIndex(DownloadManager
+//                        .COLUMN_BYTES_DOWNLOADED_SO_FAR));
+//                magazine.setDownloadProgress((int) ((bytesDL * 100.0f) / fileSize));
+//            }
+//            cursor.close();
+//            magazine.setTotalAssetCount(getTotalAssetCount(magazine));
+//            magazine.setDownloadedAssetCount(getDownloadedAssetCount(magazine));
+//            magazines.add(magazine);
+//        }
+//        c.close();
+//		return magazines;
+//	}
 
     public List<Magazine> getDownloadedMagazines(boolean hasTestMagazine) {
         List<Magazine> magazines = new ArrayList<Magazine>();

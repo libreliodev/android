@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
 
     <string name="app_name">Wind</string>
+    <string name="root_view">Magazines.plist</string>
     <string name="yearly_subs_code">yearlysubscription</string>
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
     <bool name="enable_test_magazine">false</bool>

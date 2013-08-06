@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.model.Magazine;
-import com.librelio.service.DownloadMagazineListService;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 import org.acra.ACRA;
@@ -40,14 +39,10 @@ public class LibrelioApplication extends Application {
 
 	@Override
 	public void onCreate() {
-		String clientName = getClientName(this);
-		String magazineName = getMagazineName(this);
-		baseUrl = "http://librelio-europe.s3.amazonaws.com/" + clientName + PATH_SEPARATOR + magazineName + PATH_SEPARATOR;
-		getSharedPreferences(IBaseContext.LIBRELIO_SHARED_PREFERENCES, MODE_PRIVATE)
-			.edit().putBoolean(DownloadMagazineListService.ALREADY_RUNNING, false).commit();
-
-        ACRA.init(this);
         super.onCreate();
+        ACRA.init(this);
+
+        baseUrl = "http://librelio-europe.s3.amazonaws.com/" + getClientName(this) + PATH_SEPARATOR + getMagazineName(this) + PATH_SEPARATOR;
 	}
 
 	public static void startPDFActivity(Context context, String filePath, String title){

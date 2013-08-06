@@ -18,9 +18,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import com.artifex.mupdf.LinkInfoExternal;
 import com.google.analytics.tracking.android.EasyTracker;
-import com.librelio.activity.MainMagazineActivity;
 import com.librelio.activity.MuPDFActivity;
-import com.librelio.event.UpdateGridViewEvent;
+import com.librelio.event.InvalidateGridViewEvent;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
 import com.librelio.storage.DataBaseHelper;
@@ -121,7 +120,7 @@ public class DownloadMagazineService extends IntentService {
                     magazine,
                     Magazine.TABLE_DOWNLOADED_MAGAZINES,
                     true);
-            EventBus.getDefault().post(new UpdateGridViewEvent());
+            EventBus.getDefault().post(new InvalidateGridViewEvent());
             startLinksDownload(this, magazine);
             magazine.makeCompleteFile(magazine.isSample());
         } else {
@@ -235,6 +234,6 @@ public class DownloadMagazineService extends IntentService {
                 Magazine.TABLE_DOWNLOADED_MAGAZINES,
                 true);
         magazine.clearMagazineDir();
-        EventBus.getDefault().post(new UpdateGridViewEvent());
+        EventBus.getDefault().post(new InvalidateGridViewEvent());
     }
 }

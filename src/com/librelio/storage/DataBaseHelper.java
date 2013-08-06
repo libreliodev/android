@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 import com.librelio.model.Magazine;
 
 public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
-	private static final int DB_VERSION = 2;
+	private static final int DB_VERSION = 3;
 	private static final String DB_NAME = "windDataBase";
 
     private static DataBaseHelper mInstance = null;
@@ -30,18 +30,8 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		createMagazinesTable(db);
 		createDownloadedMagazinesTable(db);
         createAssetsTable(db);
-	}
-	
-	private void createMagazinesTable(SQLiteDatabase db){
-		db.execSQL("CREATE TABLE " + Magazine.TABLE_MAGAZINES + "("
-				+ Magazine.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-				+ Magazine.FIELD_FILE_NAME + " TEXT, "
-				+ Magazine.FIELD_TITLE + " TEXT, "
-				+ Magazine.FIELD_DOWNLOAD_DATE + " TEXT, "
-				+ Magazine.FIELD_SUBTITLE + " TEXT);");
 	}
 
     private void createDownloadedMagazinesTable(SQLiteDatabase db){
@@ -66,11 +56,13 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//		db.execSQL("DROP TABLE IF EXISTS " + Magazine.TABLE_MAGAZINES);
 //		db.execSQL("DROP TABLE IF EXISTS " + Magazine.TABLE_DOWNLOADED_MAGAZINES);
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE " + Magazine.TABLE_DOWNLOADED_MAGAZINES + " ADD COLUMN " + Magazine.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER;");
             createAssetsTable(db);
+        }
+        if (oldVersion < 3) {
+		    db.execSQL("DROP TABLE IF EXISTS Magazines");
         }
 //		onCreate(db);
 	}

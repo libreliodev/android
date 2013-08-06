@@ -74,8 +74,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	
 	private static final String PLIST_DELAY = "Delay";
 	private static final String PLIST_LINK = "Link";
-	
-	private static int DEFAULT_ADV_DELAY = 1000;
+    private static final String STATIC_MAGAZINES_INIT_COMPLETE = "static_magazines_init_complete";
+
+    private static int DEFAULT_ADV_DELAY = 1000;
 
 	private ImageView startupImage;
 	private ImageView advertisingImage;
@@ -94,14 +95,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		startupImage = (ImageView) findViewById(R.id.sturtup_image);
 		advertisingImage = (ImageView) findViewById(R.id.advertising_image);
 		
-		if (hasTestMagazine()) {
-			initStorage(PARAM_TEST);
-			new InitTestMagazines().execute(PARAM_TEST);
-		} else {
-			initStorage(PARAM_TEST);
-			new InitPredefinedMagazinesTask().execute();
-		}
-		
+		new InitPredefinedMagazinesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		new LoadAdvertisingImageTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
@@ -113,70 +107,52 @@ public class StartupActivity extends AbstractLockRotationActivity {
         }
     }
 
-    private class InitTestMagazines extends AsyncTask<String, Void, Integer> {
+    private class InitPredefinedMagazinesTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
 
-		@Override
-		protected Integer doInBackground(String... params) {
-			try {
-				final String name = params[0];
-				final String testDir = StorageUtils.getStoragePath(StartupActivity.this) + name + "/";
-				final String testImage = name + ".png";
-				final String testImagePath = StorageUtils.getStoragePath(StartupActivity.this) + testImage;
-				String[] assetsList = getResources().getAssets().list(name);
-				File file = new File(testImagePath);
-				if (!file.exists()) {
-					copyFromAssets(testImage, testImagePath);
-				}
-				for(String asset : assetsList){
-					file = new File(testDir + asset);
-					if (!file.exists()) {
-						copyFromAssets(name + "/" + asset, testDir + asset);
-					}
-				}
-				return 0;
-			} catch (IOException e) {
-				Log.e(TAG,"Test directory in assets is unavailable", e);
-			}
-			return -1;
-		}
+            initStorage(PARAM_TEST);
 
-		@Override
-		protected void onPostExecute(Integer result) {
-			if (isCancelled()) {
-				return;
-			}
-			getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, result == 0).commit();
-			new InitPredefinedMagazinesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		}
-	};
+            if (hasTestMagazine()) {
+                try {
+                    final String name = PARAM_TEST;
+                    final String testDir = StorageUtils.getStoragePath(StartupActivity.this) + name + "/";
+                    final String testImage = name + ".png";
+                    final String testImagePath = StorageUtils.getStoragePath(StartupActivity.this) + testImage;
+                    String[] assetsList = getResources().getAssets().list(name);
+                    File file = new File(testImagePath);
+                    if (!file.exists()) {
+                        copyFromAssets(testImage, testImagePath);
+                    }
+                    for (String asset : assetsList) {
+                        file = new File(testDir + asset);
+                        if (!file.exists()) {
+                            copyFromAssets(name + "/" + asset, testDir + asset);
+                        }
+                    }
+                    getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, true).commit();
+                } catch (IOException e) {
+                    Log.e(TAG, "Test directory in assets is unavailable", e);
+                }
+            }
 
-	private class InitPredefinedMagazinesTask extends AsyncTask<Void, Void, Integer>{
-		@Override
-		protected Integer doInBackground(Void... params) {
-			String[] assetsList = null;
-			try {
-				assetsList = getResources().getAssets().list("");
-				for (String file : assetsList) {
-					if (file.contains(".plist") || file.contains(".png")) {
-						copyFromAssets(file, StorageUtils.getStoragePath(StartupActivity.this) + file);
-					}
-				}
-				return 0;
-			} catch (IOException e) {
-				Log.e(TAG, "copy fake-magazines failed", e);
-			}
-
-			return -1;
-		}
-
-		@Override
-		protected void onPostExecute(Integer result) {
-			if (isCancelled()) {
-				return;
-			}
-		}
-
-	}
+            if (!getPreferences().getBoolean(STATIC_MAGAZINES_INIT_COMPLETE, false)) {
+                String[] assetsList = null;
+                try {
+                    assetsList = getResources().getAssets().list("");
+                    for (String file : assetsList) {
+                        if (file.contains(".plist") || file.contains(".png")) {
+                            copyFromAssets(file, StorageUtils.getStoragePath(StartupActivity.this) + file);
+                        }
+                    }
+                    getPreferences().edit().putBoolean(STATIC_MAGAZINES_INIT_COMPLETE, true).commit();
+                } catch (IOException e) {
+                    Log.e(TAG, "copy fake-magazines failed", e);
+                }
+            }
+            return null;
+        }
+    }
 	
 	private class LoadAdvertisingImageTask extends AsyncTask<Void, Void, Bitmap>{
 		@Override
