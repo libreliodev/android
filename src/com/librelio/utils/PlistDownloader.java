@@ -2,14 +2,11 @@ package com.librelio.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.widget.Toast;
 import com.librelio.LibrelioApplication;
-import com.librelio.event.UpdatedPlistEvent;
+import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.UpdateProgressEvent;
-import com.librelio.utils.StorageUtils;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.niveales.wind.R;
 import de.greenrobot.event.EventBus;
 import org.apache.commons.io.FileUtils;
 
@@ -51,7 +48,7 @@ public class PlistDownloader {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                EventBus.getDefault().post(new UpdatedPlistEvent(plistName));
+                EventBus.getDefault().post(new LoadPlistEvent());
                 EventBus.getDefault().post(new UpdateProgressEvent(false));
             }
 

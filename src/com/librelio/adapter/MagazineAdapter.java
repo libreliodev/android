@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
-import com.librelio.event.InvalidateGridViewEvent;
+import com.librelio.event.LoadPlistEvent;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import com.librelio.storage.MagazineManager;
@@ -188,7 +188,7 @@ public class MagazineAdapter extends BaseAdapter {
                 public void onClick(View view) {
                     currentMagazine.delete();
                     magazineManager.removeDownloadedMagazine(currentMagazine);
-                    EventBus.getDefault().post(new InvalidateGridViewEvent());
+                    EventBus.getDefault().post(new LoadPlistEvent());
                 }
             });
         } else if (!currentMagazine.isDownloaded()) {

@@ -141,7 +141,7 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<Magazine>> {
             }
         }
         Log.d("time", (System.currentTimeMillis() - startTime) + " ");
-        EventBus.getDefault().post(new InvalidateGridViewEvent());
+//        EventBus.getDefault().post(new InvalidateGridViewEvent());
         for (Magazine magazine : magazines) {
             //saving png
             File png = new File(magazine.getPngPath());

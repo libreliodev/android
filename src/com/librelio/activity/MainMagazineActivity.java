@@ -28,7 +28,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import com.librelio.event.InvalidateGridViewEvent;
-import com.librelio.event.UpdatedPlistEvent;
+import com.librelio.event.LoadPlistEvent;
 import com.librelio.utils.PlistDownloader;
 import com.librelio.loader.PlistParserLoader;
 import de.greenrobot.event.EventBus;
@@ -133,7 +133,7 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
             reloadGrid();
     }
 
-    public void onEvent(UpdatedPlistEvent event) {
+    public void onEvent(LoadPlistEvent event) {
         startLoadPlistTask(0);
     }
 

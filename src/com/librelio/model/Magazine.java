@@ -8,7 +8,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.librelio.LibrelioApplication;
-import com.librelio.event.InvalidateGridViewEvent;
+import com.librelio.event.LoadPlistEvent;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
@@ -117,7 +117,7 @@ public class Magazine {
 	public void delete(){
 		Log.d(TAG,"Deleting magazine has been initiated");
 		clearMagazineDir();
-		EventBus.getDefault().post(new InvalidateGridViewEvent());
+		EventBus.getDefault().post(new LoadPlistEvent());
 	}
 
 	private void valuesInit(String fileName) {
