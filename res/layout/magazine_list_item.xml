@@ -79,7 +79,7 @@
             android:id="@+id/item_button_two"
             android:layout_width="match_parent"
             android:layout_height="@dimen/preview_button_height"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="4dp"
             android:background="@drawable/magazines_view_button_selector"
             android:text="@string/download"
             android:textColor="@android:color/white"
