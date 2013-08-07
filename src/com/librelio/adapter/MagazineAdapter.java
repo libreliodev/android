@@ -22,7 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
+import com.librelio.activity.MainMagazineActivity;
 import com.librelio.event.LoadPlistEvent;
+import com.librelio.model.DictItem;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import com.librelio.storage.MagazineManager;
@@ -34,11 +36,10 @@ public class MagazineAdapter extends BaseAdapter {
 
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
-	private ArrayList<Magazine> magazines;
+	private ArrayList<DictItem> magazines;
 	private boolean hasTestMagazine;
-//	private MagazineManager magazineManager;
-	
-	public MagazineAdapter(ArrayList<Magazine> magazines, Context context, boolean hasTestMagazine) {
+
+	public MagazineAdapter(ArrayList<DictItem> magazines, Context context, boolean hasTestMagazine) {
 		this.context = context;
 		this.magazines = magazines;
 		this.hasTestMagazine = hasTestMagazine;
@@ -73,37 +74,25 @@ public class MagazineAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		final Magazine currentMagazine = magazines.get(position);
-		MagazineItemHolder holder = new MagazineItemHolder();
-		
-		if(convertView == null){
-			convertView = LayoutInflater.from(context).inflate(R.layout.magazine_list_item, parent, false);
-			holder.title = (TextView)convertView.findViewById(R.id.item_title);
-			holder.subtitle = (TextView)convertView.findViewById(R.id.item_subtitle);
-			holder.thumbnail = (ImageView)convertView.findViewById(R.id.item_thumbnail);
-            holder.progressLayout = (LinearLayout)convertView.findViewById(R.id.item_progress_layout);
-            holder.info = (TextView)convertView.findViewById(R.id.item_info);
-            holder.progressBar = (ProgressBar)convertView.findViewById(R.id.progress_bar);
-			holder.downloadOrReadButton = (Button)convertView.findViewById(R.id.item_button_one);
-			holder.sampleOrDeleteButton = (Button)convertView.findViewById(R.id.item_button_two);
-			convertView.setTag(holder);
-		} else {
-			holder = (MagazineItemHolder)convertView.getTag();
-		}
-		holder.title.setText(currentMagazine.getTitle());
-		holder.subtitle.setText(currentMagazine.getSubtitle());
-		
-		final String imagePath = currentMagazine.getPngPath();
 
-//		if(holder.thumbnail.getDrawable() instanceof BitmapDrawable) {
-//			BitmapDrawable d = (BitmapDrawable) holder.thumbnail.getDrawable();
-//			Bitmap b = d.getBitmap();
-//			if (b != null) {
-//				Log.d(TAG, "Freeing bitmap size "+b.getRowBytes());
-//				b.recycle();
-//			}
-//
-//		}
+            MagazineItemHolder holder = new MagazineItemHolder();
+            if (convertView == null) {
+                convertView = LayoutInflater.from(context).inflate(R.layout.magazine_list_item, parent, false);
+                holder.title = (TextView) convertView.findViewById(R.id.item_title);
+                holder.subtitle = (TextView) convertView.findViewById(R.id.item_subtitle);
+                holder.thumbnail = (ImageView) convertView.findViewById(R.id.item_thumbnail);
+                holder.progressLayout = (LinearLayout) convertView.findViewById(R.id.item_progress_layout);
+                holder.info = (TextView) convertView.findViewById(R.id.item_info);
+                holder.progressBar = (ProgressBar) convertView.findViewById(R.id.progress_bar);
+                holder.downloadOrReadButton = (Button) convertView.findViewById(R.id.item_button_one);
+                holder.sampleOrDeleteButton = (Button) convertView.findViewById(R.id.item_button_two);
+                convertView.setTag(holder);
+            } else {
+                holder = (MagazineItemHolder) convertView.getTag();
+            }
+
+        holder.title.setText(magazines.get(position).getTitle());
+
         if (holder.position != position) {
             holder.position = position;
             holder.thumbnail.setImageDrawable(null);
@@ -116,7 +105,7 @@ public class MagazineAdapter extends BaseAdapter {
             @Override
             protected Bitmap doInBackground(MagazineItemHolder... params) {
                 v = params[0];
-                return SystemHelper.decodeSampledBitmapFromFile(imagePath,
+                return SystemHelper.decodeSampledBitmapFromFile(magazines.get(position).getPngPath(),
                         (int) context.getResources().getDimension(R.dimen.preview_image_height),
                         (int) context.getResources().getDimension(R.dimen.preview_image_width));
             }
@@ -130,139 +119,158 @@ public class MagazineAdapter extends BaseAdapter {
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
 
-        // reset the visibilities
-        holder.progressLayout.setVisibility(View.GONE);
-        holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
-        holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
+        if (magazines.get(position) instanceof Magazine) {
+            final Magazine currentMagazine = (Magazine) magazines.get(position);
+            holder.subtitle.setText(currentMagazine.getSubtitle());
 
-        if(hasTestMagazine && currentMagazine.isFake()){
-            holder.downloadOrReadButton.setVisibility(View.VISIBLE);
-			holder.downloadOrReadButton.setText(context.getResources().getString(R.string.read));
-			holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if(new File(currentMagazine.getPdfPath()).exists()){
-								LibrelioApplication.startPDFActivity(context,
-										currentMagazine.getPdfPath(),
-										currentMagazine.getTitle());
-							} else {
-						Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
-					}
-				}
-			});
-			return convertView;
-		}
-
-        if ((currentMagazine.getDownloadStatus() >= DownloadManager.STATUS_PENDING) &&
-        (currentMagazine.getDownloadStatus() <= DownloadManager.STATUS_FAILED)) {
-            // currently downloading
-            holder.progressLayout.setVisibility(View.VISIBLE);
+            // reset the visibilities
+            holder.progressLayout.setVisibility(View.GONE);
             holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
-            holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
-            if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING || currentMagazine
-                    .getDownloadStatus() == DownloadManager.STATUS_PENDING) {
-                holder.info.setText(context.getResources()
-                        .getString(R.string.download_in_progress));
-            } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_PAUSED) {
-                holder.info.setText("Queued");
-            } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_FAILED) {
-                holder.info.setText("ERROR");
-            } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_SUCCESSFUL) {
-                holder.info.setText(context.getResources()
-                        .getString(R.string.download_in_progress));
-            }
+            holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 
-            if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING && currentMagazine
-                    .getDownloadProgress() > 0) {
-                holder.progressBar.setIndeterminate(false);
-                holder.progressBar.setProgress(currentMagazine.getDownloadProgress());
-            } else {
-                holder.progressBar.setIndeterminate(true);
-            }
-
-            holder.sampleOrDeleteButton.setText(context.getResources().getString(R.string.cancel));
-            holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    currentMagazine.delete();
-                    MagazineManager.removeDownloadedMagazine(context, currentMagazine);
-                    EventBus.getDefault().post(new LoadPlistEvent());
-                }
-            });
-        } else if (!currentMagazine.isDownloaded()) {
-            holder.downloadOrReadButton.setVisibility(View.VISIBLE);
-            if (currentMagazine.isPaid()) {
-                holder.downloadOrReadButton.setText(context.getResources()
-                        .getString(R.string.download));
-            } else {
-                holder.downloadOrReadButton.setText(context.getResources()
-                        .getString(R.string.free_Download));
-            }
-            holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (currentMagazine.isPaid()) {
-                        Intent intent = new Intent(context, BillingActivity.class);
-                        intent.putExtra(BillingActivity.FILE_NAME_KEY, currentMagazine.getFileName());
-                        intent.putExtra(BillingActivity.TITLE_KEY, currentMagazine.getTitle());
-                        intent.putExtra(BillingActivity.SUBTITLE_KEY, currentMagazine.getSubtitle());
-                        context.startActivity(intent);
-                    } else {
-                        DownloadMagazineService.startDownload(context, currentMagazine);
-                    }
-                }
-            });
-            // Sample button
-            if (currentMagazine.isPaid()) {
-                holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
-                if (currentMagazine.isSampleDownloaded()) {
-                    holder.sampleOrDeleteButton.setText(context.getResources().getString(
-                            R.string.read_sample));
-                } else {
-                    holder.sampleOrDeleteButton.setText(context.getResources().getString(
-                            R.string.sample));
-                }
-                holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+            if (hasTestMagazine && currentMagazine.isFake()) {
+                holder.downloadOrReadButton.setVisibility(View.VISIBLE);
+                holder.downloadOrReadButton.setText(context.getResources().getString(R.string.read));
+                holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        File sample = new File(currentMagazine.getSamplePdfPath());
-                        Log.d(TAG, "test: " + sample.exists() + " "
-                                + currentMagazine.isSampleDownloaded());
-                        if (currentMagazine.isSampleDownloaded()) {
+                        if (new File(currentMagazine.getItemPath()).exists()) {
                             LibrelioApplication.startPDFActivity(context,
-                                    currentMagazine.getSamplePdfPath(),
+                                    currentMagazine.getItemPath(),
                                     currentMagazine.getTitle());
                         } else {
-                            currentMagazine.setSample(true);
+                            Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                return convertView;
+            }
+
+            if ((currentMagazine.getDownloadStatus() >= DownloadManager.STATUS_PENDING) &&
+                    (currentMagazine.getDownloadStatus() <= DownloadManager.STATUS_FAILED)) {
+                // currently downloading
+                holder.progressLayout.setVisibility(View.VISIBLE);
+                holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
+                holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
+                if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING || currentMagazine
+                        .getDownloadStatus() == DownloadManager.STATUS_PENDING) {
+                    holder.info.setText(context.getResources()
+                            .getString(R.string.download_in_progress));
+                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_PAUSED) {
+                    holder.info.setText("Queued");
+                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_FAILED) {
+                    holder.info.setText("ERROR");
+                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_SUCCESSFUL) {
+                    holder.info.setText(context.getResources()
+                            .getString(R.string.download_in_progress));
+                }
+
+                if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING && currentMagazine
+                        .getDownloadProgress() > 0) {
+                    holder.progressBar.setIndeterminate(false);
+                    holder.progressBar.setProgress(currentMagazine.getDownloadProgress());
+                } else {
+                    holder.progressBar.setIndeterminate(true);
+                }
+
+                holder.sampleOrDeleteButton.setText(context.getResources().getString(R.string.cancel));
+                holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        currentMagazine.delete();
+                        MagazineManager.removeDownloadedMagazine(context, currentMagazine);
+                        EventBus.getDefault().post(new LoadPlistEvent());
+                    }
+                });
+            } else if (!currentMagazine.isDownloaded()) {
+                holder.downloadOrReadButton.setVisibility(View.VISIBLE);
+                if (currentMagazine.isPaid()) {
+                    holder.downloadOrReadButton.setText(context.getResources()
+                            .getString(R.string.download));
+                } else {
+                    holder.downloadOrReadButton.setText(context.getResources()
+                            .getString(R.string.free_Download));
+                }
+                holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (currentMagazine.isPaid()) {
+                            Intent intent = new Intent(context, BillingActivity.class);
+                            intent.putExtra(BillingActivity.FILE_NAME_KEY, currentMagazine.getFileName());
+                            intent.putExtra(BillingActivity.TITLE_KEY, currentMagazine.getTitle());
+                            intent.putExtra(BillingActivity.SUBTITLE_KEY, currentMagazine.getSubtitle());
+                            context.startActivity(intent);
+                        } else {
                             DownloadMagazineService.startDownload(context, currentMagazine);
                         }
                     }
                 });
+                // Sample button
+                if (currentMagazine.isPaid()) {
+                    holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
+                    if (currentMagazine.isSampleDownloaded()) {
+                        holder.sampleOrDeleteButton.setText(context.getResources().getString(
+                                R.string.read_sample));
+                    } else {
+                        holder.sampleOrDeleteButton.setText(context.getResources().getString(
+                                R.string.sample));
+                    }
+                    holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            File sample = new File(currentMagazine.getSamplePdfPath());
+                            Log.d(TAG, "test: " + sample.exists() + " "
+                                    + currentMagazine.isSampleDownloaded());
+                            if (currentMagazine.isSampleDownloaded()) {
+                                LibrelioApplication.startPDFActivity(context,
+                                        currentMagazine.getSamplePdfPath(),
+                                        currentMagazine.getTitle());
+                            } else {
+                                currentMagazine.setSample(true);
+                                DownloadMagazineService.startDownload(context, currentMagazine);
+                            }
+                        }
+                    });
+                }
+            } else if (currentMagazine.isDownloaded()) {
+                // Read case
+                holder.downloadOrReadButton.setVisibility(View.VISIBLE);
+                holder.downloadOrReadButton.setText(context.getResources()
+                        .getString(R.string.read));
+                holder.downloadOrReadButton
+                        .setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                LibrelioApplication.startPDFActivity(context,
+                                        currentMagazine.getItemPath(),
+                                        currentMagazine.getTitle());
+                            }
+                        });
             }
-        } else if (currentMagazine.isDownloaded()) {
-			// Read case
-            holder.downloadOrReadButton.setVisibility(View.VISIBLE);
-			holder.downloadOrReadButton.setText(context.getResources()
-                    .getString(R.string.read));
-			holder.downloadOrReadButton
-					.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							LibrelioApplication.startPDFActivity(context,
-									currentMagazine.getPdfPath(),
-									currentMagazine.getTitle());
-						}
-					});
-		}
-        int totalAssetCount = currentMagazine.getTotalAssetCount();
-        int downloadedAssetCount = currentMagazine.getDownloadedAssetCount();
-        if (totalAssetCount > 0 && downloadedAssetCount < totalAssetCount) {
-            holder.progressLayout.setVisibility(View.VISIBLE);
-            holder.progressBar.setIndeterminate(false);
-            holder.progressBar.setProgress((int)((downloadedAssetCount * 100.0f) / totalAssetCount));
-            holder.info.setText(context.getResources()
-                    .getString(R.string.download_in_progress)+"\n" + downloadedAssetCount + "/" + totalAssetCount);
+            int totalAssetCount = currentMagazine.getTotalAssetCount();
+            int downloadedAssetCount = currentMagazine.getDownloadedAssetCount();
+            if (totalAssetCount > 0 && downloadedAssetCount < totalAssetCount) {
+                holder.progressLayout.setVisibility(View.VISIBLE);
+                holder.progressBar.setIndeterminate(false);
+                holder.progressBar.setProgress((int) ((downloadedAssetCount * 100.0f) / totalAssetCount));
+                holder.info.setText(context.getResources()
+                        .getString(R.string.download_in_progress) + "\n" + downloadedAssetCount + "/" + totalAssetCount);
+            }
+            return convertView;
+        } else {
+            holder.subtitle.setVisibility(View.GONE);
+            holder.progressLayout.setVisibility(View.GONE);
+            holder.info.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);
+            holder.downloadOrReadButton.setVisibility(View.GONE);
+            holder.sampleOrDeleteButton.setVisibility(View.GONE);
+            holder.thumbnail.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainMagazineActivity.startMagazineActivity(context, magazines.get(position).getFileName());
+                }
+            });
+            return convertView;
         }
-		return convertView;
-	}
+    }
 }

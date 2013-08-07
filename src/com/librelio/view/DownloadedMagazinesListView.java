@@ -2,7 +2,6 @@ package com.librelio.view;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -48,7 +47,7 @@ public class DownloadedMagazinesListView extends ListView {
 					LibrelioApplication.startPDFActivity(context,
 							downloadedMagazine.isSample() ?
 							downloadedMagazine.getSamplePdfPath() :
-							downloadedMagazine.getPdfPath(), downloadedMagazine.getTitle());
+							downloadedMagazine.getItemPath(), downloadedMagazine.getTitle());
 				}
 			}
 		});

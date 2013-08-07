@@ -13,7 +13,7 @@ import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
 
-public class Magazine {
+public class Magazine extends DictItem {
 	protected static final String TAG = Magazine.class.getSimpleName();
 	private static final String COMPLETE_FILE = ".complete";
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
@@ -35,12 +35,8 @@ public class Magazine {
 	private long id;
 	private String title;
 	private String subtitle;
-	private String fileName;
-	private String pdfPath;
-	private String pngPath;
+	private String itemPath;
 	private String samplePdfPath;
-	private String pdfUrl;
-	private String pngUrl;
 	private String samplePdfUrl;
 	private boolean isPaid;
 	private boolean isDownloaded;
@@ -86,7 +82,7 @@ public class Magazine {
 
 		valuesInit(fileName);
 	}
-	
+
 	public String getMagazineDir(){
 		int finishNameIndex = fileName.indexOf("/");
 		return StorageUtils.getStoragePath(context) + fileName.substring(0,finishNameIndex)+"/";
@@ -124,17 +120,17 @@ public class Magazine {
 		isPaid = fileName.contains("_.");
 		int startNameIndex = fileName.indexOf("/")+1;
 		String png = StorageUtils.getStoragePath(context)+fileName.substring(startNameIndex, fileName.length());
-		pdfUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
-		pdfPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
+	    itemUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
+		itemPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
-			pngUrl = pdfUrl.replace("_.pdf", ".png");
+			pngUrl = itemUrl.replace("_.pdf", ".png");
 			pngPath = png.replace("_.pdf", ".png");
-			samplePdfUrl = pdfUrl.replace("_.", ".");
-			samplePdfPath = pdfPath.replace("_.", ".");
+			samplePdfUrl = itemUrl.replace("_.", ".");
+			samplePdfPath = itemPath.replace("_.", ".");
 			File sample = new File(getMagazineDir()+COMPLETE_SAMPLE_FILE);
 			isSampleDownloaded = sample.exists();
 		} else {
-			pngUrl = pdfUrl.replace(".pdf", ".png");
+			pngUrl = itemUrl.replace(".pdf", ".png");
 			pngPath = png.replace(".pdf", ".png");
 		}
 		File complete = new File(getMagazineDir()+COMPLETE_FILE);
@@ -200,10 +196,6 @@ public class Magazine {
 		return subtitle;
 	}
 
-	public String getFileName() {
-		return fileName;
-	}
-
 	public String getSamplePdfPath() {
 		return samplePdfPath;
 	}
@@ -212,8 +204,8 @@ public class Magazine {
 		return samplePdfUrl;
 	}
 
-	public String getPdfPath() {
-		return pdfPath;
+	public String getItemPath() {
+		return itemPath;
 	}
 
 	public String getPngPath() {
@@ -224,8 +216,8 @@ public class Magazine {
 		this.isSample = isSample;
 	}
 
-	public String getPdfUrl() {
-		return pdfUrl;
+	public String getItemUrl() {
+		return itemUrl;
 	}
 
 	public String getPngUrl() {

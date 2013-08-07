@@ -72,7 +72,7 @@ public class DownloadMagazineService extends IntentService {
                     magazine.makeMagazineDir();
                     StorageUtils.move(srcFileName, magazine.isSample() ?
                             magazine.getSamplePdfPath() :
-                            magazine.getPdfPath());
+                            magazine.getItemPath());
                 }
             }
             c.close();
@@ -95,7 +95,7 @@ public class DownloadMagazineService extends IntentService {
             resultIntent.setAction(Intent.ACTION_VIEW);
             resultIntent.setData(Uri.parse(magazine.isSample() ?
                     magazine.getSamplePdfPath() :
-                    magazine.getPdfPath()));
+                    magazine.getItemPath()));
             resultIntent.putExtra(Magazine.FIELD_TITLE, magazine.getTitle());
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -152,7 +152,7 @@ public class DownloadMagazineService extends IntentService {
         ArrayList<String> links = new ArrayList<String>();
         ArrayList<String> assetsNames = new ArrayList<String>();
         //
-        String filePath = magazine.isSample() ? magazine.getSamplePdfPath() : magazine.getPdfPath();
+        String filePath = magazine.isSample() ? magazine.getSamplePdfPath() : magazine.getItemPath();
         PDFParser linkGetter = new PDFParser(filePath);
         SparseArray<LinkInfoExternal[]> linkBuf = linkGetter.getLinkInfo();
         if (linkBuf == null) {
@@ -210,8 +210,8 @@ public class DownloadMagazineService extends IntentService {
     }
 
     public static void startDownload(Context context, Magazine magazine, boolean isTemp, String tempUrlKey) {
-        String fileUrl = magazine.getPdfUrl();
-        String filePath = magazine.getPdfPath();
+        String fileUrl = magazine.getItemUrl();
+        String filePath = magazine.getItemPath();
         if (magazine.isSample()) {
             fileUrl = magazine.getSamplePdfUrl();
             filePath = magazine.getSamplePdfPath();

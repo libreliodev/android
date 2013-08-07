@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.event.MagazineDownloadedEvent;
@@ -84,7 +83,7 @@ public class DownloadMagazineActivity extends BaseActivity {
 
     public void onEventMainThread(MagazineDownloadedEvent event) {
         if (event.getMagazine().getFileName().equals(magazine.getFileName())) {
-            LibrelioApplication.startPDFActivity(this, magazine.getPdfPath(), magazine.getTitle());
+            LibrelioApplication.startPDFActivity(this, magazine.getItemPath(), magazine.getTitle());
             finish();
         }
     }

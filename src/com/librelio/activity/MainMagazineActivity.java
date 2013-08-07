@@ -23,12 +23,14 @@ import java.util.ArrayList;
 
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import com.librelio.event.InvalidateGridViewEvent;
 import com.librelio.event.LoadPlistEvent;
+import com.librelio.model.DictItem;
 import com.librelio.utils.PlistDownloader;
 import com.librelio.loader.PlistParserLoader;
 import de.greenrobot.event.EventBus;
@@ -50,7 +52,6 @@ import android.widget.GridView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
-import com.librelio.model.Magazine;
 import com.niveales.wind.R;
 
 /**
@@ -58,7 +59,7 @@ import com.niveales.wind.R;
  * 
  * @author Nikolay Moskvin <moskvin@netcook.org>
  */
-public class MainMagazineActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<ArrayList<Magazine>> {
+public class MainMagazineActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<ArrayList<DictItem>> {
 	/**
 	 * The static
 	 */
@@ -70,7 +71,8 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 	private static final int DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID = 3;
     private static final int PLIST_PARSER_LOADER = 0;
-//    private static final String PLIST_NAME = "plist_name";
+
+    private static final String PLIST_NAME_EXTRA = "plist_name";
 
     /**
 	 * The Purchase receivers
@@ -79,7 +81,7 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 	private BroadcastReceiver subscriptionMonthly;
 
 	private GridView grid;
-	private ArrayList<Magazine> magazines;
+	private ArrayList<DictItem> magazines;
 	private MagazineAdapter adapter;
 
 	private boolean hasTestMagazine;
@@ -100,6 +102,12 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 
     private Handler handler = new Handler();
 
+    public static void startMagazineActivity(Context context, String plistName) {
+        Intent intent = new Intent(context, MainMagazineActivity.class);
+        intent.putExtra(PLIST_NAME_EXTRA, plistName);
+        context.startActivity(intent);
+    }
+
     @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -107,13 +115,16 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 		setContentView(R.layout.issue_list_layout);
 		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
 
-        plistName = getString(R.string.root_view);
+        plistName = getIntent().getStringExtra(PLIST_NAME_EXTRA);
+        if (!plistName.equals(getString(R.string.root_view))) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 		
 		hasTestMagazine = hasTestMagazine();
 
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
 
-		magazines = new ArrayList<Magazine>();
+		magazines = new ArrayList<DictItem>();
 
 		adapter = new MagazineAdapter(magazines, this, hasTestMagazine);
 		grid.setAdapter(adapter);
@@ -211,12 +222,12 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-
+            case android.R.id.home:
+                finish();
 		case R.id.options_menu_reload:
             // force a redownload of the plist
             PlistDownloader.doLoad(this, plistName, true);
 			return true;
-
 		case R.id.options_menu_restore:
 			restorePurchases();
 			return true;
@@ -303,14 +314,14 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 	}
 
     @Override
-    public Loader<ArrayList<Magazine>> onCreateLoader(int id, Bundle args) {
+    public Loader<ArrayList<DictItem>> onCreateLoader(int id, Bundle args) {
 //        return new PlistParserLoader(getApplicationContext(), args.getString(PLIST_NAME));
 
         return new PlistParserLoader(getApplicationContext(), plistName, hasTestMagazine());
     }
 
     @Override
-    public void onLoadFinished(Loader<ArrayList<Magazine>> loader, ArrayList<Magazine> data) {
+    public void onLoadFinished(Loader<ArrayList<DictItem>> loader, ArrayList<DictItem> data) {
         magazines.clear();
         magazines.addAll(data);
         EventBus.getDefault().post(new InvalidateGridViewEvent());
@@ -323,7 +334,7 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
     }
 
     @Override
-    public void onLoaderReset(Loader<ArrayList<Magazine>> loader) {
+    public void onLoaderReset(Loader<ArrayList<DictItem>> loader) {
         magazines.clear();
         EventBus.getDefault().post(new InvalidateGridViewEvent());
     }
