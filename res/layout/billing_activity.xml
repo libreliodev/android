@@ -35,6 +35,13 @@
         android:layout_height="wrap_content"
         android:text="@string/i_have_a_subscriber_code"
         android:textSize="@dimen/preview_button_text_size" />
+
+    <Button
+        android:id="@+id/billing_username_password_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/i_have_a_username_password_login"
+        android:textSize="@dimen/preview_button_text_size" />
     
     <Button
         android:id="@+id/billing_cancel_button"

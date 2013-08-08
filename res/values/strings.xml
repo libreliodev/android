@@ -67,12 +67,14 @@
     <string name="do_you_really_want_to_quit_this_app">Do you really want to quit this app?</string>
     <string name="yes">Yes</string>
     <string name="i_have_a_subscriber_code">I have a subscriber code</string>
+    <string name="i_have_a_username_password_login">I have a username and password</string>
     <string name="i_have_a_promo_code">I have a promo code</string>
     <string name="restore_my_purchases">Restore my purchases</string>
     <string name="restore_completed">Restore completed</string>
     <string name="free_subscription">Free subscription</string>
     <string name="subscriber_code">Subscriber Code</string>
     <string name="please_enter_your_code">Please enter your code</string>
+    <string name="please_enter_your_username_password_login">Please login</string>
     <string name="invalid_code">Invalid Code</string>
     <string name="share_on_facebook">Share on Facebook</string>
     <string name="share_on_twitter">Share on Twitter</string>
@@ -84,6 +86,9 @@
     <string name="week">week</string>
     <string name="ok">OK</string>
     <string name="dismiss">Dismiss</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
     
     <string name="send_log">Send log</string>
     <string name="download_service_already_running">Download service already running</string>
@@ -93,4 +98,5 @@
     <string name="asset_downloading">Asset\nDownloading…</string>
     <string name="read_sample">Read Sample</string>
     <string name="crash_toast_text">Application crashed. Please send bug report by email.</string>
+
 </resources>

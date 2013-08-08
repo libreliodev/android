@@ -7,6 +7,7 @@
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
     <bool name="enable_test_magazine">false</bool>
     <bool name="enable_code_subs">true</bool>
+    <bool name="enable_username_password_login">true</bool>
     <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>
     <string name="google_analytics">UA-1732003-23</string>

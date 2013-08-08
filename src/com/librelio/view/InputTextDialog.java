@@ -5,11 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
+import com.niveales.wind.R;
 
 public class InputTextDialog {
-
-	private static String OK = "OK";
-	private static String Cancel = "Cancel";
 	
 	private AlertDialog.Builder builder;
 	private Context context;
@@ -40,7 +38,7 @@ public class InputTextDialog {
 		builder.setView(input);
 	
 		// Set up the buttons
-		builder.setPositiveButton(OK, new DialogInterface.OnClickListener() { 
+		builder.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		    	if (null != onEnterValueListener){
@@ -50,7 +48,7 @@ public class InputTextDialog {
 		    }
 		});
 		
-		builder.setNegativeButton(Cancel, new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        dialog.cancel();

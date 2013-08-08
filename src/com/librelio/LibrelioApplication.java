@@ -108,6 +108,10 @@ public class LibrelioApplication extends Application {
 		return context.getResources().getBoolean(R.bool.enable_code_subs);
 	}
 
+    public static boolean isEnableUsernamePasswordLogin(Context context){
+        return context.getResources().getBoolean(R.bool.enable_username_password_login);
+    }
+
 	public static String getServerUrl(Context context){
 		return context.getString(R.string.server_url);
 	}

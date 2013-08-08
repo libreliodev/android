@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import android.app.Activity;
 import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
+import com.librelio.view.UsernamePasswordLoginDialog;
+import com.librelio.view.UsernamePasswordLoginDialog.OnEnterUsernamePasswordLoginListener;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -94,6 +96,9 @@ public class BillingActivity extends BaseActivity {
 	private static final String PARAM_DATA = "@data";
 	private static final String PARAM_SIGNATURE = "@signature";
 	private static final String PARAM_URLSTRING = "@urlstring";
+
+    private static final String PARAM_USERNAME = "@username";
+    private static final String PARAM_PASSWORD = "@password";
 	private static final String PARAM_CODE = "@code";
 	private static final String PARAM_CLIENT = "@client";
 	private static final String PARAM_APP = "@app";
@@ -125,6 +130,7 @@ public class BillingActivity extends BaseActivity {
 	private Button subsYear;
 	private Button subsMonthly;
 	private Button subsCode;
+    private Button usernamePasswordLogin;
 
 	private String ownedItemSignature = "";
 	private String ownedItemPurshaseData = "";
@@ -135,7 +141,7 @@ public class BillingActivity extends BaseActivity {
 	private Editor subscrPrefEd;
 
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.wait_bar);
@@ -182,6 +188,7 @@ public class BillingActivity extends BaseActivity {
 		subsMonthly = (Button)findViewById(R.id.billing_subs_monthly);
 		subsYear = (Button)findViewById(R.id.billing_subs_year);
 		subsCode = (Button)findViewById(R.id.billing_subs_code_button);
+        usernamePasswordLogin = (Button)findViewById(R.id.billing_username_password_login_button);
 		cancel = (Button)findViewById(R.id.billing_cancel_button);
 		cancel.setOnClickListener(new OnClickListener() {
 			@Override
@@ -242,6 +249,19 @@ public class BillingActivity extends BaseActivity {
 		}else{
 			subsCode.setVisibility(View.GONE);
 		}
+        if (LibrelioApplication.isEnableUsernamePasswordLogin(getContext())){
+            usernamePasswordLogin.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UsernamePasswordLoginDialog dialog = new UsernamePasswordLoginDialog(getContext(),
+                            getString(R.string.please_enter_your_username_password_login));
+                    dialog.setOnEnterUsernamePasswordLoginListener(onEnterUsernamePasswordLoginListener);
+                    dialog.show();
+                }
+            });
+        } else {
+            usernamePasswordLogin.setVisibility(View.GONE);
+        }
 	}
 
 	private ServiceConnection mServiceConn = new ServiceConnection() {
@@ -454,7 +474,7 @@ public class BillingActivity extends BaseActivity {
 		StringBuilder query = new StringBuilder(
 				LibrelioApplication.getServerUrl(getContext()));
 		
-		String comand = getString(R.string.command_android_verify)
+		String command = getString(R.string.command_android_verify)
 				.replace(";", "&")
 				.replace(PARAM_PRODUCT_ID, Uri.encode(productId))
 				.replace(PARAM_DATA, Uri.encode(dataResponse))
@@ -462,7 +482,7 @@ public class BillingActivity extends BaseActivity {
 				.replace(PARAM_URLSTRING, Uri.encode(
 						LibrelioApplication.getUrlString(getContext(), fileName)));
 		
-		return query.append(comand).toString();
+		return query.append(command).toString();
 	}
 	
 	private String buildPswdQuery(String code) {
@@ -470,7 +490,7 @@ public class BillingActivity extends BaseActivity {
 		StringBuilder query = new StringBuilder(
 				LibrelioApplication.getServerUrl(getContext()));
 		
-		String comand = getString(R.string.command_pswd)
+		String command = getString(R.string.command_pswd)
 				.replace(";", "&")
 				.replace(PARAM_CODE, Uri.encode(code))
 				.replace(PARAM_URLSTRING, Uri.encode(
@@ -478,8 +498,24 @@ public class BillingActivity extends BaseActivity {
 				.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(getContext())))
 				.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(getContext())));
 		
-		return query.append(comand).toString();
+		return query.append(command).toString();
 	}
+
+    private String buildUsernamePswdQuery() {
+
+        StringBuilder query = new StringBuilder(
+                LibrelioApplication.getServerUrl(getContext()));
+
+        String command = getString(R.string.command_username_pswd)
+                .replace(PARAM_URLSTRING, Uri.encode(
+                        LibrelioApplication.getUrlString(fileName)))
+                .replace(PARAM_USERNAME, Uri.encode("George"))
+                .replace(PARAM_PASSWORD, Uri.encode("RoyalBaby"))
+                .replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(getContext())))
+                .replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(getContext())));
+
+        return query.append(command).toString();
+    }
 
 	private class DownloadFromTempURLTask extends AsyncTask<String, Void, HttpResponse>{
 		@Override
@@ -671,5 +707,11 @@ public class BillingActivity extends BaseActivity {
 			new DownloadSubsrcFromTempURLTask().execute(buildPswdQuery(code), code);
 		}
 	};
+
+    private OnEnterUsernamePasswordLoginListener onEnterUsernamePasswordLoginListener = new OnEnterUsernamePasswordLoginListener() {
+        @Override
+        public void onEnterUsernamePasswordLogin(String username, String password) {
+        }
+    };
 	
 }
