@@ -89,7 +89,7 @@ public class BillingActivity extends BaseActivity {
 	 */
 	public static final String SUBSCRIPTION_PREF = "SubscriptionPreferences";
 	public static final String PARAM_SUBSCRIPTION_CODE = "PARAM_SUBSCRIPTION_CODE";
-	
+
 	private static final String TEST_PRODUCT_ID = "android.test.purchased";
 	
 	private static final String PARAM_PRODUCT_ID = "@product_id";
@@ -104,6 +104,7 @@ public class BillingActivity extends BaseActivity {
 	private static final String PARAM_APP = "@app";
 	
 	private static final String UNAUTHORIZED_STRING = "Unauthorized";
+    private static final String LOGIN_FAILED_STRING = "LoginFailed";
 	
 	private static final int CALLBACK_CODE = 101;
 	private static final int UNAUTHORIZED_CODE = 401;
@@ -501,7 +502,7 @@ public class BillingActivity extends BaseActivity {
 		return query.append(command).toString();
 	}
 
-    private String buildUsernamePswdQuery() {
+    private String buildUsernamePswdQuery(String username, String password) {
 
         StringBuilder query = new StringBuilder(
                 LibrelioApplication.getServerUrl(getContext()));
@@ -509,8 +510,8 @@ public class BillingActivity extends BaseActivity {
         String command = getString(R.string.command_username_pswd)
                 .replace(PARAM_URLSTRING, Uri.encode(
                         LibrelioApplication.getUrlString(fileName)))
-                .replace(PARAM_USERNAME, Uri.encode("George"))
-                .replace(PARAM_PASSWORD, Uri.encode("RoyalBaby"))
+                .replace(PARAM_USERNAME, Uri.encode(username))
+                .replace(PARAM_PASSWORD, Uri.encode(password))
                 .replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(getContext())))
                 .replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(getContext())));
 
@@ -632,6 +633,44 @@ public class BillingActivity extends BaseActivity {
 		}
 	}
 
+    private class DownloadUsernamePasswordLoginFromTempURLTask extends DownloadFromTempURLTask{
+
+        private String username;
+        private String password;
+
+        @Override
+        protected HttpResponse doInBackground(String... params) {
+            username = params[1];
+            password = params[2];
+            return super.doInBackground(params);
+        }
+
+        @Override
+        protected void onPostExecute(HttpResponse response) {
+            if (null != response) {
+                String responseStatus = response.getStatusLine().toString();
+                int responseCode = response.getStatusLine().getStatusCode();
+
+                if (responseStatus.contains(LOGIN_FAILED_STRING) &&
+                        responseCode == UNAUTHORIZED_CODE){
+                    subscrPrefEd.remove(PARAM_USERNAME).commit();
+                    subscrPrefEd.remove(PARAM_PASSWORD).commit();
+                }else{
+                    String prefSubscrCode =
+                            subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
+                    if (prefSubscrCode == null){
+                        subscrPrefEd.putString(
+                                PARAM_USERNAME, username).commit();
+                        subscrPrefEd.putString(
+                                PARAM_PASSWORD, password).commit();
+                    }
+                }
+            }
+
+            super.onPostExecute(response);
+        }
+    }
+
 
 	private class PurchaseTask extends AsyncTask<String, String, Bundle>{
 		private Bundle ownedItems;
@@ -711,6 +750,8 @@ public class BillingActivity extends BaseActivity {
     private OnEnterUsernamePasswordLoginListener onEnterUsernamePasswordLoginListener = new OnEnterUsernamePasswordLoginListener() {
         @Override
         public void onEnterUsernamePasswordLogin(String username, String password) {
+            setContentView(R.layout.wait_bar);
+            new DownloadSubsrcFromTempURLTask().execute(buildUsernamePswdQuery(username, password), username, password);
         }
     };
 	
