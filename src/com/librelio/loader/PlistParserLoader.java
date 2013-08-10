@@ -6,6 +6,7 @@ import android.util.Log;
 import com.librelio.event.InvalidateGridViewEvent;
 import com.librelio.model.DictItem;
 import com.librelio.model.Magazine;
+import com.librelio.model.PlistItem;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
@@ -67,7 +68,7 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
     @Override
     public ArrayList<DictItem> loadInBackground() {
 
-        ArrayList<DictItem> magazines = extractMagazinesFromPlist(plistName);
+        ArrayList<DictItem> magazines = parsePlist(plistName);
         return magazines;
     }
 
@@ -76,8 +77,10 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
         super.deliverResult(data);
     }
 
-    private ArrayList<DictItem> extractMagazinesFromPlist(String plistName) {
+    private ArrayList<DictItem> parsePlist(String plistName) {
         long startTime = System.currentTimeMillis();
+
+        PlistItem plistItem = new PlistItem(plistName, "", getContext());
 
         ArrayList<DictItem> magazines = new ArrayList<DictItem>();
 
@@ -86,7 +89,11 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
         }
 
         //Convert plist to String for parsing
-        String pList = StorageUtils.getStringFromFile(StorageUtils.getStoragePath(getContext()) + plistName);
+        String pList = StorageUtils.getStringFromFile(plistItem.getItemPath());
+
+        if (pList == null) {
+            return null;
+        }
 
         //Parsing
         PListXMLHandler handler = new PListXMLHandler();

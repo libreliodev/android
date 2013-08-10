@@ -267,7 +267,7 @@ public class MagazineAdapter extends BaseAdapter {
             holder.thumbnail.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MainMagazineActivity.startMagazineActivity(context, magazines.get(position).getFileName());
+                    context.startActivity(MainMagazineActivity.getIntent(context, magazines.get(position).getFileName()));
                 }
             });
             return convertView;

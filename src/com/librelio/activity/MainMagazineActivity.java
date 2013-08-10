@@ -102,10 +102,10 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 
     private Handler handler = new Handler();
 
-    public static void startMagazineActivity(Context context, String plistName) {
+    public static Intent getIntent(Context context, String plistName) {
         Intent intent = new Intent(context, MainMagazineActivity.class);
         intent.putExtra(PLIST_NAME_EXTRA, plistName);
-        context.startActivity(intent);
+        return intent;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
         if (!plistName.equals(getString(R.string.root_view))) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
-		
+
 		hasTestMagazine = hasTestMagazine();
 
 		grid = (GridView)findViewById(R.id.issue_list_grid_view);
@@ -135,8 +135,6 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 		registerReceiver(subscriptionMonthly, subsFilter);
 
         getLoaderManager().initLoader(PLIST_PARSER_LOADER, null, this);
-
-        PlistDownloader.doLoad(this, plistName, false);
 
 	}
 
@@ -182,6 +180,7 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 		super.onResume();
 		EasyTracker.getTracker().sendView("Library/Magazines");
         startLoadPlistTask(0);
+        PlistDownloader.doLoad(this, plistName, false);
     }
 
     @Override
@@ -323,7 +322,9 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
     @Override
     public void onLoadFinished(Loader<ArrayList<DictItem>> loader, ArrayList<DictItem> data) {
         magazines.clear();
-        magazines.addAll(data);
+        if (data != null) {
+            magazines.addAll(data);
+        }
         EventBus.getDefault().post(new InvalidateGridViewEvent());
         startLoadPlistTask(2000);
     }
