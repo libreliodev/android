@@ -43,7 +43,13 @@ public class LibrelioApplication extends Application {
         ACRA.init(this);
 
         baseUrl = "http://librelio-europe.s3.amazonaws.com/" + getClientName(this) + PATH_SEPARATOR + getMagazineName(this) + PATH_SEPARATOR;
-	}
+
+
+//		baseUrl = "http://librelio-test.s3.amazonaws.com/" + getMagazineName(this) +
+//                PATH_SEPARATOR;
+
+    }
+
 
 	public static void startPDFActivity(Context context, String filePath, String title){
 		try{
@@ -86,6 +92,10 @@ public class LibrelioApplication extends Application {
 	public static String getMagazineName(Context context){
 		return context.getResources().getString(R.string.magazine_name);
 	}
+
+    public static String getServiceName(Context context){
+        return context.getResources().getString(R.string.service_name);
+    }
 	
 	public static String getUrlString(String fileName){
 		return PATH_SEPARATOR + fileName;

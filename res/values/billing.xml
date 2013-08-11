@@ -5,6 +5,6 @@
     <string name="command_android_verify">android_verify.php?product_id=@product_id;data=@data;signature=@signature;urlstring=@urlstring</string>
     <string name="command_pswd">pswd.php?code=@code;urlstring=@urlstring;client=@client;app=@app</string>
     <string
-        name="command_username_pswd">subscribers.php?urlstring=@urlstring&amp;user=@username&amp;pswd=@password&amp;client=@client&amp;app=@app&amp;service=biwing</string>
+        name="command_username_pswd">subscribers.php?urlstring=@urlstring&amp;user=@username&amp;pswd=@password&amp;client=@client&amp;app=@app&amp;service=@service</string>
 </resources>
     
