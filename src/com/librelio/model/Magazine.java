@@ -84,12 +84,12 @@ public class Magazine extends DictItem {
 	}
 
 	public String getMagazineDir(){
-		int finishNameIndex = fileName.indexOf("/");
+		int finishNameIndex = fileName.lastIndexOf("/");
 		return StorageUtils.getStoragePath(context) + fileName.substring(0,finishNameIndex)+"/";
 	}
 	
 	public static String getAssetsBaseURL(String fileName){
-		int finishNameIndex = fileName.indexOf("/");
+		int finishNameIndex = fileName.lastIndexOf("/");
 		return LibrelioApplication.getAmazonServerUrl() + fileName.substring(0,finishNameIndex) + "/";
 	}
 
@@ -118,25 +118,26 @@ public class Magazine extends DictItem {
 
 	private void valuesInit(String fileName) {
 		isPaid = fileName.contains("_.");
-		int startNameIndex = fileName.indexOf("/")+1;
-		String png = StorageUtils.getStoragePath(context)+fileName.substring(startNameIndex, fileName.length());
+		int startNameIndex = fileName.lastIndexOf("/")+1;
+//		String png = StorageUtils.getStoragePath(context)+fileName.substring(startNameIndex, fileName.length());
 	    itemUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
 		itemPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
 			pngUrl = itemUrl.replace("_.pdf", ".png");
-			pngPath = png.replace("_.pdf", ".png");
+			pngPath = itemPath.replace("_.pdf", ".png");
 			samplePdfUrl = itemUrl.replace("_.", ".");
 			samplePdfPath = itemPath.replace("_.", ".");
 			File sample = new File(getMagazineDir()+COMPLETE_SAMPLE_FILE);
 			isSampleDownloaded = sample.exists();
 		} else {
 			pngUrl = itemUrl.replace(".pdf", ".png");
-			pngPath = png.replace(".pdf", ".png");
+			pngPath = itemPath.replace(".pdf", ".png");
 		}
 		File complete = new File(getMagazineDir()+COMPLETE_FILE);
 		isDownloaded = complete.exists();
 		
 		assetsDir = getMagazineDir();
+        makeMagazineDir();
 	}
 
 	public void makeCompleteFile(boolean isSample){
