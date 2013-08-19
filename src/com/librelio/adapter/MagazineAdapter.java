@@ -1,11 +1,9 @@
 package com.librelio.adapter;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -31,6 +29,9 @@ import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 import de.greenrobot.event.EventBus;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class MagazineAdapter extends BaseAdapter {
 
@@ -105,15 +106,20 @@ public class MagazineAdapter extends BaseAdapter {
             @Override
             protected Bitmap doInBackground(MagazineItemHolder... params) {
                 v = params[0];
-                return SystemHelper.decodeSampledBitmapFromFile(magazines.get(position).getPngPath(),
-                        (int) context.getResources().getDimension(R.dimen.preview_image_height),
-                        (int) context.getResources().getDimension(R.dimen.preview_image_width));
+                try {
+                    return SystemHelper.decodeSampledBitmapFromFile(magazines.get(position).getPngPath(),
+                            (int) context.getResources().getDimension(R.dimen.preview_image_height),
+                            (int) context.getResources().getDimension(R.dimen.preview_image_width));
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
 
             @Override
             protected void onPostExecute(Bitmap result) {
                 super.onPostExecute(result);
-                if (v.position == position) {
+                if (v.position == position && result != null) {
                     v.thumbnail.setImageBitmap(result);
                 }
             }
