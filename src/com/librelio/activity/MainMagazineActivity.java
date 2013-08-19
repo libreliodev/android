@@ -19,8 +19,8 @@
 
 package com.librelio.activity;
 
-import java.util.ArrayList;
-
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,17 +28,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
-import com.librelio.event.InvalidateGridViewEvent;
-import com.librelio.event.LoadPlistEvent;
-import com.librelio.model.DictItem;
-import com.librelio.utils.PlistDownloader;
-import com.librelio.loader.PlistParserLoader;
-import de.greenrobot.event.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,11 +37,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.GridView;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.adapter.MagazineAdapter;
 import com.librelio.base.BaseActivity;
+import com.librelio.event.InvalidateGridViewEvent;
+import com.librelio.event.LoadPlistEvent;
+import com.librelio.event.UpdateMagazinesEvent;
+import com.librelio.loader.PlistParserLoader;
+import com.librelio.model.DictItem;
+import com.librelio.utils.PlistDownloader;
 import com.niveales.wind.R;
+import de.greenrobot.event.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * The main point for Librelio application
@@ -137,6 +136,14 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
         getLoaderManager().initLoader(PLIST_PARSER_LOADER, null, this);
 
 	}
+
+    public void onEventMainThread(UpdateMagazinesEvent event) {
+        if (event.getMagazines() != null) {
+            magazines.clear();
+            magazines.addAll(event.getMagazines());
+        }
+        reloadGrid();
+    }
 
     public void onEventMainThread(InvalidateGridViewEvent event) {
             reloadGrid();
@@ -321,10 +328,10 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(Loader<ArrayList<DictItem>> loader, ArrayList<DictItem> data) {
-        magazines.clear();
-        if (data != null) {
-            magazines.addAll(data);
-        }
+//        magazines.clear();
+//        if (data != null) {
+//            magazines.addAll(data);
+//        }
         EventBus.getDefault().post(new InvalidateGridViewEvent());
         startLoadPlistTask(2000);
     }

@@ -4,6 +4,7 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 import com.librelio.event.InvalidateGridViewEvent;
+import com.librelio.event.UpdateMagazinesEvent;
 import com.librelio.model.DictItem;
 import com.librelio.model.Magazine;
 import com.librelio.model.PlistItem;
@@ -112,8 +113,9 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
             if (magazine instanceof Magazine)
             MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
         }
-        Log.d("time", (System.currentTimeMillis() - startTime) + " ");
-//        EventBus.getDefault().post(new InvalidateGridViewEvent());
+        EventBus.getDefault().post(new UpdateMagazinesEvent(magazines));
+
+        // This should happen on a different thread - or just when images are displayed
         for (DictItem magazine : magazines) {
             //saving png
             File png = new File(magazine.getPngPath());
