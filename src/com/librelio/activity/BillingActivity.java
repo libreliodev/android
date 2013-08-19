@@ -19,30 +19,11 @@
 
 package com.librelio.activity;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import com.librelio.model.Magazine;
-import com.librelio.service.DownloadMagazineService;
-import com.librelio.view.SubscriberCodeDialog;
-import com.librelio.view.UsernamePasswordLoginDialog;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
@@ -58,11 +39,28 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
+import com.librelio.model.Magazine;
+import com.librelio.service.DownloadMagazineService;
+import com.librelio.view.SubscriberCodeDialog;
+import com.librelio.view.UsernamePasswordLoginDialog;
 import com.niveales.wind.R;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * The class for purchases via Google Play
@@ -179,24 +177,7 @@ public class BillingActivity extends BaseActivity {
 	
 	private void initViews() {
 
-        String prefSubscrCode = getSavedSubscriberCode();
-
-        if (prefSubscrCode != null){
-			new DownloadSubsrcFromTempURLTask().execute(
-					buildSubscriptionCodeQuery(prefSubscrCode), prefSubscrCode);
-			return;
-		}
-
-        String prefUsername = getSavedUsername();
-
-        if (prefUsername != null){
-            String prefPassword = getSavedPassword();
-            new DownloadUsernamePasswordLoginFromTempURLTask().execute(buildUsernamePasswordLoginQuery(prefUsername,
-                    prefPassword), prefUsername, prefPassword);
-            return;
-        }
-
-		setContentView(R.layout.billing_activity);
+        setContentView(R.layout.billing_activity);
 		buy = (Button)findViewById(R.id.billing_buy_button);
 		subsMonthly = (Button)findViewById(R.id.billing_subs_monthly);
 		subsYear = (Button)findViewById(R.id.billing_subs_year);
@@ -270,6 +251,26 @@ public class BillingActivity extends BaseActivity {
             usernamePasswordLogin.setVisibility(View.GONE);
         }
 	}
+
+    private boolean checkForValidSubscription() {
+        String prefSubscrCode = getSavedSubscriberCode();
+
+        if (prefSubscrCode != null){
+			new DownloadSubsrcFromTempURLTask().execute(
+					buildSubscriptionCodeQuery(prefSubscrCode), prefSubscrCode);
+            return true;
+		}
+
+        String prefUsername = getSavedUsername();
+
+        if (prefUsername != null){
+            String prefPassword = getSavedPassword();
+            new DownloadUsernamePasswordLoginFromTempURLTask().execute(buildUsernamePasswordLoginQuery(prefUsername,
+                    prefPassword), prefUsername, prefPassword);
+            return true;
+        }
+        return false;
+    }
 
     private String getSavedSubscriberCode() {
         return subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
@@ -413,7 +414,9 @@ public class BillingActivity extends BaseActivity {
 							}
 						}
 					}
-					initViews();
+                    if (!checkForValidSubscription()) {
+                        initViews();
+                    }
 					super.onPostExecute(skuDetails);
 				}
 
@@ -669,8 +672,8 @@ public class BillingActivity extends BaseActivity {
                             }
                             if (content.toString().contains(UNAUTHORIZED_DEVICE_STRING)) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage("Too many devices");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                builder.setMessage(getString(R.string.unauthorized_device));
+                                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         finish();
@@ -679,8 +682,8 @@ public class BillingActivity extends BaseActivity {
                                 builder.show();
                             } else if (content.toString().contains(UNAUTHORIZED_ISSUE_STRING)) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage("You don't own this issue");
-                                builder.setPositiveButton("Buy", new DialogInterface.OnClickListener() {
+                                builder.setMessage(getString(R.string.unauthorized_issue));
+                                builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         initViews();
@@ -744,8 +747,8 @@ public class BillingActivity extends BaseActivity {
                             }
                             if (content.toString().contains(UNAUTHORIZED_DEVICE_STRING)) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage("Too many devices");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                builder.setMessage(R.string.unauthorized_device);
+                                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         finish();
@@ -754,8 +757,8 @@ public class BillingActivity extends BaseActivity {
                                 builder.show();
                             } else if (content.toString().contains(UNAUTHORIZED_ISSUE_STRING)) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage("You don't own this issue");
-                                builder.setPositiveButton("Buy", new DialogInterface.OnClickListener() {
+                                builder.setMessage(R.string.unauthorized_issue);
+                                builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         initViews();
