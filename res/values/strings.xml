@@ -98,5 +98,7 @@
     <string name="asset_downloading">Asset\nDownloading…</string>
     <string name="read_sample">Read Sample</string>
     <string name="crash_toast_text">Application crashed. Please send bug report by email.</string>
+    <string name="incorrect_code">Incorrect code</string>
+    <string name="incorrect_username_or_password">Incorrect username or password</string>
 
 </resources>

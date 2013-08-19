@@ -13,20 +13,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/error_text"
-        android:text="@string/incorrect_username_or_password"
+        android:text="@string/incorrect_code"
         style="@style/errorText" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:id="@+id/username"
-        android:layout_gravity="left|center_vertical"
-        android:hint="@string/username" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:inputType="textPassword"
-        android:id="@+id/password"
-        android:hint="@string/password" />
+        android:id="@+id/subscriber_code"
+        android:layout_gravity="left|center_vertical" />
 </LinearLayout>

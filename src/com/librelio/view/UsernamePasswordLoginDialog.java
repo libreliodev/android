@@ -13,20 +13,23 @@ public class UsernamePasswordLoginDialog {
 	private AlertDialog.Builder builder;
 	private Context context;
 	private String title;
+    private boolean error;
 
     private EditText username;
     private EditText password;
 
-	private OnEnterUsernamePasswordLoginListener onEnterUsernamePasswordLoginListener;
+	private OnUsernamePasswordLoginListener onUsernamePasswordLoginListener;
 
-	public interface OnEnterUsernamePasswordLoginListener {
+	public interface OnUsernamePasswordLoginListener {
 		public void onEnterUsernamePasswordLogin(String username, String password);
+        public void onCancel();
 	}
 
-	public UsernamePasswordLoginDialog(Context context, String title) {
+	public UsernamePasswordLoginDialog(Context context, String title, boolean error) {
 		this.context = context;
 		this.title = title;
-		configureDialog();
+        this.error = error;
+        configureDialog();
 	}
 	
 	private void configureDialog(){
@@ -40,6 +43,10 @@ public class UsernamePasswordLoginDialog {
         View view = LayoutInflater.from(context).inflate(R.layout.username_password_login_dialog, null, false);
         username = (EditText) view.findViewById(R.id.username);
         password = (EditText) view.findViewById(R.id.password);
+
+        if (error) {
+            view.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
+        }
 		
 		builder.setView(view);
 	
@@ -47,8 +54,8 @@ public class UsernamePasswordLoginDialog {
 		builder.setPositiveButton(context.getString(R.string.login), new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
-		    	if (null != onEnterUsernamePasswordLoginListener){
-		    		onEnterUsernamePasswordLoginListener.onEnterUsernamePasswordLogin(
+		    	if (null != onUsernamePasswordLoginListener){
+		    		onUsernamePasswordLoginListener.onEnterUsernamePasswordLogin(
                             username.getText().toString(), password.getText().toString());
 		    	}
 		    }
@@ -57,13 +64,13 @@ public class UsernamePasswordLoginDialog {
 		builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
-		        dialog.cancel();
+		        onUsernamePasswordLoginListener.onCancel();
 		    }
 		});
 	} 
 	
-	public void setOnEnterUsernamePasswordLoginListener(OnEnterUsernamePasswordLoginListener onEnterUsernamePasswordLoginListener){
-		this.onEnterUsernamePasswordLoginListener = onEnterUsernamePasswordLoginListener;
+	public void setOnUsernamePasswordLoginListener(OnUsernamePasswordLoginListener onUsernamePasswordLoginListener){
+		this.onUsernamePasswordLoginListener = onUsernamePasswordLoginListener;
 	}
 	
 	public void show(){

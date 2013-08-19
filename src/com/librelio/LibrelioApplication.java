@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.provider.Settings;
 import android.util.Log;
 
 import android.widget.Toast;
@@ -129,5 +130,9 @@ public class LibrelioApplication extends Application {
 	public static String getAmazonServerUrl(){
 		return baseUrl;
 	}
+
+    public static String getAndroidId(Context context) {
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
 
 }

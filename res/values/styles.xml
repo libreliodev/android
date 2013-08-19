@@ -13,4 +13,11 @@
 
     <style name="Theme.Fullscreen" parent="android:Theme.Holo.NoActionBar.Fullscreen"></style>
 
+    <style name="errorText">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">@android:color/holo_red_light</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
 </resources>
