@@ -103,13 +103,11 @@ public class BillingActivity extends BaseActivity {
 
     private static final String PARAM_DEVICEID = "@deviceid";
 
-    private static final String UNAUTHORIZED_STRING = "Unauthorized";
-	private static final String UNAUTHORIZED_ISSUE_STRING = "UnauthorizedIssue";
-    private static final String LOGIN_FAILED_STRING = "LoginFailed";
-    private static final String UNAUTHORIZED_DEVICE_STRING = "Unauthorized device";
-	
 	private static final int CALLBACK_CODE = 101;
 	private static final int UNAUTHORIZED_CODE = 401;
+    private static final int UNAUTHORIZED_USER = 461;
+    private static final int UNAUTHORIZED_ISSUE = 462;
+    private static final int UNAUTHORIZED_DEVICE = 463;
 	
 	private static final int BILLING_RESPONSE_RESULT_OK = 0;
 	private static final int BILLING_RESPONSE_RESULT_USER_CANCELED = 1;
@@ -654,53 +652,30 @@ public class BillingActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(HttpResponse response) {
 			if (null != response) {
-				String responseStatus = response.getStatusLine().toString();
 				int responseCode = response.getStatusLine().getStatusCode();
-                if (responseStatus.contains(UNAUTHORIZED_STRING) &&
-                        responseCode == UNAUTHORIZED_CODE) {
-                    HttpEntity entity = response.getEntity();
-                    DataInputStream bodyStream = null;
-                    if (entity != null) {
-                        try {
-                            bodyStream = new DataInputStream(entity.getContent());
-                            StringBuilder content = new StringBuilder();
-                            if (null != bodyStream) {
-                                String line = null;
-                                while((line = bodyStream.readLine()) != null) {
-                                    content.append(line).append("\n");
-                                }
-                            }
-                            if (content.toString().contains(UNAUTHORIZED_DEVICE_STRING)) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage(getString(R.string.unauthorized_device));
-                                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        finish();
-                                    }
-                                });
-                                builder.show();
-                            } else if (content.toString().contains(UNAUTHORIZED_ISSUE_STRING)) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage(getString(R.string.unauthorized_issue));
-                                builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        initViews();
-                                    }
-                                });
-                                builder.show();
-                            } else {
-                                subscrPrefEd.remove(PARAM_SUBSCRIPTION_CODE).commit();
-                                showSubscriberCodeDialog(true);
-                            }
-                            Log.d(TAG, "body: " + content.toString());
-                        } catch (Exception e) {
-                            Log.e(TAG, "get content failed", e);
-                        } finally {
-                            try { bodyStream.close(); } catch (Exception e) {}
+                if (responseCode == UNAUTHORIZED_CODE) {
+                    subscrPrefEd.remove(PARAM_SUBSCRIPTION_CODE).commit();
+                    showSubscriberCodeDialog(true);
+                } else if (responseCode == UNAUTHORIZED_ISSUE) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
+                    builder.setMessage(getString(R.string.unauthorized_issue));
+                    builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            initViews();
                         }
-                    }
+                    });
+                    builder.show();
+                } else if (responseCode == UNAUTHORIZED_DEVICE) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
+                        builder.setMessage(getString(R.string.unauthorized_device));
+                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        });
+                        builder.show();
                 } else {
                     String prefSubscrCode = getSavedSubscriberCode();
                     if (prefSubscrCode == null){
@@ -710,7 +685,6 @@ public class BillingActivity extends BaseActivity {
                     startDownloadOfMagazineFromResponse(response);
 				}
 			}
-
 		}
 	}
 
@@ -731,52 +705,30 @@ public class BillingActivity extends BaseActivity {
             if (null != response) {
                 String responseStatus = response.getStatusLine().toString();
                 int responseCode = response.getStatusLine().getStatusCode();
-                if (responseStatus.contains(UNAUTHORIZED_STRING) &&
-                        responseCode == UNAUTHORIZED_CODE) {
-                    HttpEntity entity = response.getEntity();
-                    DataInputStream bodyStream = null;
-                    if (entity != null) {
-                        try {
-                            bodyStream = new DataInputStream(entity.getContent());
-                            StringBuilder content = new StringBuilder();
-                            if (null != bodyStream) {
-                                String line = null;
-                                while((line = bodyStream.readLine()) != null) {
-                                    content.append(line).append("\n");
-                                }
+                    if (responseCode == UNAUTHORIZED_USER) {
+                        subscrPrefEd.remove(PARAM_USERNAME).commit();
+                        subscrPrefEd.remove(PARAM_PASSWORD).commit();
+                        showUsernamePasswordLoginDialog(true);
+                    } else if (responseCode == UNAUTHORIZED_ISSUE) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
+                        builder.setMessage(getString(R.string.unauthorized_issue));
+                        builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                initViews();
                             }
-                            if (content.toString().contains(UNAUTHORIZED_DEVICE_STRING)) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage(R.string.unauthorized_device);
-                                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        finish();
-                                    }
-                                });
-                                builder.show();
-                            } else if (content.toString().contains(UNAUTHORIZED_ISSUE_STRING)) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
-                                builder.setMessage(R.string.unauthorized_issue);
-                                builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        initViews();
-                                    }
-                                });
-                                builder.show();
-                            } else {
-                                subscrPrefEd.remove(PARAM_USERNAME).commit();
-                                subscrPrefEd.remove(PARAM_PASSWORD).commit();
-                                showUsernamePasswordLoginDialog(true);
+                        });
+                        builder.show();
+                    } else if (responseCode == UNAUTHORIZED_DEVICE) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
+                        builder.setMessage(getString(R.string.unauthorized_device));
+                        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
                             }
-                            Log.d(TAG, "body: " + content.toString());
-                        } catch (Exception e) {
-                            Log.e(TAG, "get content failed", e);
-                        } finally {
-                            try { bodyStream.close(); } catch (Exception e) {}
-                        }
-                    }
+                        });
+                        builder.show();
                 } else {
                     String prefUsername =
                             subscrPref.getString(PARAM_USERNAME, null);
