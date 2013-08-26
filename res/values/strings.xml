@@ -100,7 +100,7 @@
     <string name="crash_toast_text">Application crashed. Please send bug report by email.</string>
     <string name="incorrect_code">Incorrect code</string>
     <string name="incorrect_username_or_password">Incorrect username or password</string>
-    <string name="unauthorized_issue">You don\'t own this issue</string>
-    <string name="unauthorized_device">Too many devices</string>
+    <string name="unauthorized_issue">Your subscription does not allow you to download this issue</string>
+    <string name="unauthorized_device">This issue has been downloaded on too many devices. Please contact license@librelio.com for more info</string>
 
 </resources>

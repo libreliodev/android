@@ -69,5 +69,11 @@
     <string name="no_space_on_device">Pas assez d\'espace sur votre stockage interne</string>
     <string name="browser">Navigateur</string>
     <string name="read_sample">Lire extrait</string>
+    <string name="crash_toast_text">L\'application a crashé. Merci de nous envoyer le rapport par mail.</string>
+    <string name="incorrect_code">Code incorrect</string>
+    <string name="incorrect_username_or_password">Identifiant ou mot de passe incorrect</string>
+    <string name="unauthorized_issue">Votre abonnement ne vous autorise pas à télécharger ce numéro</string>
+    <string name="unauthorized_device">Ce numéro a été téléchargé sur un nombre trop important d\'appareils. Merci de contacter license@librelio.com pour plus d\'infos</string>
+    
     
 </resources>
