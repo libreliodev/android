@@ -20,6 +20,7 @@
 package com.librelio.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -665,7 +666,14 @@ public class BillingActivity extends BaseActivity {
                             initViews();
                         }
                     });
-                    builder.show();
+                    Dialog dialog = builder.create();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            finish();
+                        }
+                    });
+                    dialog.show();
                 } else if (responseCode == UNAUTHORIZED_DEVICE) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
                         builder.setMessage(getString(R.string.unauthorized_device));
@@ -675,7 +683,14 @@ public class BillingActivity extends BaseActivity {
                                 finish();
                             }
                         });
-                        builder.show();
+                    Dialog dialog = builder.create();
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            finish();
+                        }
+                    });
+                    dialog.show();
                 } else {
                     String prefSubscrCode = getSavedSubscriberCode();
                     if (prefSubscrCode == null){
@@ -718,7 +733,14 @@ public class BillingActivity extends BaseActivity {
                                 initViews();
                             }
                         });
-                        builder.show();
+                        Dialog dialog = builder.create();
+                        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                finish();
+                            }
+                        });
+                        dialog.show();
                     } else if (responseCode == UNAUTHORIZED_DEVICE) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
                         builder.setMessage(getString(R.string.unauthorized_device));
@@ -728,7 +750,14 @@ public class BillingActivity extends BaseActivity {
                                 finish();
                             }
                         });
-                        builder.show();
+                        Dialog dialog = builder.create();
+                        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                finish();
+                            }
+                        });
+                        dialog.show();
                 } else {
                     String prefUsername =
                             subscrPref.getString(PARAM_USERNAME, null);
