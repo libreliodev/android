@@ -235,7 +235,7 @@ public class DownloadMagazineService extends IntentService {
                 magazine,
                 Magazine.TABLE_DOWNLOADED_MAGAZINES,
                 true);
-        magazine.clearMagazineDir();
+//        magazine.clearMagazineDir();
         EventBus.getDefault().post(new LoadPlistEvent());
     }
 }

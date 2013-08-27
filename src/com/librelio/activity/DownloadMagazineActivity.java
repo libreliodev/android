@@ -74,7 +74,7 @@ public class DownloadMagazineActivity extends BaseActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                magazine.delete();
+                magazine.clearMagazineDir();
                 MagazineManager.removeDownloadedMagazine(DownloadMagazineActivity.this, magazine);
                 finish();
             }

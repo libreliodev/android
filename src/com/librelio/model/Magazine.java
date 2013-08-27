@@ -1,17 +1,16 @@
 package com.librelio.model;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
-
 import com.librelio.LibrelioApplication;
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Magazine extends DictItem {
 	protected static final String TAG = Magazine.class.getSimpleName();
@@ -108,12 +107,7 @@ public class Magazine extends DictItem {
 			}
 			dir.delete();
 		}
-	}
-	
-	public void delete(){
-		Log.d(TAG,"Deleting magazine has been initiated");
-		clearMagazineDir();
-		EventBus.getDefault().post(new LoadPlistEvent());
+        EventBus.getDefault().post(new LoadPlistEvent());
 	}
 
 	private void valuesInit(String fileName) {

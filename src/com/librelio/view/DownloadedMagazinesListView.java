@@ -1,7 +1,5 @@
 package com.librelio.view;
 
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -16,12 +14,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.librelio.LibrelioApplication;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
+
+import java.util.List;
 
 public class DownloadedMagazinesListView extends ListView {
 	
@@ -142,7 +141,7 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 			
 			@Override
 			public void onClick(View v) {
-				downloadedMagazine.delete();
+				downloadedMagazine.clearMagazineDir();
 				magazineManager.removeDownloadedMagazine(context, downloadedMagazine);
 
 				getAdapter().remove(downloadedMagazine);

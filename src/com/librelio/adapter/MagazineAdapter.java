@@ -183,7 +183,7 @@ public class MagazineAdapter extends BaseAdapter {
                 holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        currentMagazine.delete();
+                        currentMagazine.clearMagazineDir();
                         MagazineManager.removeDownloadedMagazine(context, currentMagazine);
                         EventBus.getDefault().post(new LoadPlistEvent());
                     }
