@@ -53,7 +53,7 @@ import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
 import com.librelio.view.TwoWayView;
 import com.librelio.view.TwoWayView.Orientation;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import org.apache.commons.io.FilenameUtils;
 
 //TODO: remove preffix mXXXX from all properties this class

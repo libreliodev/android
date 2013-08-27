@@ -2,7 +2,7 @@ package com.librelio.utils;
 
 import android.content.Context;
 import android.util.Log;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 import java.io.BufferedReader;
 import java.io.File;

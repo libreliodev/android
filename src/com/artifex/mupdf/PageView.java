@@ -21,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.librelio.task.SafeAsyncTask;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 class PatchInfo {
 	public BitmapHolder bmh;

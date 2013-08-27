@@ -46,7 +46,7 @@ import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

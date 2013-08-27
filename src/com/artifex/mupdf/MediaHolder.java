@@ -40,7 +40,7 @@ import android.widget.Toast;
 import com.librelio.activity.SlideShowActivity;
 import com.librelio.activity.VideoActivity;
 import com.librelio.view.ImageLayout;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 /**
  * The class for display all pdf's media-resources

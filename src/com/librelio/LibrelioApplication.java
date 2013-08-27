@@ -14,7 +14,7 @@ import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.model.Magazine;
 import com.librelio.utils.SystemHelper;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import org.acra.ACRA;
 import org.acra.ReportField;
 import org.acra.ReportingInteractionMode;

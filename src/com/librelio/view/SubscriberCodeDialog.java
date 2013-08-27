@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class SubscriberCodeDialog {
 

@@ -11,7 +11,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 
 import com.librelio.base.BaseActivity;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class WebAdvertisingActivity extends BaseActivity {
 

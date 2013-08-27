@@ -27,7 +27,7 @@ import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import de.greenrobot.event.EventBus;
 
 import java.io.File;

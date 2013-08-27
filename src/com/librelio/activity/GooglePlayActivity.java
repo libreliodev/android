@@ -27,7 +27,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.librelio.base.BaseActivity;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 abstract public class GooglePlayActivity extends BaseActivity {
 	// These are the types supported in the IAB v2

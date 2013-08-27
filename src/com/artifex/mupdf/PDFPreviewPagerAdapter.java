@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 /**
  * @author Dmitry Valetin

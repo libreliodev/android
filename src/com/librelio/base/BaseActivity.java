@@ -19,7 +19,7 @@ import android.util.Log;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class BaseActivity extends Activity implements IBaseContext {
 	private static final String TAG = "BaseActivity";

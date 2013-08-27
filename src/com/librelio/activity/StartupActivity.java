@@ -51,7 +51,7 @@ import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 /**
  * The start point for Librelio application (Splash-screen)

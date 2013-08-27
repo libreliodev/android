@@ -9,7 +9,7 @@ import com.librelio.event.UpdateProgressEvent;
 import com.librelio.model.PlistItem;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import de.greenrobot.event.EventBus;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.HttpResponseException;

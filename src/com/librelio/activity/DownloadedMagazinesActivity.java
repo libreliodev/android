@@ -9,7 +9,7 @@ import com.librelio.base.BaseActivity;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.view.DownloadedMagazinesListView;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class DownloadedMagazinesActivity extends BaseActivity {
 

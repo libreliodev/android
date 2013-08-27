@@ -21,7 +21,7 @@ import com.librelio.LibrelioApplication;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class DownloadedMagazinesListView extends ListView {
 	

@@ -15,7 +15,7 @@ import com.librelio.base.BaseActivity;
 import com.librelio.event.MagazineDownloadedEvent;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class DownloadMagazineActivity extends BaseActivity {
 

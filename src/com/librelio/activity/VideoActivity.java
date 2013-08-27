@@ -40,7 +40,7 @@ import android.widget.MediaController;
 import android.widget.MediaController.MediaPlayerControl;
 
 import com.artifex.mupdf.MediaHolder;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 /**
  * The video player screen

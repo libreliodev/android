@@ -24,7 +24,7 @@ package com.librelio.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;

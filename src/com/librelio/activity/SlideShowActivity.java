@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import com.artifex.mupdf.MediaHolder;
 import com.librelio.base.BaseActivity;
 import com.librelio.view.ImageLayout;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 /**
  * @author Mike Osipov

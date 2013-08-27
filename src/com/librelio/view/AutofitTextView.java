@@ -8,8 +8,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
-import com.niveales.wind.BuildConfig;
-import com.niveales.wind.R;
+import com.niveales.vertical.BuildConfig;
+import com.niveales.vertical.R;
 
 /**
  * A TextView that resizes it's text to be no larger than the width of the view.

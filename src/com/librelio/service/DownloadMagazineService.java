@@ -27,7 +27,7 @@ import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import com.librelio.utils.SystemHelper;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import de.greenrobot.event.EventBus;
 import org.apache.commons.io.FilenameUtils;
 

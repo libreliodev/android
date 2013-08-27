@@ -22,7 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.librelio.utils.SystemHelper;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 
 public class ImageLayout extends RelativeLayout {
 

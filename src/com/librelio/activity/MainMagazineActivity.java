@@ -46,7 +46,7 @@ import com.librelio.event.UpdateMagazinesEvent;
 import com.librelio.loader.PlistParserLoader;
 import com.librelio.model.DictItem;
 import com.librelio.utils.PlistDownloader;
-import com.niveales.wind.R;
+import com.niveales.vertical.R;
 import de.greenrobot.event.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
