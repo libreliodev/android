@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
 
-    <string name="app_name">Wind</string>
-    <string name="root_view">Magazines.plist?waupdate=30</string>
-    <string name="yearly_subs_code">yearlysubscription</string>
-    <string name="monthly_subs_code">monthlysubscriptiontest</string>
+    <string name="app_name">Vertical</string>
+    <string name="root_view">Languages.plist</string>
+    <string name="yearly_subs_code">yearlysubscription2</string>
+    <string name="monthly_subs_code">monthlysubscription</string>
     <bool name="enable_test_magazine">false</bool>
     <bool name="enable_code_subs">true</bool>
-    <bool name="enable_username_password_login">true</bool>
-    <string name="client_name" >niveales</string>
-    <string name="magazine_name">wind</string>
+    <bool name="enable_username_password_login">false</bool>
     <string name="service_name">biwing</string>
-    <string name="google_analytics">UA-1732003-23</string>
+    <string name="client_name" >niveales</string>
+    <string name="magazine_name">vertical</string>
+    <string name="google_analytics">UA-13029323-19</string>
     <bool name="enable_send_log_in_menu">false</bool>
     <bool name="enable_downloads_in_menu">true</bool>
     <bool name="enable_refresh_in_menu">true</bool>

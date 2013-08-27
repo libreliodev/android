@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+    <dict>
+        <key>FileName</key>
+        <string>vertical_gb.plist?waupdate=30</string>
+        <key>Title</key>
+        <string>English</string>
+    </dict>
+    <dict>
+        <key>FileName</key>
+        <string>vertical_fr.plist?waupdate=30</string>
+        <key>Title</key>
+        <string>Français</string>
+    </dict>
+</array></plist>
