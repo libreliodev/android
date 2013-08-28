@@ -96,38 +96,43 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
             return null;
         }
 
-        //Parsing
-        PListXMLHandler handler = new PListXMLHandler();
-        PListXMLParser parser = new PListXMLParser();
-        parser.setHandler(handler);
-        parser.parse(pList);
-        PList list = ((PListXMLHandler) parser.getHandler()).getPlist();
-        Array arr = (Array) list.getRootElement();
-        for (int i = 0; i < arr.size(); i++) {
-            Dict dict = (Dict) arr.get(i);
-            DictItem item = DictItem.parse(getContext(), dict);
-            magazines.add(item);
-        }
-
-        for (DictItem magazine : magazines) {
-            if (magazine instanceof Magazine)
-            MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
-        }
-        EventBus.getDefault().post(new UpdateMagazinesEvent(magazines));
-
-        // This should happen on a different thread - or just when images are displayed
-        for (DictItem magazine : magazines) {
-            //saving png
-            File png = new File(magazine.getPngPath());
-            if (!png.exists()) {
-//                if (isOnline() && !useStaticMagazines) {
-                downloadFromUrl(magazine.getPngUrl(), magazine.getPngPath());
-//                }
-                Log.d(TAG, "Image download: " + magazine.getPngPath());
-                EventBus.getDefault().post(new InvalidateGridViewEvent());
-            } else {
-//                Log.d(TAG, magazine.getPngPath() + " already exist");
+        try {
+            //Parsing
+            PListXMLHandler handler = new PListXMLHandler();
+            PListXMLParser parser = new PListXMLParser();
+            parser.setHandler(handler);
+            parser.parse(pList);
+            PList list = ((PListXMLHandler) parser.getHandler()).getPlist();
+            Array arr = (Array) list.getRootElement();
+            for (int i = 0; i < arr.size(); i++) {
+                Dict dict = (Dict) arr.get(i);
+                DictItem item = DictItem.parse(getContext(), dict);
+                magazines.add(item);
             }
+
+            for (DictItem magazine : magazines) {
+                if (magazine instanceof Magazine)
+                MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
+            }
+            EventBus.getDefault().post(new UpdateMagazinesEvent(magazines));
+
+            // This should happen on a different thread - or just when images are displayed
+            for (DictItem magazine : magazines) {
+                //saving png
+                File png = new File(magazine.getPngPath());
+                if (!png.exists()) {
+    //                if (isOnline() && !useStaticMagazines) {
+                    downloadFromUrl(magazine.getPngUrl(), magazine.getPngPath());
+    //                }
+                    Log.d(TAG, "Image download: " + magazine.getPngPath());
+                    EventBus.getDefault().post(new InvalidateGridViewEvent());
+                } else {
+    //                Log.d(TAG, magazine.getPngPath() + " already exist");
+                }
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "plist = " + pList);
+            e.printStackTrace();
         }
         return magazines;
     }
