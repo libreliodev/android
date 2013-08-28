@@ -19,39 +19,39 @@
 
 package com.librelio.activity;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.librelio.utils.StorageUtils;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BinaryHttpResponseHandler;
-import org.apache.commons.io.FilenameUtils;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.animation.DisplayNextView;
 import com.librelio.animation.Rotate3dAnimation;
+import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.niveales.wind.R;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.Header;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * The start point for Librelio application (Splash-screen)
@@ -73,8 +73,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private boolean advertisingClickPerformed = false;
 	private boolean isFirstImage = true;
 	private Timer mStartupAdsTimer;
+    private Bitmap adImage;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
@@ -83,20 +84,59 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		advertisingImage = (ImageView) findViewById(R.id.advertising_image);
 
 		new InitPredefinedMagazinesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//		new LoadAdvertisingImageTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-	loadAndShowAdvertising();
+	    loadAdvertisingImage();
     }
 
-    private void loadAndShowAdvertising() {
+    private void loadAdvertisingImage() {
         AsyncHttpClient client = new AsyncHttpClient();
         client.setTimeout(2000);
         client.get(getAdvertisingImageURL(), new BinaryHttpResponseHandler() {
+
             @Override
-            public void onSuccess(byte[] bytes) {
-                super.onSuccess(bytes);
+            protected void handleMessage(Message message) {
+                super.handleMessage(message);
+                switch (message.what) {
+                    case AsyncHttpResponseHandler.FAILURE_MESSAGE:
+                        onStartMagazine(DEFAULT_ADV_DELAY);
+                }
+            }
+
+            @Override
+            protected void handleSuccessMessage(int i, byte[] bytes) {
                 EasyTracker.getTracker().sendView("Interstitial/" + FilenameUtils.getName(getAdvertisingImageURL()));
                 if (bytes != null) {
-                    Bitmap adImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    adImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                }
+                loadAdvertisingLinkAndDisplayAdvertising();
+            }
+        });
+    }
+
+    private void loadAdvertisingLinkAndDisplayAdvertising() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.setTimeout(2000);
+        client.get(this, getAdvertisingLinkURL(), new AsyncHttpResponseHandler() {
+
+            @Override
+            protected void handleMessage(Message message) {
+                super.handleMessage(message);
+                switch (message.what) {
+                    case AsyncHttpResponseHandler.FAILURE_MESSAGE:
+                        onStartMagazine(DEFAULT_ADV_DELAY);
+                }
+            }
+
+            @Override
+            protected void handleSuccessMessage(int i, Header[] headers, String s) {
+                PListXMLHandler handler = new PListXMLHandler();
+                PListXMLParser parser = new PListXMLParser();
+                parser.setHandler(handler);
+                parser.parse(s);
+                PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
+                if (list != null){
+                    Dict dict = (Dict) list.getRootElement();
+                    String delay = dict.getConfiguration(PLIST_DELAY).getValue().toString();
+                    String link = dict.getConfiguration(PLIST_LINK).getValue().toString();
                     if (adImage != null) {
                         advertisingImage.setImageBitmap(adImage);
                         if (isFirstImage) {
@@ -107,41 +147,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
                             isFirstImage = !isFirstImage;
                         }
                     }
-                }
-                loadAdvertisingLink();
-            }
-
-            @Override
-            public void onFailure(Throwable throwable, byte[] bytes) {
-                onStartMagazine(DEFAULT_ADV_DELAY);
-            }
-        });
-    }
-
-    private void loadAdvertisingLink() {
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.setTimeout(2000);
-        client.get(this, getAdvertisingLinkURL(), new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(String s) {
-                super.onSuccess(s);
-                PListXMLHandler handler = new PListXMLHandler();
-                PListXMLParser parser = new PListXMLParser();
-                parser.setHandler(handler);
-                parser.parse(s);
-                PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
-                if (list != null){
-                    Dict dict = (Dict) list.getRootElement();
-                    String delay = dict.getConfiguration(PLIST_DELAY).getValue().toString();
-                    String link = dict.getConfiguration(PLIST_LINK).getValue().toString();
                     setOnAdvertisingImageClickListener(link);
                     onStartMagazine(Integer.valueOf(delay));
                 }
-            }
-
-            @Override
-            public void onFailure(Throwable throwable, String content) {
-                onStartMagazine(DEFAULT_ADV_DELAY);
             }
         });
     }
