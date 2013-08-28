@@ -73,13 +73,15 @@ public class PlistDownloader {
             @Override
             public void onFailure(Throwable throwable, String s) {
                 super.onFailure(throwable, s);
-                int statusCode = ((HttpResponseException) throwable).getStatusCode();
-                if (statusCode == 304) {
-                    // not modified - no problem
-                } else {
+                if (throwable instanceof HttpResponseException) {
+                    int statusCode = ((HttpResponseException) throwable).getStatusCode();
+                    if (statusCode == 304) {
+                        // not modified - no problem
+                        return;
+                    }
+                }
                 Toast.makeText(context, context.getResources().getString(R.string.connection_failed),
                         Toast.LENGTH_LONG).show();
-                }
             }
 
             @Override
