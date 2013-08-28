@@ -8,6 +8,7 @@ import com.librelio.event.LoadPlistEvent;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,20 +94,18 @@ public class Magazine extends DictItem {
 	}
 
 	public void makeMagazineDir(){
-		File assets = new File(getMagazineDir());
-		if(!assets.exists()){
-			assets.mkdirs();
+		File magazineDir = new File(getMagazineDir());
+		if(!magazineDir.exists()){
+			magazineDir.mkdirs();
 		}
 	}
 	
 	public void clearMagazineDir(){
-		File dir = new File(getMagazineDir());
-		if (dir.exists()) {
-			if (dir.isDirectory()) {
-				for (File c : dir.listFiles()) c.delete();
-			}
-			dir.delete();
-		}
+        try {
+            FileUtils.deleteDirectory(new File(getMagazineDir()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         EventBus.getDefault().post(new LoadPlistEvent());
 	}
 
