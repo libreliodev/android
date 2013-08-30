@@ -673,6 +673,7 @@ public class BillingActivity extends BaseActivity {
                             finish();
                         }
                     });
+                    dialog.setCanceledOnTouchOutside(true);
                     dialog.show();
                 } else if (responseCode == UNAUTHORIZED_DEVICE) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
@@ -690,6 +691,7 @@ public class BillingActivity extends BaseActivity {
                             finish();
                         }
                     });
+                    dialog.setCanceledOnTouchOutside(true);
                     dialog.show();
                 } else {
                     String prefSubscrCode = getSavedSubscriberCode();
@@ -740,6 +742,7 @@ public class BillingActivity extends BaseActivity {
                                 finish();
                             }
                         });
+                        dialog.setCanceledOnTouchOutside(true);
                         dialog.show();
                     } else if (responseCode == UNAUTHORIZED_DEVICE) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
@@ -757,6 +760,7 @@ public class BillingActivity extends BaseActivity {
                                 finish();
                             }
                         });
+                        dialog.setCanceledOnTouchOutside(true);
                         dialog.show();
                 } else {
                     String prefUsername =
