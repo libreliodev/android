@@ -18,8 +18,7 @@
 
 package com.loopj.android.http;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
+import android.os.Message;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -29,7 +28,8 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.util.EntityUtils;
 
-import android.os.Message;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * Used to intercept and handle the responses from requests made using
@@ -147,7 +147,8 @@ public class BinaryHttpResponseHandler extends AsyncHttpResponseHandler {
                 break;
             case FAILURE_MESSAGE:
                 response = (Object[])msg.obj;
-                handleFailureMessage((Throwable)response[0], response[1].toString());
+                String res1 = response[1] == null ? "" : response[1].toString();
+                handleFailureMessage((Throwable) response[0], res1);
                 break;
             default:
                 super.handleMessage(msg);
