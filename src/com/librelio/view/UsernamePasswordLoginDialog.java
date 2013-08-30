@@ -56,7 +56,7 @@ public class UsernamePasswordLoginDialog {
 		    public void onClick(DialogInterface dialog, int which) {
 		    	if (null != onUsernamePasswordLoginListener){
 		    		onUsernamePasswordLoginListener.onEnterUsernamePasswordLogin(
-                            username.getText().toString(), password.getText().toString());
+                            username.getText().toString().trim(), password.getText().toString().trim());
 		    	}
 		    }
 		});
