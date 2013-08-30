@@ -21,11 +21,13 @@
     <string name="do_you_really_want_to_quit_this_app">Voulez-vous vraiment quitter cette application?</string>
     <string name="yes"> Oui</string>
     <string name="i_have_a_subscriber_code"> J\'ai un code abonné</string>
+    <string name="i_have_a_username_password_login">Je suis abonné au magazine papier</string>
     <string name="i_have_a_promo_code"> J\'ai un code promo</string>
     <string name="restore_my_purchases"> Restaurer mes achats</string>
     <string name="restore_completed"> Restauration effectuée</string>
     <string name="subscriber_code"> Code abonné</string>
     <string name="please_enter_your_code"> Veuillez saisir votre code</string>
+    <string name="please_enter_your_username_password_login">Mes identifiants d\'abonné</string>
     <string name="invalid_code"> Code non valide</string>
     <string name="share_on_facebook">Partager sur Facebook</string>
     <string name="share_on_twitter">Partager sur Twitter</string>
@@ -65,6 +67,11 @@
     <string name="downloaded_title">Téléchargé:</string>
     <string name="free_subscription">Abonnement gratuit</string>
     <string name="ok">OK</string>
+   <string name="dismiss">Annuler</string>
+    <string name="login">Login</string>
+    <string name="username">Code client</string>
+    <string name="password">Mot de passe</string>
+    
     <string name="loading">Chargement...</string>
     <string name="no_space_on_device">Pas assez d\'espace sur votre stockage interne</string>
     <string name="browser">Navigateur</string>
