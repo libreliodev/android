@@ -1777,7 +1777,7 @@ public class TwoWayView extends AdapterView<ListAdapter> implements
 			}
 		}
 	}
-
+	/**Removed by Librelio, prevents compilation when using Ant
 	@Override
 	@TargetApi(16)
 	public boolean performAccessibilityAction(int action, Bundle arguments) {
@@ -1823,6 +1823,7 @@ public class TwoWayView extends AdapterView<ListAdapter> implements
 
 		return false;
 	}
+	**/
 
 	/**
 	 * Return true if child is an ancestor of parent, (or equal to the parent).
