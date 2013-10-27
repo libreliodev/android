@@ -81,6 +81,7 @@
     <string name="incorrect_username_or_password">Identifiant ou mot de passe incorrect</string>
     <string name="unauthorized_issue">Votre abonnement ne vous autorise pas à télécharger ce numéro</string>
     <string name="unauthorized_device">Ce numéro a été téléchargé sur un nombre trop important d\'appareils. Merci de contacter license@librelio.com pour plus d\'infos</string>
+     <string name="asset_downloading">Téléchargement\nen cours…</string>
     
     
 </resources>
