@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -189,6 +190,8 @@ public class ImageLayout extends RelativeLayout {
 				if (flipBookImageView != null && bmp != null) {
 					flipBookImageView.setImageBitmap(bmp);
 				} else {
+
+                	Log.w("ImageLayout", "setCurrentImageViewPosition Bitmap null");
                     flipBookImageView.setVisibility(View.GONE);
                     flipBookText.setVisibility(View.VISIBLE);
                 }
@@ -211,6 +214,7 @@ public class ImageLayout extends RelativeLayout {
 				}
 				view.setBackgroundColor(backgroundColor);
                 if (bmp == null) {
+                	Log.w("ImageLayout", "Single Image Bitmap null");
                     imageView.setVisibility(View.GONE);
                     text.setVisibility(View.VISIBLE);
                 } else {
@@ -335,6 +339,7 @@ public class ImageLayout extends RelativeLayout {
 						return;
 					}
                     if (bmp == null) {
+                    	Log.w("ImageLayout", "ViewPager Image Bitmap null");
                         img.setVisibility(View.GONE);
                         text.setVisibility(View.VISIBLE);
                     } else {
