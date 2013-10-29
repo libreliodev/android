@@ -27,10 +27,12 @@ import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import com.librelio.utils.SystemHelper;
+import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import de.greenrobot.event.EventBus;
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -136,7 +138,17 @@ public class DownloadMagazineService extends IntentService {
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     // process download
                     String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+                	if (BuildConfig.DEBUG) {
+                		File srcFile = new File(srcFileName);
+                		Log.d("librelio", "file size on external storage: " + srcFile.length());
+                	}
+                    
                     StorageUtils.move(srcFileName, manager.getAssetFilename(downloadManagerID));
+                
+                	if (BuildConfig.DEBUG) {
+                		File srcFile = new File(manager.getAssetFilename(downloadManagerID));
+                		Log.d("librelio", "file size on internal storage: " + srcFile.length());
+                	}
                 }
             }
             c.close();
