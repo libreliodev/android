@@ -61,8 +61,10 @@ public class DownloadMagazineService extends IntentService {
         	DownloadManager.Query q = new DownloadManager.Query();
             q.setFilterById(downloadManagerID);
             Cursor c = mDManager.query(q);
-        	Log.d("DOWNLOAD", downloadManagerID +
+            if (c.moveToFirst()) {
+            	Log.d("DOWNLOAD", downloadManagerID +
         			", Download Status: " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+            }
         	c.close();
         }
         
