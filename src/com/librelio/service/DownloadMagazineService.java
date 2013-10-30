@@ -57,7 +57,15 @@ public class DownloadMagazineService extends IntentService {
         mDManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadManagerID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
 
-        Log.d("DOWNLOAD", "DONE " + downloadManagerID);
+        if (BuildConfig.DEBUG) {
+        	DownloadManager.Query q = new DownloadManager.Query();
+            q.setFilterById(downloadManagerID);
+            Cursor c = mDManager.query(q);
+        	Log.d("DOWNLOAD", downloadManagerID +
+        			", Download Status: " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+        	c.close();
+        }
+        
         manager = new MagazineManager(this);
         Magazine magazine = manager.findByDownloadManagerID(downloadManagerID, Magazine.TABLE_DOWNLOADED_MAGAZINES);
 
