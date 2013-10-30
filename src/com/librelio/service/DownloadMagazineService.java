@@ -155,8 +155,8 @@ public class DownloadMagazineService extends IntentService {
             			// download failed - retry
             			String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
             			String assetsFile = FilenameUtils.getName(manager.getAssetFilename(downloadManagerID));
-            			Log.d("failed asset download", assetsFile);
-            			Toast.makeText(DownloadMagazineService.this, assetsFile + " download failed - retrying", Toast.LENGTH_SHORT).show();
+//            			Log.d("failed asset download", assetsFile);
+//            			Toast.makeText(DownloadMagazineService.this, assetsFile + " download failed - retrying", Toast.LENGTH_SHORT).show();
                         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                         request.setVisibleInDownloadsUi(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
                         .setDescription("Assets downloading")
@@ -172,16 +172,16 @@ public class DownloadMagazineService extends IntentService {
                         return;
             		}
             		
-            		if (BuildConfig.DEBUG) {
-                		Log.d("librelio", "file size on external storage: " + srcFile.length());
-                	}
+//            		if (BuildConfig.DEBUG) {
+//                		Log.d("librelio", "file size on external storage: " + srcFile.length());
+//                	}
                     
                     StorageUtils.move(srcFileName, manager.getAssetFilename(downloadManagerID));
                 
-                	if (BuildConfig.DEBUG) {
-                		File destFile = new File(manager.getAssetFilename(downloadManagerID));
-                		Log.d("librelio", "file size on internal storage: " + destFile.length());
-                	}
+//                	if (BuildConfig.DEBUG) {
+//                		File destFile = new File(manager.getAssetFilename(downloadManagerID));
+//                		Log.d("librelio", "file size on internal storage: " + destFile.length());
+//                	}
 
                     manager.setAssetDownloaded(downloadManagerID);
                 }
