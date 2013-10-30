@@ -16,6 +16,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
+
 import com.artifex.mupdf.LinkInfoExternal;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.activity.MuPDFActivity;
@@ -139,7 +141,6 @@ public class DownloadMagazineService extends IntentService {
             magazine.makeCompleteFile(magazine.isSample());
         } else {
             // Asset downloaded
-            manager.setAssetDownloaded(downloadManagerID);
             DownloadManager.Query q = new DownloadManager.Query();
             q.setFilterById(downloadManagerID);
             Cursor c = mDManager.query(q);
@@ -148,17 +149,41 @@ public class DownloadMagazineService extends IntentService {
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     // process download
                     String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
-                	if (BuildConfig.DEBUG) {
-                		File srcFile = new File(srcFileName);
+            		File srcFile = new File(srcFileName);
+
+            		if (srcFile.length() == 0) {
+            			// download failed - retry
+            			String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+            			String assetsFile = FilenameUtils.getName(manager.getAssetFilename(downloadManagerID));
+            			Log.d("failed asset download", assetsFile);
+            			Toast.makeText(DownloadMagazineService.this, assetsFile + " download failed - retrying", Toast.LENGTH_SHORT).show();
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                        request.setVisibleInDownloadsUi(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                        .setDescription("Assets downloading")
+//                                .setDescription("Subtitle for " + magazine.getSubtitle()).setTitle("Assets for " + magazine.getTitle())
+                                .setDestinationInExternalFilesDir(DownloadMagazineService.this, null, assetsFile);
+                        //TODO should use cache directory?
+                        long newDownloadManagerID = mDManager.enqueue(request);
+                        ContentValues cv = new ContentValues();
+                        cv.put(Magazine.FIELD_DOWNLOAD_MANAGER_ID, newDownloadManagerID);
+                        SQLiteDatabase db = DataBaseHelper.getInstance(DownloadMagazineService.this).getWritableDatabase();
+                        db.update(Magazine.TABLE_ASSETS, cv, Magazine.FIELD_DOWNLOAD_MANAGER_ID + "=?",
+                                new String[] {String.valueOf(downloadManagerID)});
+                        return;
+            		}
+            		
+            		if (BuildConfig.DEBUG) {
                 		Log.d("librelio", "file size on external storage: " + srcFile.length());
                 	}
                     
                     StorageUtils.move(srcFileName, manager.getAssetFilename(downloadManagerID));
                 
                 	if (BuildConfig.DEBUG) {
-                		File srcFile = new File(manager.getAssetFilename(downloadManagerID));
-                		Log.d("librelio", "file size on internal storage: " + srcFile.length());
+                		File destFile = new File(manager.getAssetFilename(downloadManagerID));
+                		Log.d("librelio", "file size on internal storage: " + destFile.length());
                 	}
+
+                    manager.setAssetDownloaded(downloadManagerID);
                 }
             }
             c.close();
