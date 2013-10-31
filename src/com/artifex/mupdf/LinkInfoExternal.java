@@ -55,6 +55,11 @@ public class LinkInfoExternal extends LinkInfo {
 		final String path = Uri.parse(url).getPath();
 		return path != null && path.endsWith("mp4");
 	}
+	
+	public boolean isPdf() {
+		final String path = Uri.parse(url).getPath();
+		return path != null && path.endsWith("pdf");
+	}
 
 	@Override
 	public String toString() {

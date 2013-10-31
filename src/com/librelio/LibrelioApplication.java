@@ -52,13 +52,14 @@ public class LibrelioApplication extends Application {
     }
 
 
-	public static void startPDFActivity(Context context, String filePath, String title){
+	public static void startPDFActivity(Context context, String filePath, String title, boolean showThumbnails){
 		try{
 			Uri uri = Uri.parse(filePath);
 			Intent intent = new Intent(context,MuPDFActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
 			intent.setData(uri);
 			intent.putExtra(Magazine.FIELD_TITLE, title);
+			intent.putExtra(MuPDFActivity.SHOW_THUMBNAILS_EXTRA, showThumbnails);
 			context.startActivity(intent);
 		} catch (Exception e) {
 			Log.e(TAG,"Problem with starting PDF-activity, path: "+filePath,e);

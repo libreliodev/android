@@ -67,6 +67,8 @@ public class MuPDFActivity extends BaseActivity{
     private static final int START_BILLING_ACTIVITY = 100;
     private static final int START_OUTLINE_ACTIVITY = 101;
 
+	public static final String SHOW_THUMBNAILS_EXTRA = "show_thumbnails";
+
     private MuPDFCore core;
 	private String fileName;
 	private int mOrientation;
@@ -418,8 +420,9 @@ public class MuPDFActivity extends BaseActivity{
 		if (core == null) {
 			return;
 		}
-
+		
 		if (!buttonsVisible) {
+            buttonsView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 			buttonsVisible = true;
 			// Update page number text and slider
 			final int index = docView.getDisplayedViewIndex();
@@ -440,6 +443,12 @@ public class MuPDFActivity extends BaseActivity{
 				public void onAnimationEnd(Animation animation) {}
 			});
 			mTopBarSwitcher.startAnimation(anim);
+			
+			// Don't show thumbnail if not requested
+			if (getIntent() != null && !getIntent().getBooleanExtra(SHOW_THUMBNAILS_EXTRA, true)) {
+				return;
+			}
+
 			// Update listView position
 			setCurrentlyViewedPreview();
 			anim = new TranslateAnimation(0, 0, mPreviewBarHolder.getHeight(), 0);
@@ -458,12 +467,12 @@ public class MuPDFActivity extends BaseActivity{
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
-            buttonsView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 		}
 	}
 
 	void hideButtons() {
 		if (buttonsVisible) {
+            buttonsView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			buttonsVisible = false;
 			hideKeyboard();
 
@@ -478,6 +487,11 @@ public class MuPDFActivity extends BaseActivity{
 			});
 			mTopBarSwitcher.startAnimation(anim);
 			
+			// Don't show thumbnail if not requested
+			if (getIntent() != null && !getIntent().getBooleanExtra(SHOW_THUMBNAILS_EXTRA, true)) {
+				return;
+			}
+			
 			anim = new TranslateAnimation(0, 0, 0, this.mPreviewBarHolder.getHeight());
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
@@ -489,7 +503,6 @@ public class MuPDFActivity extends BaseActivity{
 				}
 			});
 			mPreviewBarHolder.startAnimation(anim);
-            buttonsView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 		}
 	}
 

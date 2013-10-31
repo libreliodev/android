@@ -143,7 +143,7 @@ public class MagazineAdapter extends BaseAdapter {
                         if (new File(currentMagazine.getItemPath()).exists()) {
                             LibrelioApplication.startPDFActivity(context,
                                     currentMagazine.getItemPath(),
-                                    currentMagazine.getTitle());
+                                    currentMagazine.getTitle(), true);
                         } else {
                             Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
                         }
@@ -230,7 +230,7 @@ public class MagazineAdapter extends BaseAdapter {
                             if (currentMagazine.isSampleDownloaded()) {
                                 LibrelioApplication.startPDFActivity(context,
                                         currentMagazine.getSamplePdfPath(),
-                                        currentMagazine.getTitle());
+                                        currentMagazine.getTitle(), true);
                             } else {
                                 currentMagazine.setSample(true);
                                 DownloadMagazineService.startDownload(context, currentMagazine);
@@ -249,7 +249,7 @@ public class MagazineAdapter extends BaseAdapter {
                             public void onClick(View v) {
                                 LibrelioApplication.startPDFActivity(context,
                                         currentMagazine.getItemPath(),
-                                        currentMagazine.getTitle());
+                                        currentMagazine.getTitle(), true);
                             }
                         });
             }
