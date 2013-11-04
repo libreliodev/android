@@ -81,7 +81,32 @@ public class DownloadMagazineService extends IntentService {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     // process download
-                    String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+                	String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+            		File srcFile = new File(srcFileName);
+
+            		if (srcFile.length() != 0) {
+            			// download failed - retry
+            			String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
+            	        String filePath = magazine.getItemPath();
+            	        if (magazine.isSample()) {
+            	            filePath = magazine.getSamplePdfPath();
+            	        }
+            	        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            	        request.setVisibleInDownloadsUi(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            	                .setDescription(magazine.getSubtitle()).setTitle(magazine.getTitle() + (magazine.isSample() ? " Sample" : ""))
+            	                .setDestinationInExternalFilesDir(this, null, FilenameUtils.getName(filePath));
+            	        //TODO should use cache directory?
+            	        magazine.setDownloadManagerId(mDManager.enqueue(request));
+
+            	        MagazineManager magazineManager = new MagazineManager(this);
+            	        MagazineManager.removeDownloadedMagazine(this, magazine);
+            	        magazineManager.addMagazine(
+            	                magazine,
+            	                Magazine.TABLE_DOWNLOADED_MAGAZINES,
+            	                true);
+                        return;
+            		}
+
                     magazine.clearMagazineDir();
                     magazine.makeMagazineDir();
                     StorageUtils.move(srcFileName, magazine.isSample() ?
@@ -277,7 +302,7 @@ public class DownloadMagazineService extends IntentService {
         magazine.setDownloadManagerId(dm.enqueue(request));
 
         MagazineManager magazineManager = new MagazineManager(context);
-        magazineManager.removeDownloadedMagazine(context, magazine);
+        MagazineManager.removeDownloadedMagazine(context, magazine);
         magazineManager.addMagazine(
                 magazine,
                 Magazine.TABLE_DOWNLOADED_MAGAZINES,
