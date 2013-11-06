@@ -84,7 +84,7 @@ public class DownloadMagazineService extends IntentService {
                 	String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
             		File srcFile = new File(srcFileName);
 
-            		if (srcFile.length() != 0) {
+            		if (srcFile.length() == 0) {
             			// download failed - retry
             			String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
             	        String filePath = magazine.getItemPath();
