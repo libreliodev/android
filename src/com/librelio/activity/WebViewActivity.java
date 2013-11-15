@@ -13,7 +13,7 @@ import android.widget.Button;
 import com.librelio.base.BaseActivity;
 import com.niveales.wind.R;
 
-public class WebAdvertisingActivity extends BaseActivity {
+public class WebViewActivity extends BaseActivity {
 
 	public static final String PARAM_LINK = "PARAM_LINK";
 	private String advertisingLink;
