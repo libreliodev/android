@@ -8,7 +8,7 @@
         android:icon="@drawable/ic_action_reload"
         android:visible="@bool/enable_refresh_in_menu">
     </item>
-        <item
+    <item
         android:id="@+id/options_menu_info"
         android:showAsAction="ifRoom"
         android:title="@string/info"

@@ -3,6 +3,7 @@ package com.librelio.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,7 +29,7 @@ public class WebViewActivity extends BaseActivity {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		setContentView(R.layout.activity_web_advertising);
+		setContentView(R.layout.activity_webview);
 
 		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
 
@@ -36,7 +37,7 @@ public class WebViewActivity extends BaseActivity {
 
 		webView = (WebView) findViewById(R.id.activity_web_advertising_browser_view);
 		doneButton = (Button) findViewById(R.id.activity_web_advertising_button_done);
-		browserButton = (Button) findViewById(R.id.activity_web_advertising_button_browser);
+//		browserButton = (Button) findViewById(R.id.activity_web_advertising_button_browser);
 
 		prepareBarButtons();
 		loadWebContent();
@@ -50,15 +51,6 @@ public class WebViewActivity extends BaseActivity {
 				finish();
 			}
 		});
-
-		browserButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri
-						.parse(advertisingLink));
-				startActivity(browserIntent);
-			}
-		});
 	}
 
 	private void loadWebContent() {
@@ -68,12 +60,23 @@ public class WebViewActivity extends BaseActivity {
 			webView.loadUrl(advertisingLink);
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.options_webviewactivity, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			finish();
+		case R.id.options_menu_browser:
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri
+					.parse(advertisingLink));
+			startActivity(browserIntent);
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
