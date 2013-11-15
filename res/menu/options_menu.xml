@@ -8,6 +8,13 @@
         android:icon="@drawable/ic_action_reload"
         android:visible="@bool/enable_refresh_in_menu">
     </item>
+        <item
+        android:id="@+id/options_menu_info"
+        android:showAsAction="ifRoom"
+        android:title="@string/info"
+        android:icon="@drawable/ic_action_info"
+        android:visible="@bool/enable_info_in_menu">
+    </item>
     <item
         android:id="@+id/options_menu_restore"
         android:title="@string/restore_my_purchases"
