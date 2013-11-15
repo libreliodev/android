@@ -88,6 +88,7 @@ public class WebViewActivity extends BaseActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			finish();
+			break;
 		case R.id.options_menu_browser:
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri
 					.parse(advertisingLink));
