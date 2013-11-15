@@ -15,6 +15,7 @@ import com.artifex.mupdf.MuPDFPageView;
 import com.artifex.mupdf.PageView;
 import com.artifex.mupdf.domain.SearchTaskResult;
 import com.librelio.activity.SlideShowActivity;
+import com.librelio.activity.WebViewActivity;
 
 public abstract class DocumentReaderView extends ReaderView {
 	private static final String TAG = "DocumentReaderView";
@@ -170,9 +171,7 @@ public abstract class DocumentReaderView extends ReaderView {
 		} else if(linkString.startsWith("buy://localhost")) {
 			onBuy(uri.getPath().substring(1));
 		} else {
-			//TODO: replace with custom activity
-			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-			getContext().startActivity(intent);
+			WebViewActivity.startWithUrl(getContext(), uri.toString());
 		}
 		
 	}
