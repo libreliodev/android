@@ -234,6 +234,9 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
             // force a redownload of the plist
             PlistDownloader.doLoad(this, plistName, true);
 			return true;
+		case R.id.options_menu_info:
+			WebViewActivity.startWithUrl(this, getString(R.string.info_url));
+			return true;
 		case R.id.options_menu_restore:
 			restorePurchases();
 			return true;

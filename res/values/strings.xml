@@ -14,6 +14,7 @@
     <string name="link_control">Link highlight</string>
     <string name="exit">Exit</string>
     <string name="reload">Reload</string>
+    <string name="info">Info</string>
     <string name="subscribe">Subscribe</string>
     <string name="subscription_monthly">Subscribe month</string>
     <string name="subscription_yearly">Subscribe year</string>

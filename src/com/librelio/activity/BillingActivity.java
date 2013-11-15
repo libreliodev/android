@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
@@ -667,12 +668,12 @@ public class BillingActivity extends BaseActivity {
                         }
                     });
                     Dialog dialog = builder.create();
-                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            finish();
-                        }
-                    });
+                    dialog.setOnCancelListener(new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							finish();
+						}
+					});
                     dialog.setCanceledOnTouchOutside(true);
                     dialog.show();
                 } else if (responseCode == UNAUTHORIZED_DEVICE) {
@@ -685,12 +686,12 @@ public class BillingActivity extends BaseActivity {
                             }
                         });
                     Dialog dialog = builder.create();
-                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            finish();
-                        }
-                    });
+                    dialog.setOnCancelListener(new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							finish();
+						}
+					});
                     dialog.setCanceledOnTouchOutside(true);
                     dialog.show();
                 } else {
@@ -736,12 +737,12 @@ public class BillingActivity extends BaseActivity {
                             }
                         });
                         Dialog dialog = builder.create();
-                        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                finish();
-                            }
-                        });
+                        dialog.setOnCancelListener(new OnCancelListener() {
+    						@Override
+    						public void onCancel(DialogInterface dialog) {
+    							finish();
+    						}
+    					});
                         dialog.setCanceledOnTouchOutside(true);
                         dialog.show();
                     } else if (responseCode == UNAUTHORIZED_DEVICE) {
@@ -754,12 +755,12 @@ public class BillingActivity extends BaseActivity {
                             }
                         });
                         Dialog dialog = builder.create();
-                        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                finish();
-                            }
-                        });
+                        dialog.setOnCancelListener(new OnCancelListener() {
+    						@Override
+    						public void onCancel(DialogInterface dialog) {
+    							finish();
+    						}
+    					});
                         dialog.setCanceledOnTouchOutside(true);
                         dialog.show();
                 } else {

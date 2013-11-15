@@ -268,9 +268,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	void startAdsActivity(final String pLink) {
 		Intent mainMagazineActivityIntent = getMainMagazineActivityIntent();
 		Intent webAdvertisingActivityIntent = new Intent(self(),
-				WebAdvertisingActivity.class);
+				WebViewActivity.class);
 		webAdvertisingActivityIntent.putExtra(
-				WebAdvertisingActivity.PARAM_LINK, pLink);
+				WebViewActivity.PARAM_LINK, pLink);
 		startActivities(new Intent[] { mainMagazineActivityIntent,
 				webAdvertisingActivityIntent });
 		finish();
