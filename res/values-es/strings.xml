@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sample">Muestra</string>
-    <string name="no_media_hint">Desconectar de la PC</string>
     <string name="open_failed">No se puede abrir la revista</string>
     <string name="search_backwards">Buscar hacia atrás</string>
     <string name="search_forwards">Buscar hacia adelante</string>
@@ -12,8 +11,6 @@
     <string name="link_control">Enlace destacado</string>
     <string name="exit">Salir</string>
     <string name="reload">Recargar</string>
-    <string name="not_connected">No conectado a Internet …</string>
-    <string name="restore_purchise">Restaurar compras</string>
     <string name="subscribe">Suscribirse</string>
     <string name="subscription_monthly">Suscribir abono mensual</string>
     <string name="subscription_yearly">Suscribir abono anual</string>
