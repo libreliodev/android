@@ -14,7 +14,7 @@
         <WebView
             android:id="@+id/activity_web_advertising_browser_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
     </FrameLayout>
  <LinearLayout style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
