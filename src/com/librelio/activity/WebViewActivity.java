@@ -19,6 +19,12 @@ import com.niveales.wind.R;
 public class WebViewActivity extends BaseActivity {
 	
 	public static void startWithUrl(Context context, String url) {
+		if (url.contains("youtube") || url.contains("dailymotion") || url.contains("vimeo")) {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setData(Uri.parse(url));
+			context.startActivity(intent);
+			return;
+		}
 		Intent webAdvertisingActivityIntent = new Intent(context, WebViewActivity.class);
 		webAdvertisingActivityIntent.putExtra(WebViewActivity.PARAM_LINK, url);
 		context.startActivity(webAdvertisingActivityIntent);
