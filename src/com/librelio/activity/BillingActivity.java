@@ -49,6 +49,8 @@ import com.librelio.service.DownloadMagazineService;
 import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
 import com.niveales.wind.R;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -63,6 +65,7 @@ import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * The class for purchases via Google Play
@@ -164,8 +167,9 @@ public class BillingActivity extends BaseActivity {
                 fileName = getIntent().getExtras().getString(FILE_NAME_KEY);
                 title = getIntent().getExtras().getString(TITLE_KEY);
                 subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
-                int finId = fileName.indexOf("/");
-                productId = fileName.substring(0, finId);
+                // Using Locale.US to avoid different results in different locales
+				productId = FilenameUtils.getName(fileName).toLowerCase(Locale.US);
+				productId = productId.substring(0, productId.indexOf("_.pdf"));
             }
         }
 	}
