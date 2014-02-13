@@ -10,7 +10,7 @@ Examples of customized apps published on the app stores are available on www.lib
 ## License
 This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This project is Copyright 20012-2013 WidgetAvenue - Librelio, except included libraries:
+This project is Copyright 2012-2013 Librelio, except included libraries:
 - Copyright 2006-2012 Artifex Software, Inc for the MuPDF library
 - Copyright Free Beachler (http://www.freebeachler.com) for the Android P-List Parser library
 
