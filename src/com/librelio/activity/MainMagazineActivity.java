@@ -115,7 +115,7 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
 
         plistName = getIntent().getStringExtra(PLIST_NAME_EXTRA);
-        if (!plistName.equals(getString(R.string.root_view))) {
+        if (getString(R.string.root_view) != null && !plistName.equals(getString(R.string.root_view))) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
