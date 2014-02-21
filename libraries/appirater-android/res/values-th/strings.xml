@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">ให้อันดับ %s</string>
+    <string name="rate_message">ถ้าคุณกำลังใช้ %s โปรดสละเวลาสักครู่ในการให้อันดับแก่เรา คุณจะเสียเวลาไม่เกินหนึ่งนาที ขอบคุณสำหรับการสนับสนุน!</string>
+    <string name="rate">ให้อันดับ %s</string>
+    <string name="rate_later">เตือนฉันภายหลัง</string>
+    <string name="rate_cancel">ไม่ ขอบคุณ</string>
+</resources>

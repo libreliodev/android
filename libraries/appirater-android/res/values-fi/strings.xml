@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Arvioi %s</string>
+    <string name="rate_message">Jos käytät mielelläsi %s, voisitko käyttää hetken ja arvostella sen? Se ei kestä minuuttia kauempaa. Kiitos tuestasi!</string>
+    <string name="rate">Arvioi %s</string>
+    <string name="rate_later">Muistuta minua myöhemmin</string>
+    <string name="rate_cancel">Ei kiitos</string>
+</resources>

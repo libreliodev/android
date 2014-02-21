@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Rating %s</string>
+    <string name="rate_message">Jika anda menyukai %s, maukah anda memberikan rating kepada aplikasi ini? Rating hanya memakan waktu kurang dari 1 menit. Terimakasih untuk dukungan anda!</string>
+    <string name="rate">Rating %s</string>
+    <string name="rate_later">Silakan ingatkan saya lagi</string>
+    <string name="rate_cancel">Tidak, terimakasih</string>
+</resources>

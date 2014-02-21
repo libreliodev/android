@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">%s értékelése</string>
+    <string name="rate_message">Ha tetszik a %s, ne felejtsd el értékelni az App Store-ban! Csak egy perc az egész. Köszönet a támogatásért!</string>
+    <string name="rate">%s értékelése</string>
+    <string name="rate_later">Emlékeztess később</string>
+    <string name="rate_cancel">Most inkább nem</string>
+</resources>

@@ -47,6 +47,8 @@ import com.librelio.loader.PlistParserLoader;
 import com.librelio.model.DictItem;
 import com.librelio.utils.PlistDownloader;
 import com.niveales.wind.R;
+import com.sbstrm.appirater.Appirater;
+
 import de.greenrobot.event.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -135,6 +137,10 @@ public class MainMagazineActivity extends BaseActivity implements LoaderManager.
 
         getLoaderManager().initLoader(PLIST_PARSER_LOADER, null, this);
 
+        if (getResources().getBoolean(R.bool.enable_app_rating)) {
+        	Appirater.appLaunched(this);
+        }
+        
 	}
 
     public void onEventMainThread(UpdateMagazinesEvent event) {

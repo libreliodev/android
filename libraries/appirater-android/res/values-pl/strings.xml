@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Oceń %s</string>
+    <string name="rate_message">Jeżeli podoba Ci się korzystanie z %s, może zechciałbyś poświęcić chwilę czasu, aby ocenić aplikację? Nie zajmie Ci to więcej niż minutę. Dziękujemy za pomoc!</string>
+    <string name="rate">Oceń %s</string>
+    <string name="rate_later">Przypomnij później</string>
+    <string name="rate_cancel">Nie, dziękuję</string>
+</resources>

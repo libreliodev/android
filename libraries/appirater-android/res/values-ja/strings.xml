@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">%sの評価</string>
+    <string name="rate_message">楽しんでいただけたならば簡単なご意見をお願いします。%sを評価しますか？</string>
+    <string name="rate">%sを評価する</string>
+    <string name="rate_later">後で見る</string>
+    <string name="rate_cancel">いいえ</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">给%s评分</string>
+    <string name="rate_message">如果你喜欢使用%s，你介意花一点时间给它评分吗？不会超过一分钟。感谢您的支持！</string>
+    <string name="rate">给%s评分</string>
+    <string name="rate_later">稍后提醒我</string>
+    <string name="rate_cancel">不，谢谢</string>
+</resources>

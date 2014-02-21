@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">%s Oylayın</string>
+    <string name="rate_message">Eğer %s uygulamasını beğendiyseniz, oy verip bize destek olmak ister misiniz? Desteğiniz için teşekkürler!</string>
+    <string name="rate">Evet, %s oylamak istiyorum</string>
+    <string name="rate_later">Daha sonra hatırlat</string>
+    <string name="rate_cancel">Hayır, Teşekkürler</string>
+</resources>

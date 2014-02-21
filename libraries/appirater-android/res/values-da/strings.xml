@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Bedøm %s</string>
+    <string name="rate_message">Hvis du synes om at bruge %s, vil du have noget imod at bruge et kort øjeblik på at bedømme det? Det tager kun et minut. Tak for din støtte!</string>
+    <string name="rate">Bedøm %s</string>
+    <string name="rate_later">Påmind mig senere</string>
+    <string name="rate_cancel">Nej tak</string>
+</resources>
