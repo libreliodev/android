@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Ohodnotit %s</string>
+    <string name="rate_message">Pokud se Vám aplikace %s líbí, mohli byste ji prosím ohodnotit v App Store? Zabere to jen chvilku. Díky za Vaši podporu!</string>
+    <string name="rate">Ohodnotit %s</string>
+    <string name="rate_later">Možná později</string>
+    <string name="rate_cancel">Ne, díky</string>
+</resources>

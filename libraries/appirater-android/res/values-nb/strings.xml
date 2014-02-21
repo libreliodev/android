@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Vurder %s</string>
+    <string name="rate_message">Hvis du liker å bruke %s, kan du ta deg et øyeblikk for å vurdere den? Det vil ikke ta mer enn ett minutt. Takk for din støtte!</string>
+    <string name="rate">Vurder %s</string>
+    <string name="rate_later">Påminn meg senere</string>
+    <string name="rate_cancel">Nei, takk du</string>
+</resources>

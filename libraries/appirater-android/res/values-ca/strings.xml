@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Valorar %s</string>
+    <string name="rate_message">Si li agrada utilitzar %s, li importaria prendre’s un moment per a valorar-lo? No trigarà més d’un minut. Gràcies por la seva col·laboració!</string>
+    <string name="rate">Valorar %s</string>
+    <string name="rate_later">Recordar-m’ho més tard</string>
+    <string name="rate_cancel">No, gràcies</string>
+</resources>

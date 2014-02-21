@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">%s 평가하기</string>
+    <string name="rate_message">%s 사용이 맘에 드셨나요? 잠시만 시간을 내서 평가를 부탁드리겠습니다. 감사합니다!</string>
+    <string name="rate">%s 평가하기</string>
+    <string name="rate_later">다음에 평가하겠습니다</string>
+    <string name="rate_cancel">평가하지 않겠습니다</string>
+</resources>

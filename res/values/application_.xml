@@ -18,5 +18,6 @@
     <bool name="enable_subscribe_in_menu">false</bool>
     <bool name="enable_info_in_menu">false</bool>
     <string name="info_url">http://www.example.com</string>
-
+	<bool name="enable_app_rating">true</bool>
+    
 </resources>

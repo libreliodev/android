@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Βαθμολόγηση του %s</string>
+    <string name="rate_message">Αν σου αρέσει το %s, θα μπορούσες να αφιερώσεις μια στιγμή για να το βαθμολογήσεις; Η διαδικασία είναι πολύ σύντομη. Ευχαριστούμε για τη στήριξη!</string>
+    <string name="rate">Βαθμολόγηση του %s</string>
+    <string name="rate_later">Υπενθύμιση αργότερα</string>
+    <string name="rate_cancel">Όχι, ευχαριστώ</string>
+</resources>

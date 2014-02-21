@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <groupId>com.sbstrm</groupId>
+    <artifactId>appirater</artifactId>
+    <packaging>apklib</packaging>
+    <version>1.3.1</version>
+
+    <name>Appirater</name>
+    <description>Appirater is an android library based off the original Appirater By Arash Payan.</description>
+    <url>https://github.com/drewjw81/appirater-android</url>
+    <inceptionYear>2012</inceptionYear>
+
+    <developers>
+        <developer>
+            <name>Andrew Winter</name>
+            <email>drewjw81@gmail.com</email>
+            <id>drewjw81</id>
+            <url>https://github.com/drewjw81</url>
+            <timezone>+9</timezone>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>MIT/X11</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>http://github.com/drewjw81/appirater-android/</url>
+        <connection>scm:git:git://github.com/drewjw81/appirater-android.git</connection>
+        <developerConnection>scm:git:git@github.com:drewjw81/appirater-android.git</developerConnection>
+    </scm>
+
+    <organization>
+        <name>sbstrm Ltd.</name>
+        <url>http://sbstrm.co.jp/</url>
+    </organization>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/drewjw81/appirater-android/issues</url>
+    </issueManagement>
+
+    <properties>
+        <java.version>1.5</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>4.1.1.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <sdk>
+                        <platform>17</platform>
+                    </sdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.1</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

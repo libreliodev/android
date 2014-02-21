@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Tarafkan %s</string>
+    <string name="rate_message">Jika anda suka %s, bolehkah luangkan sedikit masa untuk beri penarafan? Tak sampai seminit pun. Terima kasih atas sokongan anda!</string>
+    <string name="rate">Tarafkan %s</string>
+    <string name="rate_later">Ingatkan saya lain kali</string>
+    <string name="rate_cancel">Terima kasih saja</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">דרג את %s</string>
+    <string name="rate_message">אם נהנת להשתמש ב %s, האם תסכים לדרג אותה? זה לא יקח יותר מדקה. תודה על התמיכה!</string>
+    <string name="rate">דרג את %s</string>
+    <string name="rate_later">מאוחר יותר</string>
+    <string name="rate_cancel">לא תודה</string>
+</resources>

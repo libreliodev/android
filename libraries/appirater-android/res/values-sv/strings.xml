@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">Betygsätt %s</string>
+    <string name="rate_message">Om du tycker att %s är ett praktiskt verktyg, kan du tänka dig att betygsätta det åt oss? Det tar bara en minut. Tack för hjälpen!</string>
+    <string name="rate">Betygsätt %s</string>
+    <string name="rate_later">Påminn mig senare</string>
+    <string name="rate_cancel">Nej tack</string>
+</resources>

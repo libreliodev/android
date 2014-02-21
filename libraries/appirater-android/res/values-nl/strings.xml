@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_title">%s beoordelen</string>
+    <string name="rate_message">Als het gebruik van %s je bevalt, zou je dan een momentje de tijd willen nemen om het te beoordelen? Het duurt nog geen minuut. Bedankt voor je steun!</string>
+    <string name="rate">%s beoordelen</string>
+    <string name="rate_later">Herinner me er later aan</string>
+    <string name="rate_cancel">Nee, bedankt</string>
+</resources>
