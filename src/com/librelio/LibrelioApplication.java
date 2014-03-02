@@ -10,9 +10,12 @@ import android.provider.Settings;
 import android.util.Log;
 
 import android.widget.Toast;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
 import com.librelio.model.Magazine;
+import com.librelio.utils.GooglePlayServicesUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 import org.acra.ACRA;
@@ -49,7 +52,26 @@ public class LibrelioApplication extends Application {
 //		baseUrl = "http://librelio-test.s3.amazonaws.com/" + getMagazineName(this) +
 //                PATH_SEPARATOR;
 
+        registerForGCM();
+        
     }
+
+
+	private void registerForGCM() {
+        // Check device for Play Services APK. If check succeeds, proceed with
+        //  GCM registration.
+        if (GooglePlayServicesUtils.checkPlayServices(getApplicationContext())) {
+            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+            String regid = GooglePlayServicesUtils.getRegistrationId(getApplicationContext());
+
+            // if regid not stored in SharedPreferences then register for GCM
+            if (regid.isEmpty()) {
+                GooglePlayServicesUtils.registerInBackground(getApplicationContext());
+            }
+        } else {
+            Log.i(TAG, "No valid Google Play Services APK found.");
+        }
+	}
 
 
 	public static void startPDFActivity(Context context, String filePath, String title, boolean showThumbnails){

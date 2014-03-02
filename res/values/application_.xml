@@ -19,5 +19,6 @@
     <bool name="enable_info_in_menu">false</bool>
     <string name="info_url">http://www.example.com</string>
 	<bool name="enable_app_rating">true</bool>
+	<string name="gcm_project_number"></string>
     
 </resources>

@@ -14,6 +14,19 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>    
 	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 	<uses-permission android:name="android.permission.READ_LOGS"/>
+	
+	<!-- GCM permissions -->
+	
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.REGISTER" />
+    <uses-permission android:name="com.niveales.wind.permission.C2D_MESSAGE" />
+
+    <permission
+        android:name="com.niveales.wind.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+	
 
     <application
         android:allowBackup="false"
@@ -72,6 +85,21 @@
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
             </intent-filter>
         </receiver>
+        
+        <!-- GCM -->
+        
+        <receiver
+            android:name="com.librelio.notifications.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.niveales.wind" />
+            </intent-filter>
+        </receiver>
+        <service android:name="com.librelio.notifications.GcmIntentService" />
+        
+        <meta-data android:name="com.google.android.gms.version"
+           android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>
