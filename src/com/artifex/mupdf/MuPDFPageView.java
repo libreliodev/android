@@ -176,7 +176,7 @@ public class MuPDFPageView extends PageView {
 			runningLinks.add(linkInfo.url);
 		}
 		
-		if (linkInfo.isPdf()) {
+		if (!linkInfo.url.startsWith("buy://") && linkInfo.isPdf()) {
 				final String basePath = mCore.getFileDirectory();
 				String fileName = Uri.parse(uriString).getPath();
 				LibrelioApplication.startPDFActivity(getContext(), basePath + "/" + fileName, FilenameUtils.getBaseName(fileName), false);
