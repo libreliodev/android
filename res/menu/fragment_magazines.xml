@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/options_menu_reload"
+        android:showAsAction="always"
+        android:title="@string/reload"
+        android:icon="@drawable/ic_action_reload"
+        android:visible="@bool/enable_refresh_in_menu">
+    </item>
+
+</menu>

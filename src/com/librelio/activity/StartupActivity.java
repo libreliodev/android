@@ -254,19 +254,19 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	}
 
 	void startMainMagazineActivity() {
-		startActivity(getMainMagazineActivityIntent());
+		startActivity(getMainTabsActivityIntent());
 		finish();
 	}
 
-    private Intent getMainMagazineActivityIntent() {
-        return MainMagazineActivity.getIntent(this, getString(R.string.root_view));
+    private Intent getMainTabsActivityIntent() {
+        return MainTabsActivity.getIntent(this);
     }
 
 	/**
 	 * @param pLink - URL to display
 	 */
 	void startAdsActivity(final String pLink) {
-		Intent mainMagazineActivityIntent = getMainMagazineActivityIntent();
+		Intent mainMagazineActivityIntent = getMainTabsActivityIntent();
 		Intent webAdvertisingActivityIntent = new Intent(self(),
 				WebViewActivity.class);
 		webAdvertisingActivityIntent.putExtra(
