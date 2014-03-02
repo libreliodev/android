@@ -7,21 +7,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
-import android.app.Activity;
-import com.librelio.event.UpdateProgressEvent;
-import com.librelio.utils.StorageUtils;
-import de.greenrobot.event.EventBus;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
+import com.librelio.event.UpdateProgressEvent;
+import com.librelio.utils.StorageUtils;
 import com.niveales.wind.R;
 
-public class BaseActivity extends Activity implements IBaseContext {
+import de.greenrobot.event.EventBus;
+
+public class BaseActivity extends FragmentActivity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
 
 	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
@@ -131,7 +131,7 @@ public class BaseActivity extends Activity implements IBaseContext {
 				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, isEnable ? 1 : 0);
 	}
 
-	protected boolean hasTestMagazine() {
+	public boolean hasTestMagazine() {
 		return getResources().getBoolean(R.bool.enable_test_magazine);
 	}
 	

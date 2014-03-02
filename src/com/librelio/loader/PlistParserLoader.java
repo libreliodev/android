@@ -1,8 +1,18 @@
 package com.librelio.loader;
 
-import android.content.AsyncTaskLoader;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+
 import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
+
 import com.librelio.event.InvalidateGridViewEvent;
 import com.librelio.event.UpdateMagazinesEvent;
 import com.librelio.model.DictItem;
@@ -15,16 +25,8 @@ import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
-import de.greenrobot.event.EventBus;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
+import de.greenrobot.event.EventBus;
 
 public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
 
@@ -114,7 +116,7 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
                 if (magazine instanceof Magazine)
                 MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
             }
-            EventBus.getDefault().post(new UpdateMagazinesEvent(magazines));
+            EventBus.getDefault().post(new UpdateMagazinesEvent(plistName, magazines));
 
             // This should happen on a different thread - or just when images are displayed
             for (DictItem magazine : magazines) {

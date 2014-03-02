@@ -9,7 +9,7 @@ public class DictItem {
     private static final String TITLE_KEY = "Title";
     private static final String SUBTITLE_KEY = "Subtitle";
     protected String fileName;
-    protected String title;
+    protected String title = "";
     protected String itemUrl;
     protected String itemPath;
     protected String pngUrl;
@@ -24,9 +24,15 @@ public class DictItem {
             Magazine magazine = new Magazine(fileName, title, subtitle, null, context);
             return magazine;
         } else if (fileName.contains("plist")) {
-            PlistItem item = new PlistItem(fileName, title, context);
-            return item;
-        }
+        	return new PlistItem(fileName, title, context);
+        } else if (fileName.contains(".rss")) {
+        	return new RssFeedItem(context, fileName, title);
+        } else if (fileName.contains("http")) {
+        	return new WebAddressItem(fileName, title);
+        } else if (fileName.contains("file://")) {
+        	return new DownloadsItem(title);
+        }	
+        
         return null;
     }
 

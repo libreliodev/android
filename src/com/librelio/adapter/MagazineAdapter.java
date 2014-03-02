@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
-import com.librelio.activity.MainMagazineActivity;
+import com.librelio.activity.MagazinesActivity;
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.model.DictItem;
 import com.librelio.model.Magazine;
@@ -273,7 +273,8 @@ public class MagazineAdapter extends BaseAdapter {
             holder.thumbnail.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(MainMagazineActivity.getIntent(context, magazines.get(position).getFileName()));
+                	context.startActivity(MagazinesActivity.getIntent(context, magazines.get(position).getFileName()));
+//                    context.startActivity(MainMagazineActivity.getIntent(context, magazines.get(position).getFileName()));
                 }
             });
             return convertView;

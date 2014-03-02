@@ -155,7 +155,7 @@ public class MuPDFActivity extends BaseActivity{
 	private MuPDFCore getMuPdfCore(Bundle savedInstanceState) {
 		MuPDFCore core = null;
 		if (core == null) {
-			core = (MuPDFCore)getLastNonConfigurationInstance();
+			core = (MuPDFCore)getLastCustomNonConfigurationInstance();
 
 			if (savedInstanceState != null && savedInstanceState.containsKey(FILE_NAME)) {
 				fileName = savedInstanceState.getString(FILE_NAME);
@@ -360,7 +360,8 @@ public class MuPDFActivity extends BaseActivity{
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	public Object onRetainNonConfigurationInstance() {
+	@Override
+	public Object onRetainCustomNonConfigurationInstance() {
 		MuPDFCore mycore = core;
 		core = null;
 		return mycore;
