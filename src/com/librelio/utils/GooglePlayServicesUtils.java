@@ -109,7 +109,6 @@ public class GooglePlayServicesUtils {
 	                // The request to your server should be authenticated if your app
 	                // is using accounts.
 	                
-	                // Only persist the regid if sent to server successfully
 	                sendRegistrationIdToBackend(context, regid);
 	            } catch (IOException ex) {
 	                msg = "Error :" + ex.getMessage();
@@ -146,6 +145,7 @@ public class GooglePlayServicesUtils {
 			@Override
 			public void onSuccess(int statusCode, String content) {
 				super.onSuccess(statusCode, content);
+                // Only persist the regid if sent to server successfully
 				GooglePlayServicesUtils.storeRegistrationId(context, regid);
 			}
 			

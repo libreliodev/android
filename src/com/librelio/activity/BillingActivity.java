@@ -19,6 +19,24 @@
 
 package com.librelio.activity;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -29,8 +47,6 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -41,6 +57,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
+
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
@@ -48,24 +65,9 @@ import com.librelio.model.Magazine;
 import com.librelio.service.DownloadMagazineService;
 import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.SyncHttpClient;
 import com.niveales.wind.R;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * The class for purchases via Google Play
@@ -143,10 +145,6 @@ public class BillingActivity extends BaseActivity {
 
 	private IInAppBillingService billingService;
 
-	private SharedPreferences subscrPref;
-	private Editor subscrPrefEd;
-
-
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -157,7 +155,6 @@ public class BillingActivity extends BaseActivity {
 		if(!isNetworkConnected()){
 			showAlertDialog(CONNECTION_ALERT);
 		} else {
-			getSubscriptionPreferences();
 			bindService(
 					new Intent(
 							"com.android.vending.billing.InAppBillingService.BIND"), 
@@ -174,12 +171,7 @@ public class BillingActivity extends BaseActivity {
         }
 	}
 	
-	private void getSubscriptionPreferences(){
-		subscrPref = getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE);
-		subscrPrefEd = subscrPref.edit();
-	}
-	
-	private void initViews() {
+	private void setupDialogView() {
 
         setContentView(R.layout.billing_activity);
 		buy = (Button)findViewById(R.id.billing_buy_button);
@@ -255,37 +247,107 @@ public class BillingActivity extends BaseActivity {
             usernamePasswordLogin.setVisibility(View.GONE);
         }
 	}
+	
+	// This is to check subscription status when a push notification is sent for a new issue
+	// If something goes wrong, don't download the issue, just show a notification
+    public static boolean backgroundCheckForValidSubscriptionFailFast(Context context, String fileName) {
+    	
+        String prefSubscrCode = getSavedSubscriberCode(context);
 
-    private boolean checkForValidSubscription() {
-        String prefSubscrCode = getSavedSubscriberCode();
+        if (prefSubscrCode != null){
+			String subscriptionCodeQuery = buildSubscriptionCodeQuery(context, prefSubscrCode, fileName);
+			HttpClient httpclient = new DefaultHttpClient();
+			try {
+				HttpGet httpget = new HttpGet(subscriptionCodeQuery);
+				HttpClientParams.setRedirecting(httpclient.getParams(), false);
+				HttpResponse httpResponse = httpclient.execute(httpget);
+				int responseCode = httpResponse.getStatusLine().getStatusCode();
+                if (responseCode == UNAUTHORIZED_CODE) {
+                } else if (responseCode == UNAUTHORIZED_ISSUE) {
+                } else if (responseCode == UNAUTHORIZED_DEVICE) {
+                } else {
+                    String tempURL = getTempURL(httpResponse);
+                    if (tempURL != null) {
+                    DownloadMagazineService.startDownload(context, new Magazine(fileName, "New issue", null, null,
+                            context), true, tempURL);
+                    return true;
+                    }
+                }
+			} catch (IllegalArgumentException e) {
+				Log.e(TAG, "URI is malformed", e);
+			} catch (ClientProtocolException e) {
+				Log.e(TAG, "Download failed", e);
+			} catch (IOException e) {
+				Log.e(TAG, "Download failed", e);
+			}
+            return false;
+		}
+
+        String prefUsername = getSavedUsername(context);
+
+        if (prefUsername != null){
+            String prefPassword = getSavedPassword(context);
+            String usernamePasswordLoginQuery = buildUsernamePasswordLoginQuery(context, prefUsername,
+                    prefPassword, fileName);
+            HttpClient httpclient = new DefaultHttpClient();
+			try {
+				HttpGet httpget = new HttpGet(usernamePasswordLoginQuery);
+				HttpClientParams.setRedirecting(httpclient.getParams(), false);
+				HttpResponse httpResponse = httpclient.execute(httpget);
+				int responseCode = httpResponse.getStatusLine().getStatusCode();
+                if (responseCode == UNAUTHORIZED_CODE) {
+                } else if (responseCode == UNAUTHORIZED_ISSUE) {
+                } else if (responseCode == UNAUTHORIZED_DEVICE) {
+                } else {
+                    String tempURL = getTempURL(httpResponse);
+                    if (tempURL != null) {
+                    DownloadMagazineService.startDownload(context, new Magazine(fileName, "New issue", null, null,
+                            context), true, tempURL);
+                    return true;
+                    }
+                }
+			} catch (IllegalArgumentException e) {
+				Log.e(TAG, "URI is malformed", e);
+			} catch (ClientProtocolException e) {
+				Log.e(TAG, "Download failed", e);
+			} catch (IOException e) {
+				Log.e(TAG, "Download failed", e);
+			}
+            return false;
+        }
+        return false;
+    }
+
+    private boolean checkForValidSubscription(Context context, String fileName) {
+        String prefSubscrCode = getSavedSubscriberCode(context);
 
         if (prefSubscrCode != null){
 			new DownloadSubsrcFromTempURLTask().execute(
-					buildSubscriptionCodeQuery(prefSubscrCode), prefSubscrCode);
+					buildSubscriptionCodeQuery(context, prefSubscrCode, fileName), prefSubscrCode);
             return true;
 		}
 
-        String prefUsername = getSavedUsername();
+        String prefUsername = getSavedUsername(context);
 
         if (prefUsername != null){
-            String prefPassword = getSavedPassword();
-            new DownloadUsernamePasswordLoginFromTempURLTask().execute(buildUsernamePasswordLoginQuery(prefUsername,
-                    prefPassword), prefUsername, prefPassword);
+            String prefPassword = getSavedPassword(context);
+            new DownloadUsernamePasswordLoginFromTempURLTask().execute(buildUsernamePasswordLoginQuery(context, prefUsername,
+                    prefPassword, fileName), prefUsername, prefPassword);
             return true;
         }
         return false;
     }
 
-    private String getSavedSubscriberCode() {
-        return subscrPref.getString(PARAM_SUBSCRIPTION_CODE, null);
+    private static String getSavedSubscriberCode(Context context) {
+        return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).getString(PARAM_SUBSCRIPTION_CODE, null);
     }
 
-    private String getSavedUsername() {
-        return subscrPref.getString(PARAM_USERNAME, null);
+    private static String getSavedUsername(Context context) {
+        return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).getString(PARAM_USERNAME, null);
     }
 
-    private String getSavedPassword() {
-        return subscrPref.getString(PARAM_PASSWORD, null);
+    private static String getSavedPassword(Context context) {
+        return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).getString(PARAM_PASSWORD, null);
     }
 
     private void showSubscriberCodeDialog(boolean error) {
@@ -418,8 +480,8 @@ public class BillingActivity extends BaseActivity {
 							}
 						}
 					}
-                    if (!checkForValidSubscription()) {
-                        initViews();
+                    if (!checkForValidSubscription(BillingActivity.this, fileName)) {
+                        setupDialogView();
                     }
 					super.onPostExecute(skuDetails);
 				}
@@ -525,36 +587,36 @@ public class BillingActivity extends BaseActivity {
 		return query.append(command).toString();
 	}
 	
-	private String buildSubscriptionCodeQuery(String code) {
+	private static String buildSubscriptionCodeQuery(Context context, String code, String fileName) {
 		
 		StringBuilder query = new StringBuilder(
-				LibrelioApplication.getServerUrl(getContext()));
+				LibrelioApplication.getServerUrl(context));
 		
-		String command = getString(R.string.command_pswd)
+		String command = context.getString(R.string.command_pswd)
 				.replace(PARAM_CODE, Uri.encode(code))
 				.replace(PARAM_URLSTRING, Uri.encode(
 						LibrelioApplication.getUrlString(fileName)))
-				.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(getContext())))
-				.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(getContext())))
-                .replace(PARAM_DEVICEID, LibrelioApplication.getAndroidId(BillingActivity.this));
+				.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(context)))
+				.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(context)))
+                .replace(PARAM_DEVICEID, LibrelioApplication.getAndroidId(context));
 		
 		return query.append(command).toString();
 	}
 
-    private String buildUsernamePasswordLoginQuery(String username, String password) {
+    private static String buildUsernamePasswordLoginQuery(Context context, String username, String password, String fileName) {
 
         StringBuilder query = new StringBuilder(
-                LibrelioApplication.getServerUrl(getContext()));
+                LibrelioApplication.getServerUrl(context));
 
-        String command = getString(R.string.command_username_pswd)
+        String command = context.getString(R.string.command_username_pswd)
                 .replace(PARAM_URLSTRING, Uri.encode(
                         LibrelioApplication.getUrlString(fileName)))
                 .replace(PARAM_USERNAME, Uri.encode(username))
                 .replace(PARAM_PASSWORD, Uri.encode(password))
-                .replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(getContext())))
-                .replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(getContext())))
-                .replace(PARAM_SERVICE, Uri.encode(LibrelioApplication.getServiceName(getContext())))
-                .replace(PARAM_DEVICEID, LibrelioApplication.getAndroidId(BillingActivity.this));
+                .replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(context)))
+                .replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(context)))
+                .replace(PARAM_SERVICE, Uri.encode(LibrelioApplication.getServiceName(context)))
+                .replace(PARAM_DEVICEID, LibrelioApplication.getAndroidId(context));
 
         return query.append(command).toString();
     }
@@ -593,7 +655,33 @@ public class BillingActivity extends BaseActivity {
             return;
         }
 
-        Log.d(TAG, "status line: " + response.getStatusLine().toString());
+        tempURL = getTempURL(response);
+        if(tempURL == null){
+            //Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
+            showAlertDialog(DOWNLOAD_ALERT);
+
+            return;
+        }
+        if (getIntent().getExtras() != null) {
+        DownloadMagazineService.startDownload(this, new Magazine(fileName, title, subtitle, null,
+                this), true, tempURL);
+            Intent intent = new Intent(getContext(), DownloadMagazineActivity.class);
+            intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);
+            intent.putExtra(BillingActivity.SUBTITLE_KEY, subtitle);
+            intent.putExtra(BillingActivity.TITLE_KEY, title);
+            intent.putExtra(BillingActivity.IS_SAMPLE_KEY, false);
+            startActivity(intent);
+            setResult(RESULT_OK);
+            finish();
+        } else {
+            Toast.makeText(this, "Purchase successful", Toast.LENGTH_LONG).show();
+        }
+        finish();
+    }
+
+	private static String getTempURL(HttpResponse response) {
+		String tempURL = null;
+		Log.d(TAG, "status line: " + response.getStatusLine().toString());
         HttpEntity entity = response.getEntity();
 
         DataInputStream bodyStream = null;
@@ -622,28 +710,8 @@ public class BillingActivity extends BaseActivity {
                 Log.d(TAG, "header: " + h.getName() + " => " + h.getValue());
             }
         }
-        if(tempURL == null){
-            //Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
-            showAlertDialog(DOWNLOAD_ALERT);
-
-            return;
-        }
-        if (getIntent().getExtras() != null) {
-        DownloadMagazineService.startDownload(this, new Magazine(fileName, title, subtitle, null,
-                this), true, tempURL);
-            Intent intent = new Intent(getContext(), DownloadMagazineActivity.class);
-            intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);
-            intent.putExtra(BillingActivity.SUBTITLE_KEY, subtitle);
-            intent.putExtra(BillingActivity.TITLE_KEY, title);
-            intent.putExtra(BillingActivity.IS_SAMPLE_KEY, false);
-            startActivity(intent);
-            setResult(RESULT_OK);
-            finish();
-        } else {
-            Toast.makeText(this, "Purchase successful", Toast.LENGTH_LONG).show();
-        }
-        finish();
-    }
+		return tempURL;
+	}
 
     private class DownloadSubsrcFromTempURLTask extends DownloadFromTempURLTask{
 		
@@ -660,7 +728,7 @@ public class BillingActivity extends BaseActivity {
 			if (null != response) {
 				int responseCode = response.getStatusLine().getStatusCode();
                 if (responseCode == UNAUTHORIZED_CODE) {
-                    subscrPrefEd.remove(PARAM_SUBSCRIPTION_CODE).commit();
+                	getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit().remove(PARAM_SUBSCRIPTION_CODE).commit();
                     showSubscriberCodeDialog(true);
                 } else if (responseCode == UNAUTHORIZED_ISSUE) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
@@ -668,7 +736,7 @@ public class BillingActivity extends BaseActivity {
                     builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            initViews();
+                            setupDialogView();
                         }
                     });
                     Dialog dialog = builder.create();
@@ -699,9 +767,9 @@ public class BillingActivity extends BaseActivity {
                     dialog.setCanceledOnTouchOutside(true);
                     dialog.show();
                 } else {
-                    String prefSubscrCode = getSavedSubscriberCode();
+                    String prefSubscrCode = getSavedSubscriberCode(BillingActivity.this);
                     if (prefSubscrCode == null){
-						subscrPrefEd.putString(
+                    	getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit().putString(
 								PARAM_SUBSCRIPTION_CODE, subscrCode).commit();
 					}
                     startDownloadOfMagazineFromResponse(response);
@@ -728,8 +796,8 @@ public class BillingActivity extends BaseActivity {
                 String responseStatus = response.getStatusLine().toString();
                 int responseCode = response.getStatusLine().getStatusCode();
                     if (responseCode == UNAUTHORIZED_USER) {
-                        subscrPrefEd.remove(PARAM_USERNAME).commit();
-                        subscrPrefEd.remove(PARAM_PASSWORD).commit();
+                    	getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit().remove(PARAM_USERNAME).commit();
+                    	getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit().remove(PARAM_PASSWORD).commit();
                         showUsernamePasswordLoginDialog(true);
                     } else if (responseCode == UNAUTHORIZED_ISSUE) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(BillingActivity.this);
@@ -737,7 +805,7 @@ public class BillingActivity extends BaseActivity {
                         builder.setPositiveButton(R.string.buy, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                initViews();
+                                setupDialogView();
                             }
                         });
                         Dialog dialog = builder.create();
@@ -769,11 +837,11 @@ public class BillingActivity extends BaseActivity {
                         dialog.show();
                 } else {
                     String prefUsername =
-                            subscrPref.getString(PARAM_USERNAME, null);
+                    		getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).getString(PARAM_USERNAME, null);
                     if (prefUsername == null){
-                        subscrPrefEd.putString(
+                    	getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit().putString(
                                 PARAM_USERNAME, username).commit();
-                        subscrPrefEd.putString(
+                    	getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit().putString(
                                 PARAM_PASSWORD, password).commit();
                     }
                     startDownloadOfMagazineFromResponse(response);
@@ -854,7 +922,7 @@ public class BillingActivity extends BaseActivity {
 		@Override
 		public void onEnterValue(String code) {
 			setContentView(R.layout.wait_bar);
-			new DownloadSubsrcFromTempURLTask().execute(buildSubscriptionCodeQuery(code), code);
+			new DownloadSubsrcFromTempURLTask().execute(buildSubscriptionCodeQuery(BillingActivity.this, code, fileName), code);
 		}
 
         @Override
@@ -867,8 +935,8 @@ public class BillingActivity extends BaseActivity {
         @Override
         public void onEnterUsernamePasswordLogin(String username, String password) {
             setContentView(R.layout.wait_bar);
-            new DownloadUsernamePasswordLoginFromTempURLTask().execute(buildUsernamePasswordLoginQuery(username,
-                    password), username, password);
+            new DownloadUsernamePasswordLoginFromTempURLTask().execute(buildUsernamePasswordLoginQuery(BillingActivity.this, username,
+                    password, fileName), username, password);
         }
 
         @Override

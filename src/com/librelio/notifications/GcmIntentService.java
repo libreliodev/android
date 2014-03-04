@@ -5,17 +5,27 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.librelio.activity.BillingActivity;
+import com.librelio.activity.MainTabsActivity;
+import com.librelio.activity.MuPDFActivity;
+import com.librelio.model.Magazine;
+import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
 public class GcmIntentService extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
+    private static final String WAURL = "waurl";
+	private static final String CONTENT_AVAILABLE = "content-available";
+	public static final int NOTIFICATION_ID = 1;
 	private static final String TAG = "GcmIntentService";
+	private static final String ALERT = "alert";
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
 
@@ -48,44 +58,63 @@ public class GcmIntentService extends IntentService {
             // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                // This loop represents the service doing some work.
-                for (int i=0; i<5; i++) {
-                    Log.i(TAG, "Working... " + (i+1)
-                            + "/5 @ " + SystemClock.elapsedRealtime());
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                    }
-                }
-                Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
-                // Post notification of received message.
-                sendNotification("Received: " + extras.toString());
+
                 Log.i(TAG, "Received: " + extras.toString());
+            	if (intent.hasExtra(ALERT)) {
+            		String alertMessage = intent.getStringExtra(ALERT);
+            		sendNotification(alertMessage);
+            	} else if (intent.hasExtra(CONTENT_AVAILABLE)) {
+            		if (intent.getStringExtra(CONTENT_AVAILABLE).equals("1")) {
+            			String waurl = intent.getStringExtra(WAURL);
+            			if (!BillingActivity.backgroundCheckForValidSubscriptionFailFast(getApplicationContext(), waurl)) {
+            	            NotificationCompat.Builder mBuilder =
+            	                    new NotificationCompat.Builder(this)
+            	                            .setSmallIcon(R.drawable.ic_launcher)
+            	                            .setContentTitle("New issue downloaded")
+            	                            .setContentText("Click to read");
+
+            	            // Create large icon from magazine cover png
+            	            Resources res = getResources();
+            	            int height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
+            	            int width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
+//            	            mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(magazine.getPngPath(), height, width));
+
+            	            Intent resultIntent = new Intent(getApplicationContext(), MainTabsActivity.class);
+            	            PendingIntent resultPendingIntent =
+            	            	    PendingIntent.getActivity(
+            	            	    this,
+            	            	    0,
+            	            	    resultIntent,
+            	            	    PendingIntent.FLAG_UPDATE_CURRENT
+            	            	);
+            	            
+            	            mBuilder.setContentIntent(resultPendingIntent);
+            	            mBuilder.setAutoCancel(true);
+            	            NotificationManager mNotificationManager =
+            	                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            	            mNotificationManager.notify(0, mBuilder.build());
+            			}
+            		}
+            	}
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    // Put the message into a notification and post it.
-    // This is just one simple example of what you might choose to do with
-    // a GCM message.
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-//                new Intent(this, DemoActivity.class), 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainTabsActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
         .setSmallIcon(R.drawable.ic_launcher)
-        .setContentTitle("GCM Notification")
-        .setStyle(new NotificationCompat.BigTextStyle()
-        .bigText(msg))
-        .setContentText(msg);
+        .setContentTitle(msg);
 
-//        mBuilder.setContentIntent(contentIntent);
+        mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 }
