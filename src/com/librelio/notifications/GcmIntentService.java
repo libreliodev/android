@@ -70,8 +70,8 @@ public class GcmIntentService extends IntentService {
             	            NotificationCompat.Builder mBuilder =
             	                    new NotificationCompat.Builder(this)
             	                            .setSmallIcon(R.drawable.ic_launcher)
-            	                            .setContentTitle("New issue downloaded")
-            	                            .setContentText("Click to read");
+            	                            .setContentTitle("New issue available");
+//            	                            .setContentText("Click to read");
 
             	            // Create large icon from magazine cover png
             	            Resources res = getResources();
