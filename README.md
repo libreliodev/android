@@ -14,6 +14,7 @@ This project is Copyright 2012-2014 Librelio, except included libraries:
 - Copyright 2006-2012 Artifex Software, Inc for the MuPDF library
 - Copyright Free Beachler (http://www.freebeachler.com) for the Android P-List Parser library
 - Copyright 2013 Andreas Stuetz for the PagerSlidingTabStrip library
+- Copyright 2011-2013 sbstrm. Copyright 2014 drewjw81 for the Appirater Android library
 
 The use of the Google Analytics library is governed by the following terms: http://www.google.com/analytics/tos.html
 
@@ -23,6 +24,7 @@ The use of the Google Analytics library is governed by the following terms: http
 - MuPDF: https://github.com/libreliodev/mupdf.git
 - Android P-List Parser: https://github.com/libreliodev/android-plist-parser
 - PagerSlidingTabStrip: https://github.com/astuetz/PagerSlidingTabStrip
+- Appiarater Android: https://github.com/drewjw81/appirater-android
 
 ## Documentation
 The documentation is available in the [Wiki](https://github.com/libreliodev/android/wiki)
