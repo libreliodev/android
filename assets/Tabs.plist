@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>FileName</key>
+		<string>Magazines.plist?waupdate=30</string>
+		<key>Icon</key>
+		<string>download.png</string>
+		<key>Title</key>
+		<string>Magazines</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>file://localhost/</string>
+		<key>Icon</key>
+		<string>folder.png</string>
+		<key>Title</key>
+		<string>Downloads</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>news.rss?waurl=http%3A%2F%2Fwww.windmag.com%2Ffeed%2Fall&amp;waupdate=30</string>
+		<key>Icon</key>
+		<string>rss.png</string>
+		<key>Title</key>
+		<string>News</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>http://www.windmag.com</string>
+		<key>Icon</key>
+		<string>globe.png</string>
+		<key>Title</key>
+		<string>Site</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>https://www.facebook.com/windmag</string>
+		<key>Icon</key>
+		<string>facebook.png</string>
+		<key>Title</key>
+		<string>Facebook</string>
+	</dict>
+</array>
+</plist>
