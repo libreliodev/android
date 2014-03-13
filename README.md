@@ -10,9 +10,10 @@ Examples of customized apps published on the app stores are available on www.lib
 ## License
 This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This project is Copyright 2012-2013 Librelio, except included libraries:
+This project is Copyright 2012-2014 Librelio, except included libraries:
 - Copyright 2006-2012 Artifex Software, Inc for the MuPDF library
 - Copyright Free Beachler (http://www.freebeachler.com) for the Android P-List Parser library
+- Copyright 2013 Andreas Stuetz for the PagerSlidingTabStrip library
 
 The use of the Google Analytics library is governed by the following terms: http://www.google.com/analytics/tos.html
 
@@ -21,6 +22,7 @@ The use of the Google Analytics library is governed by the following terms: http
 ## Source code of libraries used
 - MuPDF: https://github.com/libreliodev/mupdf.git
 - Android P-List Parser: https://github.com/libreliodev/android-plist-parser
+- PagerSlidingTabStrip: https://github.com/astuetz/PagerSlidingTabStrip
 
 ## Documentation
 The documentation is available in the [Wiki](https://github.com/libreliodev/android/wiki)
