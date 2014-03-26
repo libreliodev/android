@@ -104,5 +104,9 @@
     <string name="unauthorized_issue">Your subscription does not allow you to download this issue</string>
     <string name="unauthorized_device">This issue has been downloaded on too many devices. Please contact license@librelio.com for more info</string>
     <string name="no_downloaded_magazines">No downloaded magazines.</string>
+    
+    <string name="new_issue">New issue</string>
+    <string name="available">available</string>
+    
 
 </resources>

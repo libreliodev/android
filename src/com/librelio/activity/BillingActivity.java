@@ -250,7 +250,8 @@ public class BillingActivity extends BaseActivity {
 	
 	// This is to check subscription status when a push notification is sent for a new issue
 	// If something goes wrong, don't download the issue, just show a notification
-    public static boolean backgroundCheckForValidSubscriptionFailFast(Context context, String fileName) {
+    public static boolean backgroundCheckForValidSubscriptionFailFast(Context context,
+    		String fileName, String title, String subtitle) {
     	
         String prefSubscrCode = getSavedSubscriberCode(context);
 
@@ -268,7 +269,7 @@ public class BillingActivity extends BaseActivity {
                 } else {
                     String tempURL = getTempURL(httpResponse);
                     if (tempURL != null) {
-                    DownloadMagazineService.startDownload(context, new Magazine(fileName, "New issue", null, null,
+                    DownloadMagazineService.startDownload(context, new Magazine(fileName, title, subtitle, null,
                             context), true, tempURL);
                     return true;
                     }
@@ -301,7 +302,7 @@ public class BillingActivity extends BaseActivity {
                 } else {
                     String tempURL = getTempURL(httpResponse);
                     if (tempURL != null) {
-                    DownloadMagazineService.startDownload(context, new Magazine(fileName, "New issue", null, null,
+                    DownloadMagazineService.startDownload(context, new Magazine(fileName, title, subtitle, null,
                             context), true, tempURL);
                     return true;
                     }

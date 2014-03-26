@@ -116,6 +116,20 @@ public class DownloadMagazineService extends IntentService {
             }
             c.close();
 
+            Date date = Calendar.getInstance().getTime();
+            String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
+            magazine.setDownloadDate(downloadDate);
+            manager.removeDownloadedMagazine(this, magazine);
+            manager.addMagazine(
+                    magazine,
+                    Magazine.TABLE_DOWNLOADED_MAGAZINES,
+                    true);
+            EventBus.getDefault().post(new LoadPlistEvent());
+            EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
+            startLinksDownload(this, magazine);
+            magazine.makeCompleteFile(magazine.isSample());
+            
+
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
@@ -150,20 +164,6 @@ public class DownloadMagazineService extends IntentService {
             NotificationManager mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify((int) magazine.getDownloadManagerId(), mBuilder.build());
-
-
-            Date date = Calendar.getInstance().getTime();
-            String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
-            magazine.setDownloadDate(downloadDate);
-            manager.removeDownloadedMagazine(this, magazine);
-            manager.addMagazine(
-                    magazine,
-                    Magazine.TABLE_DOWNLOADED_MAGAZINES,
-                    true);
-            EventBus.getDefault().post(new LoadPlistEvent());
-            EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
-            startLinksDownload(this, magazine);
-            magazine.makeCompleteFile(magazine.isSample());
         } else {
             // Asset downloaded
             DownloadManager.Query q = new DownloadManager.Query();
@@ -291,6 +291,7 @@ public class DownloadMagazineService extends IntentService {
             fileUrl = tempUrlKey;
         }
         Log.d(TAG, "isSample: " + magazine.isSample() + "\nfileUrl: " + fileUrl + "\nfilePath: " + filePath);
+        EasyTracker.getInstance().setContext(context);
         EasyTracker.getTracker().sendView(
                 "Downloading/" + FilenameUtils.getBaseName(filePath));
         DownloadManager dm = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);

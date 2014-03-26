@@ -17,6 +17,7 @@ import com.librelio.base.IBaseContext;
 import com.librelio.model.Magazine;
 import com.librelio.utils.GooglePlayServicesUtils;
 import com.librelio.utils.SystemHelper;
+import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import org.acra.ACRA;
 import org.acra.ReportField;
@@ -61,8 +62,11 @@ public class LibrelioApplication extends Application {
         // Check device for Play Services APK. If check succeeds, proceed with
         //  GCM registration.
         if (GooglePlayServicesUtils.checkPlayServices(getApplicationContext())) {
-            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
             String regid = GooglePlayServicesUtils.getRegistrationId(getApplicationContext());
+            
+            if (BuildConfig.DEBUG) {
+            	Log.i(TAG, "current GCM RegistrationID = " + regid);
+            }
 
             // if regid not stored in SharedPreferences then register for GCM
             if (regid.isEmpty()) {

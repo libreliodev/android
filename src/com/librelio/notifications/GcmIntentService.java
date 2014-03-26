@@ -66,11 +66,17 @@ public class GcmIntentService extends IntentService {
             	} else if (intent.hasExtra(CONTENT_AVAILABLE)) {
             		if (intent.getStringExtra(CONTENT_AVAILABLE).equals("1")) {
             			String waurl = intent.getStringExtra(WAURL);
-            			if (!BillingActivity.backgroundCheckForValidSubscriptionFailFast(getApplicationContext(), waurl)) {
+            			String title = intent.getStringExtra("title");
+            			if (title.equals("")) {
+            				title = getString(R.string.new_issue);
+            			}
+            			String subtitle = intent.getStringExtra("subtitle");
+            			if (!BillingActivity.backgroundCheckForValidSubscriptionFailFast(getApplicationContext(),
+            					waurl, title, subtitle)) {
             	            NotificationCompat.Builder mBuilder =
             	                    new NotificationCompat.Builder(this)
             	                            .setSmallIcon(R.drawable.ic_launcher)
-            	                            .setContentTitle("New issue available");
+            	                            .setContentTitle(title + " " + getString(R.string.available));
 //            	                            .setContentText("Click to read");
 
             	            // Create large icon from magazine cover png
