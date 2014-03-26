@@ -8,10 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.librelio.event.ChangeInDownloadedMagazinesEvent;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.librelio.view.DownloadedMagazinesListView;
 import com.niveales.wind.R;
+
+import de.greenrobot.event.EventBus;
 
 public class DownloadedMagazinesFragment extends ListFragment {
 
@@ -39,7 +42,28 @@ public class DownloadedMagazinesFragment extends ListFragment {
 
 		magazineManager = new MagazineManager(getActivity());
 
+		listMagazines();
+	}
+
+	private void listMagazines() {
 		List<Magazine> downloads = magazineManager.getDownloadedMagazines(false);
-		((DownloadedMagazinesListView) getListView()).setMagazines(downloads);
+		((DownloadedMagazinesListView) getListView()).setMagazines(getActivity(), downloads);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		listMagazines();
+		EventBus.getDefault().register(this);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		EventBus.getDefault().unregister(this);
+	}
+	
+	public void onEvent(ChangeInDownloadedMagazinesEvent event) {
+		listMagazines();
 	}
 }

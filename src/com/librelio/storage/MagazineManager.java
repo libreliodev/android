@@ -13,7 +13,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.librelio.base.BaseManager;
+import com.librelio.event.ChangeInDownloadedMagazinesEvent;
 import com.librelio.model.Magazine;
+
+import de.greenrobot.event.EventBus;
 
 public class MagazineManager extends BaseManager {
 	private static final String TAG = "MagazineManager";
@@ -92,6 +95,8 @@ public class MagazineManager extends BaseManager {
 		}
         // Add magazine and set id of magazine to newly created row id
 		magazine.setId(db.insert(tableName, null, cv));
+
+		EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
 	}
 	
 	public static synchronized void removeDownloadedMagazine(Context context, Magazine magazine) {
@@ -120,6 +125,8 @@ public class MagazineManager extends BaseManager {
 
         db.delete(Magazine.TABLE_DOWNLOADED_MAGAZINES, Magazine.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()});
         db.delete(Magazine.TABLE_ASSETS, Magazine.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()});
+
+        EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
 	}
 
     public static void removeNotification(Context context, int notificationId) {
@@ -222,6 +229,8 @@ public class MagazineManager extends BaseManager {
             magazine.setTotalAssetCount(getTotalAssetCount(context, magazine));
             magazine.setDownloadedAssetCount(getDownloadedAssetCount(context, magazine));
         }
+
+    	EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
     }
 
     public static int getTotalAssetCount(Context context, Magazine magazine) {

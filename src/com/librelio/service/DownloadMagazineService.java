@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.artifex.mupdf.LinkInfoExternal;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.activity.MuPDFActivity;
+import com.librelio.event.ChangeInDownloadedMagazinesEvent;
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.MagazineDownloadedEvent;
 import com.librelio.lib.utils.PDFParser;
@@ -164,6 +165,8 @@ public class DownloadMagazineService extends IntentService {
             NotificationManager mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify((int) magazine.getDownloadManagerId(), mBuilder.build());
+            
+            EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
         } else {
             // Asset downloaded
             DownloadManager.Query q = new DownloadManager.Query();

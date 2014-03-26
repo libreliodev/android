@@ -1,5 +1,6 @@
 package com.librelio.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -20,19 +21,22 @@ import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadedMagazinesListView extends ListView {
 	
 	private Context context;
 	private MagazinesAdapter magazinesAdapter;
-	private List<Magazine> downloads;
 
 	public DownloadedMagazinesListView(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
 		this.context = context;
 		setOnItemClickListener();
+
+		magazinesAdapter = new MagazinesAdapter(context);
+		setAdapter(magazinesAdapter);
 	}
 	
 	private void setOnItemClickListener(){
@@ -41,13 +45,11 @@ public class DownloadedMagazinesListView extends ListView {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				
-				if (downloads != null){
-					Magazine downloadedMagazine = downloads.get(position);
+					Magazine downloadedMagazine = magazinesAdapter.getItem(position);
 					LibrelioApplication.startPDFActivity(context,
 							downloadedMagazine.isSample() ?
 							downloadedMagazine.getSamplePdfPath() :
 							downloadedMagazine.getItemPath(), downloadedMagazine.getTitle(), true);
-				}
 			}
 		});
 	}
@@ -60,12 +62,8 @@ public class DownloadedMagazinesListView extends ListView {
 		this(context, null, 0);
 	}
 	
-	public void setMagazines(List<Magazine> downloads){
-		if (downloads != null){
-			this.downloads = downloads; 
-			magazinesAdapter = new MagazinesAdapter(context, downloads);
-			setAdapter(magazinesAdapter);
-		}
+	public void setMagazines(Activity activity, List<Magazine> downloads){
+		magazinesAdapter.setDownloads(activity, downloads);
 	}
 }
 
@@ -76,16 +74,37 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 	private MagazineManager magazineManager;
 	private String samplePostfix;  
 	
-	public MagazinesAdapter(Context context, List<Magazine> downloads) {
-		super(context, R.layout.downloaded_magazines_item, downloads);
+	public MagazinesAdapter(Context context) {
+		super(context, R.layout.downloaded_magazines_item, 0);
 		this.context = context;
-		this.downloads = downloads;
+		downloads = new ArrayList<Magazine>();
 		
 		samplePostfix = new StringBuilder(" (")
 							.append(context.getString(R.string.sample))
 							.append(")").toString(); 
 		
 		magazineManager = new MagazineManager(context);
+	}
+	
+	public void setDownloads(Activity activity, List<Magazine> downloads) {
+		this.downloads.clear();
+		this.downloads.addAll(downloads);
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				notifyDataSetChanged();
+			}
+		});
+	}
+	
+	@Override
+	public int getCount() {
+		return downloads.size();
+	}
+	
+	@Override
+	public Magazine getItem(int position) {
+		return downloads.get(position);
 	}
 	
 	static class ViewHolder {
@@ -144,8 +163,8 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 				downloadedMagazine.clearMagazineDir();
 				magazineManager.removeDownloadedMagazine(context, downloadedMagazine);
 
-				getAdapter().remove(downloadedMagazine);
-				getAdapter().notifyDataSetChanged();
+//				getAdapter().remove(downloadedMagazine);
+//				getAdapter().notifyDataSetChanged();
 			}
 		});
         holder.position = position;
