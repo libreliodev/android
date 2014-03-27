@@ -59,7 +59,7 @@
             android:theme="@style/Theme.Fullscreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.librelio.activity.MagazinesActivity" />
+                android:value="com.librelio.activity.MainTabsActivity" />
             </activity>
         <activity
             android:name="com.librelio.activity.OutlineActivity"

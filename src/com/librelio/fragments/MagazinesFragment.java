@@ -41,17 +41,20 @@ public class MagazinesFragment extends Fragment implements LoaderManager.LoaderC
 
     private Handler handler = new Handler();
 
-    private Runnable loadPlistTask = new Runnable() {
-        @Override
-        public void run() {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getLoaderManager().restartLoader(PLIST_PARSER_LOADER, null, MagazinesFragment.this);
-                }
-            });
-        }
-    };
+	private Runnable loadPlistTask = new Runnable() {
+		@Override
+		public void run() {
+			if (getActivity() != null) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						getLoaderManager().restartLoader(PLIST_PARSER_LOADER,
+								null, MagazinesFragment.this);
+					}
+				});
+			}
+		}
+	};
     
 	public static MagazinesFragment newInstance(String plistName) {
 		MagazinesFragment f = new MagazinesFragment();
