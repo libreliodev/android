@@ -71,35 +71,40 @@ public class GcmIntentService extends IntentService {
             				title = getString(R.string.new_issue);
             			}
             			String subtitle = intent.getStringExtra("subtitle");
-            			if (!BillingActivity.backgroundCheckForValidSubscriptionFailFast(getApplicationContext(),
-            					waurl, title, subtitle)) {
-            	            NotificationCompat.Builder mBuilder =
-            	                    new NotificationCompat.Builder(this)
-            	                            .setSmallIcon(R.drawable.ic_launcher)
-            	                            .setContentTitle(title + " " + getString(R.string.available));
-//            	                            .setContentText("Click to read");
+            			
+            			// Start download if subscription valid
+						BillingActivity
+								.backgroundCheckForValidSubscriptionFailFast(
+										getApplicationContext(), waurl, title,
+										subtitle);
 
-            	            // Create large icon from magazine cover png
-            	            Resources res = getResources();
-            	            int height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
-            	            int width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
-//            	            mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(magazine.getPngPath(), height, width));
+						NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+								this)
+								.setSmallIcon(R.drawable.ic_launcher)
+								.setContentTitle(
+										title + " "
+												+ getString(R.string.available));
+						// .setContentText("Click to read");
 
-            	            Intent resultIntent = new Intent(getApplicationContext(), MainTabsActivity.class);
-            	            PendingIntent resultPendingIntent =
-            	            	    PendingIntent.getActivity(
-            	            	    this,
-            	            	    0,
-            	            	    resultIntent,
-            	            	    PendingIntent.FLAG_UPDATE_CURRENT
-            	            	);
-            	            
-            	            mBuilder.setContentIntent(resultPendingIntent);
-            	            mBuilder.setAutoCancel(true);
-            	            NotificationManager mNotificationManager =
-            	                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            	            mNotificationManager.notify(0, mBuilder.build());
-            			}
+						// Create large icon from magazine cover png
+						Resources res = getResources();
+						int height = (int) res
+								.getDimension(android.R.dimen.notification_large_icon_height);
+						int width = (int) res
+								.getDimension(android.R.dimen.notification_large_icon_width);
+						// mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(magazine.getPngPath(),
+						// height, width));
+
+						Intent resultIntent = new Intent(
+								getApplicationContext(), MainTabsActivity.class);
+						PendingIntent resultPendingIntent = PendingIntent
+								.getActivity(this, 0, resultIntent,
+										PendingIntent.FLAG_UPDATE_CURRENT);
+
+						mBuilder.setContentIntent(resultPendingIntent);
+						mBuilder.setAutoCancel(true);
+						NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						mNotificationManager.notify(waurl.hashCode(), mBuilder.build());
             		}
             	}
             }

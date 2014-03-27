@@ -164,7 +164,7 @@ public class DownloadMagazineService extends IntentService {
             mBuilder.setAutoCancel(true);
             NotificationManager mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify((int) magazine.getDownloadManagerId(), mBuilder.build());
+            mNotificationManager.notify(magazine.getFileName().hashCode(), mBuilder.build());
             
             EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
         } else {
