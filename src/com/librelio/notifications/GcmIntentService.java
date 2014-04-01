@@ -67,7 +67,7 @@ public class GcmIntentService extends IntentService {
             		if (intent.getStringExtra(CONTENT_AVAILABLE).equals("1")) {
             			String waurl = intent.getStringExtra(WAURL);
             			String title = intent.getStringExtra("title");
-            			if (title.equals("")) {
+            			if (title == null || title.equals("")) {
             				title = getString(R.string.new_issue);
             			}
             			String subtitle = intent.getStringExtra("subtitle");

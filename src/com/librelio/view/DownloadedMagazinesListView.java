@@ -86,12 +86,12 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 		magazineManager = new MagazineManager(context);
 	}
 	
-	public void setDownloads(Activity activity, List<Magazine> downloads) {
-		this.downloads.clear();
-		this.downloads.addAll(downloads);
+	public void setDownloads(Activity activity, final List<Magazine> newDownloads) {
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				downloads.clear();
+				downloads.addAll(newDownloads);
 				notifyDataSetChanged();
 			}
 		});
@@ -120,75 +120,91 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 	public View getView(final int position, View convertView, ViewGroup parent) {
 
 		final ViewHolder holder;
-		final Magazine downloadedMagazine = this.downloads.get(position);
-		
-		if ((convertView == null) || (null == convertView.getTag())){
+		if (position < this.downloads.size()) {
+			final Magazine downloadedMagazine = this.downloads.get(position);
 
-			holder = new ViewHolder();
+			if ((convertView == null) || (null == convertView.getTag())) {
 
-			LayoutInflater inflater = LayoutInflater.from(context);
-			convertView = inflater.inflate(R.layout.downloaded_magazines_item, null);
+				holder = new ViewHolder();
 
-			ImageView image = (ImageView) convertView.findViewById(R.id.downloaded_magasines_item_image);
-			holder.image = image;
-			
-			TextView title = (TextView) convertView.findViewById(R.id.downloaded_magasines_item_title);
-			holder.title = title;
-			
-			TextView editionDate = (TextView) convertView.findViewById(R.id.downloaded_magasines_item_edition_date);
-			holder.editionDate = editionDate;
-			
-			TextView downloadDate = (TextView) convertView.findViewById(R.id.downloaded_magasines_item_download_date);
-			holder.downloadDate = downloadDate;
-			
-			Button deleteButton = (Button) convertView.findViewById(R.id.downloaded_magasines_item_delete_button);
-			holder.deleteButton = deleteButton;
-			holder.deleteButton.setFocusable(false);
-			holder.deleteButton.setFocusableInTouchMode(false);
+				LayoutInflater inflater = LayoutInflater.from(context);
+				convertView = inflater.inflate(
+						R.layout.downloaded_magazines_item, null);
 
-			convertView.setTag(holder);
-		} else {
-			holder = (ViewHolder) convertView.getTag();
-		}
+				ImageView image = (ImageView) convertView
+						.findViewById(R.id.downloaded_magasines_item_image);
+				holder.image = image;
 
-		holder.title.setText(downloadedMagazine.getTitle() 
-				+ (downloadedMagazine.isSample() ? samplePostfix : ""));
-		holder.editionDate.setText(downloadedMagazine.getSubtitle());
-		holder.downloadDate.setText(downloadedMagazine.getDownloadDate());
-		
-		holder.deleteButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				downloadedMagazine.clearMagazineDir();
-				magazineManager.removeDownloadedMagazine(context, downloadedMagazine);
+				TextView title = (TextView) convertView
+						.findViewById(R.id.downloaded_magasines_item_title);
+				holder.title = title;
 
-//				getAdapter().remove(downloadedMagazine);
-//				getAdapter().notifyDataSetChanged();
+				TextView editionDate = (TextView) convertView
+						.findViewById(R.id.downloaded_magasines_item_edition_date);
+				holder.editionDate = editionDate;
+
+				TextView downloadDate = (TextView) convertView
+						.findViewById(R.id.downloaded_magasines_item_download_date);
+				holder.downloadDate = downloadDate;
+
+				Button deleteButton = (Button) convertView
+						.findViewById(R.id.downloaded_magasines_item_delete_button);
+				holder.deleteButton = deleteButton;
+				holder.deleteButton.setFocusable(false);
+				holder.deleteButton.setFocusableInTouchMode(false);
+
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
 			}
-		});
-        holder.position = position;
 
-        // Using an AsyncTask to load the slow images in a background thread
-        new AsyncTask<ViewHolder, Void, Bitmap>() {
-            private ViewHolder v;
+			holder.title.setText(downloadedMagazine.getTitle()
+					+ (downloadedMagazine.isSample() ? samplePostfix : ""));
+			holder.editionDate.setText(downloadedMagazine.getSubtitle());
+			holder.downloadDate.setText(downloadedMagazine.getDownloadDate());
 
-            @Override
-            protected Bitmap doInBackground(ViewHolder... params) {
-                v = params[0];
-                return SystemHelper.decodeSampledBitmapFromFile(downloadedMagazine.getPngPath(),
-                                (int) context.getResources().getDimension(R.dimen.preview_image_height),
-                                (int) context.getResources().getDimension(R.dimen.preview_image_width));
-            }
+			holder.deleteButton.setOnClickListener(new OnClickListener() {
 
-            @Override
-            protected void onPostExecute(Bitmap result) {
-                super.onPostExecute(result);
-                if (v.position == position) {
-                    v.image.setImageBitmap(result);
-                }
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
+				@Override
+				public void onClick(View v) {
+					downloadedMagazine.clearMagazineDir();
+					magazineManager.removeDownloadedMagazine(context,
+							downloadedMagazine);
+
+					// getAdapter().remove(downloadedMagazine);
+					// getAdapter().notifyDataSetChanged();
+				}
+			});
+			holder.position = position;
+
+			// Using an AsyncTask to load the slow images in a background thread
+			new AsyncTask<ViewHolder, Void, Bitmap>() {
+				private ViewHolder v;
+
+				@Override
+				protected Bitmap doInBackground(ViewHolder... params) {
+					v = params[0];
+					return SystemHelper.decodeSampledBitmapFromFile(
+							downloadedMagazine.getPngPath(),
+							(int) context.getResources().getDimension(
+									R.dimen.preview_image_height),
+							(int) context.getResources().getDimension(
+									R.dimen.preview_image_width));
+				}
+
+				@Override
+				protected void onPostExecute(Bitmap result) {
+					super.onPostExecute(result);
+					if (v.position == position) {
+						v.image.setImageBitmap(result);
+					}
+				}
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
+		} else {
+			LayoutInflater inflater = LayoutInflater.from(context);
+			convertView = inflater.inflate(
+					R.layout.downloaded_magazines_item, null);
+		}
 		
 		return convertView;
 	}
