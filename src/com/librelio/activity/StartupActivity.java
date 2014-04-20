@@ -135,8 +135,8 @@ public class StartupActivity extends AbstractLockRotationActivity {
                 PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
                 if (list != null){
                     Dict dict = (Dict) list.getRootElement();
-                    String delay = dict.getConfiguration(PLIST_DELAY).getValue().toString();
-                    String link = dict.getConfiguration(PLIST_LINK).getValue().toString();
+                    String delay = dict.getString(PLIST_DELAY).getValue().toString();
+                    String link = dict.getString(PLIST_LINK).getValue().toString();
                     if (adImage != null) {
                         advertisingImage.setImageBitmap(adImage);
                         if (isFirstImage) {

@@ -16,11 +16,11 @@ public class DictItem {
     protected String pngPath;
 
     public static DictItem parse(Context context, Dict dict) {
-        String fileName = dict.getConfiguration(FILE_NAME_KEY).getValue().toString();
-        String title = dict.getConfiguration(TITLE_KEY).getValue().toString();
+        String fileName = dict.getString(FILE_NAME_KEY).getValue().toString();
+        String title = dict.getString(TITLE_KEY).getValue().toString();
 
         if (fileName.contains("pdf")) {
-            String subtitle = dict.getConfiguration(SUBTITLE_KEY).getValue().toString();
+            String subtitle = dict.getString(SUBTITLE_KEY).getValue().toString();
             Magazine magazine = new Magazine(fileName, title, subtitle, null, context);
             return magazine;
         } else if (fileName.contains("plist")) {
