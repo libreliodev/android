@@ -18,7 +18,6 @@ public class Magazine extends DictItem {
 	protected static final String TAG = Magazine.class.getSimpleName();
 	private static final String COMPLETE_FILE = ".complete";
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
-	private static final String PAID_FILE = ".payed";
 
 	private Context context;
 	private long id;
@@ -133,18 +132,6 @@ public class Magazine extends DictItem {
 			create = file.createNewFile();
 		} catch (IOException e) {
 			Log.d(TAG,"Problem with create "+completeModificator+", createNewFile() return "+create,e);
-		}
-	}
-	public void makePaidFile(){
-		File file = new File(getMagazineDir()+ PAID_FILE);
-		boolean create = false;
-		if(file.exists()){
-			return;
-		}
-		try {
-			create = file.createNewFile();
-		} catch (IOException e) {
-			Log.d(TAG,"Problem with create "+ PAID_FILE +", createNewFile() return "+create,e);
 		}
 	}
 	
