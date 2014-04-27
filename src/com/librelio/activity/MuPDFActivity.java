@@ -49,6 +49,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.base.BaseActivity;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.Magazine;
+import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
 import com.librelio.view.TwoWayView;
@@ -281,7 +282,7 @@ public class MuPDFActivity extends BaseActivity{
 		makeButtonsView();
 
 		// Set the magazine title text
-		String title = getIntent().getStringExtra(Magazine.FIELD_TITLE);
+		String title = getIntent().getStringExtra(DataBaseHelper.FIELD_TITLE);
 		if (title != null) {
 			mFilenameView.setText(title);
 		} else {
@@ -629,7 +630,7 @@ public class MuPDFActivity extends BaseActivity{
 	private void onBuy(String path) {
 		Log.d(TAG, "onBuy event path = " + path);
 		MagazineManager magazineManager = new MagazineManager(getContext());
-		Magazine magazine = magazineManager.findByFileName(path, Magazine.TABLE_DOWNLOADED_MAGAZINES);
+		Magazine magazine = magazineManager.findByFileName(path, DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES);
 		if (null != magazine) {
 			Intent intent = new Intent(getContext(), BillingActivity.class);
 			intent

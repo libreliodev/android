@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.base.IBaseContext;
-import com.librelio.model.Magazine;
+import com.librelio.storage.DataBaseHelper;
 import com.librelio.utils.GooglePlayServicesUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.BuildConfig;
@@ -84,7 +84,7 @@ public class LibrelioApplication extends Application {
 			Intent intent = new Intent(context,MuPDFActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
 			intent.setData(uri);
-			intent.putExtra(Magazine.FIELD_TITLE, title);
+			intent.putExtra(DataBaseHelper.FIELD_TITLE, title);
 			intent.putExtra(MuPDFActivity.SHOW_THUMBNAILS_EXTRA, showThumbnails);
 			context.startActivity(intent);
 		} catch (Exception e) {

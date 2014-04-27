@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.util.Log;
 import com.librelio.LibrelioApplication;
 import com.librelio.event.LoadPlistEvent;
+import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
@@ -19,19 +20,7 @@ public class Magazine extends DictItem {
 	private static final String COMPLETE_SAMPLE_FILE = ".sample_complete";
 	private static final String PAID_FILE = ".payed";
 
-	public static final String TABLE_DOWNLOADED_MAGAZINES = "DownloadedMagazines";
-    public static final String TABLE_ASSETS = "Assets";
-	public static final String FIELD_ID = "_id";
-	public static final String FIELD_TITLE = "title";
-	public static final String FIELD_SUBTITLE = "subtitle";
-	public static final String FIELD_FILE_NAME = "filename";
-    public static final String FIELD_ASSET_FILE_NAME = "assetfilename";
-    public static final String FIELD_ASSET_IS_DOWNLOADED = "assetisdownloaded";
-	public static final String FIELD_DOWNLOAD_DATE = "downloaddate";
-	public static final String FIELD_IS_SAMPLE = "sample";
-    public static final String FIELD_DOWNLOAD_MANAGER_ID = "downloadmanagerid";
-
-    private Context context;
+	private Context context;
 	private long id;
 	private String title;
 	private String subtitle;
@@ -61,13 +50,13 @@ public class Magazine extends DictItem {
 	}
 
 	public Magazine(Cursor cursor, Context context) {
-		int idColumnId = cursor.getColumnIndex(FIELD_ID);
-		int titleColumnId = cursor.getColumnIndex(FIELD_TITLE);
-		int subitleColumnId = cursor.getColumnIndex(FIELD_SUBTITLE);
-		int fileNameColumnId = cursor.getColumnIndex(FIELD_FILE_NAME);
-		int dateColumnId = cursor.getColumnIndex(FIELD_DOWNLOAD_DATE);
-		int isSampleColumnId = cursor.getColumnIndex(FIELD_IS_SAMPLE);
-        int downloadManagerId = cursor.getColumnIndex(FIELD_DOWNLOAD_MANAGER_ID);
+		int idColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_ID);
+		int titleColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_TITLE);
+		int subitleColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_SUBTITLE);
+		int fileNameColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_FILE_NAME);
+		int dateColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_DATE);
+		int isSampleColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_IS_SAMPLE);
+        int downloadManagerId = cursor.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID);
 		
 		this.id = cursor.getInt(idColumnId);
 		this.fileName = cursor.getString(fileNameColumnId);
