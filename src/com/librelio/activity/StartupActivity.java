@@ -44,6 +44,7 @@ import com.longevitysoft.android.xml.plist.domain.PList;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BinaryHttpResponseHandler;
+import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.Header;
@@ -230,15 +231,18 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	}
 
 	private String getAdvertisingImageURL() {
-		Log.d(TAG, "Will get advertising image");
-		Log.d(TAG, "Advertising url"+ getString(R.string.get_advertising_image_url));
-		Log.d(TAG, "Client name"+ Uri.encode(LibrelioApplication.getClientName(self())));
 
-		return new StringBuilder(getString(R.string.get_advertising_image_url))
+		String advertisingUrl = new StringBuilder(getString(R.string.get_advertising_image_url))
 							.append(getString(R.string.get_advertising_image_end))
 							.toString()
 							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(self())))
 							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(self())));
+
+		if (BuildConfig.DEBUG) {
+			Log.d(TAG, "Advertising url: "+ advertisingUrl);
+			Log.d(TAG, "Client name: "+ Uri.encode(LibrelioApplication.getClientName(self())));
+		}
+		return advertisingUrl;
 	}
 
 	private String getAdvertisingLinkURL() {
