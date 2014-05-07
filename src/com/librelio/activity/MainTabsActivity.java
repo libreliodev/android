@@ -37,6 +37,7 @@ import com.librelio.model.DownloadsItem;
 import com.librelio.model.PlistItem;
 import com.librelio.model.RssFeedItem;
 import com.librelio.model.WebAddressItem;
+import com.librelio.service.DownloadMagazineService;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -147,6 +148,12 @@ public class MainTabsActivity extends BaseActivity {
 		}
 		super.onDestroy();
 	}
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	DownloadMagazineService.startPendingAssetsDownload(this);
+    }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

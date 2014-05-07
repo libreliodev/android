@@ -269,7 +269,7 @@ public class BillingActivity extends BaseActivity {
                 } else {
                     String tempURL = getTempURL(httpResponse);
                     if (tempURL != null) {
-                    DownloadMagazineService.startDownload(context, new Magazine(fileName, title, subtitle, null,
+                    DownloadMagazineService.startMagazineDownload(context, new Magazine(fileName, title, subtitle, null,
                             context), true, tempURL);
                     return true;
                     }
@@ -302,7 +302,7 @@ public class BillingActivity extends BaseActivity {
                 } else {
                     String tempURL = getTempURL(httpResponse);
                     if (tempURL != null) {
-                    DownloadMagazineService.startDownload(context, new Magazine(fileName, title, subtitle, null,
+                    DownloadMagazineService.startMagazineDownload(context, new Magazine(fileName, title, subtitle, null,
                             context), true, tempURL);
                     return true;
                     }
@@ -664,7 +664,7 @@ public class BillingActivity extends BaseActivity {
             return;
         }
         if (getIntent().getExtras() != null) {
-        DownloadMagazineService.startDownload(this, new Magazine(fileName, title, subtitle, null,
+        DownloadMagazineService.startMagazineDownload(this, new Magazine(fileName, title, subtitle, null,
                 this), true, tempURL);
             Intent intent = new Intent(getContext(), DownloadMagazineActivity.class);
             intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);

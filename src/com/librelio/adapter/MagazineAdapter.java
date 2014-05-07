@@ -207,7 +207,7 @@ public class MagazineAdapter extends BaseAdapter {
                             intent.putExtra(BillingActivity.SUBTITLE_KEY, currentMagazine.getSubtitle());
                             context.startActivity(intent);
                         } else {
-                            DownloadMagazineService.startDownload(context, currentMagazine);
+                            DownloadMagazineService.startMagazineDownload(context, currentMagazine);
                         }
                     }
                 });
@@ -233,7 +233,7 @@ public class MagazineAdapter extends BaseAdapter {
                                         currentMagazine.getTitle(), true);
                             } else {
                                 currentMagazine.setSample(true);
-                                DownloadMagazineService.startDownload(context, currentMagazine);
+                                DownloadMagazineService.startMagazineDownload(context, currentMagazine);
                             }
                         }
                     });
@@ -253,14 +253,15 @@ public class MagazineAdapter extends BaseAdapter {
                             }
                         });
             }
-            int totalAssetCount = currentMagazine.getTotalAssetCount();
-            int downloadedAssetCount = currentMagazine.getDownloadedAssetCount();
-            if (totalAssetCount > 0 && downloadedAssetCount < totalAssetCount) {
+            int totalAssetCount = MagazineManager.getTotalAssetCount(context, currentMagazine);
+            int downloadedAssetCount = MagazineManager.getDownloadedAssetCount(context, currentMagazine);
+            int failedAssetCount = MagazineManager.getFailedAssetCount(context, currentMagazine);
+            if (totalAssetCount > 0 && (downloadedAssetCount + failedAssetCount) < totalAssetCount) {
                 holder.progressLayout.setVisibility(View.VISIBLE);
                 holder.progressBar.setIndeterminate(false);
                 holder.progressBar.setProgress((int) ((downloadedAssetCount * 100.0f) / totalAssetCount));
                 holder.info.setText(context.getResources()
-                        .getString(R.string.download_in_progress) + "\n" + downloadedAssetCount + "/" + totalAssetCount);
+                        .getString(R.string.download_in_progress) + "\n" + (downloadedAssetCount + failedAssetCount) + "/" + totalAssetCount);
             }
             return convertView;
         } else {

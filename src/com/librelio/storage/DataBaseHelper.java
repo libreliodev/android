@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 
 
 public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
-	private static final int DB_VERSION = 3;
+	private static final int DB_VERSION = 4;
 	private static final String DB_NAME = "windDataBase";
 
     private static DataBaseHelper mInstance = null;
@@ -23,17 +23,19 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
         return mInstance;
     }
 
-	public static final String FIELD_DOWNLOAD_MANAGER_ID = "downloadmanagerid";
 	public static final String TABLE_DOWNLOADED_MAGAZINES = "DownloadedMagazines";
-	public static final String TABLE_ASSETS = "Assets";
+	public static final String TABLE_DOWNLOADS = "Downloads";
 	public static final String FIELD_ID = "_id";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_SUBTITLE = "subtitle";
 	public static final String FIELD_FILE_NAME = "filename";
 	public static final String FIELD_ASSET_FILE_NAME = "assetfilename";
-	public static final String FIELD_ASSET_IS_DOWNLOADED = "assetisdownloaded";
+	public static final String FIELD_ASSET_URL = "asseturl";
+	public static final String FIELD_RETRY_COUNT = "retrycount";
+	public static final String FIELD_ASSET_DOWNLOAD_STATUS = "assetdownloadstatus";
 	public static final String FIELD_DOWNLOAD_DATE = "downloaddate";
 	public static final String FIELD_IS_SAMPLE = "sample";
+	public static final String FIELD_DOWNLOAD_MANAGER_ID = "downloadmanagerid";
 
 	private DataBaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -42,7 +44,7 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		createDownloadedMagazinesTable(db);
-        createAssetsTable(db);
+        createDownloadsTable(db);
 	}
 
     private void createDownloadedMagazinesTable(SQLiteDatabase db){
@@ -55,14 +57,15 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
                 + DataBaseHelper.FIELD_IS_SAMPLE + " INTEGER, "
                 + DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER);");
     }
-
-    private void createAssetsTable(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE "+DataBaseHelper.TABLE_ASSETS+ "("
+    
+    private void createDownloadsTable(SQLiteDatabase db){
+        db.execSQL("CREATE TABLE "+DataBaseHelper.TABLE_DOWNLOADS+ "("
                 + DataBaseHelper.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + DataBaseHelper.FIELD_FILE_NAME + " TEXT, "
                 + DataBaseHelper.FIELD_ASSET_FILE_NAME + " TEXT, "
-                + DataBaseHelper.FIELD_ASSET_IS_DOWNLOADED + " INTEGER, "
-                + DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER);");
+                + DataBaseHelper.FIELD_ASSET_URL + " TEXT, "
+                + DataBaseHelper.FIELD_RETRY_COUNT + " INTEGER, "
+                + DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS + " INTEGER);");
     }
 	
 	@Override
@@ -70,10 +73,14 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 //		db.execSQL("DROP TABLE IF EXISTS " + Magazine.TABLE_DOWNLOADED_MAGAZINES);
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE " + DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES + " ADD COLUMN " + DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER;");
-            createAssetsTable(db);
+//            createAssetsTable(db);
         }
         if (oldVersion < 3) {
 		    db.execSQL("DROP TABLE IF EXISTS Magazines");
+        }
+        if (oldVersion < 4) {
+        	db.execSQL("DROP TABLE IF EXISTS Assets");
+        	createDownloadsTable(db);
         }
 //		onCreate(db);
 	}

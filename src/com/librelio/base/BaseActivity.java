@@ -15,7 +15,7 @@ import android.util.Log;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
-import com.librelio.event.UpdateProgressEvent;
+import com.librelio.event.UpdateProgressBarEvent;
 import com.librelio.utils.StorageUtils;
 import com.niveales.wind.R;
 
@@ -198,7 +198,7 @@ public class BaseActivity extends FragmentActivity implements IBaseContext {
         EventBus.getDefault().unregister(this);
     }
 
-    public void onEventMainThread(UpdateProgressEvent event) {
+    public void onEventMainThread(UpdateProgressBarEvent event) {
         setProgressBarIndeterminateVisibility(event.isShowProgress());
     }
 

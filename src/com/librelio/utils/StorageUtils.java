@@ -1,6 +1,9 @@
 package com.librelio.utils;
 
 import android.content.Context;
+import android.os.Environment;
+import android.os.StatFs;
+import android.support.v4.os.EnvironmentCompat;
 import android.util.Log;
 import com.niveales.wind.R;
 
@@ -95,4 +98,33 @@ public class StorageUtils {
         }
         return fileData.toString();
     }
+    
+    public static long getAvailableStorage() {
+
+        String storageDirectory = null;
+        storageDirectory = Environment.getDataDirectory().getPath();
+
+        try {
+            StatFs stat = new StatFs(storageDirectory);
+            long avaliableSize = ((long) stat.getAvailableBlocks() * (long) stat.getBlockSize());
+            return avaliableSize;
+        } catch (RuntimeException ex) {
+            return 0;
+        }
+    }
+
+    public static long getTotalStorage() {
+
+        String storageDirectory = null;
+        storageDirectory = Environment.getDataDirectory().getPath();
+
+        try {
+            StatFs stat = new StatFs(storageDirectory);
+            long totalSize = ((long) stat.getBlockCount() * (long) stat.getBlockSize());
+            return totalSize;
+        } catch (RuntimeException ex) {
+            return 0;
+        }
+    }
+
 }

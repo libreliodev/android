@@ -1,10 +1,23 @@
 package com.librelio.service;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.apache.commons.io.FilenameUtils;
+
+import android.accounts.NetworkErrorException;
 import android.app.DownloadManager;
-import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -16,15 +29,18 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.Toast;
 
 import com.artifex.mupdf.LinkInfoExternal;
+import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.event.ChangeInDownloadedMagazinesEvent;
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.MagazineDownloadedEvent;
+import com.librelio.exception.FileAlreadyExistException;
+import com.librelio.exception.NoMemoryException;
 import com.librelio.lib.utils.PDFParser;
+import com.librelio.model.Asset;
 import com.librelio.model.Magazine;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
@@ -32,17 +48,15 @@ import com.librelio.utils.StorageUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
+import com.squareup.okhttp.OkHttpClient;
+
 import de.greenrobot.event.EventBus;
-import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
-public class DownloadMagazineService extends IntentService {
+public class DownloadMagazineService extends WakefulIntentService {
     private static final String TAG = "DownloadMagazineService";
+	private static final String TEMP_SUFFIX = ".temp";
+	public final static int TIME_OUT = 30000;
+    private final static int BUFFER_SIZE = 1024 * 8;
     private DownloadManager mDManager;
     private MagazineManager manager;
 
@@ -55,7 +69,9 @@ public class DownloadMagazineService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+	protected void doWakefulWork(Intent intent) {
+    	
+    	Log.d(TAG, "DownloadMagazineService start");
 
         mDManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadManagerID = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
@@ -72,7 +88,7 @@ public class DownloadMagazineService extends IntentService {
         }
         
         manager = new MagazineManager(this);
-        Magazine magazine = manager.findByDownloadManagerID(downloadManagerID, Magazine.TABLE_DOWNLOADED_MAGAZINES);
+        Magazine magazine = manager.findByDownloadManagerID(downloadManagerID, DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES);
 
         if (magazine != null) {
             DownloadManager.Query q = new DownloadManager.Query();
@@ -103,7 +119,7 @@ public class DownloadMagazineService extends IntentService {
             	        MagazineManager.removeDownloadedMagazine(this, magazine);
             	        magazineManager.addMagazine(
             	                magazine,
-            	                Magazine.TABLE_DOWNLOADED_MAGAZINES,
+            	                DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES,
             	                true);
                         return;
             		}
@@ -118,16 +134,16 @@ public class DownloadMagazineService extends IntentService {
             c.close();
 
             Date date = Calendar.getInstance().getTime();
-            String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
+//            String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
+            String downloadDate = DateFormat.getDateInstance().format(date);
             magazine.setDownloadDate(downloadDate);
-            manager.removeDownloadedMagazine(this, magazine);
+            MagazineManager.removeDownloadedMagazine(this, magazine);
             manager.addMagazine(
                     magazine,
-                    Magazine.TABLE_DOWNLOADED_MAGAZINES,
+                    DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES,
                     true);
             EventBus.getDefault().post(new LoadPlistEvent());
             EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
-            startLinksDownload(this, magazine);
             magazine.makeCompleteFile(magazine.isSample());
             
 
@@ -150,7 +166,7 @@ public class DownloadMagazineService extends IntentService {
             resultIntent.setData(Uri.parse(magazine.isSample() ?
                     magazine.getSamplePdfPath() :
                     magazine.getItemPath()));
-            resultIntent.putExtra(Magazine.FIELD_TITLE, magazine.getTitle());
+            resultIntent.putExtra(DataBaseHelper.FIELD_TITLE, magazine.getTitle());
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             stackBuilder.addParentStack(MuPDFActivity.class);
@@ -167,64 +183,21 @@ public class DownloadMagazineService extends IntentService {
             mNotificationManager.notify(magazine.getFileName().hashCode(), mBuilder.build());
             
             EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
+            addAssetsToDatabase(this, magazine);
+            downloadPendingAssets();
         } else {
-            // Asset downloaded
-            DownloadManager.Query q = new DownloadManager.Query();
-            q.setFilterById(downloadManagerID);
-            Cursor c = mDManager.query(q);
-            if (c.moveToFirst()) {
-                int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    // process download
-                    String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
-            		File srcFile = new File(srcFileName);
-
-            		if (srcFile.length() == 0) {
-            			// download failed - retry
-            			String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
-            			String assetsFile = FilenameUtils.getName(manager.getAssetFilename(downloadManagerID));
-//            			Log.d("failed asset download", assetsFile);
-//            			Toast.makeText(DownloadMagazineService.this, assetsFile + " download failed - retrying", Toast.LENGTH_SHORT).show();
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                        request.setVisibleInDownloadsUi(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                        .setDescription("Assets downloading")
-//                                .setDescription("Subtitle for " + magazine.getSubtitle()).setTitle("Assets for " + magazine.getTitle())
-                                .setDestinationInExternalFilesDir(DownloadMagazineService.this, null, assetsFile);
-                        //TODO should use cache directory?
-                        long newDownloadManagerID = mDManager.enqueue(request);
-                        ContentValues cv = new ContentValues();
-                        cv.put(Magazine.FIELD_DOWNLOAD_MANAGER_ID, newDownloadManagerID);
-                        SQLiteDatabase db = DataBaseHelper.getInstance(DownloadMagazineService.this).getWritableDatabase();
-                        db.update(Magazine.TABLE_ASSETS, cv, Magazine.FIELD_DOWNLOAD_MANAGER_ID + "=?",
-                                new String[] {String.valueOf(downloadManagerID)});
-                        return;
-            		}
-            		
-//            		if (BuildConfig.DEBUG) {
-//                		Log.d("librelio", "file size on external storage: " + srcFile.length());
-//                	}
-                    
-                    StorageUtils.move(srcFileName, manager.getAssetFilename(downloadManagerID));
-                
-//                	if (BuildConfig.DEBUG) {
-//                		File destFile = new File(manager.getAssetFilename(downloadManagerID));
-//                		Log.d("librelio", "file size on internal storage: " + destFile.length());
-//                	}
-
-                    manager.setAssetDownloaded(downloadManagerID);
-                }
-            }
-            c.close();
+        	// Just try to download any remaining failed assets
+        	downloadPendingAssets();
         }
+        Log.d(TAG, "DownloadMagazineService end");
     }
-
-    private void startLinksDownload(Context context, Magazine magazine) {
+    
+    private void addAssetsToDatabase(Context context, Magazine magazine) {
         Log.d(TAG, "Start DownloadLinksTask");
 
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWritableDatabase();
         db.beginTransaction();
 
-        ArrayList<String> links = new ArrayList<String>();
         ArrayList<String> assetsNames = new ArrayList<String>();
         //
         String filePath = magazine.isSample() ? magazine.getSamplePdfPath() : magazine.getItemPath();
@@ -250,25 +223,20 @@ public class DownloadMagazineService extends IntentService {
                             finIdx = link.indexOf("?");
                         }
                         String assetsFile = link.substring(startIdx, finIdx);
-                        links.add(Magazine.getAssetsBaseURL(magazine.getFileName()) + assetsFile);
                         assetsNames.add(assetsFile);
                         Log.d(TAG, "   link: " + Magazine.getAssetsBaseURL(magazine.getFileName()) + assetsFile);
                         Log.d(TAG, "   file: " + assetsFile);
 
                         String uriString = Magazine.getAssetsBaseURL(magazine.getFileName()) + assetsFile;
                         Log.d(TAG, "  link to download: " + uriString);
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(uriString));
-                        request.setVisibleInDownloadsUi(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                                .setDescription("Subtitle for " + magazine.getSubtitle()).setTitle("Assets for " + magazine.getTitle())
-                                .setDestinationInExternalFilesDir(context, null, assetsFile);
-                        //TODO should use cache directory?
-                        long downloadManagerID = mDManager.enqueue(request);
-                        ContentValues cv = new ContentValues();
-                        cv.put(Magazine.FIELD_FILE_NAME, magazine.getFileName());
-                        cv.put(Magazine.FIELD_ASSET_FILE_NAME, magazine.getAssetsDir() + assetsFile);
-                        cv.put(Magazine.FIELD_ASSET_IS_DOWNLOADED, false);
-                        cv.put(Magazine.FIELD_DOWNLOAD_MANAGER_ID, downloadManagerID);
-                        db.insert(Magazine.TABLE_ASSETS, null, cv);
+                        
+//                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(uriString));
+//                        request.setVisibleInDownloadsUi(false).setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+//                                .setDescription("Subtitle for " + magazine.getSubtitle()).setTitle("Assets for " + magazine.getTitle())
+//                                .setDestinationInExternalFilesDir(context, null, assetsFile);
+////                        TODO should use cache directory?
+//                        long downloadManagerID = mDManager.enqueue(request);
+                        manager.addAsset(magazine, assetsFile, uriString);
                     }
                 }
             }
@@ -280,11 +248,191 @@ public class DownloadMagazineService extends IntentService {
         }
     }
 
-    public static void startDownload(Context context, Magazine currentMagazine) {
-        startDownload(context, currentMagazine, false, null);
+    private void downloadPendingAssets() {
+    	ArrayList<Asset> assetsToDownload = new ArrayList<Asset>();
+    	assetsToDownload = manager.getAssetsToDownload();
+    	
+		OkHttpClient client = new OkHttpClient();
+    	
+    	for (Asset asset : assetsToDownload) {
+    		try {
+				download(client, asset);
+			} catch (NetworkErrorException e) {
+				e.printStackTrace();
+				assetDownloadFailed(asset);
+			} catch (FileAlreadyExistException e) {
+				e.printStackTrace();
+			} catch (NoMemoryException e) {
+				e.printStackTrace();
+				assetDownloadFailed(asset);
+			} catch (IOException e) {
+				e.printStackTrace();
+				assetDownloadFailed(asset);
+			}
+    	}
+   }
+    
+    private void assetDownloadFailed(Asset asset) {
+		manager.incrementRetryCount(asset);
+		manager.setAssetStatus(asset.id, MagazineManager.FAILED);
+		Log.w(TAG, "asset download failed");
+    }
+    
+	private void download(OkHttpClient client, Asset asset) throws NetworkErrorException, IOException,
+			FileAlreadyExistException, NoMemoryException {
+		
+        File file = new File(asset.assetfilename);
+        File tempFile = new File(asset.assetfilename + TEMP_SUFFIX);
+        long previousFileSize = 0;
+
+//		/*
+//		 * check net work
+//		 */
+//		// if (!NetworkUtils.isNetworkAvailable(context)) {
+//		// throw new NetworkErrorException("Network blocked.");
+//		// }
+
+//		/*
+//		 * check file length
+//		 */
+		HttpURLConnection connection = client.open(new URL(asset.assetUrl));
+		 if (tempFile.exists()) {
+				previousFileSize = tempFile.length();
+				connection.setRequestProperty("Range", "bytes=" + tempFile.length() + "-");
+				//
+				// if (DEBUG) {
+				// Log.v(TAG, "File is not complete, download now.");
+				// Log.v(TAG, "File length:" + tempFile.length() + " totalSize:" +
+				// totalSize);
+				// }
+			}
+		 
+		connection.connect();
+
+		int totalSize = connection.getContentLength();
+		Log.d("asset size", totalSize + " bytes");
+
+		if (file.exists() && totalSize == file.length()) {
+			if (BuildConfig.DEBUG) {
+				Log.v(null, "Output file already exists. Skipping download.");
+			}
+
+			throw new FileAlreadyExistException(
+					"Output file already exists. Skipping download.");
+		}
+//
+//		/*
+//		 * check memory
+//		 */
+		long storage = StorageUtils.getAvailableStorage();
+		if (BuildConfig.DEBUG) {
+			Log.i(null, "available storage:" + storage + " asset size:" + totalSize);
+		}
+
+		if (totalSize - tempFile.length() > storage) {
+			throw new NoMemoryException("Not enough storage space.");
+		}
+//
+//		/*
+//		 * start download
+//		 */
+		RandomAccessFile outputStream = new RandomAccessFile(tempFile, "rw");
+
+		InputStream input = connection.getInputStream();
+		int bytesDownloaded = download(connection, input, outputStream);
+//
+		if ((bytesDownloaded) != totalSize && totalSize != -1)
+				{
+//				&& !interrupt) {
+			throw new IOException("Download incomplete: previous file size:"
+					+ previousFileSize + " bytes downloaded:" + bytesDownloaded
+					+ " previous+downloaded:"
+					+ (previousFileSize + bytesDownloaded) + " != totalsize:"
+					+ totalSize);
+		}
+
+		StorageUtils.move(tempFile.getPath(), file.getPath());
+		manager.setAssetStatus(asset.id, MagazineManager.DOWNLOADED);
+		EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
+		
+		if (BuildConfig.DEBUG) {
+			Log.v(TAG, "Download completed successfully.");
+		}
+		
+//
+//		return bytesCopied;
+//
+	}
+	
+	public int download(HttpURLConnection connection, InputStream input, RandomAccessFile out)
+			throws IOException, NetworkErrorException {
+
+		if (input == null || out == null) {
+			return -1;
+		}
+
+		byte[] buffer = new byte[BUFFER_SIZE];
+
+		BufferedInputStream in = new BufferedInputStream(input, BUFFER_SIZE);
+//		if (BuildConfig.DEBUG) {
+//			Log.v(TAG, "current file length " + out.length());
+//		}
+
+		int count = 0, n = 0;
+		long errorBlockTimePreviousTime = -1, expireTime = 0;
+
+		try {
+
+			out.seek(out.length());
+
+			while (true) {
+				// while (!interrupt) {
+				n = in.read(buffer, 0, BUFFER_SIZE);
+				if (n == -1) {
+					break;
+				}
+				out.write(buffer, 0, n);
+				count += n;
+
+				/*
+				 * check network
+				 */
+				// if (!NetworkUtils.isNetworkAvailable(context)) {
+				// throw new NetworkErrorException("Network blocked.");
+				// }
+				//
+				// if (networkSpeed == 0) {
+				// if (errorBlockTimePreviousTime > 0) {
+				// expireTime = System.currentTimeMillis() -
+				// errorBlockTimePreviousTime;
+				// if (expireTime > TIME_OUT) {
+				// throw new ConnectTimeoutException("connection time out.");
+				// }
+				// } else {
+				// errorBlockTimePreviousTime = System.currentTimeMillis();
+				// }
+				// } else {
+				// expireTime = 0;
+				// errorBlockTimePreviousTime = -1;
+				// }
+			}
+		} finally {
+			out.close();
+			if (in != null) {
+				in.close();
+			}
+			input.close();
+		}
+		
+		return count;
+
+	}
+
+    public static void startMagazineDownload(Context context, Magazine currentMagazine) {
+        startMagazineDownload(context, currentMagazine, false, null);
     }
 
-    public static void startDownload(Context context, Magazine magazine, boolean isTemp, String tempUrlKey) {
+    public static void startMagazineDownload(Context context, Magazine magazine, boolean isTemp, String tempUrlKey) {
         String fileUrl = magazine.getItemUrl();
         String filePath = magazine.getItemPath();
         if (magazine.isSample()) {
@@ -309,9 +457,13 @@ public class DownloadMagazineService extends IntentService {
         MagazineManager.removeDownloadedMagazine(context, magazine);
         magazineManager.addMagazine(
                 magazine,
-                Magazine.TABLE_DOWNLOADED_MAGAZINES,
+                DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES,
                 true);
 //        magazine.clearMagazineDir();
         EventBus.getDefault().post(new LoadPlistEvent());
     }
+
+	public static void startPendingAssetsDownload(Context context) {
+		WakefulIntentService.sendWakefulWork(context, DownloadMagazineService.class);
+	}
 }

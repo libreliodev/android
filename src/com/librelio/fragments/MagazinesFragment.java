@@ -23,6 +23,7 @@ import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.UpdateMagazinesEvent;
 import com.librelio.loader.PlistParserLoader;
 import com.librelio.model.DictItem;
+import com.librelio.service.DownloadMagazineService;
 import com.librelio.utils.PlistDownloader;
 import com.niveales.wind.R;
 
@@ -140,6 +141,8 @@ public class MagazinesFragment extends Fragment implements LoaderManager.LoaderC
 		case R.id.options_menu_reload:
             // force a redownload of the plist
             PlistDownloader.doLoad(getActivity(), plistName, true);
+            // Also try downloading any failed assets
+            DownloadMagazineService.startPendingAssetsDownload(getActivity());
 			return true;
     	}
     	return super.onOptionsItemSelected(item);

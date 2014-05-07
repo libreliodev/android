@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.librelio.base.BaseManager;
 import com.librelio.event.ChangeInDownloadedMagazinesEvent;
+import com.librelio.model.Asset;
 import com.librelio.model.Magazine;
 
 import de.greenrobot.event.EventBus;
@@ -21,12 +22,15 @@ import de.greenrobot.event.EventBus;
 public class MagazineManager extends BaseManager {
 	private static final String TAG = "MagazineManager";
 	public static final String TEST_FILE_NAME = "test/test.pdf";
-    private final DownloadManager downloadManager;
+    
+    public static final int NOT_DOWNLOADED = 0;
+    public static final int DOWNLOADED = 1;
+    public static final int FAILED = 2;
+	private static final int NUMBER_OF_RETRY_ATTEMPTS = 10;
 
     public MagazineManager(Context context) {
 		super(context);
 
-        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
 	}
 
 //	public List<Magazine> getMagazines(boolean hasTestMagazine) {
@@ -113,18 +117,20 @@ public class MagazineManager extends BaseManager {
         }
         c.close();
 
-        // cancel any asset downloads for this magazine
-       c = db.query(DataBaseHelper.TABLE_ASSETS, new String[] {DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID},
-               DataBaseHelper.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()}, null, null, null);
-        while (c.moveToNext()) {
-            int downloadManagerID = c.getInt(c.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID));
-//            removeNotification(downloadManagerID);
-            dm.remove(downloadManagerID);
-        }
-        c.close();
+//        // cancel any asset downloads for this magazine
+//       c = db.query(DataBaseHelper.TABLE_DOWNLOADS, new String[] {DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID},
+//               DataBaseHelper.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()}, null, null, null);
+//        while (c.moveToNext()) {
+//            int downloadManagerID = c.getInt(c.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID));
+////            removeNotification(downloadManagerID);
+//            dm.remove(downloadManagerID);
+//        }
+//        c.close();
+        
+        // Should try to stop assets that are downloading
 
         db.delete(DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES, DataBaseHelper.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()});
-        db.delete(DataBaseHelper.TABLE_ASSETS, DataBaseHelper.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()});
+        db.delete(DataBaseHelper.TABLE_DOWNLOADS, DataBaseHelper.FIELD_FILE_NAME + "=?", new String[] {magazine.getFileName()});
 
         EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
 	}
@@ -135,12 +141,6 @@ public class MagazineManager extends BaseManager {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(notificationId);
     }
-
-	public int getCount(String tableName) {
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
-		int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + DataBaseHelper.FIELD_ID + ") from " + tableName, null);
-		return count;
-	}
 
 	public synchronized void cleanMagazines(String tableName){
         SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getWritableDatabase();
@@ -182,25 +182,61 @@ public class MagazineManager extends BaseManager {
         cursor.close();
         return magazine;
     }
+    
+    public synchronized void addAsset(Magazine magazine, String assetsFile, String assetUrl) {
+    	SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DataBaseHelper.FIELD_FILE_NAME, magazine.getFileName());
+        cv.put(DataBaseHelper.FIELD_ASSET_FILE_NAME, magazine.getAssetsDir() + assetsFile);
+        cv.put(DataBaseHelper.FIELD_ASSET_URL, assetUrl);
+        cv.put(DataBaseHelper.FIELD_RETRY_COUNT, 0);
+        cv.put(DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS, false);
+        db.insert(DataBaseHelper.TABLE_DOWNLOADS, null, cv);
+    }
+    
+	public synchronized ArrayList<Asset> getAssetsToDownload() {
+		ArrayList<Asset> assetsToDownload = new ArrayList<Asset>();
+		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
+				.getWritableDatabase();
+		Cursor cursor = db.query(DataBaseHelper.TABLE_DOWNLOADS, null,
+				DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS + "!=? AND " + DataBaseHelper.FIELD_RETRY_COUNT + "<3",
+				new String[] { String.valueOf(DOWNLOADED) }, null, null, null);
+		if (cursor.moveToFirst()) {
+			while (!cursor.isAfterLast()) {
+				Asset asset = new Asset(
+						cursor.getInt(cursor
+								.getColumnIndex(DataBaseHelper.FIELD_ID)),
+						cursor.getString(cursor
+								.getColumnIndex(DataBaseHelper.FIELD_FILE_NAME)),
+						cursor.getString(cursor
+								.getColumnIndex(DataBaseHelper.FIELD_ASSET_FILE_NAME)),
+						cursor.getString(cursor
+								.getColumnIndex(DataBaseHelper.FIELD_ASSET_URL)),
+						cursor.getInt(cursor
+								.getColumnIndex(DataBaseHelper.FIELD_RETRY_COUNT)));
+				assetsToDownload.add(asset);
+				setAssetStatus(asset.id, MagazineManager.NOT_DOWNLOADED);
+				cursor.moveToNext();
+			}
+		}
+		cursor.close();
+		return assetsToDownload;
+	}
 
-    public synchronized void setAssetDownloaded(long downloadManagerID) {
+    public synchronized void setAssetStatus(long id, int status) {
         SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(DataBaseHelper.FIELD_ASSET_IS_DOWNLOADED, true);
-        db.update(DataBaseHelper.TABLE_ASSETS, cv, DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + "=?",
-                new String[] {String.valueOf(downloadManagerID)});
+        cv.put(DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS, status);
+        db.update(DataBaseHelper.TABLE_DOWNLOADS, cv, DataBaseHelper.FIELD_ID + "=?",
+                new String[] {String.valueOf(id)});
     }
-
-    public String getAssetFilename(long downloadManagerID) {
-        String assetFilename = null;
-        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getReadableDatabase();
-        Cursor cursor = db.query(DataBaseHelper.TABLE_ASSETS, null, DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + "=?",
-                new String[] {String.valueOf(downloadManagerID)}, null, null, null);
-        if (cursor.moveToFirst()) {
-            assetFilename = cursor.getString(cursor.getColumnIndex(DataBaseHelper.FIELD_ASSET_FILE_NAME));
-        }
-        cursor.close();
-        return assetFilename;
+    
+    public synchronized void incrementRetryCount(Asset asset) {
+        SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(DataBaseHelper.FIELD_RETRY_COUNT, asset.retryCount + 1);
+        db.update(DataBaseHelper.TABLE_DOWNLOADS, cv, DataBaseHelper.FIELD_ID + "=?",
+                new String[] {String.valueOf(asset.id)});
     }
 
     public static void updateMagazineDetails(Context context, Magazine magazine) {
@@ -226,8 +262,6 @@ public class MagazineManager extends BaseManager {
                 magazine.setDownloadStatus(-1);
             }
             cursor.close();
-            magazine.setTotalAssetCount(getTotalAssetCount(context, magazine));
-            magazine.setDownloadedAssetCount(getDownloadedAssetCount(context, magazine));
         }
 
     	EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
@@ -236,17 +270,26 @@ public class MagazineManager extends BaseManager {
     public static int getTotalAssetCount(Context context, Magazine magazine) {
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getReadableDatabase();
         int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + DataBaseHelper.FIELD_ID + ") from " + DataBaseHelper
-                .TABLE_ASSETS + " WHERE " + DataBaseHelper.FIELD_FILE_NAME + "=?",
-                new String[]{magazine.getFileName()});
+                .TABLE_DOWNLOADS + " WHERE " + DataBaseHelper.FIELD_FILE_NAME + "=?  AND " + DataBaseHelper.FIELD_RETRY_COUNT + "<"
+        		+ NUMBER_OF_RETRY_ATTEMPTS, new String[]{magazine.getFileName()});
         return count;
     }
 
     public static int getDownloadedAssetCount(Context context, Magazine magazine) {
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getReadableDatabase();
         int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + DataBaseHelper.FIELD_ID + ") from " + DataBaseHelper
-                .TABLE_ASSETS + " WHERE " + DataBaseHelper.FIELD_FILE_NAME + "=? AND " + DataBaseHelper.FIELD_ASSET_IS_DOWNLOADED
-                + "='1'",
-                new String[]{magazine.getFileName()});
+                .TABLE_DOWNLOADS + " WHERE " + DataBaseHelper.FIELD_FILE_NAME + "=? AND " + DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS
+                + "=? AND " + DataBaseHelper.FIELD_RETRY_COUNT + "<" + NUMBER_OF_RETRY_ATTEMPTS,
+                new String[]{magazine.getFileName(), String.valueOf(DOWNLOADED)});
+        return count;
+    }
+    
+    public static int getFailedAssetCount(Context context, Magazine magazine) {
+        SQLiteDatabase db = DataBaseHelper.getInstance(context).getReadableDatabase();
+        int count = (int) DatabaseUtils.longForQuery(db, "select COUNT(" + DataBaseHelper.FIELD_ID + ") from " + DataBaseHelper
+                .TABLE_DOWNLOADS + " WHERE " + DataBaseHelper.FIELD_FILE_NAME + "=? AND " + DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS
+                + "=? AND " + DataBaseHelper.FIELD_RETRY_COUNT + "<" + NUMBER_OF_RETRY_ATTEMPTS,
+                new String[]{magazine.getFileName(), String.valueOf(FAILED)});
         return count;
     }
 

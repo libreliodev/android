@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.widget.Toast;
 import com.librelio.event.LoadPlistEvent;
-import com.librelio.event.UpdateProgressEvent;
+import com.librelio.event.UpdateProgressBarEvent;
 import com.librelio.model.PlistItem;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -46,7 +46,7 @@ public class PlistDownloader {
             return;
         }
 
-        EventBus.getDefault().post(new UpdateProgressEvent(true));
+        EventBus.getDefault().post(new UpdateProgressBarEvent(true));
         AsyncHttpClient client = new AsyncHttpClient();
         if (!force) {
             client.addHeader(IF_MODIFIED_SINCE_HEADER, updateDateFormat.format(lastUpdateDate));
@@ -58,7 +58,7 @@ public class PlistDownloader {
                 super.onSuccess(i, s);
                 if (i == 304) {
                     //no change - but this never happens - 304 means failure due to empty string
-                    EventBus.getDefault().post(new UpdateProgressEvent(false));
+                    EventBus.getDefault().post(new UpdateProgressBarEvent(false));
                     return;
                 }
                 try {
@@ -87,7 +87,7 @@ public class PlistDownloader {
             @Override
             public void onFinish() {
                 super.onFinish();
-                EventBus.getDefault().post(new UpdateProgressEvent(false));
+                EventBus.getDefault().post(new UpdateProgressBarEvent(false));
             }
         });
     }
