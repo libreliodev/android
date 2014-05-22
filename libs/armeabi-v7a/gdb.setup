@@ -1,2 +1,0 @@
-set solib-search-path ./obj/local/armeabi-v7a
-directory /Users/valetin/Documents/Development/android-ndk-r8d/platforms/android-8/arch-arm/usr/include ../draw ../fitz ../pdf jni ../thirdparty/jbig2dec ../thirdparty/openjpeg/libopenjpeg ../thirdparty/jpeg ../thirdparty/zlib ../thirdparty/freetype/include ../xps ../cbz ../scripts /Users/valetin/Documents/Development/android-ndk-r8d/sources/cxx-stl/system
