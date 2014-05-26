@@ -133,62 +133,64 @@ public class DownloadMagazineService extends WakefulIntentService {
                             magazine.getSamplePdfPath() :
                             magazine.getItemPath());
                     Log.d(TAG, bytesMoved + " bytes moved for " + magazine.getFileName());
+
+                    Date date = Calendar.getInstance().getTime();
+//                    String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
+                    String downloadDate = DateFormat.getDateInstance().format(date);
+                    magazine.setDownloadDate(downloadDate);
+                    MagazineManager.removeDownloadedMagazine(this, magazine);
+                    manager.addMagazine(
+                            magazine,
+                            DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES,
+                            true);
+                    EventBus.getDefault().post(new LoadPlistEvent());
+                    EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
+                    magazine.makeCompleteFile(magazine.isSample());
+                    
+
+                    NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(this)
+                                    .setSmallIcon(R.drawable.ic_launcher)
+                                    .setContentTitle(magazine.getTitle() + (magazine.isSample() ? " sample" : "") + " downloaded")
+                                    .setContentText("Click to read");
+
+                    // Create large icon from magazine cover png
+                    Resources res = getResources();
+                    int height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
+                    int width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
+                    mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(magazine.getPngPath(), height, width));
+
+                    //TODO show magazine cover as large image
+
+                    Intent resultIntent = new Intent(this, MuPDFActivity.class);
+                    resultIntent.setAction(Intent.ACTION_VIEW);
+                    resultIntent.setData(Uri.parse(magazine.isSample() ?
+                            magazine.getSamplePdfPath() :
+                            magazine.getItemPath()));
+                    resultIntent.putExtra(DataBaseHelper.FIELD_TITLE, magazine.getTitle());
+
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                    stackBuilder.addParentStack(MuPDFActivity.class);
+                    stackBuilder.addNextIntent(resultIntent);
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(
+                                    0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+                    mBuilder.setContentIntent(resultPendingIntent);
+                    mBuilder.setAutoCancel(true);
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.notify(magazine.getFileName().hashCode(), mBuilder.build());
+                    
+                    EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
+                    addAssetsToDatabase(this, magazine);
+                    downloadPendingAssets();
+                } else if (status == DownloadManager.STATUS_FAILED) {
+                	Log.d(TAG, "STATUS FAILED - REASON CODE: " + c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
                 }
             }
             c.close();
-
-            Date date = Calendar.getInstance().getTime();
-//            String downloadDate = new SimpleDateFormat(" dd.MM.yyyy").format(date);
-            String downloadDate = DateFormat.getDateInstance().format(date);
-            magazine.setDownloadDate(downloadDate);
-            MagazineManager.removeDownloadedMagazine(this, magazine);
-            manager.addMagazine(
-                    magazine,
-                    DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES,
-                    true);
-            EventBus.getDefault().post(new LoadPlistEvent());
-            EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
-            magazine.makeCompleteFile(magazine.isSample());
-            
-
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(magazine.getTitle() + (magazine.isSample() ? " sample" : "") + " downloaded")
-                            .setContentText("Click to read");
-
-            // Create large icon from magazine cover png
-            Resources res = getResources();
-            int height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
-            int width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
-            mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(magazine.getPngPath(), height, width));
-
-            //TODO show magazine cover as large image
-
-            Intent resultIntent = new Intent(this, MuPDFActivity.class);
-            resultIntent.setAction(Intent.ACTION_VIEW);
-            resultIntent.setData(Uri.parse(magazine.isSample() ?
-                    magazine.getSamplePdfPath() :
-                    magazine.getItemPath()));
-            resultIntent.putExtra(DataBaseHelper.FIELD_TITLE, magazine.getTitle());
-
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            stackBuilder.addParentStack(MuPDFActivity.class);
-            stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-            mBuilder.setContentIntent(resultPendingIntent);
-            mBuilder.setAutoCancel(true);
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(magazine.getFileName().hashCode(), mBuilder.build());
-            
-            EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
-            addAssetsToDatabase(this, magazine);
-            downloadPendingAssets();
         } else {
         	// Just try to download any remaining failed assets
         	downloadPendingAssets();
@@ -197,7 +199,7 @@ public class DownloadMagazineService extends WakefulIntentService {
     }
     
     private void addAssetsToDatabase(Context context, Magazine magazine) {
-        Log.d(TAG, "Start DownloadLinksTask");
+        Log.d(TAG, "addAssetsToDatabase " + magazine.getFileName());
 
         SQLiteDatabase db = DataBaseHelper.getInstance(context).getWritableDatabase();
         db.beginTransaction();
