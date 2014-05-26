@@ -256,12 +256,12 @@ public class MagazineAdapter extends BaseAdapter {
             int totalAssetCount = MagazineManager.getTotalAssetCount(context, currentMagazine);
             int downloadedAssetCount = MagazineManager.getDownloadedAssetCount(context, currentMagazine);
             int failedAssetCount = MagazineManager.getFailedAssetCount(context, currentMagazine);
-            if (totalAssetCount > 0 && (downloadedAssetCount + failedAssetCount) < totalAssetCount) {
+            if ((totalAssetCount > 0) && (downloadedAssetCount > 0) && ((downloadedAssetCount + failedAssetCount) < totalAssetCount)) {
                 holder.progressLayout.setVisibility(View.VISIBLE);
                 holder.progressBar.setIndeterminate(false);
                 holder.progressBar.setProgress((int) ((downloadedAssetCount * 100.0f) / totalAssetCount));
                 holder.info.setText(context.getResources()
-                        .getString(R.string.download_in_progress) + "\n" + (downloadedAssetCount + failedAssetCount) + "/" + totalAssetCount);
+                        .getString(R.string.download_in_progress) + "\n" + downloadedAssetCount + "/" + totalAssetCount);
             }
             return convertView;
         } else {
@@ -275,7 +275,6 @@ public class MagazineAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
                 	context.startActivity(MagazinesActivity.getIntent(context, magazines.get(position).getFileName()));
-//                    context.startActivity(MainMagazineActivity.getIntent(context, magazines.get(position).getFileName()));
                 }
             });
             return convertView;
