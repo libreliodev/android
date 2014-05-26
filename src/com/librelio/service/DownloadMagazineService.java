@@ -97,12 +97,14 @@ public class DownloadMagazineService extends WakefulIntentService {
             if (c.moveToFirst()) {
                 int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                	Log.d(TAG, "Download manager says download successful for " + magazine.getFileName());
                     // process download
                 	String srcFileName = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
             		File srcFile = new File(srcFileName);
 
             		if (srcFile.length() == 0) {
             			// download failed - retry
+            			Log.d(TAG, "But the file is actually 0 bytes so retry " + magazine.getFileName());
             			String url = c.getString(c.getColumnIndex(DownloadManager.COLUMN_URI));
             	        String filePath = magazine.getItemPath();
             	        if (magazine.isSample()) {
@@ -126,9 +128,11 @@ public class DownloadMagazineService extends WakefulIntentService {
 
                     magazine.clearMagazineDir();
                     magazine.makeMagazineDir();
-                    StorageUtils.move(srcFileName, magazine.isSample() ?
+                    Log.d(TAG, "Attempting to move file for " + magazine.getFileName());
+                    int bytesMoved = StorageUtils.move(srcFileName, magazine.isSample() ?
                             magazine.getSamplePdfPath() :
                             magazine.getItemPath());
+                    Log.d(TAG, bytesMoved + " bytes moved for " + magazine.getFileName());
                 }
             }
             c.close();

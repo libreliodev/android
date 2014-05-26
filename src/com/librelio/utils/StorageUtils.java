@@ -54,6 +54,7 @@ public class StorageUtils {
             return -1;
         }
         int count = -1;
+        int bytesCount = 0;
         Log.d(TAG, "move " + src + " => " + dst);
         try {
             InputStream input = new FileInputStream(src);
@@ -62,6 +63,7 @@ public class StorageUtils {
 
             while ((count = input.read(data)) != -1) {
                 output.write(data, 0, count);
+                bytesCount += count;
             }
             output.flush();
             output.close();
@@ -70,7 +72,7 @@ public class StorageUtils {
             Log.e(TAG, "copyFromAssets failed", e);
         }
         new File(src).delete();
-        return count;
+        return bytesCount;
     }
 
     public static String getStringFromFile(String path){
