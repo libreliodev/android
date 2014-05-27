@@ -233,18 +233,22 @@ public class ImageLayout extends RelativeLayout {
 
 	private class SlidesInfo {
 		public final String assetDir;
-		public final int count;
-		public final String preffix;
-		public final String suffix;
+		public int count;
+		public String preffix;
+		public String suffix;
 
 		public SlidesInfo(String basePath) {
-			File file = new File(basePath);
-			this.assetDir = file.getParent();
-			String fileName = file.getName();
-			this.count = Integer
-					.valueOf(fileName.split("_")[1].split("\\.")[0]);
-			this.preffix = fileName.split("_")[0];
-			this.suffix = fileName.split("_")[1].split("\\.")[1];
+				File file = new File(basePath);
+				this.assetDir = file.getParent();
+				String fileName = file.getName();
+			try {
+				this.count = Integer
+						.valueOf(fileName.split("_")[1].split("\\.")[0]);
+				this.preffix = fileName.split("_")[0];
+				this.suffix = fileName.split("_")[1].split("\\.")[1];
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public String getFullPathToImage(int position) {

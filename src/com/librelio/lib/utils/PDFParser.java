@@ -44,28 +44,33 @@ public class PDFParser {
 				ArrayList<LinkInfoExternal> fixedLinkInfo = new ArrayList<LinkInfoExternal>();
 				LinkInfoExternal current;
 				for(int i = 0; i < mPageLinkInfo.length; i++) {
-					if( !(mPageLinkInfo[i] instanceof LinkInfoExternal))
-						continue;
-					current = (LinkInfoExternal)mPageLinkInfo[i];
-					if(current.url != null && current.url.startsWith("http://localhost")) {
-						String path = Uri.parse(current.url).getPath();
-						if(path.contains("_") && ( path.contains("jpg") || path.contains("png"))) {
-							// ops... we have a slideshow here
-							int mSlideshowCount = Integer
-									.valueOf(path.split("_")[1].split("\\.")[0]);
-							String mSlideshowPreffix = path.split("_")[0];
-							String mSlideshowSuffix = path.split("_")[1].split("\\.")[1];
-                            for (int j = 1; j <= mSlideshowCount; j++) {
-                                LinkInfoExternal newLink = new LinkInfoExternal(current.rect.left, current.rect.top,
-                                        current.rect.right, current.rect.bottom, "http://localhost" +
-                                        mSlideshowPreffix + "_" + String.valueOf(j) + "." + mSlideshowSuffix);
-                                fixedLinkInfo.add(newLink);
-                            }
-                        } else {
+					try {
+						if( !(mPageLinkInfo[i] instanceof LinkInfoExternal))
+							continue;
+						current = (LinkInfoExternal)mPageLinkInfo[i];
+						if(current.url != null && current.url.startsWith("http://localhost")) {
+							String path = Uri.parse(current.url).getPath();
+							if(path.contains("_") && ( path.contains("jpg") || path.contains("png"))) {
+								// ops... we have a slideshow here
+								int mSlideshowCount = Integer
+										.valueOf(path.split("_")[1].split("\\.")[0]);
+								String mSlideshowPreffix = path.split("_")[0];
+								String mSlideshowSuffix = path.split("_")[1].split("\\.")[1];
+						        for (int j = 1; j <= mSlideshowCount; j++) {
+						            LinkInfoExternal newLink = new LinkInfoExternal(current.rect.left, current.rect.top,
+						                    current.rect.right, current.rect.bottom, "http://localhost" +
+						                    mSlideshowPreffix + "_" + String.valueOf(j) + "." + mSlideshowSuffix);
+						            fixedLinkInfo.add(newLink);
+						        }
+						    } else {
+								fixedLinkInfo.add(current);
+							}
+						}else {
 							fixedLinkInfo.add(current);
 						}
-					}else {
-						fixedLinkInfo.add(current);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 				
