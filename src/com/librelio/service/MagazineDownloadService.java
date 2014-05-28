@@ -176,11 +176,16 @@ public class MagazineDownloadService extends WakefulIntentService {
 			MagazineManager.removeDownloadedMagazine(this, magazine);
 			manager.addMagazine(magazine,
 					DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES, true);
+			
+			addAssetsToDatabase(this, magazine);
+			
 			manager.setDownloadStatus(magazine.getId(),
 					DownloadStatus.DOWNLOADED);
+
+			magazine.makeCompleteFile(magazine.isSample());
+			
 			EventBus.getDefault().post(new LoadPlistEvent());
 			EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
-			magazine.makeCompleteFile(magazine.isSample());
 
 			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 					this)
@@ -221,7 +226,6 @@ public class MagazineDownloadService extends WakefulIntentService {
 					mBuilder.build());
 
 			EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
-			addAssetsToDatabase(this, magazine);
 			AssetDownloadService.startAssetDownloadService(this);
 		} catch (IOException e) {
 			e.printStackTrace();
