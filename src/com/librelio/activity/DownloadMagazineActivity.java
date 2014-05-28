@@ -1,6 +1,5 @@
 package com.librelio.activity;
 
-import android.app.DownloadManager;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,9 +9,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.event.MagazineDownloadedEvent;
+import com.librelio.model.DownloadStatus;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
@@ -33,12 +34,13 @@ public class DownloadMagazineActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (magazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING && magazine
-                                    .getDownloadProgress() > 0) {
+                            if (magazine.getDownloadStatus() > DownloadStatus.QUEUED && magazine.getDownloadStatus() < DownloadStatus.DOWNLOADED) {
                                 progress.setIndeterminate(false);
-                                progress.setProgress(magazine.getDownloadProgress());
+                                progress.setProgress(magazine.getDownloadStatus());
+                                progressText.setText(R.string.download_in_progress);
                             } else {
                                 progress.setIndeterminate(true);
+                                progressText.setText(getString(R.string.queued));
                             }
                             handler.postDelayed(loadPlistTask, 2000);
                         }
@@ -47,6 +49,7 @@ public class DownloadMagazineActivity extends BaseActivity {
             });
         }
     };
+	private TextView progressText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class DownloadMagazineActivity extends BaseActivity {
 
         ImageView preview = (ImageView) findViewById(R.id.download_preview_image);
         progress = (ProgressBar)findViewById(R.id.download_progress);
+        progressText = (TextView)findViewById(R.id.download_progress_text);
         preview.setImageBitmap(BitmapFactory.decodeFile(magazine.getPngPath()));
 
         ((TextView) findViewById(R.id.item_title)).setText(title);

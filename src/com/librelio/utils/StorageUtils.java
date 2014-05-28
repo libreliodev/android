@@ -53,7 +53,7 @@ public class StorageUtils {
         if (src == null || dst == null) {
             return -1;
         }
-        int count = -1;
+        int bytesRead = -1;
         int bytesCount = 0;
         Log.d(TAG, "move " + src + " => " + dst);
         try {
@@ -61,15 +61,15 @@ public class StorageUtils {
             OutputStream output = new FileOutputStream(dst);
             byte data[] = new byte[1024];
 
-            while ((count = input.read(data)) != -1) {
-                output.write(data, 0, count);
-                bytesCount += count;
+            while ((bytesRead = input.read(data)) != -1) {
+                output.write(data, 0, bytesRead);
+                bytesCount += bytesRead;
             }
             output.flush();
             output.close();
             input.close();
         } catch (IOException e) {
-            Log.e(TAG, "copyFromAssets failed", e);
+            Log.e(TAG, "move failed", e);
         }
         new File(src).delete();
         return bytesCount;

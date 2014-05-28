@@ -49,6 +49,7 @@
     <string name="download_failed_please_check_your_connection">Download failed, please check your connection</string>
     <string name="please_check_your_connection">Please check your connection</string>
     <string name="download_in_progress">Download in progress</string>
+    <string name="downloading_assets">Downloading assets</string>
     <string name="caching_operation_in_progress">Caching operation in progress</string>
     <string name="what_do_you_want_to_buy">What do you want to buy?</string>
     <string name="cancel">Cancel</string>
@@ -107,6 +108,7 @@
     
     <string name="new_issue">New issue</string>
     <string name="available">available</string>
+    <string name="queued">Queued</string>
     
 
 </resources>

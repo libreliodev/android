@@ -32,9 +32,8 @@ public class Magazine extends DictItem {
 	private String assetsDir;
 	private String downloadDate;
 	private boolean isSample;
-    private int downloadStatus = -1;
-    private long downloadManagerId;
-    private int downloadProgress;
+    private int downloadStatus = DownloadStatus.NOT_DOWNLOADED;
+//    private int downloadProgress;
 
     public Magazine(String fileName, String title, String subtitle, String downloadDate, Context context) {
 		this.fileName = fileName;
@@ -53,16 +52,17 @@ public class Magazine extends DictItem {
 		int fileNameColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_FILE_NAME);
 		int dateColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_DATE);
 		int isSampleColumnId = cursor.getColumnIndex(DataBaseHelper.FIELD_IS_SAMPLE);
-        int downloadManagerId = cursor.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID);
+        int downloadStatus = cursor.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_STATUS);
 		
 		this.id = cursor.getInt(idColumnId);
 		this.fileName = cursor.getString(fileNameColumnId);
 		this.title = cursor.getString(titleColumnId);
 		this.subtitle = cursor.getString(subitleColumnId);
 		this.downloadDate = cursor.getString(dateColumnId);
+		this.downloadStatus = cursor.getInt(downloadStatus);
 		if (isSampleColumnId > -1){
 			this.isSample = cursor.getInt(isSampleColumnId) == 0 ? false : true;
-            this.downloadManagerId = cursor.getLong(downloadManagerId);
+//            this.downloadManagerId = cursor.getLong(downloadStatus);
 		}
 		this.context = context;
 
@@ -220,19 +220,11 @@ public class Magazine extends DictItem {
         this.downloadStatus = downloadStatus;
     }
 
-    public long getDownloadManagerId() {
-        return downloadManagerId;
-    }
-
-    public void setDownloadManagerId(long downloadManagerId) {
-        this.downloadManagerId = downloadManagerId;
-    }
-
-    public void setDownloadProgress(int downloadProgress) {
-        this.downloadProgress = downloadProgress;
-    }
-
-    public int getDownloadProgress() {
-        return downloadProgress;
-    }
+//    public void setDownloadProgress(int downloadProgress) {
+//        this.downloadProgress = downloadProgress;
+//    }
+//
+//    public int getDownloadProgress() {
+//        return downloadProgress;
+//    }
 }

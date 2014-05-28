@@ -3,16 +3,20 @@ package com.librelio.loader;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import org.apache.commons.io.IOUtils;
+
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.librelio.LibrelioApplication;
 import com.librelio.event.InvalidateGridViewEvent;
 import com.librelio.event.UpdateMagazinesEvent;
 import com.librelio.model.DictItem;
@@ -25,6 +29,9 @@ import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import de.greenrobot.event.EventBus;
 
@@ -42,32 +49,6 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
         onContentChanged();
     }
 
-    public static int downloadFromUrl(String sUrl, String filePath) {
-        int count = -1;
-        try {
-            URL url = new URL(sUrl);
-            URLConnection connection = url.openConnection();
-            connection.connect();
-
-//            int lenghtOfFile = connection.getContentLength();
-//            Log.d(TAG, "downloadFromUrl Lenght of file: " + lenghtOfFile);
-
-            InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(filePath);
-
-            byte data[] = new byte[1024];
-            while ((count = input.read(data)) != -1) {
-                output.write(data, 0, count);
-            }
-            output.flush();
-            output.close();
-            input.close();
-        } catch (Exception e) {
-            Log.e(TAG, "Problem with download: " + filePath, e);
-        }
-        return count;
-    }
-
     @Override
     public ArrayList<DictItem> loadInBackground() {
 
@@ -81,7 +62,6 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
     }
 
     private ArrayList<DictItem> parsePlist(String plistName) {
-        long startTime = System.currentTimeMillis();
 
         PlistItem plistItem = new PlistItem(plistName, "", getContext());
 
@@ -118,16 +98,31 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
             }
             EventBus.getDefault().post(new UpdateMagazinesEvent(plistName, magazines));
 
-            // This should happen on a different thread - or just when images are displayed
-            for (DictItem magazine : magazines) {
-                //saving png
+            for (final DictItem magazine : magazines) {
+            	// Download thumbnail png
                 File png = new File(magazine.getPngPath());
                 if (!png.exists()) {
     //                if (isOnline() && !useStaticMagazines) {
-                    downloadFromUrl(magazine.getPngUrl(), magazine.getPngPath());
-    //                }
+
                     Log.d(TAG, "Image download: " + magazine.getPngPath());
-                    EventBus.getDefault().post(new InvalidateGridViewEvent());
+                	Request request = new Request.Builder().url(magazine.getPngUrl()).build();
+                	
+                	LibrelioApplication.getOkHttpClient().newCall(request).enqueue(new Callback() {
+						
+						@Override
+						public void onResponse(Response response) throws IOException {
+							if (response.code() == 200) {
+							IOUtils.copy(response.body().byteStream(), new FileOutputStream(magazine.getPngPath()));
+		                    EventBus.getDefault().post(new InvalidateGridViewEvent());
+							}
+							
+						}
+						
+						@Override
+						public void onFailure(Request arg0, Throwable arg1) {
+							Log.d(TAG, "magazine thumbnail download failed " + magazine.getPngUrl());
+						}
+					});
                 } else {
     //                Log.d(TAG, magazine.getPngPath() + " already exist");
                 }

@@ -1,5 +1,14 @@
 package com.librelio;
 
+import java.security.GeneralSecurityException;
+
+import javax.net.ssl.SSLContext;
+
+import org.acra.ACRA;
+import org.acra.ReportField;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -9,20 +18,13 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
-import android.widget.Toast;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.librelio.activity.MuPDFActivity;
-import com.librelio.base.IBaseContext;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.utils.GooglePlayServicesUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
-import org.acra.ACRA;
-import org.acra.ReportField;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
+import com.squareup.okhttp.OkHttpClient;
 
 @ReportsCrashes(formKey = "",
         mailTo = "android@librelio.com",
@@ -41,6 +43,7 @@ public class LibrelioApplication extends Application {
 //	private static final String SERVER_URL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 	
 	private static String baseUrl;
+	private static OkHttpClient client;
 
 	@Override
 	public void onCreate() {
@@ -54,9 +57,25 @@ public class LibrelioApplication extends Application {
 //                PATH_SEPARATOR;
 
         registerForGCM();
-        
     }
 
+	public static OkHttpClient getOkHttpClient() {
+		if (client == null) {
+			client = new OkHttpClient();
+			// Fix for https://github.com/square/okhttp/issues/184
+			// Although it should be fixed in OkHttp 2
+			SSLContext sslContext;
+			try {
+				sslContext = SSLContext.getInstance("TLS");
+				sslContext.init(null, null, null);
+			} catch (GeneralSecurityException e) {
+				throw new AssertionError(); // The system has no TLS. Just give
+											// up.
+			}
+			client.setSslSocketFactory(sslContext.getSocketFactory());
+		}
+		return client;
+	}
 
 	private void registerForGCM() {
         // Check device for Play Services APK. If check succeeds, proceed with

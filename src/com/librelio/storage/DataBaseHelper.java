@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 
 
 public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
-	private static final int DB_VERSION = 4;
+	private static final int DB_VERSION = 5;
 	private static final String DB_NAME = "windDataBase";
 
     private static DataBaseHelper mInstance = null;
@@ -35,7 +35,7 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	public static final String FIELD_ASSET_DOWNLOAD_STATUS = "assetdownloadstatus";
 	public static final String FIELD_DOWNLOAD_DATE = "downloaddate";
 	public static final String FIELD_IS_SAMPLE = "sample";
-	public static final String FIELD_DOWNLOAD_MANAGER_ID = "downloadmanagerid";
+	public static final String FIELD_DOWNLOAD_STATUS = "downloadstatus";
 
 	private DataBaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -55,7 +55,7 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
                 + DataBaseHelper.FIELD_DOWNLOAD_DATE + " TEXT, "
                 + DataBaseHelper.FIELD_SUBTITLE + " TEXT, "
                 + DataBaseHelper.FIELD_IS_SAMPLE + " INTEGER, "
-                + DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER);");
+                + DataBaseHelper.FIELD_DOWNLOAD_STATUS + " INTEGER DEFAULT -2);");
     }
     
     private void createDownloadsTable(SQLiteDatabase db){
@@ -72,7 +72,7 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 //		db.execSQL("DROP TABLE IF EXISTS " + Magazine.TABLE_DOWNLOADED_MAGAZINES);
         if (oldVersion < 2) {
-            db.execSQL("ALTER TABLE " + DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES + " ADD COLUMN " + DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER;");
+//            db.execSQL("ALTER TABLE " + DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES + " ADD COLUMN " + DataBaseHelper.FIELD_DOWNLOAD_MANAGER_ID + " INTEGER;");
 //            createAssetsTable(db);
         }
         if (oldVersion < 3) {
@@ -81,6 +81,9 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
         if (oldVersion < 4) {
         	db.execSQL("DROP TABLE IF EXISTS Assets");
         	createDownloadsTable(db);
+        }
+        if (oldVersion < 5) {
+        	 db.execSQL("ALTER TABLE " + DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES + " ADD COLUMN " + DataBaseHelper.FIELD_DOWNLOAD_STATUS + " INTEGER DEFAULT -2;");
         }
 //		onCreate(db);
 	}

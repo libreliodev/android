@@ -30,7 +30,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -62,11 +61,9 @@ import com.android.vending.billing.IInAppBillingService;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.model.Magazine;
-import com.librelio.service.DownloadMagazineService;
+import com.librelio.service.MagazineDownloadService;
 import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.SyncHttpClient;
 import com.niveales.wind.R;
 
 /**
@@ -269,7 +266,7 @@ public class BillingActivity extends BaseActivity {
                 } else {
                     String tempURL = getTempURL(httpResponse);
                     if (tempURL != null) {
-                    DownloadMagazineService.startMagazineDownload(context, new Magazine(fileName, title, subtitle, null,
+                    MagazineDownloadService.startMagazineDownload(context, new Magazine(fileName, title, subtitle, null,
                             context), true, tempURL);
                     return true;
                     }
@@ -302,7 +299,7 @@ public class BillingActivity extends BaseActivity {
                 } else {
                     String tempURL = getTempURL(httpResponse);
                     if (tempURL != null) {
-                    DownloadMagazineService.startMagazineDownload(context, new Magazine(fileName, title, subtitle, null,
+                    	MagazineDownloadService.startMagazineDownload(context, new Magazine(fileName, title, subtitle, null,
                             context), true, tempURL);
                     return true;
                     }
@@ -660,11 +657,10 @@ public class BillingActivity extends BaseActivity {
         if(tempURL == null){
             //Toast.makeText(getContext(), "Download failed", Toast.LENGTH_SHORT).show();
             showAlertDialog(DOWNLOAD_ALERT);
-
             return;
         }
         if (getIntent().getExtras() != null) {
-        DownloadMagazineService.startMagazineDownload(this, new Magazine(fileName, title, subtitle, null,
+        MagazineDownloadService.startMagazineDownload(this, new Magazine(fileName, title, subtitle, null,
                 this), true, tempURL);
             Intent intent = new Intent(getContext(), DownloadMagazineActivity.class);
             intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);

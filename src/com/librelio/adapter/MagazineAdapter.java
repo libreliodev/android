@@ -1,6 +1,8 @@
 package com.librelio.adapter;
 
-import android.app.DownloadManager;
+import java.io.File;
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -18,20 +20,20 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.MagazinesActivity;
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.model.DictItem;
+import com.librelio.model.DownloadStatus;
 import com.librelio.model.Magazine;
-import com.librelio.service.DownloadMagazineService;
+import com.librelio.service.MagazineDownloadService;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
-import de.greenrobot.event.EventBus;
 
-import java.io.File;
-import java.util.ArrayList;
+import de.greenrobot.event.EventBus;
 
 public class MagazineAdapter extends BaseAdapter {
 
@@ -131,6 +133,7 @@ public class MagazineAdapter extends BaseAdapter {
 
             // reset the visibilities
             holder.progressLayout.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.VISIBLE);
             holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
             holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
 
@@ -152,29 +155,24 @@ public class MagazineAdapter extends BaseAdapter {
                 return convertView;
             }
 
-            if ((currentMagazine.getDownloadStatus() >= DownloadManager.STATUS_PENDING) &&
-                    (currentMagazine.getDownloadStatus() <= DownloadManager.STATUS_FAILED)) {
+            // If downloading
+            if (currentMagazine.getDownloadStatus() >= DownloadStatus.QUEUED && currentMagazine.getDownloadStatus() < DownloadStatus.DOWNLOADED) {
                 // currently downloading
                 holder.progressLayout.setVisibility(View.VISIBLE);
                 holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
                 holder.sampleOrDeleteButton.setVisibility(View.VISIBLE);
-                if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING || currentMagazine
-                        .getDownloadStatus() == DownloadManager.STATUS_PENDING) {
-                    holder.info.setText(context.getResources()
-                            .getString(R.string.download_in_progress));
-                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_PAUSED) {
-                    holder.info.setText("Queued");
-                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_FAILED) {
-                    holder.info.setText("ERROR");
-                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_SUCCESSFUL) {
-                    holder.info.setText(context.getResources()
-                            .getString(R.string.download_in_progress));
+                if (currentMagazine.getDownloadStatus() == DownloadStatus.QUEUED) {
+                    holder.info.setText(context.getString(R.string.queued));
+//                } else if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_SUCCESSFUL) {
+//                    holder.info.setText(context.getResources()
+//                            .getString(R.string.download_in_progress));
                 }
 
-                if (currentMagazine.getDownloadStatus() == DownloadManager.STATUS_RUNNING && currentMagazine
-                        .getDownloadProgress() > 0) {
+                if (currentMagazine.getDownloadStatus() > DownloadStatus.QUEUED && currentMagazine.getDownloadStatus() < 101) {
+                    holder.info.setText(context.getResources()
+                            .getString(R.string.download_in_progress));
                     holder.progressBar.setIndeterminate(false);
-                    holder.progressBar.setProgress(currentMagazine.getDownloadProgress());
+                    holder.progressBar.setProgress(currentMagazine.getDownloadStatus());
                 } else {
                     holder.progressBar.setIndeterminate(true);
                 }
@@ -183,6 +181,7 @@ public class MagazineAdapter extends BaseAdapter {
                 holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                    	// Cancel download
                         currentMagazine.clearMagazineDir();
                         MagazineManager.removeDownloadedMagazine(context, currentMagazine);
                         EventBus.getDefault().post(new LoadPlistEvent());
@@ -207,7 +206,7 @@ public class MagazineAdapter extends BaseAdapter {
                             intent.putExtra(BillingActivity.SUBTITLE_KEY, currentMagazine.getSubtitle());
                             context.startActivity(intent);
                         } else {
-                            DownloadMagazineService.startMagazineDownload(context, currentMagazine);
+                            MagazineDownloadService.startMagazineDownload(context, currentMagazine);
                         }
                     }
                 });
@@ -233,7 +232,7 @@ public class MagazineAdapter extends BaseAdapter {
                                         currentMagazine.getTitle(), true);
                             } else {
                                 currentMagazine.setSample(true);
-                                DownloadMagazineService.startMagazineDownload(context, currentMagazine);
+                                MagazineDownloadService.startMagazineDownload(context, currentMagazine);
                             }
                         }
                     });
@@ -253,6 +252,7 @@ public class MagazineAdapter extends BaseAdapter {
                             }
                         });
             }
+            
             int totalAssetCount = MagazineManager.getTotalAssetCount(context, currentMagazine);
             int downloadedAssetCount = MagazineManager.getDownloadedAssetCount(context, currentMagazine);
             int failedAssetCount = MagazineManager.getFailedAssetCount(context, currentMagazine);
@@ -261,7 +261,15 @@ public class MagazineAdapter extends BaseAdapter {
                 holder.progressBar.setIndeterminate(false);
                 holder.progressBar.setProgress((int) ((downloadedAssetCount * 100.0f) / totalAssetCount));
                 holder.info.setText(context.getResources()
-                        .getString(R.string.download_in_progress) + "\n" + downloadedAssetCount + "/" + totalAssetCount);
+                        .getString(R.string.downloading_assets) + "\n" + downloadedAssetCount + "/" + totalAssetCount);
+            }
+            
+            // If download failed
+            if (currentMagazine.getDownloadStatus() == DownloadStatus.FAILED) {
+                holder.info.setText("Download failed");
+                holder.progressLayout.setVisibility(View.VISIBLE);
+                holder.progressBar.setVisibility(View.INVISIBLE);
+                holder.info.setVisibility(View.VISIBLE);
             }
             return convertView;
         } else {
