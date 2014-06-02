@@ -102,8 +102,6 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
             	// Download thumbnail png
                 File png = new File(magazine.getPngPath());
                 if (!png.exists()) {
-    //                if (isOnline() && !useStaticMagazines) {
-
                     Log.d(TAG, "Image download: " + magazine.getPngPath());
                 	Request request = new Request.Builder().url(magazine.getPngUrl()).build();
                 	
