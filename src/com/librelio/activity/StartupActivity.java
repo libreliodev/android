@@ -96,30 +96,39 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	    loadAdvertisingImage();
     }
 
-    private void loadAdvertisingImage() {
-    	
-    	client.setReadTimeout(2, TimeUnit.SECONDS);
-    	Request request = new Request.Builder().url(getAdvertisingImageURL()).build();
-    	
-    	client.newCall(request).enqueue(new Callback() {
-			
+	private void loadAdvertisingImage() {
+
+		client.setReadTimeout(2, TimeUnit.SECONDS);
+		Request request = new Request.Builder().url(getAdvertisingImageURL())
+				.build();
+
+		client.newCall(request).enqueue(new Callback() {
+
 			@Override
 			public void onResponse(Response response) throws IOException {
-                EasyTracker.getTracker().sendView("Interstitial/" + FilenameUtils.getName(getAdvertisingImageURL()));
-                byte[] bytes = response.body().bytes();
-                if (bytes != null) {
-                    adImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                }
-                loadAdvertisingLinkAndDisplayAdvertising();
+				if (response.code() == 200) {
+					EasyTracker.getTracker().sendView(
+							"Interstitial/"
+									+ FilenameUtils
+											.getName(getAdvertisingImageURL()));
+					byte[] bytes = response.body().bytes();
+					if (bytes != null) {
+						adImage = BitmapFactory.decodeByteArray(bytes, 0,
+								bytes.length);
+					}
+					loadAdvertisingLinkAndDisplayAdvertising();
+				} else {
+					showMagazineAfterDelay(DEFAULT_ADV_DELAY);
+				}
 			}
-			
+
 			@Override
 			public void onFailure(Request request, Throwable throwable) {
 				showMagazineAfterDelay(DEFAULT_ADV_DELAY);
-				
+
 			}
 		});
-    }
+	}
 
     private void loadAdvertisingLinkAndDisplayAdvertising() {
     	
@@ -129,6 +138,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
     		
 			@Override
 			public void onResponse(Response response) throws IOException {
+				if (response.code() == 200) {
 				 PListXMLHandler handler = new PListXMLHandler();
 	                PListXMLParser parser = new PListXMLParser();
 	                parser.setHandler(handler);
@@ -157,6 +167,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	                    setOnAdvertisingImageClickListener(link);
 	                    showMagazineAfterDelay(Integer.valueOf(delay));
 	                }
+				} else {
+					showMagazineAfterDelay(DEFAULT_ADV_DELAY);	
+				}
 			}
 			
 			@Override
