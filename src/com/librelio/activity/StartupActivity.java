@@ -46,6 +46,11 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.Header;
 
@@ -53,6 +58,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The start point for Librelio application (Splash-screen)
@@ -76,6 +82,8 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	private Timer mStartupAdsTimer;
     private Bitmap adImage;
 
+	OkHttpClient client = new OkHttpClient();
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,70 +97,73 @@ public class StartupActivity extends AbstractLockRotationActivity {
     }
 
     private void loadAdvertisingImage() {
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.setTimeout(2000);
-        client.get(getAdvertisingImageURL(), new BinaryHttpResponseHandler() {
-
-            @Override
-            protected void handleMessage(Message message) {
-                super.handleMessage(message);
-                switch (message.what) {
-                    case AsyncHttpResponseHandler.FAILURE_MESSAGE:
-                        onStartMagazine(DEFAULT_ADV_DELAY);
-                }
-            }
-
-            @Override
-            protected void handleSuccessMessage(int i, byte[] bytes) {
+    	
+    	client.setReadTimeout(2, TimeUnit.SECONDS);
+    	Request request = new Request.Builder().url(getAdvertisingImageURL()).build();
+    	
+    	client.newCall(request).enqueue(new Callback() {
+			
+			@Override
+			public void onResponse(Response response) throws IOException {
                 EasyTracker.getTracker().sendView("Interstitial/" + FilenameUtils.getName(getAdvertisingImageURL()));
+                byte[] bytes = response.body().bytes();
                 if (bytes != null) {
                     adImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 }
                 loadAdvertisingLinkAndDisplayAdvertising();
-            }
-        });
+			}
+			
+			@Override
+			public void onFailure(Request request, Throwable throwable) {
+				showMagazineAfterDelay(DEFAULT_ADV_DELAY);
+				
+			}
+		});
     }
 
     private void loadAdvertisingLinkAndDisplayAdvertising() {
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.setTimeout(2000);
-        client.get(this, getAdvertisingLinkURL(), new AsyncHttpResponseHandler() {
-
-            @Override
-            protected void handleMessage(Message message) {
-                super.handleMessage(message);
-                switch (message.what) {
-                    case AsyncHttpResponseHandler.FAILURE_MESSAGE:
-                        onStartMagazine(DEFAULT_ADV_DELAY);
-                }
-            }
-
-            @Override
-            protected void handleSuccessMessage(int i, Header[] headers, String s) {
-                PListXMLHandler handler = new PListXMLHandler();
-                PListXMLParser parser = new PListXMLParser();
-                parser.setHandler(handler);
-                parser.parse(s);
-                PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
-                if (list != null){
-                    Dict dict = (Dict) list.getRootElement();
-                    String delay = dict.getString(PLIST_DELAY).getValue().toString();
-                    String link = dict.getString(PLIST_LINK).getValue().toString();
-                    if (adImage != null) {
-                        advertisingImage.setImageBitmap(adImage);
-                        if (isFirstImage) {
-                            applyRotation(0, 90);
-                            isFirstImage = !isFirstImage;
-                        } else {
-                            applyRotation(0, -90);
-                            isFirstImage = !isFirstImage;
-                        }
-                    }
-                    setOnAdvertisingImageClickListener(link);
-                    onStartMagazine(Integer.valueOf(delay));
-                }
-            }
-        });
+    	
+    	Request request = new Request.Builder().url(getAdvertisingLinkURL()).build();
+    	
+    	client.newCall(request).enqueue(new Callback() {
+    		
+			@Override
+			public void onResponse(Response response) throws IOException {
+				 PListXMLHandler handler = new PListXMLHandler();
+	                PListXMLParser parser = new PListXMLParser();
+	                parser.setHandler(handler);
+	                parser.parse(response.body().string());
+	                PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
+	                if (list != null){
+	                    Dict dict = (Dict) list.getRootElement();
+	                    String delay = dict.getString(PLIST_DELAY).getValue().toString();
+	                    String link = dict.getString(PLIST_LINK).getValue().toString();
+	                    if (adImage != null) {
+	                    	runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+			                        advertisingImage.setImageBitmap(adImage);
+			                        if (isFirstImage) {
+			                            applyRotation(0, 90);
+			                            isFirstImage = !isFirstImage;
+			                        } else {
+			                            applyRotation(0, -90);
+			                            isFirstImage = !isFirstImage;
+			                        }
+									
+								}
+							});
+	                    }
+	                    setOnAdvertisingImageClickListener(link);
+	                    showMagazineAfterDelay(Integer.valueOf(delay));
+	                }
+			}
+			
+			@Override
+			public void onFailure(Request request, Throwable throwable) {
+				showMagazineAfterDelay(DEFAULT_ADV_DELAY);
+			}
+		});
     }
 
     @Override
@@ -184,7 +195,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		}
 	}
 
-	protected void onStartMagazine(int delay) {
+	protected void showMagazineAfterDelay(int delay) {
 		mStartupAdsTimer = new Timer();
 		mStartupAdsTimer.schedule(new TimerTask() {
 			@Override
@@ -231,7 +242,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	}
 
 	private String getAdvertisingImageURL() {
-
 		String advertisingUrl = new StringBuilder(getString(R.string.get_advertising_image_url))
 							.append(getString(R.string.get_advertising_image_end))
 							.toString()
@@ -239,18 +249,20 @@ public class StartupActivity extends AbstractLockRotationActivity {
 							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(self())));
 
 		if (BuildConfig.DEBUG) {
-			Log.d(TAG, "Advertising url: "+ advertisingUrl);
-			Log.d(TAG, "Client name: "+ Uri.encode(LibrelioApplication.getClientName(self())));
+			Log.d(TAG, "Advertising imageurl: "+ advertisingUrl);
 		}
 		return advertisingUrl;
 	}
 
 	private String getAdvertisingLinkURL() {
-
-		return new StringBuilder(getString(R.string.get_advertising_link_url))
+		String advertisingLinkUrl = new StringBuilder(getString(R.string.get_advertising_link_url))
 							.toString()
 							.replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(self())))
 							.replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(self())));
+		if (BuildConfig.DEBUG) {
+			Log.d(TAG, "Advertising link url: "+ advertisingLinkUrl);
+		}
+		return advertisingLinkUrl;
 	}
 
 	private StartupActivity self(){
