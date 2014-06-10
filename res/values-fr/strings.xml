@@ -72,7 +72,7 @@
     <string name="username">Code client</string>
     <string name="password">Mot de passe</string>
     
-    <string name="loading">Chargement...</string>
+    <string name="loading">Chargement…</string>
     <string name="no_space_on_device">Pas assez d\'espace sur votre stockage interne</string>
     <string name="browser">Navigateur</string>
     <string name="read_sample">Lire extrait</string>
@@ -82,6 +82,11 @@
     <string name="unauthorized_issue">Votre abonnement ne vous autorise pas à télécharger ce numéro</string>
     <string name="unauthorized_device">Ce numéro a été téléchargé sur un nombre trop important d\'appareils. Merci de contacter license@librelio.com pour plus d\'infos</string>
      <string name="asset_downloading">Téléchargement\nen cours…</string>
+     
+     <string name="new_issue">Nouveau numéro</string>
+    <string name="available">disponible</string>
+    <string name="queued">En attente</string>
+     
     
     
 </resources>
