@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="connecting"> Connexion...</string>
+    <string name="connecting"> Connexion …</string>
     <string name="download_failed_please_check_your_connection"> Le téléchargement a échoué, veuillez vérifier votre connection internet</string>
     <string name="please_check_your_connection"> Veuillez vérifier votre connection internet</string>
     <string name="download_in_progress"> Téléchargement en cours</string>
@@ -14,7 +14,7 @@
     <string name="downloads"> Téléchargements</string>
     <string name="downloaded"> Téléchargé</string>
     <string name="free_Download"> Téléchargement gratuit</string>
-    <string name="download"> Télécharger ...</string>
+    <string name="download"> Télécharger …</string>
     <string name="free_sample"> Extrait gratuit</string>
     <string name="read">Lire</string>
     <string name="magazines"> Magazines</string>
@@ -40,7 +40,7 @@
     <string name="sample"> Extrait</string>
     <string name="open_failed">Impossible d\'ouvrir ce magazine</string>
     <string name="text_not_found">Non trouvé</string>
-    <string name="searching_">Recherche en cours ...</string>
+    <string name="searching_">Recherche en cours …</string>
     <string name="exit">Sortir</string>
     <string name="reload">Recharger</string>
     <string name="subscribe">Abonnement</string>
@@ -72,7 +72,7 @@
     <string name="username">Code client</string>
     <string name="password">Mot de passe</string>
     
-    <string name="loading">Chargement…</string>
+    <string name="loading">Chargement …</string>
     <string name="no_space_on_device">Pas assez d\'espace sur votre stockage interne</string>
     <string name="browser">Navigateur</string>
     <string name="read_sample">Lire extrait</string>
@@ -82,7 +82,8 @@
     <string name="unauthorized_issue">Votre abonnement ne vous autorise pas à télécharger ce numéro</string>
     <string name="unauthorized_device">Ce numéro a été téléchargé sur un nombre trop important d\'appareils. Merci de contacter license@librelio.com pour plus d\'infos</string>
      <string name="asset_downloading">Téléchargement\nen cours…</string>
-     
+   <string name="no_downloaded_magazines">Aucun magazine téléchargé.</string>
+      
      <string name="new_issue">Nouveau numéro</string>
     <string name="available">disponible</string>
     <string name="queued">En attente</string>
