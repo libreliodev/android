@@ -120,12 +120,12 @@ public class StartupActivity extends AbstractLockRotationActivity {
 				} else {
 					showMagazineAfterDelay(DEFAULT_ADV_DELAY);
 				}
+				response.body().close();
 			}
 
 			@Override
 			public void onFailure(Request request, Throwable throwable) {
 				showMagazineAfterDelay(DEFAULT_ADV_DELAY);
-
 			}
 		});
 	}
@@ -170,6 +170,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 				} else {
 					showMagazineAfterDelay(DEFAULT_ADV_DELAY);	
 				}
+				response.body().close();
 			}
 			
 			@Override
