@@ -334,21 +334,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
                     Log.e(TAG, "Test directory in assets is unavailable", e);
                 }
             }
-
-            if (!getPreferences().getBoolean(STATIC_MAGAZINES_INIT_COMPLETE, false)) {
-                String[] assetsList = null;
-                try {
-                    assetsList = getResources().getAssets().list("");
-                    for (String file : assetsList) {
-                        if (file.contains(".plist") || file.contains(".png")) {
-                            copyFromAssets(file, StorageUtils.getStoragePath(StartupActivity.this) + file);
-                        }
-                    }
-                    getPreferences().edit().putBoolean(STATIC_MAGAZINES_INIT_COMPLETE, true).commit();
-                } catch (IOException e) {
-                    Log.e(TAG, "copy fake-magazines failed", e);
-                }
-            }
             return null;
         }
     }

@@ -87,7 +87,7 @@ public class DownloadMagazineActivity extends BaseActivity {
 
     public void onEventMainThread(MagazineDownloadedEvent event) {
         if (event.getMagazine().getFileName().equals(magazine.getFileName())) {
-            LibrelioApplication.startPDFActivity(this, magazine.getItemPath(), magazine.getTitle(), true);
+            LibrelioApplication.startPDFActivity(this, magazine.getFilename(), magazine.getTitle(), true);
             finish();
         }
     }

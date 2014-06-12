@@ -38,7 +38,7 @@ public class PlistItem extends DictItem {
         }
 
         itemUrl = LibrelioApplication.getAmazonServerUrl() + actualFileName;
-        itemPath = StorageUtils.getStoragePath(context) + actualFileName;
+        itemFilename = actualFileName;
         pngUrl = itemUrl.replace(".plist", ".png");
         pngPath = (StorageUtils.getStoragePath(context) + actualFileName).replace(".plist", ".png");
     }

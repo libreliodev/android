@@ -172,7 +172,7 @@ public class Magazine extends DictItem {
 		return samplePdfUrl;
 	}
 
-	public String getItemPath() {
+	public String getFilename() {
 		return itemPath;
 	}
 

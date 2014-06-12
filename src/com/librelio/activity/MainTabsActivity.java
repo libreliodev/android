@@ -39,6 +39,7 @@ import com.librelio.model.RssFeedItem;
 import com.librelio.model.WebAddressItem;
 import com.librelio.service.AssetDownloadService;
 import com.librelio.service.MagazineDownloadService;
+import com.librelio.utils.AssetsUtils;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -49,14 +50,14 @@ import com.niveales.wind.R;
 import com.sbstrm.appirater.Appirater;
 
 public class MainTabsActivity extends BaseActivity {
-	
+
 	public static final String REQUEST_SUBS = "request_subs";
 
 	private static final int DIALOG_CANNOT_CONNECT_ID = 1;
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 	private static final int DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID = 3;
 
-    /**
+	/**
 	 * The Purchase receivers
 	 */
 	private BroadcastReceiver subscriptionYear;
@@ -65,7 +66,7 @@ public class MainTabsActivity extends BaseActivity {
 	private static final String TAG = "MainTabsActivity";
 	ViewPager pager;
 	private ArrayList<DictItem> tabs = new ArrayList<DictItem>();
-	
+
 	public static Intent getIntent(Context context) {
 		Intent intent = new Intent(context, MainTabsActivity.class);
 		return intent;
@@ -77,11 +78,13 @@ public class MainTabsActivity extends BaseActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_main_tabs);
 
-//		overridePendingTransition(R.anim.flip_right_in, R.anim.flip_left_out);
+		// overridePendingTransition(R.anim.flip_right_in,
+		// R.anim.flip_left_out);
 
 		if (!parseTabsPlist()) {
 			// if no Tabs.plist
-			tabs.add(new PlistItem(getString(R.string.root_view), getString(R.string.magazines), this));
+			tabs.add(new PlistItem(getString(R.string.root_view),
+					getString(R.string.magazines), this));
 			tabs.add(new DownloadsItem(getString(R.string.downloads)));
 		}
 
@@ -89,12 +92,12 @@ public class MainTabsActivity extends BaseActivity {
 
 		pager.setAdapter(new MainTabsAdapter(getSupportFragmentManager(), tabs));
 
-	    getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-	    
-	    ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-	        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-	            pager.setCurrentItem(tab.getPosition());
-	        }
+		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+			public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+				pager.setCurrentItem(tab.getPosition());
+			}
 
 			@Override
 			public void onTabReselected(Tab tab, FragmentTransaction ft) {
@@ -103,18 +106,16 @@ public class MainTabsActivity extends BaseActivity {
 			@Override
 			public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			}
-	    };
+		};
 
-		
 		for (final DictItem item : tabs) {
 			getActionBar().addTab(
-	                getActionBar().newTab()
-	                        .setText(item.getTitle())
-	                        .setTabListener(tabListener));
+					getActionBar().newTab().setText(item.getTitle())
+							.setTabListener(tabListener));
 		}
-		
+
 		pager.setOffscreenPageLimit(4);
-		
+
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
 			public void onPageSelected(int position) {
@@ -123,23 +124,23 @@ public class MainTabsActivity extends BaseActivity {
 			}
 		});
 
-        if (getResources().getBoolean(R.bool.enable_app_rating)) {
-        	Appirater.appLaunched(this);
-        }
-        
+		if (getResources().getBoolean(R.bool.enable_app_rating)) {
+			Appirater.appLaunched(this);
+		}
+
 		IntentFilter subsFilter = new IntentFilter(REQUEST_SUBS);
 
 		registerReceiver(subscriptionYear, subsFilter);
 		registerReceiver(subscriptionMonthly, subsFilter);
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
 		setProgressBarIndeterminateVisibility(false);
 	}
 
-    @Override
+	@Override
 	protected void onDestroy() {
 		if (subscriptionYear != null) {
 			unregisterReceiver(subscriptionYear);
@@ -149,26 +150,26 @@ public class MainTabsActivity extends BaseActivity {
 		}
 		super.onDestroy();
 	}
-    
-    @Override
-    protected void onResume() {
-    	super.onResume();
-    	AssetDownloadService.startAssetDownloadService(this);
-    }
-	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AssetDownloadService.startAssetDownloadService(this);
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
+		case android.R.id.home:
+			finish();
 		case R.id.options_menu_info:
 			WebViewActivity.startWithUrl(this, getString(R.string.info_url));
 			return true;
@@ -176,7 +177,7 @@ public class MainTabsActivity extends BaseActivity {
 			restorePurchases();
 			return true;
 		case R.id.options_menu_send_log:
-//			onSendLog();
+			// onSendLog();
 			return true;
 		case R.id.options_menu_subscribe:
 			Intent subscribeIntent = new Intent(getBaseContext(),
@@ -190,13 +191,14 @@ public class MainTabsActivity extends BaseActivity {
 
 	private void restorePurchases() {
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1001) {
-//			int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+			// int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
 			String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-//			String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+			// String dataSignature =
+			// data.getStringExtra("INAPP_DATA_SIGNATURE");
 
 			if (resultCode == RESULT_OK & purchaseData != null) {
 				try {
@@ -215,8 +217,7 @@ public class MainTabsActivity extends BaseActivity {
 
 		// TODO do this off ui thread
 
-		String path = StorageUtils.getStoragePath(this) + "Tabs.plist";
-		String pList = StorageUtils.getStringFromFile(path);
+		String pList = AssetsUtils.getStringFromFilename(this, "Tabs.plist");
 
 		if (pList == null) {
 			// ERROR
@@ -260,7 +261,8 @@ public class MainTabsActivity extends BaseActivity {
 		public Fragment getItem(int position) {
 			DictItem item = tabs.get(position);
 			if (item instanceof WebAddressItem) {
-				return WebViewFragment.newInstance(((WebAddressItem) item).getWebAddress());
+				return WebViewFragment.newInstance(((WebAddressItem) item)
+						.getWebAddress());
 			} else if (item instanceof RssFeedItem) {
 				return RssFragment.newInstance(item.getItemUrl());
 			} else if (item instanceof DownloadsItem) {
@@ -269,8 +271,7 @@ public class MainTabsActivity extends BaseActivity {
 				// TODO send full plistitem
 				return MagazinesFragment.newInstance(item.getFileName());
 			}
-			
-			
+
 			return WebViewFragment.newInstance("dsfsd");
 		}
 
@@ -280,7 +281,7 @@ public class MainTabsActivity extends BaseActivity {
 		}
 
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -311,8 +312,10 @@ public class MainTabsActivity extends BaseActivity {
 				.setNegativeButton(R.string.learn_more,
 						new DialogInterface.OnClickListener() {
 							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								Intent intent = new Intent(Intent.ACTION_VIEW, helpUri);
+							public void onClick(DialogInterface dialog,
+									int which) {
+								Intent intent = new Intent(Intent.ACTION_VIEW,
+										helpUri);
 								startActivity(intent);
 							}
 						});

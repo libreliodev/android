@@ -11,7 +11,7 @@ public class DictItem {
     protected String fileName;
     protected String title = "";
     protected String itemUrl;
-    protected String itemPath;
+    protected String itemFilename;
     protected String pngUrl;
     protected String pngPath;
 
@@ -48,8 +48,8 @@ public class DictItem {
         return itemUrl;
     }
 
-    public String getItemPath() {
-        return itemPath;
+    public String getFilename() {
+        return itemFilename;
     }
 
     public String getPngUrl() {

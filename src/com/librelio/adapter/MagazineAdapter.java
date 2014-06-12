@@ -143,9 +143,9 @@ public class MagazineAdapter extends BaseAdapter {
                 holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (new File(currentMagazine.getItemPath()).exists()) {
+                        if (new File(currentMagazine.getFilename()).exists()) {
                             LibrelioApplication.startPDFActivity(context,
-                                    currentMagazine.getItemPath(),
+                                    currentMagazine.getFilename(),
                                     currentMagazine.getTitle(), true);
                         } else {
                             Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
@@ -247,7 +247,7 @@ public class MagazineAdapter extends BaseAdapter {
                             @Override
                             public void onClick(View v) {
                                 LibrelioApplication.startPDFActivity(context,
-                                        currentMagazine.getItemPath(),
+                                        currentMagazine.getFilename(),
                                         currentMagazine.getTitle(), true);
                             }
                         });

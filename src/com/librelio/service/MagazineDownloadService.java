@@ -87,7 +87,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 				DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES);
 
 		String fileUrl = magazine.getItemUrl();
-		String filePath = magazine.getItemPath();
+		String filePath = magazine.getFilename();
 		if (magazine.isSample()) {
 			fileUrl = magazine.getSamplePdfUrl();
 			filePath = magazine.getSamplePdfPath();
@@ -210,7 +210,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 			Intent resultIntent = new Intent(this, MuPDFActivity.class);
 			resultIntent.setAction(Intent.ACTION_VIEW);
 			resultIntent.setData(Uri.parse(magazine.isSample() ? magazine
-					.getSamplePdfPath() : magazine.getItemPath()));
+					.getSamplePdfPath() : magazine.getFilename()));
 			resultIntent.putExtra(DataBaseHelper.FIELD_TITLE,
 					magazine.getTitle());
 
@@ -244,7 +244,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 		ArrayList<String> assetsNames = new ArrayList<String>();
 		//
 		String filePath = magazine.isSample() ? magazine.getSamplePdfPath()
-				: magazine.getItemPath();
+				: magazine.getFilename();
 		PDFParser linkGetter = new PDFParser(filePath);
 		SparseArray<LinkInfoExternal[]> linkBuf = linkGetter.getLinkInfo();
 		if (linkBuf == null) {

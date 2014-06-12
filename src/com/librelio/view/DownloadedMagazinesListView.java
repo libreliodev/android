@@ -49,7 +49,7 @@ public class DownloadedMagazinesListView extends ListView {
 					LibrelioApplication.startPDFActivity(context,
 							downloadedMagazine.isSample() ?
 							downloadedMagazine.getSamplePdfPath() :
-							downloadedMagazine.getItemPath(), downloadedMagazine.getTitle(), true);
+							downloadedMagazine.getFilename(), downloadedMagazine.getTitle(), true);
 			}
 		});
 	}

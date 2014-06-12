@@ -1,13 +1,8 @@
 package com.librelio.loader;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
@@ -23,7 +18,7 @@ import com.librelio.model.DictItem;
 import com.librelio.model.Magazine;
 import com.librelio.model.PlistItem;
 import com.librelio.storage.MagazineManager;
-import com.librelio.utils.StorageUtils;
+import com.librelio.utils.AssetsUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
@@ -72,7 +67,7 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
         }
 
         //Convert plist to String for parsing
-        String pList = StorageUtils.getStringFromFile(plistItem.getItemPath());
+        String pList = AssetsUtils.getStringFromFilename(getContext(), plistItem.getFilename());
 
         if (pList == null) {
             return null;

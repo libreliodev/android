@@ -1,24 +1,27 @@
 package com.librelio.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.HttpResponseException;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.widget.Toast;
+
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.UpdateProgressBarEvent;
 import com.librelio.model.PlistItem;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.niveales.wind.R;
-import de.greenrobot.event.EventBus;
-import org.apache.commons.io.FileUtils;
-import org.apache.http.client.HttpResponseException;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import de.greenrobot.event.EventBus;
 
 public class PlistDownloader {
 
@@ -62,7 +65,7 @@ public class PlistDownloader {
                     return;
                 }
                 try {
-                    FileUtils.writeStringToFile(new File(plistItem.getItemPath()), s);
+                    FileUtils.writeStringToFile(new File(StorageUtils.getStoragePath(context) + plistItem.getFilename()), s);
                     saveUpdateDate(context, plistName);
                 } catch (IOException e1) {
                     e1.printStackTrace();
