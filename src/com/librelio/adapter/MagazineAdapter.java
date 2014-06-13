@@ -32,6 +32,7 @@ import com.librelio.service.MagazineDownloadService;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
+import com.squareup.picasso.Picasso;
 
 import de.greenrobot.event.EventBus;
 
@@ -100,32 +101,8 @@ public class MagazineAdapter extends BaseAdapter {
             holder.position = position;
             holder.thumbnail.setImageDrawable(null);
         }
-
-        // Using an AsyncTask to load the slow images in a background thread
-        new AsyncTask<MagazineItemHolder, Void, Bitmap>() {
-            private MagazineItemHolder v;
-
-            @Override
-            protected Bitmap doInBackground(MagazineItemHolder... params) {
-                v = params[0];
-                try {
-                    return SystemHelper.decodeSampledBitmapFromFile(magazines.get(position).getPngPath(),
-                            (int) context.getResources().getDimension(R.dimen.preview_image_height),
-                            (int) context.getResources().getDimension(R.dimen.preview_image_width));
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap result) {
-                super.onPostExecute(result);
-                if (v.position == position && result != null) {
-                    v.thumbnail.setImageBitmap(result);
-                }
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
+        
+        Picasso.with(context).load(magazines.get(position).getPngUrl()).fit().centerInside().into(holder.thumbnail);
 
         if (magazines.get(position) instanceof Magazine) {
             final Magazine currentMagazine = (Magazine) magazines.get(position);

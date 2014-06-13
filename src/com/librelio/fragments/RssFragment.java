@@ -28,11 +28,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.librelio.activity.WebViewActivity;
-import com.librelio.model.RssFeedItem;
 import com.niveales.wind.R;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.squareup.picasso.Picasso;
 
 public class RssFragment extends ListFragment {
 
@@ -53,12 +50,6 @@ public class RssFragment extends ListFragment {
 		super.onCreate(savedInstanceState);
 
 		adapter = new RssAdapter();
-		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-				.cacheInMemory(true).cacheOnDisc(true).build();
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				getActivity()).defaultDisplayImageOptions(defaultOptions)
-				.build();
-		ImageLoader.getInstance().init(config);
 
 		setListAdapter(adapter);
 
@@ -149,9 +140,9 @@ public class RssFragment extends ListFragment {
 			String s = "<img src=\"";
 			int ix = item.getDescription().indexOf(s) + s.length();
 			String imgSrc = item.getDescription().substring(ix,
-					item.getDescription().indexOf("\"", ix + 1));
+					item.getDescription().indexOf("\"", ix + 1)).replace(" ", "%20");
 			holder.image.setImageDrawable(null);
-			ImageLoader.getInstance().displayImage(imgSrc, holder.image);
+			Picasso.with(getActivity()).load(imgSrc).fit().centerCrop().into(holder.image);
 			return convertView;
 		}
 

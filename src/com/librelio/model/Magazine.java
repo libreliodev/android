@@ -33,7 +33,6 @@ public class Magazine extends DictItem {
 	private String downloadDate;
 	private boolean isSample;
     private int downloadStatus = DownloadStatus.NOT_DOWNLOADED;
-//    private int downloadProgress;
 
     public Magazine(String fileName, String title, String subtitle, String downloadDate, Context context) {
 		this.fileName = fileName;
@@ -103,14 +102,12 @@ public class Magazine extends DictItem {
 		itemPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
 			pngUrl = itemUrl.replace("_.pdf", ".png");
-			pngPath = itemPath.replace("_.pdf", ".png");
 			samplePdfUrl = itemUrl.replace("_.", ".");
 			samplePdfPath = itemPath.replace("_.", ".");
 			File sample = new File(getMagazineDir()+COMPLETE_SAMPLE_FILE);
 			isSampleDownloaded = sample.exists();
 		} else {
 			pngUrl = itemUrl.replace(".pdf", ".png");
-			pngPath = itemPath.replace(".pdf", ".png");
 		}
 		File complete = new File(getMagazineDir()+COMPLETE_FILE);
 		isDownloaded = complete.exists();
@@ -174,10 +171,6 @@ public class Magazine extends DictItem {
 
 	public String getFilename() {
 		return itemPath;
-	}
-
-	public String getPngPath() {
-		return pngPath;
 	}
 
 	public void setSample(boolean isSample) {

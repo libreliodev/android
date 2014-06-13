@@ -74,7 +74,7 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
         }
 
         try {
-            //Parsing
+            //Parse plist
             PListXMLHandler handler = new PListXMLHandler();
             PListXMLParser parser = new PListXMLParser();
             parser.setHandler(handler);
@@ -92,34 +92,6 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
                 MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
             }
             EventBus.getDefault().post(new UpdateMagazinesEvent(plistName, magazines));
-
-            for (final DictItem magazine : magazines) {
-            	// Download thumbnail png
-                File png = new File(magazine.getPngPath());
-                if (!png.exists()) {
-                    Log.d(TAG, "Image download: " + magazine.getPngPath());
-                	Request request = new Request.Builder().url(magazine.getPngUrl()).build();
-                	
-                	LibrelioApplication.getOkHttpClient().newCall(request).enqueue(new Callback() {
-						
-						@Override
-						public void onResponse(Response response) throws IOException {
-							if (response.code() == 200) {
-							IOUtils.copy(response.body().byteStream(), new FileOutputStream(magazine.getPngPath()));
-		                    EventBus.getDefault().post(new InvalidateGridViewEvent());
-							}
-							
-						}
-						
-						@Override
-						public void onFailure(Request arg0, Throwable arg1) {
-							Log.d(TAG, "magazine thumbnail download failed " + magazine.getPngUrl());
-						}
-					});
-                } else {
-    //                Log.d(TAG, magazine.getPngPath() + " already exist");
-                }
-            }
         } catch (Exception e) {
             Log.d(TAG, "plist = " + pList);
             e.printStackTrace();
