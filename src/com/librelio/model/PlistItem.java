@@ -37,9 +37,9 @@ public class PlistItem extends DictItem {
             updateFrequency = Integer.parseInt(updateFrequencyMatcher.group(1));
         }
 
-        itemUrl = LibrelioApplication.getAmazonServerUrl() + actualFileName;
+        pdfUrl = LibrelioApplication.getAmazonServerUrl() + actualFileName;
         itemFilename = actualFileName;
-        pngUrl = itemUrl.replace(".plist", ".png");
+        pngUrl = pdfUrl.replace(".plist", ".png");
         pngPath = (StorageUtils.getStoragePath(context) + actualFileName).replace(".plist", ".png");
     }
 

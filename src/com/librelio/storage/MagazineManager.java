@@ -247,11 +247,11 @@ public class MagazineManager extends BaseManager {
                 new String[] {String.valueOf(magazineId)});
     }
     
-    public synchronized void addAsset(Magazine magazine, String assetsFile, String assetUrl) {
+    public synchronized void addAsset(Magazine magazine, String assetFile, String assetUrl) {
     	SQLiteDatabase db = DataBaseHelper.getInstance(getContext()).getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(DataBaseHelper.FIELD_FILE_NAME, magazine.getFileName());
-        cv.put(DataBaseHelper.FIELD_ASSET_FILE_NAME, magazine.getAssetsDir() + assetsFile);
+        cv.put(DataBaseHelper.FIELD_ASSET_FILE_NAME, magazine.getMagazineDir() + assetFile);
         cv.put(DataBaseHelper.FIELD_ASSET_URL, assetUrl);
         cv.put(DataBaseHelper.FIELD_RETRY_COUNT, 0);
         cv.put(DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS, false);

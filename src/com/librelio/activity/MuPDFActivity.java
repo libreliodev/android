@@ -166,16 +166,6 @@ public class MuPDFActivity extends BaseActivity{
 			Intent intent = getIntent();
 			if (Intent.ACTION_VIEW.equals(intent.getAction())) {
 				Uri uri = intent.getData();
-				if (uri.toString().startsWith("content://media/external/file")) {
-					// Handle view requests from the Transformer Prime's file manager
-					// Hopefully other file managers will use this same scheme, if not
-					// using explicit paths.
-					Cursor cursor = getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
-					if (cursor.moveToFirst()) {
-						uri = Uri.parse(cursor.getString(0));
-					}
-				}
-
 				core = openFile(Uri.decode(uri.getEncodedPath()));
 				SearchTaskResult.recycle();
 			}

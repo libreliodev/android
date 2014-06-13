@@ -10,7 +10,7 @@ public class DictItem {
     private static final String SUBTITLE_KEY = "Subtitle";
     protected String fileName;
     protected String title = "";
-    protected String itemUrl;
+    protected String pdfUrl;
     protected String itemFilename;
     protected String pngUrl;
     protected String pngPath;
@@ -45,7 +45,7 @@ public class DictItem {
     }
 
     public String getItemUrl() {
-        return itemUrl;
+        return pdfUrl;
     }
 
     public String getFilename() {

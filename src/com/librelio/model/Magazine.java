@@ -23,13 +23,12 @@ public class Magazine extends DictItem {
 	private long id;
 	private String title;
 	private String subtitle;
-	private String itemPath;
+	private String pdfPath;
 	private String samplePdfPath;
 	private String samplePdfUrl;
 	private boolean isPaid;
 	private boolean isDownloaded;
 	private boolean isSampleDownloaded = false;
-	private String assetsDir;
 	private String downloadDate;
 	private boolean isSample;
     private int downloadStatus = DownloadStatus.NOT_DOWNLOADED;
@@ -41,7 +40,7 @@ public class Magazine extends DictItem {
 		this.downloadDate = downloadDate;
 		this.context = context;
 
-		valuesInit(fileName);
+		initValues(fileName);
 	}
 
 	public Magazine(Cursor cursor, Context context) {
@@ -61,11 +60,10 @@ public class Magazine extends DictItem {
 		this.downloadStatus = cursor.getInt(downloadStatus);
 		if (isSampleColumnId > -1){
 			this.isSample = cursor.getInt(isSampleColumnId) == 0 ? false : true;
-//            this.downloadManagerId = cursor.getLong(downloadStatus);
 		}
 		this.context = context;
 
-		valuesInit(fileName);
+		initValues(fileName);
 	}
 
 	public String getMagazineDir(){
@@ -73,7 +71,7 @@ public class Magazine extends DictItem {
 		return StorageUtils.getStoragePath(context) + fileName.substring(0,finishNameIndex)+"/";
 	}
 	
-	public static String getAssetsBaseURL(String fileName){
+	public static String getServerBaseURL(String fileName){
 		int finishNameIndex = fileName.lastIndexOf("/");
 		return LibrelioApplication.getAmazonServerUrl() + fileName.substring(0,finishNameIndex) + "/";
 	}
@@ -94,41 +92,39 @@ public class Magazine extends DictItem {
         EventBus.getDefault().post(new LoadPlistEvent());
 	}
 
-	private void valuesInit(String fileName) {
+	private void initValues(String fileName) {
 		isPaid = fileName.contains("_.");
 		int startNameIndex = fileName.lastIndexOf("/")+1;
-//		String png = StorageUtils.getStoragePath(context)+fileName.substring(startNameIndex, fileName.length());
-	    itemUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
-		itemPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
+	    pdfUrl = LibrelioApplication.getAmazonServerUrl() + fileName;
+		pdfPath = getMagazineDir()+fileName.substring(startNameIndex, fileName.length());
 		if(isPaid){
-			pngUrl = itemUrl.replace("_.pdf", ".png");
-			samplePdfUrl = itemUrl.replace("_.", ".");
-			samplePdfPath = itemPath.replace("_.", ".");
-			File sample = new File(getMagazineDir()+COMPLETE_SAMPLE_FILE);
+			pngUrl = pdfUrl.replace("_.pdf", ".png");
+			samplePdfUrl = pdfUrl.replace("_.", ".");
+			samplePdfPath = pdfPath.replace("_.", ".");
+			File sample = new File(samplePdfPath);
 			isSampleDownloaded = sample.exists();
 		} else {
-			pngUrl = itemUrl.replace(".pdf", ".png");
+			pngUrl = pdfUrl.replace(".pdf", ".png");
 		}
-		File complete = new File(getMagazineDir()+COMPLETE_FILE);
+		File complete = new File(pdfPath);
 		isDownloaded = complete.exists();
 		
-		assetsDir = getMagazineDir();
         makeMagazineDir();
 	}
 
-	public void makeCompleteFile(boolean isSample){
-		String completeModificator = COMPLETE_FILE;
-		if(isSample){
-			completeModificator = COMPLETE_SAMPLE_FILE;
-		}
-		File file = new File(getMagazineDir()+completeModificator);
-		boolean create = false;
-		try {
-			create = file.createNewFile();
-		} catch (IOException e) {
-			Log.d(TAG,"Problem with create "+completeModificator+", createNewFile() return "+create,e);
-		}
-	}
+//	public void makeCompleteFile(boolean isSample){
+//		String completeModificator = COMPLETE_FILE;
+//		if (isSample) {
+//			completeModificator = COMPLETE_SAMPLE_FILE;
+//		}
+//		File file = new File(getMagazineDir() + completeModificator);
+//		boolean create = false;
+//		try {
+//			create = file.createNewFile();
+//		} catch (IOException e) {
+//			Log.d(TAG,"Problem creating "+completeModificator+", createNewFile() return "+create,e);
+//		}
+//	}
 	
 	public long getId(){
 		return this.id;
@@ -137,10 +133,6 @@ public class Magazine extends DictItem {
     public void setId(long id){
         this.id = id;
     }
-	
-	public String getAssetsDir(){
-		return this.assetsDir;
-	}
 	
 	public boolean isPaid() {
 		return this.isPaid;
@@ -170,7 +162,7 @@ public class Magazine extends DictItem {
 	}
 
 	public String getFilename() {
-		return itemPath;
+		return pdfPath;
 	}
 
 	public void setSample(boolean isSample) {
@@ -178,7 +170,7 @@ public class Magazine extends DictItem {
 	}
 
 	public String getItemUrl() {
-		return itemUrl;
+		return pdfUrl;
 	}
 
 	public String getPngUrl() {
@@ -212,12 +204,4 @@ public class Magazine extends DictItem {
     public void setDownloadStatus(int downloadStatus) {
         this.downloadStatus = downloadStatus;
     }
-
-//    public void setDownloadProgress(int downloadProgress) {
-//        this.downloadProgress = downloadProgress;
-//    }
-//
-//    public int getDownloadProgress() {
-//        return downloadProgress;
-//    }
 }

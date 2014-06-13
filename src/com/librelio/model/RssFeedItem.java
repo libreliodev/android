@@ -28,7 +28,7 @@ public class RssFeedItem extends DictItem {
         Matcher actualFileNameMatcher = actualFileNamePattern.matcher(fullFileName);
         if (actualFileNameMatcher.find()) {
         	try {
-				this.itemUrl = URLDecoder.decode(actualFileNameMatcher.group(1), "utf-8");
+				this.pdfUrl = URLDecoder.decode(actualFileNameMatcher.group(1), "utf-8");
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

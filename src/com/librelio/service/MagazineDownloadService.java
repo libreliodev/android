@@ -54,6 +54,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 	
 	private final static int BUFFER_SIZE = 1024 * 8;
 
+	private static final String TEMP_FILE_SUFFIX = ".temp";
+
 	public MagazineDownloadService() {
 		super("magazinedownload");
 	}
@@ -89,9 +91,11 @@ public class MagazineDownloadService extends WakefulIntentService {
 		String fileUrl = magazine.getItemUrl();
 		String filePath = magazine.getFilename();
 		if (magazine.isSample()) {
+			// If sample
 			fileUrl = magazine.getSamplePdfUrl();
 			filePath = magazine.getSamplePdfPath();
 		} else if (intent.getBooleanExtra("is_temp", false)) {
+			// If temp url
 			fileUrl = intent.getStringExtra("temp_url_key");
 		}
 		Log.d(TAG, "isSample: " + magazine.isSample() + "\nfileUrl: " + fileUrl
@@ -100,19 +104,21 @@ public class MagazineDownloadService extends WakefulIntentService {
 		EasyTracker.getTracker().sendView(
 				"Downloading/" + FilenameUtils.getBaseName(filePath));
 		
+		String tempFilePath = filePath + TEMP_FILE_SUFFIX;
+		
 		Request.Builder requestBuilder = new Request.Builder().url(fileUrl);
 		
-		File file = new File(filePath);
+		File currentFile = new File(tempFilePath);
 		long previousFileSize = 0;
 		
-		if (file.exists()) {
-			previousFileSize = file.length();
-			requestBuilder.addHeader("Range", "bytes=" + file.length()
+		if (currentFile.exists()) {
+			previousFileSize = currentFile.length();
+			requestBuilder.addHeader("Range", "bytes=" + currentFile.length()
 					+ "-");
 			
 			 if (BuildConfig.DEBUG) {
 			 Log.v(TAG, "File is not complete, resuming download.");
-			 Log.v(TAG, "Current file length:" + file.length() + " totalSize:");
+			 Log.v(TAG, "Current file length:" + currentFile.length() + " totalSize:");
 //			 totalSize);
 			 }
 		}
@@ -124,7 +130,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 			if (response.code() == 200) {
 			}
 
-			RandomAccessFile out = new RandomAccessFile(filePath, "rw");
+			RandomAccessFile out = new RandomAccessFile(tempFilePath, "rw");
 
 			byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -167,6 +173,9 @@ public class MagazineDownloadService extends WakefulIntentService {
 			}
 
 			Log.d(TAG, "Downloaded " + magazine.getFileName());
+			
+			File tempFile = new File(filePath + TEMP_FILE_SUFFIX);
+			tempFile.renameTo(new File(filePath));
 
 			Date date = Calendar.getInstance().getTime();
 			// String downloadDate = new
@@ -182,7 +191,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 			manager.setDownloadStatus(magazine.getId(),
 					DownloadStatus.DOWNLOADED);
 
-			magazine.makeCompleteFile(magazine.isSample());
+//			magazine.makeCompleteFile(magazine.isSample());
 			
 			EventBus.getDefault().post(new LoadPlistEvent());
 			EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
@@ -268,14 +277,10 @@ public class MagazineDownloadService extends WakefulIntentService {
 						}
 						String assetsFile = link.substring(startIdx, finIdx);
 						assetsNames.add(assetsFile);
-						Log.d(TAG,
-								"   link: "
-										+ Magazine.getAssetsBaseURL(magazine
-												.getFileName()) + assetsFile);
-						Log.d(TAG, "   file: " + assetsFile);
 
-						String uriString = Magazine.getAssetsBaseURL(magazine
+						String uriString = Magazine.getServerBaseURL(magazine
 								.getFileName()) + assetsFile;
+						Log.d(TAG, "   file: " + assetsFile);
 						Log.d(TAG, "  link to download: " + uriString);
 
 						manager.addAsset(magazine, assetsFile, uriString);

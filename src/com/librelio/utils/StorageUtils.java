@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.io.IOUtils;
+
 public class StorageUtils {
 
     private static final String TAG = "StorageUtils";
@@ -128,5 +130,24 @@ public class StorageUtils {
             return 0;
         }
     }
+
+	public static String getStringFromFilename(Context context, String filename) {
+		String path = getStoragePath(context) + filename;
+		// If file exists in local storage then use that
+		if (new File(path).exists()) {
+			return getStringFromFile(path);
+		} else {
+			// Otherwise use the version from the assets folder
+			try {
+				InputStream is = context.getResources().getAssets().open(filename);
+				String string = IOUtils.toString(is);
+				IOUtils.closeQuietly(is);
+				return string;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
 
 }

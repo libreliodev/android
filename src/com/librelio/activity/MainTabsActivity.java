@@ -39,7 +39,6 @@ import com.librelio.model.RssFeedItem;
 import com.librelio.model.WebAddressItem;
 import com.librelio.service.AssetDownloadService;
 import com.librelio.service.MagazineDownloadService;
-import com.librelio.utils.AssetsUtils;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -217,7 +216,7 @@ public class MainTabsActivity extends BaseActivity {
 
 		// TODO do this off ui thread
 
-		String pList = AssetsUtils.getStringFromFilename(this, "Tabs.plist");
+		String pList = StorageUtils.getStringFromFilename(this, "Tabs.plist");
 
 		if (pList == null) {
 			// ERROR
