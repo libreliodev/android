@@ -27,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 
+import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.fragments.DownloadedMagazinesFragment;
 import com.librelio.fragments.MagazinesFragment;
@@ -38,7 +39,6 @@ import com.librelio.model.PlistItem;
 import com.librelio.model.RssFeedItem;
 import com.librelio.model.WebAddressItem;
 import com.librelio.service.AssetDownloadService;
-import com.librelio.service.MagazineDownloadService;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -123,7 +123,7 @@ public class MainTabsActivity extends BaseActivity {
 			}
 		});
 
-		if (getResources().getBoolean(R.bool.enable_app_rating)) {
+		if (((LibrelioApplication)getApplication()).showAppirater()) {
 			Appirater.appLaunched(this);
 		}
 

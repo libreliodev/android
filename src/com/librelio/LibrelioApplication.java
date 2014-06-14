@@ -18,10 +18,16 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.utils.GooglePlayServicesUtils;
+import com.librelio.utils.StorageUtils;
 import com.librelio.utils.SystemHelper;
+import com.longevitysoft.android.xml.plist.PListXMLHandler;
+import com.longevitysoft.android.xml.plist.PListXMLParser;
+import com.longevitysoft.android.xml.plist.domain.Dict;
+import com.longevitysoft.android.xml.plist.domain.PList;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import com.squareup.okhttp.OkHttpClient;
@@ -44,10 +50,14 @@ public class LibrelioApplication extends Application {
 	
 	private static String baseUrl;
 	private static OkHttpClient client;
+	private Dict appSettingsDict;
 
 	@Override
 	public void onCreate() {
         super.onCreate();
+
+        parseApplicationPlist();
+        
         ACRA.init(this);
 
         baseUrl = "http://librelio-europe.s3.amazonaws.com/" + getClientName(this) + PATH_SEPARATOR + getMagazineName(this) + PATH_SEPARATOR;
@@ -58,7 +68,46 @@ public class LibrelioApplication extends Application {
 
         registerForGCM();
     }
+	
+	private boolean parseApplicationPlist() {
 
+		String pList = StorageUtils.getStringFromFilename(this, "Application_.plist");
+
+		if (pList == null) {
+			// ERROR
+			return false;
+		}
+
+		try {
+			PListXMLHandler handler = new PListXMLHandler();
+			PListXMLParser parser = new PListXMLParser();
+			parser.setHandler(handler);
+			parser.parse(pList);
+			PList list = ((PListXMLHandler) parser.getHandler()).getPlist();
+			appSettingsDict = (Dict) list.getRootElement();
+		} catch (Exception e) {
+			Log.d(getClass().getSimpleName(), "plist = " + pList);
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	public boolean showAppirater() {
+		return !appSettingsDict.getString("AppId").getValue().isEmpty();
+	}
+	
+	public String getGcmProjectNumber() {
+		return appSettingsDict.getString("GcmProjectNumber").getValue();
+	}
+	
+	public String getYearlySubsCode() {
+		return appSettingsDict.getString("YearlySubsCode").getValue();
+	}
+
+	public String getMonthlySubsCode() {
+		return appSettingsDict.getString("MonthlySubsCode").getValue();
+	}
+	
 	public static OkHttpClient getOkHttpClient() {
 		if (client == null) {
 			client = new OkHttpClient();
@@ -89,7 +138,7 @@ public class LibrelioApplication extends Application {
 
             // if regid not stored in SharedPreferences then register for GCM
             if (regid.isEmpty()) {
-                GooglePlayServicesUtils.registerInBackground(getApplicationContext());
+                GooglePlayServicesUtils.registerInBackground(this);
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
@@ -151,14 +200,6 @@ public class LibrelioApplication extends Application {
 	public static String getUrlString(Context context, String fileName){
 		return LibrelioApplication.getClientName(context) + PATH_SEPARATOR 
 		+ LibrelioApplication.getMagazineName(context) + PATH_SEPARATOR + fileName;
-	}
-
-	public static String getYearlySubsCode(Context context){
-		return context.getResources().getString(R.string.yearly_subs_code);
-	}
-
-	public static String getMonthlySubsCode(Context context){
-		return context.getResources().getString(R.string.monthly_subs_code);
 	}
 	
 	public static boolean isEnableCodeSubs(Context context){

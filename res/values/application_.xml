@@ -2,23 +2,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
 
     <string name="app_name">Wind</string>
+    <string name="google_analytics">UA-1732003-23</string>
+    
     <string name="root_view">Magazines.plist?waupdate=30</string>
-    <string name="yearly_subs_code">yearlysubscription</string>
-    <string name="monthly_subs_code">monthlysubscriptiontest</string>
     <bool name="enable_test_magazine">false</bool>
     <bool name="enable_code_subs">true</bool>
     <bool name="enable_username_password_login">true</bool>
     <string name="client_name" >niveales</string>
     <string name="magazine_name">wind</string>
     <string name="service_name">biwing</string>
-    <string name="google_analytics">UA-1732003-23</string>
     <bool name="enable_send_log_in_menu">false</bool>
     <bool name="enable_downloads_in_menu">true</bool>
     <bool name="enable_refresh_in_menu">true</bool>
     <bool name="enable_subscribe_in_menu">false</bool>
     <bool name="enable_info_in_menu">false</bool>
     <string name="info_url">http://www.example.com</string>
-	<bool name="enable_app_rating">true</bool>
-	<string name="gcm_project_number">1012641315687</string>
     
 </resources>
