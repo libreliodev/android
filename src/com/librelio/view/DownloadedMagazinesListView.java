@@ -1,9 +1,10 @@
 package com.librelio.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,14 +16,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.librelio.LibrelioApplication;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
-import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.squareup.picasso.Picasso;
 
 public class DownloadedMagazinesListView extends ListView {
 	
@@ -177,29 +176,7 @@ class MagazinesAdapter extends ArrayAdapter<Magazine> {
 			});
 			holder.position = position;
 
-			// Using an AsyncTask to load the slow images in a background thread
-			new AsyncTask<ViewHolder, Void, Bitmap>() {
-				private ViewHolder v;
-
-				@Override
-				protected Bitmap doInBackground(ViewHolder... params) {
-					v = params[0];
-					return SystemHelper.decodeSampledBitmapFromFile(
-							downloadedMagazine.getPngPath(),
-							(int) context.getResources().getDimension(
-									R.dimen.preview_image_height),
-							(int) context.getResources().getDimension(
-									R.dimen.preview_image_width));
-				}
-
-				@Override
-				protected void onPostExecute(Bitmap result) {
-					super.onPostExecute(result);
-					if (v.position == position) {
-						v.image.setImageBitmap(result);
-					}
-				}
-			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, holder);
+	        Picasso.with(context).load(downloadedMagazine.getPngUrl()).fit().centerInside().into(holder.image);
 		} else {
 			LayoutInflater inflater = LayoutInflater.from(context);
 			convertView = inflater.inflate(

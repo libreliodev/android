@@ -17,6 +17,7 @@ import com.librelio.model.DownloadStatus;
 import com.librelio.model.Magazine;
 import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
+import com.squareup.picasso.Picasso;
 
 public class DownloadMagazineActivity extends BaseActivity {
 
@@ -69,7 +70,7 @@ public class DownloadMagazineActivity extends BaseActivity {
         ImageView preview = (ImageView) findViewById(R.id.download_preview_image);
         progress = (ProgressBar)findViewById(R.id.download_progress);
         progressText = (TextView)findViewById(R.id.download_progress_text);
-        preview.setImageBitmap(BitmapFactory.decodeFile(magazine.getPngPath()));
+        Picasso.with(this).load(magazine.getPngUrl()).fit().centerInside().into(preview);
 
         ((TextView) findViewById(R.id.item_title)).setText(title);
         ((TextView) findViewById(R.id.item_subtitle)).setText(subtitle);
