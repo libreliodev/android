@@ -75,7 +75,7 @@ public class MagazinesFragment extends Fragment implements LoaderManager.LoaderC
 
 		magazines = new ArrayList<DictItem>();
 
-		adapter = new MagazineAdapter(magazines, getActivity(), getBaseActivity().hasTestMagazine());
+		adapter = new MagazineAdapter(magazines, getActivity());
 		grid.setAdapter(adapter);
 		
 		plistName = getArguments().getString(PLIST_NAME);
@@ -151,9 +151,7 @@ public class MagazinesFragment extends Fragment implements LoaderManager.LoaderC
     
     @Override
     public Loader<ArrayList<DictItem>> onCreateLoader(int id, Bundle args) {
-//        return new PlistParserLoader(getApplicationContext(), args.getString(PLIST_NAME));
-
-        return new PlistParserLoader(getActivity().getApplicationContext(), plistName, getBaseActivity().hasTestMagazine());
+        return new PlistParserLoader(getActivity().getApplicationContext(), plistName);
     }
 
     @Override

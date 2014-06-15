@@ -130,10 +130,6 @@ public class BaseActivity extends FragmentActivity implements IBaseContext {
 		android.provider.Settings.System.putInt(
 				getContentResolver(), android.provider.Settings.System.ACCELEROMETER_ROTATION, isEnable ? 1 : 0);
 	}
-
-	public boolean hasTestMagazine() {
-		return getResources().getBoolean(R.bool.enable_test_magazine);
-	}
 	
 	protected void showAlertDialog(int id){
 		int msg_id = 0;

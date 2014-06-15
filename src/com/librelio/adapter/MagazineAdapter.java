@@ -41,12 +41,10 @@ public class MagazineAdapter extends BaseAdapter {
 	private static final String TAG = "MagazineAdapter";
 	private Context context;
 	private ArrayList<DictItem> magazines;
-	private boolean hasTestMagazine;
 
-	public MagazineAdapter(ArrayList<DictItem> magazines, Context context, boolean hasTestMagazine) {
+	public MagazineAdapter(ArrayList<DictItem> magazines, Context context) {
 		this.context = context;
 		this.magazines = magazines;
-		this.hasTestMagazine = hasTestMagazine;
 	}
 
 	@Override
@@ -113,24 +111,6 @@ public class MagazineAdapter extends BaseAdapter {
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.downloadOrReadButton.setVisibility(View.INVISIBLE);
             holder.sampleOrDeleteButton.setVisibility(View.INVISIBLE);
-
-            if (hasTestMagazine && currentMagazine.isFake()) {
-                holder.downloadOrReadButton.setVisibility(View.VISIBLE);
-                holder.downloadOrReadButton.setText(context.getResources().getString(R.string.read));
-                holder.downloadOrReadButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (new File(currentMagazine.getFilename()).exists()) {
-                            LibrelioApplication.startPDFActivity(context,
-                                    currentMagazine.getFilename(),
-                                    currentMagazine.getTitle(), true);
-                        } else {
-                            Toast.makeText(context, "No test pdf, check assets dir", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                return convertView;
-            }
 
             // If downloading
             if (currentMagazine.getDownloadStatus() >= DownloadStatus.QUEUED && currentMagazine.getDownloadStatus() < DownloadStatus.DOWNLOADED) {

@@ -34,12 +34,10 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
 
     private static final String TAG = "PlistParserLoader";
     private final String plistName;
-    private final boolean hasTestMagazine;
 
-    public PlistParserLoader(Context context, String plistName, boolean hasTestMagazine) {
+    public PlistParserLoader(Context context, String plistName) {
         super(context);
         this.plistName = plistName;
-        this.hasTestMagazine = hasTestMagazine;
         setUpdateThrottle(2000);
         onContentChanged();
     }
@@ -61,10 +59,6 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
         PlistItem plistItem = new PlistItem(plistName, "", getContext());
 
         ArrayList<DictItem> magazines = new ArrayList<DictItem>();
-
-        if (hasTestMagazine) {
-            magazines.add(new Magazine(MagazineManager.TEST_FILE_NAME, "TEST", "test", "", getContext()));
-        }
 
         //Convert plist to String for parsing
         String pList = StorageUtils.getStringFromFilename(getContext(), plistItem.getFilename());

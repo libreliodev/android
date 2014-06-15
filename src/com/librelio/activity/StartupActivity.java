@@ -19,46 +19,39 @@
 
 package com.librelio.activity;
 
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FilenameUtils;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
+
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.animation.DisplayNextView;
 import com.librelio.animation.Rotate3dAnimation;
-import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.http.Header;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The start point for Librelio application (Splash-screen)
@@ -68,12 +61,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class StartupActivity extends AbstractLockRotationActivity {
 	private static final String TAG = "StartupActivity";
-	private static final String PARAM_TEST = "test";
 	private static final String PARAM_CLIENT = "@client";
 	private static final String PARAM_APP = "@app";
 	private static final String PLIST_DELAY = "Delay";
 	private static final String PLIST_LINK = "Link";
-    private static final String STATIC_MAGAZINES_INIT_COMPLETE = "static_magazines_init_complete";
     private static int DEFAULT_ADV_DELAY = 1000;
 	private ImageView startupImage;
 	private ImageView advertisingImage;
@@ -92,7 +83,6 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		startupImage = (ImageView) findViewById(R.id.sturtup_image);
 		advertisingImage = (ImageView) findViewById(R.id.advertising_image);
 
-		new InitPredefinedMagazinesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	    loadAdvertisingImage();
     }
 
@@ -305,37 +295,4 @@ public class StartupActivity extends AbstractLockRotationActivity {
 				webAdvertisingActivityIntent });
 		finish();
 	}
-
-    private class InitPredefinedMagazinesTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            initStorage(PARAM_TEST);
-
-            if (hasTestMagazine()) {
-                try {
-                    final String name = PARAM_TEST;
-                    final String testDir = StorageUtils.getStoragePath(StartupActivity.this) + name + "/";
-                    final String testImage = name + ".png";
-                    final String testImagePath = StorageUtils.getStoragePath(StartupActivity.this) + testImage;
-                    String[] assetsList = getResources().getAssets().list(name);
-                    File file = new File(testImagePath);
-                    if (!file.exists()) {
-                        copyFromAssets(testImage, testImagePath);
-                    }
-                    for (String asset : assetsList) {
-                        file = new File(testDir + asset);
-                        if (!file.exists()) {
-                            copyFromAssets(name + "/" + asset, testDir + asset);
-                        }
-                    }
-                    getPreferences().edit().putBoolean(TEST_INIT_COMPLETE, true).commit();
-                } catch (IOException e) {
-                    Log.e(TAG, "Test directory in assets is unavailable", e);
-                }
-            }
-            return null;
-        }
-    }
-
 }

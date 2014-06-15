@@ -5,7 +5,6 @@
     <string name="root_view">Magazines.plist?waupdate=30</string>
     <string name="yearly_subs_code">yearlysubscription</string>
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
-    <bool name="enable_test_magazine">false</bool>
     <bool name="enable_code_subs">true</bool>
     <bool name="enable_username_password_login">true</bool>
     <string name="client_name" >niveales</string>
