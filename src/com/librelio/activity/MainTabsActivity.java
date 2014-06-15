@@ -38,7 +38,6 @@ import com.librelio.model.PlistItem;
 import com.librelio.model.RssFeedItem;
 import com.librelio.model.WebAddressItem;
 import com.librelio.service.AssetDownloadService;
-import com.librelio.service.MagazineDownloadService;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -80,12 +79,7 @@ public class MainTabsActivity extends BaseActivity {
 		// overridePendingTransition(R.anim.flip_right_in,
 		// R.anim.flip_left_out);
 
-		if (!parseTabsPlist()) {
-			// if no Tabs.plist
-			tabs.add(new PlistItem(getString(R.string.root_view),
-					getString(R.string.magazines), this));
-			tabs.add(new DownloadsItem(getString(R.string.downloads)));
-		}
+		parseTabsPlist();
 
 		pager = (ViewPager) findViewById(R.id.view_pager);
 
@@ -217,11 +211,6 @@ public class MainTabsActivity extends BaseActivity {
 		// TODO do this off ui thread
 
 		String pList = StorageUtils.getStringFromFilename(this, "Tabs.plist");
-
-		if (pList == null) {
-			// ERROR
-			return false;
-		}
 
 		try {
 			PListXMLHandler handler = new PListXMLHandler();
