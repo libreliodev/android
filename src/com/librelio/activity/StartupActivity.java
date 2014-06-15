@@ -80,7 +80,7 @@ public class StartupActivity extends AbstractLockRotationActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.startup);
 
-		startupImage = (ImageView) findViewById(R.id.sturtup_image);
+		startupImage = (ImageView) findViewById(R.id.startup_image);
 		advertisingImage = (ImageView) findViewById(R.id.advertising_image);
 
 	    loadAdvertisingImage();
