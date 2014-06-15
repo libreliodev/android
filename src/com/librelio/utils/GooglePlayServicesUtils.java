@@ -2,7 +2,6 @@ package com.librelio.utils;
 
 import java.io.IOException;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -92,7 +91,7 @@ public class GooglePlayServicesUtils {
 	 * Stores the registration ID and app versionCode in the application's
 	 * shared preferences.
 	 */
-	public static void registerInBackground(final Application application) {
+	public static void registerInBackground(final Context context) {
 	    new AsyncTask<Void, Void, String>() {
 	        private GoogleCloudMessaging gcm;
 
@@ -101,9 +100,9 @@ public class GooglePlayServicesUtils {
 	            String msg = "";
 	            try {
 	                if (gcm == null) {
-	                    gcm = GoogleCloudMessaging.getInstance(application);
+	                    gcm = GoogleCloudMessaging.getInstance(context);
 	                }
-	                String regid = gcm.register(((LibrelioApplication) application).getGcmProjectNumber());
+	                String regid = gcm.register(context.getResources().getString(R.string.gcm_project_number));
 	                msg = "Device registered, registration ID=" + regid;
 
 	                // You should send the registration ID to your server over HTTP,
@@ -111,7 +110,7 @@ public class GooglePlayServicesUtils {
 	                // The request to your server should be authenticated if your app
 	                // is using accounts.
 	                
-	                sendRegistrationIdToBackend(application, regid);
+	                sendRegistrationIdToBackend(context, regid);
 	            } catch (IOException ex) {
 	                msg = "Error :" + ex.getMessage();
 	                // If there is an error, don't just keep trying to register.

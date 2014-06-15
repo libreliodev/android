@@ -384,8 +384,8 @@ public class BillingActivity extends BaseActivity {
 						skuList.add(productId);
 
 						//Add  subscription codes
-						skuList.add(((LibrelioApplication)getApplication()).getYearlySubsCode());
-						skuList.add(((LibrelioApplication)getApplication()).getMonthlySubsCode());
+						skuList.add(LibrelioApplication.getYearlySubsCode(getContext()));
+						skuList.add(LibrelioApplication.getMonthlySubsCode(getContext()));
 						
 						Bundle querySkus = new Bundle();
 						querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
@@ -416,10 +416,6 @@ public class BillingActivity extends BaseActivity {
 
 				@Override
 				protected void onPostExecute(Bundle skuDetails) {
-
-					String yearlySubsCode = ((LibrelioApplication)getApplication()).getYearlySubsCode();
-					String monthlySubsCode = ((LibrelioApplication)getApplication()).getMonthlySubsCode();
-					
 					//If item was purchase then download begin without open billing activity 
 					int getPurchaseResponse = ownedItems.getInt("RESPONSE_CODE");
 					if (TEST_MODE) {
@@ -439,12 +435,12 @@ public class BillingActivity extends BaseActivity {
 							Log.d(TAG, productId + " already purchased? " + s);
 						}
 
-						if(ownedSkus.contains(yearlySubsCode)){
-							prepareDownloadWithOwnedItem(ownedSubs, yearlySubsCode);
+						if(ownedSkus.contains(LibrelioApplication.getYearlySubsCode(getContext()))){
+							prepareDownloadWithOwnedItem(ownedSubs,LibrelioApplication.getYearlySubsCode(getContext()));
 							return;
 						}
-						if(ownedSkus.contains(monthlySubsCode)){
-							prepareDownloadWithOwnedItem(ownedSubs, monthlySubsCode);
+						if(ownedSkus.contains(LibrelioApplication.getMonthlySubsCode(getContext()))){
+							prepareDownloadWithOwnedItem(ownedSubs,LibrelioApplication.getMonthlySubsCode(getContext()));
 							return;
 						}
 					}
@@ -471,12 +467,12 @@ public class BillingActivity extends BaseActivity {
 								productPrice = price;
 								productTitle = title;
 							}
-							else if (sku.equals(yearlySubsCode)){
+							else if (sku.equals(LibrelioApplication.getYearlySubsCode(getContext()))){
 								yearlySubPrice = price;
 								yearlySubTitle = title;
 								
 							}
-							else if (sku.equals(monthlySubsCode)){
+							else if (sku.equals(LibrelioApplication.getMonthlySubsCode(getContext()))){
 								monthlySubPrice = price;
 								monthlySubTitle = title;
 							}
@@ -559,10 +555,10 @@ public class BillingActivity extends BaseActivity {
 				new PurchaseTask().execute(productId);
 	}
 	private void purchaseMonthlySub(){
-		new PurchaseTask().execute(((LibrelioApplication)getApplication()).getMonthlySubsCode());
+		new PurchaseTask().execute(LibrelioApplication.getMonthlySubsCode(getContext()));
 	}
 	private void purchaseYearlySub(){
-		new PurchaseTask().execute(((LibrelioApplication)getApplication()).getYearlySubsCode());
+		new PurchaseTask().execute(LibrelioApplication.getYearlySubsCode(getContext()));
 	}
 
 	private boolean isNetworkConnected() {
