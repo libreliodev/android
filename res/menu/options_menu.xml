@@ -18,10 +18,5 @@
         android:title="@string/subscribe"
         android:visible="@bool/enable_subscribe_in_menu">
     </item>
-    <item
-        android:id="@+id/options_menu_send_log"
-        android:title="@string/send_log"
-        android:visible="@bool/enable_send_log_in_menu">
-    </item>
-
+    
 </menu>
