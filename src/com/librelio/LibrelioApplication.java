@@ -133,11 +133,14 @@ public class LibrelioApplication extends Application {
 	}
 
 	public static String getClientName(Context context){
-		return context.getResources().getString(R.string.client_name);
+		String packageName = context.getPackageName();
+		int lastIndexOfDot = packageName.lastIndexOf(".");
+		return packageName.substring(packageName.lastIndexOf(".", lastIndexOfDot - 1) + 1, lastIndexOfDot);
 	}
 	
 	public static String getMagazineName(Context context){
-		return context.getResources().getString(R.string.magazine_name);
+		String packageName = context.getPackageName();
+		return packageName.substring(packageName.lastIndexOf(".") + 1);
 	}
 
     public static String getServiceName(Context context){

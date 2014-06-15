@@ -138,8 +138,8 @@ public class GooglePlayServicesUtils {
 		final AsyncHttpClient client = new AsyncHttpClient();
 		RequestParams params = new RequestParams();
 		params.put("platform", "android");
-		params.put("client", context.getString(R.string.client_name));
-		params.put("app", context.getString(R.string.magazine_name));
+		params.put("client", LibrelioApplication.getClientName(context));
+		params.put("app", LibrelioApplication.getMagazineName(context));
 		params.put("deviceid", LibrelioApplication.getAndroidId(context));
 		params.put("registrationid", regid);
 		client.post("http://apns.librelio.com/apns/gcm.php", params, new AsyncHttpResponseHandler() {
