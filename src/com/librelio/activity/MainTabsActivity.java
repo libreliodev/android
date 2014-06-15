@@ -169,9 +169,6 @@ public class MainTabsActivity extends BaseActivity {
 		case R.id.options_menu_restore:
 			restorePurchases();
 			return true;
-		case R.id.options_menu_send_log:
-			// onSendLog();
-			return true;
 		case R.id.options_menu_subscribe:
 			Intent subscribeIntent = new Intent(getBaseContext(),
 					BillingActivity.class);
