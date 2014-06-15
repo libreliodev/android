@@ -3,10 +3,8 @@
 
     <item
         android:id="@+id/options_menu_reload"
-        android:showAsAction="always"
-        android:title="@string/reload"
         android:icon="@drawable/ic_action_reload"
-        android:visible="@bool/enable_refresh_in_menu">
-    </item>
+        android:showAsAction="always"
+        android:title="@string/reload"/>
 
 </menu>

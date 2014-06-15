@@ -13,8 +13,6 @@
     <string name="service_name">biwing</string>
     <string name="google_analytics">UA-1732003-23</string>
     <bool name="enable_send_log_in_menu">false</bool>
-    <bool name="enable_downloads_in_menu">true</bool>
-    <bool name="enable_refresh_in_menu">true</bool>
     <bool name="enable_subscribe_in_menu">false</bool>
     <bool name="enable_info_in_menu">false</bool>
     <string name="info_url">http://www.example.com</string>
