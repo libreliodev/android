@@ -4,11 +4,9 @@
     <string name="app_name">Wind</string>
     <string name="yearly_subs_code">yearlysubscription</string>
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
-    <bool name="enable_code_subs">true</bool>
-    <bool name="enable_username_password_login">true</bool>
-    <string name="service_name">biwing</string>
+	<string name="code_service">S3</string>
+	<string name="user_service"></string>
     <string name="google_analytics">UA-1732003-23</string>
-    <bool name="enable_send_log_in_menu">false</bool>
     <bool name="enable_subscribe_in_menu">false</bool>
     <bool name="enable_info_in_menu">false</bool>
     <string name="info_url">http://www.example.com</string>

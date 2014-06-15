@@ -144,7 +144,7 @@ public class LibrelioApplication extends Application {
 	}
 
     public static String getServiceName(Context context){
-        return context.getResources().getString(R.string.service_name);
+        return context.getResources().getString(R.string.user_service);
     }
 	
 	public static String getUrlString(String fileName){
@@ -165,11 +165,11 @@ public class LibrelioApplication extends Application {
 	}
 	
 	public static boolean isEnableCodeSubs(Context context){
-		return context.getResources().getBoolean(R.bool.enable_code_subs);
+		return !context.getResources().getString(R.string.code_service).isEmpty();
 	}
 
     public static boolean isEnableUsernamePasswordLogin(Context context){
-        return context.getResources().getBoolean(R.bool.enable_username_password_login);
+        return !context.getResources().getString(R.string.user_service).isEmpty();
     }
 
 	public static String getServerUrl(Context context){
