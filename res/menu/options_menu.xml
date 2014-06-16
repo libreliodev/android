@@ -2,13 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/options_menu_info"
-        android:icon="@drawable/ic_action_info"
-        android:showAsAction="ifRoom"
-        android:title="@string/info"
-        android:visible="@bool/enable_info_in_menu">
-    </item>
-    <item
         android:id="@+id/options_menu_restore"
         android:title="@string/restore_my_purchases"
         android:visible="false">

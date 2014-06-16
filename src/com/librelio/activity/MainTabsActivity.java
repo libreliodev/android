@@ -163,9 +163,6 @@ public class MainTabsActivity extends BaseActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			finish();
-		case R.id.options_menu_info:
-			WebViewActivity.startWithUrl(this, getString(R.string.info_url));
-			return true;
 		case R.id.options_menu_restore:
 			restorePurchases();
 			return true;
