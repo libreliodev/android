@@ -39,7 +39,7 @@ import android.view.WindowManager.BadTokenException;
 import android.widget.MediaController;
 import android.widget.MediaController.MediaPlayerControl;
 
-import com.artifex.mupdf.MediaHolder;
+import com.artifex.mupdfdemo.MediaHolder;
 import com.niveales.wind.R;
 
 /**

@@ -24,7 +24,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.artifex.mupdf.LinkInfoExternal;
+import com.artifex.mupdfdemo.LinkInfoExternal;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;

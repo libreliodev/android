@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import android.net.Uri;
 import android.util.SparseArray;
 
-import com.artifex.mupdf.LinkInfo;
-import com.artifex.mupdf.LinkInfoExternal;
-import com.artifex.mupdf.MuPDFCore;
+import com.artifex.mupdfdemo.LinkInfo;
+import com.artifex.mupdfdemo.LinkInfoExternal;
+import com.artifex.mupdfdemo.MuPDFCore;
 
 /**
  * @author Dmitry Valetin

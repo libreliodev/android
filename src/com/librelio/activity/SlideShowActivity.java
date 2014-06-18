@@ -8,7 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.LinearLayout;
 
-import com.artifex.mupdf.MediaHolder;
+import com.artifex.mupdfdemo.MediaHolder;
 import com.librelio.base.BaseActivity;
 import com.librelio.view.ImageLayout;
 import com.niveales.wind.R;
