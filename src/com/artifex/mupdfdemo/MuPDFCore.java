@@ -1,6 +1,9 @@
 package com.artifex.mupdfdemo;
 
 import java.io.File;
+import java.security.MessageDigest;
+
+import org.apache.commons.io.FileUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -71,8 +74,26 @@ public class MuPDFCore {
 	public MuPDFCore(String filename) throws Exception {
 		mFileName = filename;
 		globals = openFile(filename);
+		
 		if (globals == 0)
 		{
+			// Logging
+			File file = new File(filename);
+			Log.e(TAG, "Filename: " + filename);
+			Log.e(TAG, "File exists: " + file.exists());
+			Log.e(TAG, "File size: " + file.length());
+			byte[] hash = MessageDigest.getInstance("md5").digest(FileUtils.readFileToByteArray(file));
+			StringBuilder hexString = new StringBuilder();
+	        for (int i = 0; i < hash.length; i++) {
+	            if ((0xff & hash[i]) < 0x10) {
+	                hexString.append("0"
+	                        + Integer.toHexString((0xFF & hash[i])));
+	            } else {
+	                hexString.append(Integer.toHexString(0xFF & hash[i]));
+	            }
+	        }
+			Log.e(TAG, "File md5sum: " + hexString.toString());
+			
 			throw new Exception("Failed to open "+filename);
 		}
 	}
