@@ -1,7 +1,9 @@
 package com.librelio.adapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.content.Context;
 import android.content.Intent;
@@ -100,8 +102,19 @@ public class MagazineAdapter extends BaseAdapter {
             holder.thumbnail.setImageDrawable(null);
         }
         
-        Picasso.with(context).load(magazines.get(position).getPngUrl()).fit().centerInside().into(holder.thumbnail);
-
+        // Check for images in assets folder first before loading from remote server
+        String pngName = magazines.get(position).getFilename().replace(".plist", ".png");
+		String string = "file:///android_asset/" + pngName;
+        try {
+			if (Arrays.asList(context.getResources().getAssets().list("")).contains(pngName)) {
+				Picasso.with(context).load(string).fit().centerInside().into(holder.thumbnail);
+			} else {
+				Picasso.with(context).load(magazines.get(position).getPngUrl()).fit().centerInside().into(holder.thumbnail);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
         if (magazines.get(position) instanceof Magazine) {
             final Magazine currentMagazine = (Magazine) magazines.get(position);
             holder.subtitle.setText(currentMagazine.getSubtitle());
@@ -180,9 +193,6 @@ public class MagazineAdapter extends BaseAdapter {
                     holder.sampleOrDeleteButton.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            File sample = new File(currentMagazine.getSamplePdfPath());
-                            Log.d(TAG, "test: " + sample.exists() + " "
-                                    + currentMagazine.isSampleDownloaded());
                             if (currentMagazine.isSampleDownloaded()) {
                                 LibrelioApplication.startPDFActivity(context,
                                         currentMagazine.getSamplePdfPath(),
