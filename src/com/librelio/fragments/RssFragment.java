@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -137,12 +138,18 @@ public class RssFragment extends ListFragment {
 					.format(item.getPubDate())
 					+ " - "
 					+ stripHtml(item.getDescription()));
+			holder.image.setImageDrawable(null);
 			String s = "<img src=\"";
 			int ix = item.getDescription().indexOf(s) + s.length();
-			String imgSrc = item.getDescription().substring(ix,
-					item.getDescription().indexOf("\"", ix + 1)).replace(" ", "%20");
-			holder.image.setImageDrawable(null);
-			Picasso.with(getActivity()).load(imgSrc).fit().centerCrop().into(holder.image);
+			int indexOf = item.getDescription().indexOf("\"", ix + 1);
+			if (indexOf > ix) {
+				String imgSrc = item.getDescription().substring(ix, indexOf)
+						.replace(" ", "%20");
+				Picasso.with(getActivity()).load(imgSrc).fit().centerCrop()
+						.into(holder.image);
+			} else {
+				Log.d(getClass().getSimpleName(), "No image for item with description: " + item.getDescription());
+			}
 			return convertView;
 		}
 
