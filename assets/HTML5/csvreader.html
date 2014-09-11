@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title localize>CSV Reader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!--IE Compatibility modes-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+    <script>
+      var config = {
+        "storageAuthKey": "librelio-auth",
+        "s3Bucket": "librelio-europe",
+        "s3BucketRegion": "eu-west-1",
+        "storageAppNameKey": "librelio-app",
+        "singleAppModeKey": "librelio-sappmode",
+        "awsExpireReverseInHours": 72,
+        "idFedS3RootDirectory": "librelio",
+        "idFedAppName": "reader",
+        "idFedFBUserDirnamePrefix": "fb_",
+        "idFedGPUserDirnamePrefix": "gp_",
+        "idFedFBAppId": "201544626555225",
+        "idFedFBUsersRoleArn": "arn:aws:iam::105216790221:role/RoleForFacebook",
+        "idFedGPAppId": "1012641315687.apps.googleusercontent.com",
+        "idFedGPUsersRoleArn": "arn:aws:iam::105216790221:role/RoleForGoogle",
+        "locale": "en-US"
+      },
+        assets = 'assets';
+    </script>
+    <script src="assets/lib/url.min.js"></script>
+    <script src="assets/js/helper.js"></script>
+    <script>
+      (function() {
+        var httpreq_open = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(m, url_str, a2, a3, a4) {
+          /* url('hostname', url_str) == config.s3Bucket + '.s3.amazonaws.com' */
+          if (url_protocol(url_str) === null)
+            url_str = 'app://' + url_str;
+          return httpreq_open.call(this, m, url_str, a2, a3, a4);
+        }
+      })();
+    </script>
+    <script src="assets/lib/jquery.min.js"></script>
+    <script src="assets/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/lib/sprintf.min.js"></script>
+    <script src="assets/js/dhtml.js"></script>
+    <script src="assets/lib/localeplanet/icu_en-US.js"></script>
+    <script src="assets/lib/localeplanet/translate.js"></script>
+    <script src="assets/js/localize.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/lib/querystring.min.js"></script>
+    <script src="assets/lib/path.min.js"></script>
+    <script src="assets/lib/async.js"></script>
+    <script src="assets/lib/d3.min.js"></script>
+    <script src="assets/lib/jquery.plist.js"></script>
+    <script src="assets/lib/taffy-min.js"></script>
+    <script src="assets/js/sharelist.js"></script>
+    <script src="assets/js/csvreader.js"></script>
+    <script src="assets/js/csvreader-main.js"></script>
+  </head>
+  <body class="light-bkg">
+
+    <!-- social media scripts -->
+    <div id="fb-root"></div>
+    <script>
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=201544626555225&version=v2.0";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <!-- main-content -->
+    <div id="sidebar">
+      <div id="sidebar-content">
+        <div id="search-wrp" class="form-group">
+          <input id="search-inp" type="text" class="form-control" placeholder="Search" />
+        </div>
+        <div class="main-btns btn-group">
+          <button type="button" class="favorites-toggle-btn btn btn-default">
+            <span class="is-disabled">Show Favorites</span> 
+            <span class="is-enabled">Show All</span> 
+          </button>
+        </div>
+        <div id="csvfilters" role="form" class="scrollable fillheight">
+          <fieldset data-id="Range">
+            <label data-content="name"></label>
+            <div class="form-group">
+              <label>From</label>
+              <input type="number" class="form-control" placeholder="From" name="From" data-attrs="value=From" />
+            </div>
+            <div class="form-group">
+              <label>To</label>
+              <input type="number" class="form-control" placeholder="To" name="To" data-attrs="value=To" />
+            </div>
+          </fieldset>
+          <fieldset data-id="MultipleChoice">
+            <label data-content="name"></label>
+            <select multiple class="form-control">
+              <option data-foreach="options as i=>option" data-attrs="value=option;selected=get(checked_options,option)" data-content="get(option_values,i)"></option>
+            </select>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+    <a href="#" class="sidebartoggle">
+      <i class="glyphicon glyphicon-list"></i>
+    </a> 
+    <div id="csvreader">
+    </div>
+    <style>
+      .sharelist {
+        padding: 0px;
+        margin: 0px;
+        list-style: none;
+      }
+      .sharelist li {
+        display: inline-block;
+        padding: 2px;
+        margin-right: 6px;
+      }
+    </style>
+    <ul id="sharelist-template" class="sharelist" style="display:none">
+      <li data-id="mail">
+        <a data-attrs="href=share_mail_href()">Share with mail</a> 
+      </li>
+      <li data-id="twitter">
+        <a href="#" data-bind="click=share_twitter_clicked">Share on twitter</a> 
+      </li>
+      <li data-id="facebook">
+        <a href="#" data-bind="click=share_facebook_clicked">Share on facebook</a> 
+      </li>
+    </ul>
+    <script>
+      var tmpl = $('#sharelist-template');
+      tmpl.removeAttr('id');
+      sharelist.setTemplate(tmpl[0]);
+    </script>
+
+    <!-- #main-content -->
+  </body>
+</html>

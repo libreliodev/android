@@ -1,16 +1,19 @@
 package com.librelio.fragments;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -43,6 +46,7 @@ public class WebViewFragment extends Fragment {
 	/**
 	 * Called to instantiate the view. Creates and returns the WebView.
 	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -55,6 +59,9 @@ public class WebViewFragment extends Fragment {
 				false);
 
 		mWebView = (WebView) view.findViewById(R.id.web_view);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			mWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+		}
 		mIsWebViewAvailable = true;
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setUseWideViewPort(true);
@@ -76,9 +83,24 @@ public class WebViewFragment extends Fragment {
 
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				Log.d("shouldOverrideUrlLoading", "trying to load url: " + url);
+				if (url.startsWith("ios-log")) {
+					Log.w("ios-log", url);
+					return false;
+				}
 				view.loadUrl(url);
 				// ((ViewAnimator)getView().findViewById(R.id.view_animator)).setDisplayedChild(0);
 				return false;
+			}
+			
+			@Override
+			public WebResourceResponse shouldInterceptRequest(WebView view, String url)
+			{
+//			    if (magicallyMatch(url))
+//			        return new WebResourceResponse("text/json", "utf-8", magicallyGetSomeInputStream());
+				Log.d("shouldInterceptRequest", "intercept url: " + url);	
+//				return new WebResourceResponse("text/csv", "utf-8", data)
+			    return null;
 			}
 		});
 		mWebView.loadUrl(url);

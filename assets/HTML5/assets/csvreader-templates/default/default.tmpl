@@ -1,0 +1,601 @@
+<style class="csvinit" data-init="replace('TMPL_DIR',tmpl_urldir)">
+.sort-list .btn {
+  background: rgb(252,252,252); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(252,252,252,1) 0%, rgba(204,200,203,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(204,200,203,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(252,252,252,1) 0%,rgba(204,200,203,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: linear-gradient(to bottom, rgba(252,252,252,1) 0%,rgba(204,200,203,1) 100%); /* W3C */
+}
+ 
+.sort-list .btn {
+  background: rgb(252,252,252); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(252,252,252,1) 0%, rgba(204,200,203,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(204,200,203,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(252,252,252,1) 0%,rgba(204,200,203,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: linear-gradient(to bottom, rgba(252,252,252,1) 0%,rgba(204,200,203,1) 100%); /* W3C */
+}
+
+.nav-btns .btn {
+  background: rgb(186,186,186); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(186,186,186,1) 0%, rgba(150,150,150,1) 50%, rgba(140,140,140,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(186,186,186,1)), color-stop(50%,rgba(150,150,150,1)), color-stop(100%,rgba(140,140,140,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(186,186,186,1) 0%,rgba(150,150,150,1) 50%,rgba(140,140,140,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: linear-gradient(to bottom, rgba(186,186,186,1) 0%,rgba(150,150,150,1) 50%,rgba(140,140,140,1) 100%); /* W3C */
+  border: 1px solid rgb(114,114,114);
+  margin-top: 3px;
+  padding: 0px 14px 2px;
+}
+
+.main-btns .btn {
+  background: rgb(255,255,255); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(206,198,198,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(206,198,198,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(206,198,198,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(206,198,198,1) 100%); /* W3C */
+}
+.main-btns .active {
+  background: rgb(101,	184,	213);
+  box-shadow: inset 0 0 4px #000000;
+  -moz-box-shadow: inset 0 0 4px #000000;
+  -webkit-box-shadow: inset 0 0 4px #000000;
+  border-color: #555555;
+}
+
+.nav-btns .btn i {
+  color: white;
+  font-size: 10px;
+}
+.csvpage-navbar .row-fav-toggle-btn, 
+.csvpage-navbar .row-fav-toggle-btn:hover {
+  color: #333333;
+  font-size: 24px;
+  bottom: 0px;
+  padding: 2px 6px 0px;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+.head-tile {
+  display: none;
+}
+.csvpage-navbar {
+  background: rgb(233, 233, 233);
+  height: 34px;
+}
+.head-tile h2,
+.csvpage-navbar h2 {
+  display: none;
+}
+@media (min-width:601px) {
+  .csvpage-content {
+    padding-top: 0px;
+  }
+  .csvpage-navbar,
+  .csvpage-content {
+    position: relative;
+    margin-left: 330px;
+    width: auto;
+  }
+  .head-tile,
+  .csvpage-navbar {
+    display: block;
+    background-color: rgb(144, 146, 144);
+    color: white;
+    height: 97px;
+  }
+  .head-tile h2,
+  .csvpage-navbar h2 {
+    display: block;
+    margin: 0px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    padding-left: 30px;
+    font-size: 24px;
+    text-align: left;
+  }
+
+  #csvreader {
+    margin-left: 330px;
+  }
+  #sidebar {
+    position: relative;
+    z-index: 4;
+    width: 330px;
+    padding-top: 60px;
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-image: url(TMPL_DIR/skis-logo.png);
+    /* image is embeded in bottom of document */
+    border-right: 1px solid rgb(175, 177, 175);
+  }
+  #search-wrp { 
+    margin-bottom: 2px;
+  }
+  #search-inp {
+    background-color: transparent;
+  }
+  .csvpage-navbar .row-fav-toggle-btn,
+  .csvpage-navbar .row-fav-toggle-btn:hover {
+    padding: 6px 0px;
+    bottom: 3px;
+  }
+}
+ 
+.item-title {
+  text-transform: uppercase;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 18px;
+}
+.item-title, .item-budget {
+  color: rgb(113, 186, 211);
+}
+.items-list {
+  padding: 0px;
+  margin: 0px;
+}
+.items-list li {
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid darkgrey;
+  padding-bottom: 4px;
+}
+.item-icons .item-icon {
+  margin-right: 4px;
+}
+.item-thumbnail {
+  transform-origin: 0 0 0;
+  transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+ 	-webkit-transform: rotate(90deg);
+ 	-o-transform: rotate(90deg);
+  -webkit-transform-origin: 0 0 0;
+ 	-o-transform-origin: 0 0 0;
+  height: 40px;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+.item-thumbnail img {
+  clip: rect(0px, 80px, 40px, 0px);
+  position: absolute;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+}
+.item-pair-list dt {
+  float: left;
+  margin-right: 4px;
+}
+.sort-list { 
+  text-align: right;
+}
+
+.clearb { 
+  clear: both;
+}
+
+#csvtable .csvcolumn {
+  display: none;
+}
+#csvtable .csvcolumn[data-sortable] {
+  display: block;
+  cursor: pointer;
+}
+
+.item-icons {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding-right: 40px;
+  overflow: hidden;
+  height: 80px;
+}
+.item-icons .item-icon {
+  float: right;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+.item-icons .item-icon img {
+  width: 40px;
+  hieght: 40px;
+}
+</style>
+<div data-init-block="row-icons">
+  <!-- icon for men -->
+  <span class="item-icon np" data-init="if(not(eq(row.6,'1')),this.remove())" data-block="Homme-img"></span>
+  <!-- icon for women -->
+  <span class="item-icon np" data-init="if(not(eq(row.6,'2')),this.remove())" data-block="Femme-img"></span>
+  <!-- icon -->
+  <span class="item-icon np" data-init="if(not(eq(row.3,'1')),this.remove())" data-block="TesterChoice-img"></span>
+</div>
+<div class="head-tile"><h2>Votre recherche</h2></div>
+<div id="csvtable">
+  <div class="sort-list">
+    <label>Tri par:</label>
+    <div class="btn-group">
+      <button type="button" class="btn btn-default csvcolumn" data-name="Marque" data-key="9" data-sortable data-filterable data-searchable>
+        Marque
+        <dict class="filter-info">
+          <key>Type</key>
+          <string>MultipleChoice</string>
+          <key>AllChoice</key>
+          <string>All</string>
+          <key>Options</key>
+          <array>
+            <string>Apo</string>
+            <string>Armada</string>
+            <string>Atomic</string>
+            <string>Black Crows</string>
+            <string>Black Diamond</string>
+            <string>Blizzard</string>
+            <string>Coreupt</string>
+            <string>DPS</string>
+            <string>Dupraz</string>
+            <string>Dynafit</string>
+            <string>Dynastar</string>
+            <string>Elan</string>
+            <string>Extrem</string>
+            <string>Faction</string>
+            <string>Fischer</string>
+            <string>Hagan</string>
+            <string>Head</string>
+            <string>K2 Skis</string>
+            <string>Kästle</string>
+            <string>La Sportiva</string>
+            <string>Line</string>
+            <string>Majesty</string>
+            <string>Movement</string>
+            <string>Nordica</string>
+            <string>Rossignol</string>
+            <string>Salomon</string>
+            <string>Scott</string>
+            <string>Ski Logic</string>
+            <string>Stöckli</string>
+            <string>Trab</string>
+            <string>Volant</string>
+            <string>Völkl</string>
+            <string>Wed’ze</string>
+            <string>White Doctor</string>
+            <string>White Dot</string>
+            <string>Zag</string>
+          </array>
+        </dict>
+      </button>
+      <button type="button" class="btn btn-default csvcolumn" data-name="Gamme" data-key="5" data-sortable data-searchable>Gamme</button>
+      <button type="button" class="btn btn-default csvcolumn" data-name="Prix" data-key="14" data-sortable data-filterable data-searchable>
+        Prix
+        <!-- plist dict tag -->
+        <dict class="sort-info">
+          <key>DataType</key>
+          <string>real</string>
+        </dict>
+        <dict class="filter-info">
+          <key>Type</key>
+          <string>Range</string>
+        </dict>
+      </button>
+      <div class="csvcolumn" data-name="Genre" data-key="6" data-filterable>
+        <dict class="filter-info">
+          <key>Type</key>
+          <string>MultipleChoice</string>
+          <key>Options</key>
+          <dict>
+            <key>2</key>
+            <string>Femme</string>
+            <key>1</key>
+            <string>Homme</string>
+          </dict>
+          <key>Order</key>
+          <integer>0</integer>
+        </dict>
+      </div>
+      <div class="csvcolumn" data-name="Modele" data-key="10" data-searchable>
+      </div>
+    </div>
+  </div>
+  <ul class="items-list scrollable fillheight">
+    <li data-foreach="rows as i=>row" data-bind="click=open_row_page('#detailpage',i,row)">
+      <div class="item-icons">
+        <!-- thumbnail -->
+        <span class="item-thumbnail">
+          <img data-attrs="src=row.8" />
+        </span>
+        <span data-block="row-icons"></span>
+      </div>
+      <h3 class="item-title" data-content="row.9"></h3>
+      <dl class="item-pair-list">
+        <dt>Modèle:</dt>
+        <dd data-content="row.10"></dd>
+        <dt>Gamme:</dt>
+        <dd data-content="row.5"></dd>
+        <dt>Budget:</dt>
+        <dd class="item-budget" data-init="replace('%d',decimalFormat(int(2),row.14))">%d &#8364;</dd>
+      </dl>
+    </li>
+  </ul>
+</div>
+<div id="detailpage" class="csvpage">
+  <div class="csvpage-navbar">
+    <h2>Fiche produit</h2>
+    <div class="btn-group nav-btns">
+      <button type="button" class="previous-btn btn btn-default"><i class="glyphicon glyphicon-chevron-up"></i></button>
+      <button type="button" class="next-btn btn btn-default"><i class="glyphicon glyphicon-chevron-down"></i></button>
+    </div>
+    <button type="button" class="row-fav-toggle-btn btn btn-default">
+      <span class="is-enabled"><i class="glyphicon glyphicon-star"></i></span>
+      <span class="is-disabled"><i class="glyphicon glyphicon-star-empty"></i></span>
+    </button>
+  </div>
+  <div id="detailpagec" class="csvpage-content scrollable fillparentheight">
+    <style>
+	  #detailpagec p
+	  {
+		  margin: 0px;
+		  padding: 0px;
+	  }
+	  
+    #detailpagec
+    {
+      font-family: "Helvetica neue";
+      background-color: #ffffff;
+      padding-bottom: 20px;
+    }
+    
+    #detailpagec span
+    {
+      margin: 0px;
+      padding: 10px 10px 10px 10px;
+    }
+    
+    #detailpagec span.title
+    {
+      color: #ffffff;
+      text-transform: uppercase;
+      font-size: 18px;
+      font-weight: bold;
+		  margin-left: 15px;
+		  padding-left: 0px;
+		  padding-bottom: 0px;
+    }
+    #detailpagec table.top_table
+    {
+      width:100%;
+      height:40px; 
+      border:0; 
+      padding:0;
+      background-color:#32aac3;
+    }
+    #detailpagec table.caracteristics
+    {
+      width:100%;
+      border:0; 
+      padding:0;
+    }
+    #detailpagec table.caracteristics td
+    {
+      vertical-align: top;
+      font-size:12px;
+    }
+    #detailpagec p.Test_baseline
+    {
+      text-transform: uppercase;
+      font-weight: bold;
+		  font-size: 14px;
+      margin-top: 15px;
+    }
+    
+    #detailpagec p.Description_Test
+    {
+      font-size: 14px; 
+      text-align: justify;                
+    }
+	  
+    #detailpagec span.modele
+    {
+      color: #000000;
+      font-size: 14px;
+      font-weight: bold;
+		  margin-left: 15px;
+		  padding-left: 0px;
+		  padding-top: 0px;
+    }
+    #detailpagec span.budget
+    {
+      color: #ffffff;
+      text-transform: uppercase;
+      font-size: 24px;
+      text-align: right;
+      width: 100%;
+      font-weight: bold;
+		  padding-bottom: 0px;
+    }
+    #detailpagec div.main
+    {
+      margin: 0px;
+		  padding-top: 5px;
+      padding-bottom: 0px;
+		  padding-left: 15px;
+		  padding-right: 15px;
+    }
+    
+    #detailpagec div.main table.caracteristics img
+    {
+      margin: 2px;
+    }
+    
+    #detailpagec div.tableview
+    {
+      width: 100%;
+      margin: 0px;
+      padding: 0px;
+		  font-size: 12px;
+      height: 130px;
+    }
+    #detailpagec div.tableview table
+    {
+      width: 100%;
+      border-collapse: collapse;
+      border-style: solid;
+      border-width: 4px;
+      border-color: black;
+		  
+    }
+    #detailpagec div.tableview table th
+    {
+      background-color: white;
+      color: gray;
+      text-transform: uppercase;
+      border-collapse: collapse;
+      border-style: solid;
+      border-width: 2px;
+      border-color: black;
+      text-align: center;
+    }
+    #detailpagec div.tableview table td
+    {
+      background-color: white;
+      border-collapse: collapse;
+      border-style: solid;
+      border-width: 2px;
+      border-color: black;
+      text-align: center;
+	  }
+    
+    #detailpagec div.ski_preview
+    {
+      padding: 1px 1px 1px 1px;
+      background-color: white;
+      display: block; 
+      margin-left:auto; 
+      margin-right: auto;
+      border-bottom-color: gray;
+      border-style: solid;
+      border-width: 1px;
+      -webkit-border-radius: 4px;
+    }
+    #detailpagec div.ski_preview img
+    {
+      width: 100%;
+      margin: 0px;
+    }
+	  #detailpagec .np {
+      padding: 0px;
+    }
+	  #detailpagec div.badges_placeholder img
+	  {
+		  margin-right: 3px;
+	  }
+    #detailpagec .caracteristics-wrp {
+        margin-top: 6px;
+    }
+    #detailpagec .top_table_sc {
+      width: 140px;
+    }
+    @media (min-width:601px) {
+      #detailpagec .top_table_fc div {
+        display: inline;
+      }
+      #detailpagec .caracteristics-wrp {
+        float:left;
+      }
+      #detailpagec .badges_placeholder {
+        margin-top: 6px;
+        float: right;
+      }
+      #detailpagec span.title
+      {
+        color: #ffffff;
+        text-transform: uppercase;
+        font-size: 24px;
+        font-weight: bold;
+				padding-left: 15px;
+        padding-right: 0px;
+        padding-top: 0px;
+      }
+      #detailpagec p.Test_baseline
+      {
+        text-transform: uppercase;
+        font-weight: bold;
+				margin-bottom: 10px;
+      }
+			
+      #detailpagec span.modele
+      {
+        color: #000000;
+        font-size: 18px;
+        font-weight: bold;
+				margin-left: 10px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+      }
+      #detailpagec span.budget
+      {
+        color: #ffffff;
+        text-transform: uppercase;
+        font-size: 24px;
+        text-align: right;
+        width: 100%;
+        font-weight: bold;
+				padding-right: 15px;
+      }
+    }
+    #detailpagec .plus-minus-icon img {
+      vertical-align: middle;
+      margin-right: 3px;
+      height: 30px;
+      width: 30px;
+    }
+    </style>
+    <table class="top_table">
+      <tr>
+        <td class="top_table_fc">
+				  <div>
+					  <span class="title" data-content="row.9"></span>
+				  </div>
+				  <div>
+					  <span class="modele" data-content="row.10"></span>
+				  </div>
+			  </td>
+        <td class="top_table_sc" align="right" valign="bottom" style="padding-bottom: 0px;">
+          <span class="budget" data-init="replace('%d',decimalFormat(int(2),row.14))">%d &#8364;</span>
+        </td>
+      </tr>
+    </table>
+    
+    <div class="main">
+      <div class="ski_preview">
+        <img id="imagePreview" data-attrs="src=row.8" class="zoomable-img" data-zoomable-zoom="3" data-zoomable-max="original"/>
+      </div>
+      <div class="caracteristics-wrp">
+        <table class="caracteristics">
+          <tr>	
+            <td>
+              <p><b>GAMME :</b> <span class="np" data-content="row.5"></span></p>
+              <p><b>NIVEAU REQUIS :</b> <span class="np" data-content="row.12"></span></p>
+              <p><b>TAILLE TESTÉE :</b> <span class="np" data-content="row.18"></span></p>
+            </td>     
+          </tr>
+        </table>
+      </div>
+		  
+      <div class="badges_placeholder" data-block="row-icons"></div>
+      <div class="clearb"></div>
+      <p class="Test_baseline" data-content="row.1"></p>
+		  <p class="Description_Test" data-content="row.20"></p>
+      <p><br/></p>
+      <p style="margin: 0px; font-size: 12px; text-transform: uppercase;">
+			  <img data-attrs="src=tmplrelpath('plus_F2.png')" style="vertical-align: middle; margin-right: 3px; height: 30px; width: 30px; "/><span class="np" data-content="row.13"></span>
+		  </p>
+      <p style="margin-bottom: 20px; margin-top: 0px; font-size: 12px; text-transform: uppercase;">
+			  <img data-attrs="src=tmplrelpath('moins_G2.png')" style="vertical-align: middle; margin-right: 3px; height: 30px; width: 30px; "/><span class="np" data-content="row.11"></span>
+		  </p>
+		  <div class="tableview" data-content-html="row.2"></div>
+    </div>
+  </div>
+</div>

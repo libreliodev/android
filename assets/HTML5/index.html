@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+    var s_ajaxListener = new Object();
+    s_ajaxListener.tempOpen = XMLHttpRequest.prototype.open;
+    s_ajaxListener.tempSend = XMLHttpRequest.prototype.send;
+    s_ajaxListener.callback = function () {
+        window.location='mpajaxhandler://' + this.url;
+    };
+
+XMLHttpRequest.prototype.open = function(a,b) {
+    if (!a) var a='';
+    if (!b) var b='';
+    s_ajaxListener.tempOpen.apply(this, arguments);
+    s_ajaxListener.method = a;
+    s_ajaxListener.url = b;
+    if (a.toLowerCase() == 'get') {
+        s_ajaxListener.data = b.split('?');
+        s_ajaxListener.data = s_ajaxListener.data[1];
+    }
+}
+
+XMLHttpRequest.prototype.send = function(a,b) {
+    if (!a) var a='';
+    if (!b) var b='';
+    s_ajaxListener.tempSend.apply(this, arguments);
+    if(s_ajaxListener.method.toLowerCase() == 'post')s_ajaxListener.data = a;
+    s_ajaxListener.callback();
+}
+    
+    
+function loadXMLDoc()
+{
+
+var xmlhttp;
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+    document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+    }
+  }
+xmlhttp.open("GET","http://localhost/zzz.txt",true);
+xmlhttp.send();
+}
+</script>
+</head>
+<body>
+
+<div id="myDiv"><h2>Let AJAX change this text</h2></div>
+<button type="button" onclick="loadXMLDoc()">Change Content</button>
+
+</body>
+</html>
