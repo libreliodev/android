@@ -1,5 +1,10 @@
 package com.librelio;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
@@ -12,13 +17,29 @@ import org.acra.annotation.ReportsCrashes;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 
 import com.librelio.activity.MuPDFActivity;
+import com.librelio.library.ui.NivealesApplication;
+import com.librelio.library.ui.criteraselectors.CheckedCriteriaSelectorFragment;
+import com.librelio.library.ui.criteraselectors.CheckedCriteriaSelectorFragment.OnCriteriaChangedListener;
+import com.librelio.library.ui.criteraselectors.RangeCriteriaSelectorFragment;
+import com.librelio.library.ui.criteraselectors.RangeCriteriaSelectorFragment.OnRangeCriteriaChangedListener;
+import com.librelio.library.ui.lexique.LexiqueFragment;
+import com.librelio.library.ui.productdetail.ProductDetailFragment;
+import com.librelio.library.ui.productdetail.ProductDetailFragment.ShareProductListener;
+import com.librelio.library.ui.productlist.FavoriteProductListFragment;
+import com.librelio.library.ui.productlist.ProductListFragment;
+import com.librelio.library.ui.productsearch.ProductSearchFragment;
+import com.librelio.library.utils.adapters.CursorViewBinder;
+import com.librelio.library.utils.db.DBHelper;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.utils.GooglePlayServicesUtils;
 import com.librelio.utils.SystemHelper;
@@ -183,5 +204,4 @@ public class LibrelioApplication extends Application {
     public static String getAndroidId(Context context) {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
-
 }

@@ -23,13 +23,13 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
         return mInstance;
     }
 
-	public static final String TABLE_DOWNLOADED_MAGAZINES = "DownloadedMagazines";
+	public static final String TABLE_DOWNLOADED_ITEMS = "DownloadedMagazines";
 	public static final String TABLE_DOWNLOADS = "Downloads";
 	public static final String FIELD_ID = "_id";
 	public static final String FIELD_TITLE = "title";
 	public static final String FIELD_SUBTITLE = "subtitle";
-	public static final String FIELD_FILE_NAME = "filename";
-	public static final String FIELD_ASSET_FILE_NAME = "assetfilename";
+	public static final String FIELD_FILE_PATH = "filename";
+	public static final String FIELD_ASSET_FILE_PATH = "assetfilename";
 	public static final String FIELD_ASSET_URL = "asseturl";
 	public static final String FIELD_RETRY_COUNT = "retrycount";
 	public static final String FIELD_ASSET_DOWNLOAD_STATUS = "assetdownloadstatus";
@@ -48,9 +48,9 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
 	}
 
     private void createDownloadedMagazinesTable(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE " + DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES + "("
+        db.execSQL("CREATE TABLE " + DataBaseHelper.TABLE_DOWNLOADED_ITEMS + "("
                 + DataBaseHelper.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + DataBaseHelper.FIELD_FILE_NAME + " TEXT, "
+                + DataBaseHelper.FIELD_FILE_PATH + " TEXT, "
                 + DataBaseHelper.FIELD_TITLE + " TEXT, "
                 + DataBaseHelper.FIELD_DOWNLOAD_DATE + " TEXT, "
                 + DataBaseHelper.FIELD_SUBTITLE + " TEXT, "
@@ -61,8 +61,8 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
     private void createDownloadsTable(SQLiteDatabase db){
         db.execSQL("CREATE TABLE "+DataBaseHelper.TABLE_DOWNLOADS+ "("
                 + DataBaseHelper.FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + DataBaseHelper.FIELD_FILE_NAME + " TEXT, "
-                + DataBaseHelper.FIELD_ASSET_FILE_NAME + " TEXT, "
+                + DataBaseHelper.FIELD_FILE_PATH + " TEXT, "
+                + DataBaseHelper.FIELD_ASSET_FILE_PATH + " TEXT, "
                 + DataBaseHelper.FIELD_ASSET_URL + " TEXT, "
                 + DataBaseHelper.FIELD_RETRY_COUNT + " INTEGER, "
                 + DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS + " INTEGER);");
@@ -83,7 +83,7 @@ public class DataBaseHelper extends SQLiteOpenHelper implements BaseColumns{
         	createDownloadsTable(db);
         }
         if (oldVersion < 5) {
-        	 db.execSQL("ALTER TABLE " + DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES + " ADD COLUMN " + DataBaseHelper.FIELD_DOWNLOAD_STATUS + " INTEGER DEFAULT -2;");
+        	 db.execSQL("ALTER TABLE " + DataBaseHelper.TABLE_DOWNLOADED_ITEMS + " ADD COLUMN " + DataBaseHelper.FIELD_DOWNLOAD_STATUS + " INTEGER DEFAULT -2;");
         }
 //		onCreate(db);
 	}

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.librelio.base.BaseActivity;
-import com.librelio.fragments.MagazinesFragment;
+import com.librelio.fragments.PlistGridFragment;
 
 public class MagazinesActivity extends BaseActivity {
 
@@ -27,7 +27,7 @@ public class MagazinesActivity extends BaseActivity {
 			return;
 		}
 
-		MagazinesFragment f = MagazinesFragment.newInstance(getIntent()
+		PlistGridFragment f = PlistGridFragment.newInstance(getIntent()
 				.getStringExtra(PLIST_NAME_EXTRA));
 
 		getSupportFragmentManager().beginTransaction()

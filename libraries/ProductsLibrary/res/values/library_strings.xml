@@ -1,0 +1,50 @@
+<resources>
+
+    <string name="tests_snowboards_app_name">Snowboards</string>
+    <string name="tests_skis_app_name">Skis</string>
+    <string name="title_activity_test_snowboards_main">TestSnowboards</string>
+
+    <string-array name="Genre_Fields"></string-array>
+    <string-array name="Genre_Ids"></string-array>
+
+    <string name="spaceholder"> </string>
+    <string name="DatabaseFileName">snowsurf_tests2013_.sqlite</string>
+    <string name="modele">Modèle:</string>
+    <string name="gamme">Gamme:</string>
+    <string name="budget">Budget:</string>
+    <string name="tri_par">Tri par:</string>
+    <string name="productlist_sort_marque">Marque</string>
+    <string name="productlist_sort_gamme">Gamme</string>
+    <string name="productlist_sort_prix">Prix</string>
+    <string name="main_layout_search_input_hint">Recherche directe</string>
+    <string name="main_layout_search_button_label">AFFICHER LES RÉSULTATS</string>
+    <string name="main_layout_clear_button_label"> NOUVELLE RECHERCHE</string>
+
+    <string-array name="TabsNames">
+        <item>Recherche</item>
+        <item>Favoris</item>
+        <item>Lexique</item>
+    </string-array>
+
+    <string name="product_list_search_results">Votre recherche</string>
+    <string name="product_detail_title">Fiche produit</string>
+    <string name="ProductDetailWebPage">detailsIphone.html</string>
+    <string name="min">mini</string>
+    <string name="max">maxi</string>
+    <string name="MenuItemAbout">Editeur</string>
+    <string name="empty">TestTestTest</string>
+
+    <string-array name="ShareOptions">
+        <item>Facebook</item>
+        <item>Twitter</item>
+        <item>Mail</item>
+    </string-array>
+    <string name="share_dialog_title">Partager via:</string>
+    <string name="facebook">Facebook</string>
+    <string name="FacebookPageUrl">http&#58;&#47;&#47;www.facebook.com</string>
+    <string name="previouse_search_title">Ma dernière recherche:</string>
+    <string name="NewSearchText">Pour rechercher un ski, sélectionner vos critères de recherche</string>
+    <string name="right_pane_search_message">Recherche par marque</string>
+    <string name="nothing_found_message">Désolé aucun produit ne correspond à votre demande</string>
+
+</resources>

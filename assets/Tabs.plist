@@ -12,6 +12,14 @@
 	</dict>
 	<dict>
 		<key>FileName</key>
+		<string>Products.plist</string>
+		<key>Icon</key>
+		<string>download.png</string>
+		<key>Title</key>
+		<string>Products</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
 		<string>file://localhost/</string>
 		<key>Icon</key>
 		<string>folder.png</string>

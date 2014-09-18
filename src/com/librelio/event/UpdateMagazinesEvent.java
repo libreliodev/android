@@ -1,6 +1,6 @@
 package com.librelio.event;
 
-import com.librelio.model.DictItem;
+import com.librelio.model.dictitem.DictItem;
 
 import java.util.ArrayList;
 

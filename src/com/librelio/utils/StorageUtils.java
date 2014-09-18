@@ -1,12 +1,16 @@
 package com.librelio.utils;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.os.EnvironmentCompat;
 import android.util.Log;
+
 import com.niveales.wind.R;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -145,6 +149,38 @@ public class StorageUtils {
 				return string;
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	public static String copyFileToExternalDirectory(Context context, String pic,
+			AssetManager assets) {
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			File externalDir = context.getExternalCacheDir();
+			if (externalDir.canWrite()) {
+				try {
+					String fileName = pic.split("/")[pic.split("/").length - 1];
+					File newPic = new File(externalDir.getAbsolutePath() + "/" + fileName);
+					byte[] buffer = new byte[1024];
+					BufferedOutputStream bos = new BufferedOutputStream(
+							new FileOutputStream(newPic));
+					BufferedInputStream bis = new BufferedInputStream(
+							assets.open(pic));
+					int count = 0;
+					while ((count = bis.read(buffer, 0, 1024)) > 0) {
+						bos.write(buffer, 0, count);
+					}
+					bos.close();
+					bis.close();
+					return newPic.getAbsolutePath();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
+			} else {
+				return null;
 			}
 		}
 		return null;

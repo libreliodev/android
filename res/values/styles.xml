@@ -20,4 +20,9 @@
         <item name="android:visibility">gone</item>
     </style>
 
+    <style name="mainGridViewButtonStyle" parent="android:Widget.Holo.Button">
+        <item name="android:background">@drawable/magazines_view_button_selector</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/preview_button_text_size</item>
+    </style>
 </resources>

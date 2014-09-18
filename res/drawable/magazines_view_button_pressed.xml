@@ -2,11 +2,7 @@
     android:shape="rectangle" >
 
     <corners android:radius="5dip" />
-
-    <gradient
-        android:endColor="#54575e"
-        android:gradientRadius="70"        
-        android:startColor="@android:color/white"
-        android:type="radial" />
+    
+    <solid android:color="#9954575e" />
 
 </shape>

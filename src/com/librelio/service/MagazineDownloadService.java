@@ -4,10 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -18,29 +15,30 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.artifex.mupdfdemo.LinkInfoExternal;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MuPDFActivity;
-import com.librelio.event.ChangeInDownloadedMagazinesEvent;
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.MagazineDownloadedEvent;
+import com.librelio.event.MagazinesUpdatedEvent;
+import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.lib.utils.PDFParser;
-import com.librelio.model.DownloadStatus;
-import com.librelio.model.Magazine;
+import com.librelio.model.DownloadStatusCode;
+import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
-import com.librelio.utils.SystemHelper;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -55,6 +53,12 @@ public class MagazineDownloadService extends WakefulIntentService {
 	private final static int BUFFER_SIZE = 1024 * 8;
 
 	private static final String TEMP_FILE_SUFFIX = ".temp";
+
+	private static final String EXTRA_IS_SAMPLE = "extra_is_sample";
+
+	private static final String EXTRA_TEMP_URL_KEY = "temp_url_key";
+
+	private static final String EXTRA_IS_TEMP = "is_temp";
 
 	public MagazineDownloadService() {
 		super("magazinedownload");
@@ -84,21 +88,38 @@ public class MagazineDownloadService extends WakefulIntentService {
 //	}
 
 	private void downloadMagazine(Intent intent) {
-		Magazine magazine = manager.findById(
-				intent.getLongExtra(DataBaseHelper.FIELD_ID, -1),
-				DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES);
+		MagazineItem magazine = null;
+		// TODO Fix this properly - why isn't the magazine in the database
+		try {
+			magazine = manager.findByFilePath(
+					intent.getStringExtra(DataBaseHelper.FIELD_FILE_PATH),
+					DataBaseHelper.TABLE_DOWNLOADED_ITEMS);
+		} catch (MagazineNotFoundInDatabaseException e1) {
+			e1.printStackTrace();
+			  Handler h = new Handler(getMainLooper());
+
+			    h.post(new Runnable() {
+			        @Override
+			        public void run() {
+
+						Toast.makeText(MagazineDownloadService.this, "Magazine not found - please try again", Toast.LENGTH_SHORT).show();
+			        }
+			    });
+			return;
+		}
 
 		String fileUrl = magazine.getItemUrl();
-		String filePath = magazine.getFilename();
-		if (magazine.isSample()) {
+		String filePath = magazine.getItemFileName();
+		boolean isSample = intent.getBooleanExtra(EXTRA_IS_SAMPLE, false);
+		if (isSample) {
 			// If sample
 			fileUrl = magazine.getSamplePdfUrl();
 			filePath = magazine.getSamplePdfPath();
-		} else if (intent.getBooleanExtra("is_temp", false)) {
+		} else if (intent.getBooleanExtra(EXTRA_IS_TEMP, false)) {
 			// If temp url
-			fileUrl = intent.getStringExtra("temp_url_key");
+			fileUrl = intent.getStringExtra(EXTRA_TEMP_URL_KEY);
 		}
-		Log.d(TAG, "isSample: " + magazine.isSample() + "\nfileUrl: " + fileUrl
+		Log.d(TAG, "isSample: " + isSample + "\nfileUrl: " + fileUrl
 				+ "\nfilePath: " + filePath);
 		EasyTracker.getInstance().setContext(this);
 		EasyTracker.getTracker().sendView(
@@ -109,10 +130,10 @@ public class MagazineDownloadService extends WakefulIntentService {
 		Request.Builder requestBuilder = new Request.Builder().url(fileUrl);
 		
 		File currentFile = new File(tempFilePath);
-		long previousFileSize = 0;
 		
+		// FIXME Download never resumes because the magazine directory is deleted just before starting download
 		if (currentFile.exists()) {
-			previousFileSize = currentFile.length();
+			// Add Range header to restart download
 			requestBuilder.addHeader("Range", "bytes=" + currentFile.length()
 					+ "-");
 			
@@ -153,13 +174,14 @@ public class MagazineDownloadService extends WakefulIntentService {
 						break;
 					}
 					out.write(buffer, 0, bytesRead);
-					manager.setDownloadStatus(magazine.getId(),
+					manager.setDownloadStatus(magazine.getFilePath(),
 							(int) ((bytesCount * 100) / totalSize));
 					bytesCount += bytesRead;
 					
+					// check if download exists in database - if not, cancel download
 					// TODO don't check too often - log to see how often this is called
-					if (!manager.doesMagazineExist(intent.getLongExtra(DataBaseHelper.FIELD_ID, -1),
-							DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES)) {
+					if (!manager.doesMagazineExistInDatabase(intent.getStringExtra(DataBaseHelper.FIELD_FILE_PATH),
+							DataBaseHelper.TABLE_DOWNLOADED_ITEMS)) {
 						Log.d(TAG, "DOWNLOAD CANCELLED!");
 						return;
 					}
@@ -172,27 +194,20 @@ public class MagazineDownloadService extends WakefulIntentService {
 				in.close();
 			}
 
-			Log.d(TAG, "Downloaded " + magazine.getFileName());
+			Log.d(TAG, "Downloaded " + magazine.getFilePath());
 			
 			File tempFile = new File(filePath + TEMP_FILE_SUFFIX);
 			tempFile.renameTo(new File(filePath));
 
-			Date date = Calendar.getInstance().getTime();
-			// String downloadDate = new
-			// SimpleDateFormat(" dd.MM.yyyy").format(date);
-			String downloadDate = DateFormat.getDateInstance().format(date);
-			magazine.setDownloadDate(downloadDate);
 			MagazineManager.removeDownloadedMagazine(this, magazine);
 			manager.addMagazine(magazine,
-					DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES, true);
+					DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
 			
 			addAssetsToDatabase(this, magazine);
 			
-			manager.setDownloadStatus(magazine.getId(),
-					DownloadStatus.DOWNLOADED);
+			manager.setDownloadStatus(magazine.getFilePath(),
+					DownloadStatusCode.DOWNLOADED);
 
-//			magazine.makeCompleteFile(magazine.isSample());
-			
 			EventBus.getDefault().post(new LoadPlistEvent());
 			EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
 
@@ -201,7 +216,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 					.setSmallIcon(R.drawable.ic_launcher)
 					.setContentTitle(
 							magazine.getTitle()
-									+ (magazine.isSample() ? " sample" : "")
+									+ (isSample ? " sample" : "")
 									+ " downloaded")
 					.setContentText("Click to read");
 
@@ -211,15 +226,15 @@ public class MagazineDownloadService extends WakefulIntentService {
 					.getDimension(android.R.dimen.notification_large_icon_height);
 			int width = (int) res
 					.getDimension(android.R.dimen.notification_large_icon_width);
-			mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(
-					magazine.getPngPath(), height, width));
+//			mBuilder.setLargeIcon(SystemHelper.decodeSampledBitmapFromFile(
+//					magazine.getPngPath(), height, width));
 
 			// TODO show magazine cover as large image
 
 			Intent resultIntent = new Intent(this, MuPDFActivity.class);
 			resultIntent.setAction(Intent.ACTION_VIEW);
-			resultIntent.setData(Uri.parse(magazine.isSample() ? magazine
-					.getSamplePdfPath() : magazine.getFilename()));
+			resultIntent.setData(Uri.parse(isSample ? magazine
+					.getSamplePdfPath() : magazine.getItemFileName()));
 			resultIntent.putExtra(DataBaseHelper.FIELD_TITLE,
 					magazine.getTitle());
 
@@ -231,20 +246,20 @@ public class MagazineDownloadService extends WakefulIntentService {
 			mBuilder.setContentIntent(resultPendingIntent);
 			mBuilder.setAutoCancel(true);
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			mNotificationManager.notify(magazine.getFileName().hashCode(),
+			mNotificationManager.notify(magazine.getFilePath().hashCode(),
 					mBuilder.build());
 
-			EventBus.getDefault().post(new ChangeInDownloadedMagazinesEvent());
+			EventBus.getDefault().post(new MagazinesUpdatedEvent());
 			AssetDownloadService.startAssetDownloadService(this);
 		} catch (IOException e) {
 			e.printStackTrace();
-			manager.setDownloadStatus(magazine.getId(), DownloadStatus.FAILED);
-			Log.d(TAG, "failed to download " + magazine.getFileName());
+			manager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.FAILED);
+			Log.d(TAG, "failed to download " + magazine.getFilePath());
 		}
 	}
 
-	private void addAssetsToDatabase(Context context, Magazine magazine) {
-		Log.d(TAG, "addAssetsToDatabase " + magazine.getFileName());
+	private void addAssetsToDatabase(Context context, MagazineItem magazine) {
+		Log.d(TAG, "addAssetsToDatabase " + magazine.getFilePath());
 
 		SQLiteDatabase db = DataBaseHelper.getInstance(context)
 				.getWritableDatabase();
@@ -253,7 +268,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 		ArrayList<String> assetsNames = new ArrayList<String>();
 		//
 		String filePath = magazine.isSample() ? magazine.getSamplePdfPath()
-				: magazine.getFilename();
+				: magazine.getItemFileName();
 		PDFParser linkGetter = new PDFParser(filePath);
 		SparseArray<LinkInfoExternal[]> linkBuf = linkGetter.getLinkInfo();
 		if (linkBuf == null) {
@@ -275,15 +290,14 @@ public class MagazineDownloadService extends WakefulIntentService {
 						if (link.contains("?")) {
 							finIdx = link.indexOf("?");
 						}
-						String assetsFile = link.substring(startIdx, finIdx);
-						assetsNames.add(assetsFile);
+						String assetsFileName = link.substring(startIdx, finIdx);
+						assetsNames.add(assetsFileName);
 
-						String uriString = Magazine.getServerBaseURL(magazine
-								.getFileName()) + assetsFile;
-						Log.d(TAG, "   file: " + assetsFile);
+						String uriString = magazine.getAssetUrl(assetsFileName);
+						Log.d(TAG, "   file: " + assetsFileName);
 						Log.d(TAG, "  link to download: " + uriString);
 
-						manager.addAsset(magazine, assetsFile, uriString);
+						manager.addAsset(magazine, assetsFileName, uriString);
 					}
 				}
 			}
@@ -296,27 +310,28 @@ public class MagazineDownloadService extends WakefulIntentService {
 	}
 
 	public static void startMagazineDownload(Context context,
-			Magazine currentMagazine) {
-		startMagazineDownload(context, currentMagazine, false, null);
+			MagazineItem currentMagazine, boolean isSample) {
+		startMagazineDownload(context, currentMagazine, false, null, isSample);
 	}
 
 	public static void startMagazineDownload(Context context,
-			Magazine magazine, boolean isTemp, String tempUrlKey) {
+			MagazineItem magazine, boolean isTemp, String tempUrlKey, boolean isSample) {
 
 		MagazineManager magazineManager = new MagazineManager(context);
 		MagazineManager.removeDownloadedMagazine(context, magazine);
 		magazineManager.addMagazine(magazine,
-				DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES, true);
-		magazineManager.setDownloadStatus(magazine.getId(),
-				DownloadStatus.QUEUED);
+				DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
+		magazineManager.setDownloadStatus(magazine.getFilePath(),
+				DownloadStatusCode.QUEUED);
 		// magazine.clearMagazineDir();
-		magazine.makeMagazineDir();
+		magazine.makeMagazineDir(context);
 		EventBus.getDefault().post(new LoadPlistEvent());
 
 		Intent intent = new Intent(context, MagazineDownloadService.class);
-		intent.putExtra(DataBaseHelper.FIELD_ID, magazine.getId());
-		intent.putExtra("is_temp", isTemp);
-		intent.putExtra("temp_url_key", tempUrlKey);
+		intent.putExtra(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());
+		intent.putExtra(EXTRA_IS_TEMP, isTemp);
+		intent.putExtra(EXTRA_TEMP_URL_KEY, tempUrlKey);
+		intent.putExtra(EXTRA_IS_SAMPLE, isSample);
 		MagazineDownloadService.sendWakefulWork(context, intent);
 	}
 

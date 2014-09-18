@@ -215,7 +215,7 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 		showWaitDialog();
 		Log.d(TAG, "onPlayVideoInside " + basePath + ", linkInfo = " + linkInfo);
 		LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.video_activity_layout, this, true);
+		inflater.inflate(R.layout.activity_video, this, true);
         errorTextView = (TextView)findViewById(R.id.error_text);
 		videoView = (SurfaceView)findViewById(R.id.surface_frame);
 		videoView.setOnTouchListener(new OnTouchListener() {

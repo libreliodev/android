@@ -1,6 +1,5 @@
 package com.librelio.activity;
 
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -13,15 +12,15 @@ import android.widget.TextView;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.event.MagazineDownloadedEvent;
-import com.librelio.model.DownloadStatus;
-import com.librelio.model.Magazine;
+import com.librelio.model.DownloadStatusCode;
+import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.MagazineManager;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
 public class DownloadMagazineActivity extends BaseActivity {
 
-    private Magazine magazine;
+    private MagazineItem magazine;
     private ProgressBar progress;
     private Handler handler = new Handler();
 
@@ -35,9 +34,10 @@ public class DownloadMagazineActivity extends BaseActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (magazine.getDownloadStatus() > DownloadStatus.QUEUED && magazine.getDownloadStatus() < DownloadStatus.DOWNLOADED) {
+                        	int downloadStatus = magazine.getDownloadStatus();
+                            if (downloadStatus > DownloadStatusCode.QUEUED && downloadStatus < DownloadStatusCode.DOWNLOADED) {
                                 progress.setIndeterminate(false);
-                                progress.setProgress(magazine.getDownloadStatus());
+                                progress.setProgress(downloadStatus);
                                 progressText.setText(R.string.download_in_progress);
                             } else {
                                 progress.setIndeterminate(true);
@@ -55,22 +55,20 @@ public class DownloadMagazineActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.download_magazines_activity);
+        setContentView(R.layout.activity_download_magazines);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         String title = getIntent().getExtras().getString(BillingActivity.TITLE_KEY);
         String subtitle = getIntent().getExtras().getString(BillingActivity.SUBTITLE_KEY);
         String fileName = getIntent().getExtras().getString(BillingActivity.FILE_NAME_KEY);
-        boolean isSample = getIntent().getExtras().getBoolean(BillingActivity.IS_SAMPLE_KEY);
 
-        magazine = new Magazine(fileName, title, subtitle, "", this);
-        magazine.setSample(isSample);
+        magazine = new MagazineItem(this, title, subtitle, fileName);
 
         ImageView preview = (ImageView) findViewById(R.id.download_preview_image);
         progress = (ProgressBar)findViewById(R.id.download_progress);
         progressText = (TextView)findViewById(R.id.download_progress_text);
-        Picasso.with(this).load(magazine.getPngUrl()).fit().centerInside().into(preview);
+        Picasso.with(this).load(magazine.getPngUri()).fit().centerInside().into(preview);
 
         ((TextView) findViewById(R.id.item_title)).setText(title);
         ((TextView) findViewById(R.id.item_subtitle)).setText(subtitle);
@@ -79,7 +77,7 @@ public class DownloadMagazineActivity extends BaseActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                magazine.clearMagazineDir();
+                magazine.clearMagazineDir(DownloadMagazineActivity.this);
                 MagazineManager.removeDownloadedMagazine(DownloadMagazineActivity.this, magazine);
                 finish();
             }
@@ -87,8 +85,8 @@ public class DownloadMagazineActivity extends BaseActivity {
     }
 
     public void onEventMainThread(MagazineDownloadedEvent event) {
-        if (event.getMagazine().getFileName().equals(magazine.getFileName())) {
-            LibrelioApplication.startPDFActivity(this, magazine.getFilename(), magazine.getTitle(), true);
+        if (event.getMagazine().getFilePath().equals(magazine.getFilePath())) {
+            LibrelioApplication.startPDFActivity(this, magazine.getItemFileName(), magazine.getTitle(), true);
             finish();
         }
     }

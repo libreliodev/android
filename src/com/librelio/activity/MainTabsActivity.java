@@ -28,15 +28,8 @@ import android.view.MenuItem;
 import android.view.Window;
 
 import com.librelio.base.BaseActivity;
-import com.librelio.fragments.DownloadedMagazinesFragment;
-import com.librelio.fragments.MagazinesFragment;
-import com.librelio.fragments.RssFragment;
-import com.librelio.fragments.WebViewFragment;
-import com.librelio.model.DictItem;
-import com.librelio.model.DownloadsItem;
-import com.librelio.model.PlistItem;
-import com.librelio.model.RssFeedItem;
-import com.librelio.model.WebAddressItem;
+import com.librelio.model.dictitem.DictItem;
+import com.librelio.model.interfaces.DisplayableAsTab;
 import com.librelio.service.AssetDownloadService;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
@@ -75,9 +68,6 @@ public class MainTabsActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_main_tabs);
-
-		// overridePendingTransition(R.anim.flip_right_in,
-		// R.anim.flip_left_out);
 
 		parseTabsPlist();
 
@@ -242,19 +232,10 @@ public class MainTabsActivity extends BaseActivity {
 		@Override
 		public Fragment getItem(int position) {
 			DictItem item = tabs.get(position);
-			if (item instanceof WebAddressItem) {
-				return WebViewFragment.newInstance(((WebAddressItem) item)
-						.getWebAddress());
-			} else if (item instanceof RssFeedItem) {
-				return RssFragment.newInstance(item.getItemUrl());
-			} else if (item instanceof DownloadsItem) {
-				return new DownloadedMagazinesFragment();
-			} else if (item instanceof PlistItem) {
-				// TODO send full plistitem
-				return MagazinesFragment.newInstance(item.getFileName());
+			if (item instanceof DisplayableAsTab) {
+				return ((DisplayableAsTab) item).getFragment();
 			}
-
-			return WebViewFragment.newInstance("dsfsd");
+			return null;
 		}
 
 		@Override

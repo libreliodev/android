@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="row_downloaded_magazine_large_text_size">26sp</dimen>
+    <dimen name="row_downloaded_magazine_small_text_size">22sp</dimen>
+    <dimen name="downloaded_preview_image_width">160dp</dimen>
+    <dimen name="downloaded_preview_image_height">240dp</dimen>
+
+</resources>

@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.librelio.event.LoadPlistEvent;
 import com.librelio.event.UpdateProgressBarEvent;
-import com.librelio.model.PlistItem;
+import com.librelio.model.dictitem.PlistItem;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.niveales.wind.R;
@@ -33,7 +33,7 @@ public class PlistDownloader {
 
     public static void doLoad(final Context context, final String plistName, boolean force) {
 
-        final PlistItem plistItem = new PlistItem(plistName, "", context);
+        final PlistItem plistItem = new PlistItem(context, "", plistName);
         // Don't update if updates not required - i.e. waupdate=0
         if (plistItem.getUpdateFrequency() == -1) {
             EventBus.getDefault().post(new LoadPlistEvent());
@@ -65,7 +65,7 @@ public class PlistDownloader {
                     return;
                 }
                 try {
-                    FileUtils.writeStringToFile(new File(StorageUtils.getStoragePath(context) + plistItem.getFilename()), s);
+                    FileUtils.writeStringToFile(new File(StorageUtils.getStoragePath(context) + plistItem.getItemFileName()), s);
                     saveUpdateDate(context, plistName);
                 } catch (IOException e1) {
                     e1.printStackTrace();

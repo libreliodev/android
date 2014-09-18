@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.librelio.event.ChangeInDownloadedMagazinesEvent;
-import com.librelio.model.Magazine;
+import com.librelio.event.MagazinesUpdatedEvent;
+import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.MagazineManager;
 import com.librelio.view.DownloadedMagazinesListView;
 import com.niveales.wind.R;
@@ -46,7 +46,7 @@ public class DownloadedMagazinesFragment extends ListFragment {
 	}
 
 	private void listMagazines() {
-		List<Magazine> downloads = magazineManager.getDownloadedMagazines(false);
+		List<MagazineItem> downloads = magazineManager.getDownloadedMagazines();
 		((DownloadedMagazinesListView) getListView()).setMagazines(getActivity(), downloads);
 	}
 	
@@ -63,7 +63,7 @@ public class DownloadedMagazinesFragment extends ListFragment {
 		EventBus.getDefault().unregister(this);
 	}
 	
-	public void onEvent(ChangeInDownloadedMagazinesEvent event) {
+	public void onEvent(MagazinesUpdatedEvent event) {
 		listMagazines();
 	}
 }

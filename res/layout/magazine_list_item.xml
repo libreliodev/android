@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp" >
 
     <TextView
         android:id="@+id/item_title"
@@ -30,7 +30,7 @@
 
         <RelativeLayout
             android:layout_width="@dimen/preview_image_width"
-            android:layout_height="@dimen/preview_image_height">
+            android:layout_height="@dimen/preview_image_height" >
 
             <ImageView
                 android:id="@+id/item_thumbnail"
@@ -41,49 +41,77 @@
                 android:id="@+id/item_progress_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/transparent_gray"
                 android:layout_alignParentBottom="true"
-                android:paddingTop="5dp"
-                android:paddingBottom="20dp">
+                android:background="@color/transparent_gray"
+                android:orientation="vertical"
+                android:paddingBottom="20dp"
+                android:paddingTop="5dp" >
 
                 <TextView
                     android:id="@+id/item_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="sdhgfdfgsd" android:textSize="16sp"
+                    android:paddingBottom="5dp"
+                    android:text="Test Info"
                     android:textColor="@android:color/white"
-                    android:paddingBottom="5dp"/>
+                    android:textSize="16sp" />
 
                 <ProgressBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
                     android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp" />
             </LinearLayout>
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/item_button_one"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/preview_button_height"
-            android:background="@drawable/magazines_view_button_selector"
-            android:text="@string/read"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/preview_button_text_size" />
+            android:layout_height="wrap_content"
+            android:minHeight="92dp"
+            android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/item_button_two"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/preview_button_height"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/magazines_view_button_selector"
-            android:text="@string/download"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/preview_button_text_size" />
+            <Button
+                android:id="@+id/button_read"
+                style="@style/mainGridViewButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/preview_button_height"
+                android:text="@string/read" />
+
+            <Button
+                android:id="@+id/button_download"
+                style="@style/mainGridViewButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/preview_button_height"
+                android:layout_marginTop="4dp"
+                android:text="@string/download" />
+
+            <Button
+                android:id="@+id/button_sample"
+                style="@style/mainGridViewButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/preview_button_height"
+                android:layout_marginTop="4dp"
+                android:text="@string/sample" />
+
+            <Button
+                android:id="@+id/button_delete"
+                style="@style/mainGridViewButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/preview_button_height"
+                android:layout_marginTop="4dp"
+                android:text="@string/delete" />
+
+            <Button
+                android:id="@+id/button_cancel"
+                style="@style/mainGridViewButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/preview_button_height"
+                android:layout_marginTop="4dp"
+                android:text="@string/cancel" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

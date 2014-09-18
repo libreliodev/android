@@ -122,7 +122,7 @@ public class RssFragment extends ListFragment {
 			final ViewHolder holder;
 			if (convertView == null) {
 				convertView = View.inflate(getActivity(),
-						R.layout.rss_item_row, null);
+						R.layout.row_rss_item, null);
 				holder = new ViewHolder();
 				holder.title = (TextView) convertView.findViewById(R.id.title);
 				holder.description = (TextView) convertView

@@ -16,7 +16,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.MainTabsActivity;
 import com.librelio.activity.MuPDFActivity;
-import com.librelio.model.Magazine;
+import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
 

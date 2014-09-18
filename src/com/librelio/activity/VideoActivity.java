@@ -63,7 +63,7 @@ public class VideoActivity extends AbstractLockRotationActivity implements Media
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.video_activity_layout);
+		setContentView(R.layout.activity_video);
 		onWait();
 		path = getIntent().getExtras().getString(MediaHolder.VIDEO_PATH_KEY);
 		if(getIntent().getExtras().containsKey(MediaHolder.PLAYBACK_POSITION_KEY)){

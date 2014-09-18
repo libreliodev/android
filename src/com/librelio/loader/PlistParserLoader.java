@@ -1,22 +1,15 @@
 package com.librelio.loader;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import org.apache.commons.io.IOUtils;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.librelio.LibrelioApplication;
-import com.librelio.event.InvalidateGridViewEvent;
 import com.librelio.event.UpdateMagazinesEvent;
-import com.librelio.model.DictItem;
-import com.librelio.model.Magazine;
-import com.librelio.model.PlistItem;
+import com.librelio.model.dictitem.DictItem;
+import com.librelio.model.dictitem.MagazineItem;
+import com.librelio.model.dictitem.PlistItem;
 import com.librelio.storage.MagazineManager;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
@@ -24,9 +17,7 @@ import com.longevitysoft.android.xml.plist.PListXMLParser;
 import com.longevitysoft.android.xml.plist.domain.Array;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.niveales.wind.BuildConfig;
 
 import de.greenrobot.event.EventBus;
 
@@ -55,13 +46,17 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
     }
 
     private ArrayList<DictItem> parsePlist(String plistName) {
+    	
+    	if (BuildConfig.DEBUG) {
+    		Log.d(getClass().getSimpleName(), "parsing plist: " + plistName);
+    	}
 
-        PlistItem plistItem = new PlistItem(plistName, "", getContext());
+        PlistItem plistItem = new PlistItem(getContext(), "", plistName);
 
         ArrayList<DictItem> magazines = new ArrayList<DictItem>();
 
         //Convert plist to String for parsing
-        String pList = StorageUtils.getStringFromFilename(getContext(), plistItem.getFilename());
+        String pList = StorageUtils.getStringFromFilename(getContext(), plistItem.getItemFileName());
 
         if (pList == null) {
             return null;
@@ -81,22 +76,29 @@ public class PlistParserLoader extends AsyncTaskLoader<ArrayList<DictItem>> {
                 magazines.add(item);
             }
 
-            for (DictItem magazine : magazines) {
-                if (magazine instanceof Magazine)
-                MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
-            }
+//            for (DictItem magazine : magazines) {
+//                if (magazine instanceof Magazine) {
+                	// TODO don't always need to save details in database
+//                MagazineManager.updateMagazineDetails(getContext(), (Magazine) magazine);
+//                }
+//            }
             EventBus.getDefault().post(new UpdateMagazinesEvent(plistName, magazines));
         } catch (Exception e) {
             Log.d(TAG, "plist = " + pList);
             e.printStackTrace();
         }
+        
+    	if (BuildConfig.DEBUG) {
+    		Log.d(getClass().getSimpleName(), "finished parsing plist: " + plistName);
+    	}
         return magazines;
     }
 
     @Override
     protected void onStartLoading() {
-        if (takeContentChanged())
+        if (takeContentChanged()) {
             forceLoad();
+        }
     }
 
     @Override

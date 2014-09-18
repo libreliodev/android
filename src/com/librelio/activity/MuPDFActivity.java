@@ -47,14 +47,16 @@ import com.artifex.mupdfdemo.view.DocumentReaderView;
 import com.artifex.mupdfdemo.view.ReaderView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.librelio.base.BaseActivity;
+import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.lib.utils.PDFParser;
-import com.librelio.model.Magazine;
+import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.MagazineManager;
 import com.librelio.task.TinySafeAsyncTask;
 import com.librelio.view.TwoWayView;
 import com.librelio.view.TwoWayView.Orientation;
 import com.niveales.wind.R;
+
 import org.apache.commons.io.FilenameUtils;
 
 //TODO: remove preffix mXXXX from all properties this class
@@ -620,14 +622,19 @@ public class MuPDFActivity extends BaseActivity{
 	private void onBuy(String path) {
 		Log.d(TAG, "onBuy event path = " + path);
 		MagazineManager magazineManager = new MagazineManager(getContext());
-		Magazine magazine = magazineManager.findByFileName(path, DataBaseHelper.TABLE_DOWNLOADED_MAGAZINES);
-		if (null != magazine) {
-			Intent intent = new Intent(getContext(), BillingActivity.class);
-			intent
-				.putExtra(BillingActivity.FILE_NAME_KEY, magazine.getFileName())
-				.putExtra(BillingActivity.TITLE_KEY, magazine.getTitle())
-				.putExtra(BillingActivity.SUBTITLE_KEY, magazine.getSubtitle());
-			startActivityForResult(intent, START_BILLING_ACTIVITY);
+		MagazineItem magazine;
+		try {
+			magazine = magazineManager.findByFilePath(path, DataBaseHelper.TABLE_DOWNLOADED_ITEMS);
+			if (null != magazine) {
+				Intent intent = new Intent(getContext(), BillingActivity.class);
+				intent
+					.putExtra(BillingActivity.FILE_NAME_KEY, magazine.getFilePath())
+					.putExtra(BillingActivity.TITLE_KEY, magazine.getTitle())
+					.putExtra(BillingActivity.SUBTITLE_KEY, magazine.getSubtitle());
+				startActivityForResult(intent, START_BILLING_ACTIVITY);
+			}
+		} catch (MagazineNotFoundInDatabaseException e) {
+			e.printStackTrace();
 		}
 	}
 

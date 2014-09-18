@@ -1,16 +1,16 @@
 package com.librelio.event;
 
-import com.librelio.model.Magazine;
+import com.librelio.model.dictitem.MagazineItem;
 
 public class MagazineDownloadedEvent {
 
-    private Magazine magazine;
+    private MagazineItem magazine;
 
-    public MagazineDownloadedEvent(Magazine magazine) {
+    public MagazineDownloadedEvent(MagazineItem magazine) {
         this.magazine = magazine;
     }
 
-    public Magazine getMagazine() {
+    public MagazineItem getMagazine() {
         return magazine;
     }
 }
