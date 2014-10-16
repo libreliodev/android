@@ -156,7 +156,9 @@ public class StartupActivity extends AbstractLockRotationActivity {
 	                    }
 	                    setOnAdvertisingImageClickListener(link);
 	                    showMagazineAfterDelay(Integer.valueOf(delay));
-	                }
+	                } else {
+						showMagazineAfterDelay(DEFAULT_ADV_DELAY);	
+					}
 				} else {
 					showMagazineAfterDelay(DEFAULT_ADV_DELAY);	
 				}
