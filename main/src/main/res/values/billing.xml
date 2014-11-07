@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="server_url">http://download.librelio.com/downloads/</string>
+    <string name="command_android_verify">android_verify.php?product_id=@product_id;data=@data;signature=@signature;urlstring=@urlstring</string>
+    <string name="command_pswd">pswd.php?code=@code&amp;urlstring=@urlstring&amp;client=@client&amp;app=@app&amp;deviceid=@deviceid</string>
+    <string name="command_username_pswd">subscribers.php?urlstring=@urlstring&amp;user=@username&amp;pswd=@password&amp;client=@client&amp;app=@app&amp;service=@service&amp;deviceid=@deviceid</string>
+</resources>
+    

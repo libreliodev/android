@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="android-plist-parser-app">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/main/libs/android-plist-parser-app.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="page_preview_size">100dp</dimen>
+    <dimen name="preview_image_width">80dp</dimen>
+    <dimen name="preview_image_height">160dp</dimen>
+    <dimen name="preview_button_text_size">16dp</dimen>
+    <dimen name="preview_button_height">46dp</dimen>
+	<dimen name="billing_window_width">250dp</dimen>
+	<dimen name="row_downloaded_magazine_large_text_size">14sp</dimen>
+	<dimen name="row_downloaded_magazine_small_text_size">12sp</dimen>
+	<dimen name="downloaded_preview_image_width">80dp</dimen>
+    <dimen name="downloaded_preview_image_height">160dp</dimen>
+</resources>

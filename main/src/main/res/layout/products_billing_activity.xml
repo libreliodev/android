@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/what_do_you_want_to_buy" />
+
+    <Button
+        android:id="@+id/billing_buy_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/preview_button_text_size" />
+
+	<Button
+        android:id="@+id/billing_subs_code_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/i_have_a_subscriber_code"
+        android:textSize="@dimen/preview_button_text_size" />
+
+    <Button
+        android:id="@+id/billing_username_password_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/i_have_a_username_password_login"
+        android:textSize="@dimen/preview_button_text_size" />
+    
+    <Button
+        android:id="@+id/billing_cancel_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:textSize="@dimen/preview_button_text_size" />
+
+</LinearLayout>

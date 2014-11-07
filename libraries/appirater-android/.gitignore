@@ -1,7 +1,0 @@
-*.DS_Store
-target/
-bin/
-gen/
-doc/
-.settings/
-res/values/settings.xml

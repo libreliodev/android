@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="cwac-wakeful-1.0.3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/main/libs/cwac-wakeful-1.0.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

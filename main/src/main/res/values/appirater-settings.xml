@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+           tools:ignore="MissingTranslation">
+    <!-- Change the market_url for other markets i.e. Amazon App Store
+    	Google Play = market://details?id=%s
+    	Amazon App Store = http://www.amazon.com/gp/mas/dl/android?p=%s
+     -->
+    <string name="appirator_app_title">@string/app_name</string>
+    <string name="appirator_market_url">market://details?id=%s</string>
+    <integer name="appirator_days_until_prompt">0</integer>
+    <integer name="appirator_launches_until_prompt">2</integer>
+    <integer name="appirator_events_until_prompt">-1</integer>
+    <!-- Set this to 0 to remind every launch -->
+    <integer name="appirator_days_before_reminding">1</integer>
+    <!-- Change to true to show every time, for testing -->
+    <bool name="appirator_test_mode">false</bool>
+</resources>
