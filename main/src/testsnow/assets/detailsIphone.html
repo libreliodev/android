@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style>
+			
+			/* http://meyerweb.com/eric/tools/css/reset/ 
+			 v2.0 | 20110126
+			 License: none (public domain)
+			 */
+			
+			html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+			table, caption, tbody, tfoot, thead, tr, th, td,
+			article, aside, canvas, details, embed, 
+			figure, figcaption, footer, header, hgroup, 
+			menu, nav, output, ruby, section, summary,
+			time, mark, audio, video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+			/* HTML5 display-role reset for older browsers */
+			article, aside, details, figcaption, figure, 
+			footer, header, hgroup, menu, nav, section {
+				display: block;
+			}
+			body {
+				line-height: 1;
+                padding-bottom: 20px;
+			}
+			ol, ul {
+				list-style: none;
+			}
+			blockquote, q {
+				quotes: none;
+			}
+			blockquote:before, blockquote:after,
+			q:before, q:after {
+				content: '';
+				content: none;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+			
+            body
+            {
+                font-family: "Helvetica neue";
+                background-color: #ffffff;
+                height: 100%;
+            }
+            
+			b
+			{
+				font-weight: bold;
+			}
+			
+			img
+			{
+				vertical-align: top;
+			}
+            
+			div.badges img
+			{
+				margin-right: 7px;
+				margin-bottom: 6px;
+			}
+			div.badges img.lastone
+			{
+				margin-right: 0px;
+				margin-bottom: 6px;
+			}
+            span.title
+            {
+                color: #ffffff;
+                text-transform: uppercase;
+                font-size: 24px;
+                font-weight: bold;
+				padding-left: 15px;
+				margin-left: 0px;
+            }
+            p.Test_baseline
+            {
+                text-transform: uppercase;
+                font-weight: bold;
+				font-size: 80%;
+                margin-top: 15px; 
+                margin-bottom: 2px;
+                
+            }
+			
+            span.modele
+            {
+                color: #000000;
+                font-size: 16px;
+                font-weight: bold;
+				padding-bottom: 5px;
+            }
+            span.budget
+            {
+                color: #000000;
+                text-transform: uppercase;
+                font-size: 16px;
+                text-align: right;
+                width: 100%;
+                font-weight: bold;
+            }
+			
+			div.title
+			{
+				background-color: #e2001a;
+				color: white;
+				font-size: 18px;
+				font-weight: bold;
+                display: block; 
+                margin-left:auto; 
+                margin-right: auto;
+				height: 30px;
+				padding-left: 15px;
+				text-transform: uppercase;
+			}
+            div.main
+            {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            div.main table.caracteristics img
+            {
+                margin: 2px;
+            }
+            
+            div.tableview
+            {
+				padding-left: 10px;
+            }
+            div.tableview table
+            {
+                border-collapse: collapse;
+                border-style: solid;
+                border-width: 2px;
+                border-color: white;
+            }
+            div.tableview table th
+            {
+                background-color: white;
+                color: gray;
+                text-transform: uppercase;
+                border-collapse: collapse;
+                border-style: solid;
+                border-width: 2px;
+                border-color: black;
+                text-align: center;
+            }
+            div.tableview table td
+            {
+				color: gray;
+				font-size: 12px;
+                background-color: #cccccc;
+                border-collapse: collapse;
+                border-style: solid;
+                border-width: 2px;
+                text-align: center;
+                border-color: white;
+				padding: 5px;
+				font-weight: bold;
+			}
+            
+            div.ski_preview
+            {
+                background-color: white;
+                display: block; 
+                margin-left:auto; 
+                margin-right: auto;
+				margin-top: 5px;
+				margin-bottom: 15px;
+                border-color: gray;
+                border-style: none;
+                border-width: 0px;
+				padding: 0px;
+            }
+			
+			div.stars
+			{
+				border-color: #e2001a;
+				color: #e2001a;
+                border-style: solid;
+                border-width: 4px;
+                -webkit-border-radius: 15px;
+				padding: 15px 15px 0px 15px;
+				text-align: left;
+				margin-bottom: 15px;
+			}
+			div.stars p
+			{
+				font-weight: bold;
+				margin: 0px;
+				padding: 0px;
+			}
+			
+			div.stars img
+			{
+				margin: 0px;
+				padding: 0px;
+				padding-bottom: 10px;
+			}
+            div.ski_preview img
+            {
+                width: 100%;
+                margin: 0px;
+            }
+            </style>
+        <script>
+            function touchstartHandler(event)
+            { 
+                image = document.getElementById('imagePreview');
+                location = "zoom://touchstart/?" + event.targetTouches[0].pageX + "," + 
+				event.targetTouches[0].pageY + "," + 
+				image.y + "," + 
+				image.height + "," +
+				image.x + "," +
+				image.width;
+            }
+            
+            function touchmoveHandler(event)
+            { 
+                image = document.getElementById('imagePreview');
+                location = "zoom://touchmove/?" + event.targetTouches[0].pageX + "," + 
+				event.targetTouches[0].pageY + "," + 
+				image.y + "," + 
+				image.height + "," +
+				image.x + "," +
+				image.width;
+            }
+            
+            function touchendHandler(event)
+            { 
+                location = "zoom://touchend/";
+            }
+            
+            function bodyLoad()
+            {
+                document.getElementById('imagePreview').addEventListener('touchstart', touchstartHandler, false); 
+                document.getElementById('imagePreview').addEventListener('touchmove', touchmoveHandler, false);
+                document.getElementById('imagePreview').addEventListener('touchend', touchendHandler, false); 
+            }
+            </script>
+    </head>
+    <body onload="bodyLoad();">
+		
+        <div class="title">
+			<div style="display: table-cell; vertical-align: middle; height: 30px;">
+				%TAITLE%
+			</div>
+		</div>
+        
+        <div class="main">
+			
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tr>	
+					<td width="75%"><span class="modele">%Modele%</span></td>
+					<td width="75%" align="right"><span class="budget">%Budget%</span></td>       
+				</tr>
+			</table>
+			
+			
+			<div class="ski_preview">
+                <img id="imagePreview" src="%img%" />
+            </div>
+			
+			<div class="badges" style="vertical-align: top;">
+				%icone_genre%%icone_cambres%%icone_wide%%icone_top%
+			</div>
+
+                        <div style="font-size: 75%; text-align:left; background-color: #cccccc; padding: 3px; line-height: 120%; margin-bottom: 2px;">
+                        <span style="color: #e2001a; font-weight: bold;">Gamme :</span> %GAMME%<br />
+                        <span style="color: #e2001a; font-weight: bold;">Taille testée :</span> %TAILLE TESTEE%<br />
+							<span style="color: #e2001a; font-weight: bold;">Tailles disponibles :</span> %TAILLES DISPONIBLES%<br />
+							<span style="color: #e2001a; font-weight: bold;">Cambre :</span> %type_de_cambre_text%<br />
+							<span style="color: #e2001a; font-weight: bold;">Niveau :</span> %niveau%<br />
+							<span style="color: #e2001a; font-weight: bold;">Pratique :</span> %pratique%
+                        </div>
+						
+						<p style="line-height: 125%; text-align: justify; margin-bottom: 2px; font-size: 80%;">
+						%Description_Test%
+						</p>
+						
+			<p style="margin-bottom: 2px; font-size: 12px;">
+			<img src="plus_F2.png" style="vertical-align: middle; margin-right: 10px; "/>%Test_avantages%
+			</p>
+			<p style="margin-bottom: 20px; font-size: 12px;">
+			<img src="moins_G2.png" style="vertical-align: middle; margin-right: 10px; "/>%test_inconvenients%
+			</p>
+						
+							
+			<!-- >
+						<b><font color="#e2001a">CAMBRE :</font></b> %type_de_cambre_text%<br />
+			<img src="%figure-icone_cambres%" />
+			 < -->
+
+			<div class="tableview">
+							%Caractéristiques%
+						</div>
+			
+            
+        </div>
+    </body>
+</html>

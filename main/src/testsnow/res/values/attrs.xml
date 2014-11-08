@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<declare-styleable name="Button3State">
+		<attr name="state1drawable" format="reference"/>
+		<attr name="state2drawable" format="reference"/>
+		<attr name="state3drawable" format="reference"/>
+		<attr name="state1background" format="reference"/>
+		<attr name="state2background" format="reference"/>
+		<attr name="state3background" format="reference"/>
+	</declare-styleable>
+
+</resources>

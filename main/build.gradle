@@ -31,8 +31,25 @@ android {
             flavorDimension "type"
         }
 
+        products {
+            flavorDimension "type"
+        }
+
         magazine {
             applicationId "com.niveales.wind"
+            flavorDimension "name"
+        }
+
+        testskis {
+            applicationId "com.niveales.testskis2014"
+            versionCode 30
+            versionName "1.3.0"
+            flavorDimension "name"
+        }
+        testsnow {
+            applicationId "com.niveales.testsnowboards2014"
+            versionCode 30
+            versionName "1.3.0"
             flavorDimension "name"
         }
     }

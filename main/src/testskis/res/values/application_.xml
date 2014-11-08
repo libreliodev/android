@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
+
+    <string name="app_name">Test Skis</string>
+    <!--<string name="yearly_subs_code">yearlysubscription</string>-->
+    <!--<string name="monthly_subs_code">monthlysubscriptiontest</string>-->
+	<!--<string name="code_service">S3</string>-->
+	<!--<string name="user_service"></string>-->
+    <!--<string name="google_analytics">UA-1732003-23</string>-->
+    <!--<bool name="enable_subscribe_in_menu">false</bool>-->
+	<!--<bool name="enable_app_rating">true</bool>-->
+	<!--<string name="gcm_project_number">1012641315687</string>-->
+    
+</resources>

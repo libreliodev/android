@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>FileName</key>
+		<string>skis2014/skis2014.sqlite</string>
+		<key>Subtitle</key>
+		<string>Saison 2013-2014</string>
+		<key>Title</key>
+		<string>Test skis 2014</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>skis2015/skis2015_.sqlite</string>
+		<key>Subtitle</key>
+		<string>Saison 2014-2015</string>
+		<key>Title</key>
+		<string>Test skis 2015</string>
+	</dict>
+</array>
+</plist>

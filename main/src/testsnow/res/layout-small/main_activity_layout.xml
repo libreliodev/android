@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/FragmentHolder"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/MainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="6"
+        android:background="@color/white"
+        android:orientation="vertical" >
+
+        <AutoCompleteTextView
+            android:id="@+id/SearchEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/main_layout_search_input_hint"
+            android:imeOptions="actionSearch"
+            android:singleLine="true" />
+
+        <FrameLayout
+            android:id="@+id/SearchResultHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TabHost
+                android:id="@+id/MainLayoutTabHost"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
+
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+                    </TabWidget>
+
+                    <FrameLayout
+                        android:id="@android:id/tabcontent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+
+                        <RelativeLayout
+                            android:id="@+id/main_list_tab"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical" >
+
+                            <ListView
+                                android:id="@+id/MainActivityCreteriaSelectionListView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_above="@+id/PrevSearchTextView"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentTop="true"
+                                android:layout_weight="1" >
+                            </ListView>
+
+                            <TextView
+                                android:id="@+id/PrevSearchTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_above="@+id/MainLayoutSearchButton"
+                                android:layout_alignParentLeft="true"
+                                android:layout_weight="1"
+                                android:text="@string/spaceholder"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/SelectedColor"
+                                android:visibility="gone" />
+
+                            <ImageButton
+                                android:id="@+id/MainLayoutSearchButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"
+                                android:layout_weight="1"
+                                android:background="@drawable/bout_aff_resultat" />
+
+                            <TextView
+                                android:id="@+id/NewSearchTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentLeft="true"
+                                android:text="@string/NewSearchText"
+                                android:textColor="@color/grey"
+                                android:visibility="invisible" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:id="@+id/favorites_tab"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" >
+
+                            <ListView
+                                android:id="@+id/listView1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1" >
+                            </ListView>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/terms_tab"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" >
+                        </LinearLayout>
+
+                    </FrameLayout>
+                </LinearLayout>
+            </TabHost>
+        </FrameLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>FileName</key>
+		<string>Magazines.plist?waupdate=30</string>
+		<key>Icon</key>
+		<string>tab-skieur.png</string>
+		<key>Title</key>
+		<string>Tests</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>file://localhost/</string>
+		<key>Icon</key>
+		<string>folder.png</string>
+		<key>Title</key>
+		<string>Downloads</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>http://www.skieur.com/app-teasing</string>
+		<key>Icon</key>
+		<string>download.png</string>
+		<key>Title</key>
+		<string>Magazine</string>
+	</dict>
+	<dict>
+		<key>FileName</key>
+		<string>http://fr-fr.facebook.com/skieurmagazine</string>
+		<key>Icon</key>
+		<string>facebook.png</string>
+		<key>Title</key>
+		<string>Facebook</string>
+	</dict>
+</array>
+</plist>

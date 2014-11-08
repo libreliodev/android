@@ -1,0 +1,28 @@
+/* CSS Document */
+body
+{
+	font-family: "Helvetica neue";
+    background-color: #f1f1f1;
+    margin: 0px;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+
+
+h1 
+{
+	color: #e2001a;
+	font-weight: bold;
+	font-size: 21px;
+    text-transform: uppercase;
+}
+
+
+
+p 
+{
+	color: #000000;
+	font-size: 13px;
+}
+
