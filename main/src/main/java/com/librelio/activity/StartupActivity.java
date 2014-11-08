@@ -125,18 +125,22 @@ public class StartupActivity extends AbstractLockRotationActivity {
     private void loadAdvertisingLinkAndDisplayAdvertising() {
     	
     	Request request = new Request.Builder().url(getAdvertisingLinkURL()).build();
-    	
+
     	client.newCall(request).enqueue(new Callback() {
-    		
+
 			@Override
 			public void onResponse(Response response) throws IOException {
-				if (response.code() == 200) {
-				 PListXMLHandler handler = new PListXMLHandler();
+				if (response.code() != 200) {
+                    showMagazineAfterDelay(DEFAULT_ADV_DELAY);
+                } else {
+				    PListXMLHandler handler = new PListXMLHandler();
 	                PListXMLParser parser = new PListXMLParser();
 	                parser.setHandler(handler);
 	                parser.parse(response.body().string());
 	                PList list = ((PListXMLHandler)parser.getHandler()).getPlist();
-	                if (list != null){
+	                if (list == null) {
+                        showMagazineAfterDelay(DEFAULT_ADV_DELAY);
+                    } else {
 	                    Dict dict = (Dict) list.getRootElement();
 	                    String delay = dict.getString(PLIST_DELAY).getValue().toString();
 	                    String link = dict.getString(PLIST_LINK).getValue().toString();
@@ -152,18 +156,15 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			                            applyRotation(0, -90);
 			                            isFirstImage = !isFirstImage;
 			                        }
-									
 								}
 							});
 	                    }
 	                    setOnAdvertisingImageClickListener(link);
-	                    showMagazineAfterDelay(Integer.valueOf(delay));
-	                }
-				} else {
-					showMagazineAfterDelay(DEFAULT_ADV_DELAY);	
-				}
-				response.body().close();
-			}
+                        showMagazineAfterDelay(Integer.valueOf(delay));
+                    }
+                }
+                response.body().close();
+            }
 
             @Override
 			public void onFailure(Request request, IOException e) {
