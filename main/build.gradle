@@ -32,7 +32,6 @@ android {
         }
 
         magazine {
-            applicationId "com.niveales.wind"
             flavorDimension "name"
         }
     }
