@@ -29,6 +29,8 @@ import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
 
+import de.greenrobot.event.EventBus;
+
 @ReportsCrashes(formKey = "",
         mailTo = "android@librelio.com",
         customReportContent = { ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME,
@@ -59,6 +61,8 @@ public class LibrelioApplication extends Application {
 
 //		baseUrl = "http://librelio-test.s3.amazonaws.com/" + getMagazineName(this) +
 //                PATH_SEPARATOR;
+
+        EventBus.builder().sendNoSubscriberEvent(false).installDefaultEventBus();
 
         registerForGCM();
     }

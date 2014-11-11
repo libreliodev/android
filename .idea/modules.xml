@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android-testmatos.iml" filepath="$PROJECT_DIR$/android-testmatos.iml" />
       <module fileurl="file://$PROJECT_DIR$/appiraterAndroid/appiraterAndroid.iml" filepath="$PROJECT_DIR$/appiraterAndroid/appiraterAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libreliodev-android.iml" filepath="$PROJECT_DIR$/libreliodev-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/main.iml" filepath="$PROJECT_DIR$/main/main.iml" />
     </modules>
   </component>
