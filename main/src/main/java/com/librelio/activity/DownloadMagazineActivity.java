@@ -11,12 +11,15 @@ import android.widget.TextView;
 
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
-import com.librelio.event.MagazineDownloadedEvent;
+import com.librelio.event.NewMagazineDownloadedEvent;
+import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.DownloadsManager;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
+
+import de.greenrobot.event.EventBus;
 
 public class DownloadMagazineActivity extends BaseActivity {
 
@@ -30,7 +33,7 @@ public class DownloadMagazineActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    DownloadsManager.updateMagazineDetails(DownloadMagazineActivity.this, magazine);
+                    EventBus.getDefault().post(new ReloadPlistEvent());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -84,7 +87,7 @@ public class DownloadMagazineActivity extends BaseActivity {
         });
     }
 
-    public void onEventMainThread(MagazineDownloadedEvent event) {
+    public void onEventMainThread(NewMagazineDownloadedEvent event) {
         if (event.getMagazine().getFilePath().equals(magazine.getFilePath())) {
             LibrelioApplication.startPDFActivity(this, magazine.getItemFilePath(), magazine.getTitle(), true);
             finish();

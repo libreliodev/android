@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.librelio.base.BaseManager;
-import com.librelio.event.PlistUpdatedEvent;
+import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.model.Asset;
 import com.librelio.model.DownloadStatusCode;
@@ -66,7 +66,7 @@ public class DownloadsManager extends BaseManager {
 		cv.put(DataBaseHelper.FIELD_SUBTITLE, magazine.getSubtitle());
 		db.insert(tableName, null, cv);
 
-		EventBus.getDefault().post(new PlistUpdatedEvent());
+		EventBus.getDefault().post(new ReloadPlistEvent());
 	}
 
 	public static synchronized void removeDownload(Context context,
@@ -113,7 +113,7 @@ public class DownloadsManager extends BaseManager {
 				DataBaseHelper.FIELD_FILE_PATH + "=?",
 				new String[] { magazine.getFilePath() });
 
-		EventBus.getDefault().post(new PlistUpdatedEvent());
+		EventBus.getDefault().post(new ReloadPlistEvent());
 	}
 
 	public static void removeNotification(Context context, long notificationId) {
@@ -297,43 +297,6 @@ public class DownloadsManager extends BaseManager {
 		cv.put(DataBaseHelper.FIELD_RETRY_COUNT, asset.retryCount + 1);
 		db.update(DataBaseHelper.TABLE_DOWNLOADS, cv, DataBaseHelper.FIELD_ID
 				+ "=?", new String[] { String.valueOf(asset.id) });
-	}
-
-	public static void updateMagazineDetails(Context context, MagazineItem magazine) {
-//		SQLiteDatabase db = DataBaseHelper.getInstance(context)
-//				.getReadableDatabase();
-//		Cursor c = db.query(DataBaseHelper.TABLE_DOWNLOADED_ITEMS,
-//				new String[] { DataBaseHelper.FIELD_IS_SAMPLE,
-//						DataBaseHelper.FIELD_DOWNLOAD_STATUS },
-//				DataBaseHelper.FIELD_FILE_PATH + "=?",
-//				new String[] { magazine.getFilePath() }, null, null, null);
-//		while (c.moveToNext()) {
-////			magazine.setSample(c.getInt(c
-////					.getColumnIndex(DataBaseHelper.FIELD_IS_SAMPLE)) == 0 ? false
-////					: true);
-////			magazine.setDownloadStatus(c.getInt(c
-////					.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_STATUS)));
-//			// magazine.setDownloadManagerId(c.getLong(c.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_STATUS)));
-//			// DownloadManager.Query q = new DownloadManager.Query();
-//			// q.setFilterById(magazine.getDownloadManagerId());
-//			// Cursor cursor = downloadManager.query(q);
-//			// if (cursor.moveToFirst()) {
-//			// magazine.setDownloadStatus(cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)));
-//			// long fileSize =
-//			// cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-//			// long bytesDL =
-//			// cursor.getLong(cursor.getColumnIndex(DownloadManager
-//			// .COLUMN_BYTES_DOWNLOADED_SO_FAR));
-//			// magazine.setDownloadProgress((int) ((bytesDL * 100.0f) /
-//			// fileSize));
-//			// } else {
-//			// magazine.setDownloadProgress(0);
-//			// magazine.setDownloadStatus(-1);
-//			// }
-//			// cursor.close();
-//		}
-
-		EventBus.getDefault().post(new PlistUpdatedEvent());
 	}
 
 	public static int getTotalAssetCount(Context context, DownloadableDictItem magazine) {

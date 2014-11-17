@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'hugo'
 
 buildscript {
     repositories {
@@ -8,6 +9,7 @@ buildscript {
 
     dependencies {
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.5'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
     }
 }
 
@@ -65,4 +67,5 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'org.lucasr.twowayview:twowayview:0.1.1'
     compile 'com.android.support:appcompat-v7:21.0.0'
+    compile 'io.reactivex:rxandroid:0.22.0'
 }

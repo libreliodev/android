@@ -1,5 +1,6 @@
 package com.librelio.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -21,9 +22,8 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MuPDFActivity;
-import com.librelio.event.LoadPlistEvent;
-import com.librelio.event.MagazineDownloadedEvent;
-import com.librelio.event.PlistUpdatedEvent;
+import com.librelio.event.NewMagazineDownloadedEvent;
+import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.DownloadStatusCode;
@@ -210,8 +210,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 			manager.setDownloadStatus(magazine.getFilePath(),
 					DownloadStatusCode.DOWNLOADED);
 
-			EventBus.getDefault().post(new LoadPlistEvent());
-			EventBus.getDefault().post(new MagazineDownloadedEvent(magazine));
+			EventBus.getDefault().post(new ReloadPlistEvent());
+			EventBus.getDefault().post(new NewMagazineDownloadedEvent(magazine));
 
 			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 					this)
@@ -248,10 +248,11 @@ public class MagazineDownloadService extends WakefulIntentService {
 			mBuilder.setContentIntent(resultPendingIntent);
 			mBuilder.setAutoCancel(true);
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			mNotificationManager.notify(magazine.getFilePath().hashCode(),
-					mBuilder.build());
+            Notification notification = mBuilder.build();
+            mNotificationManager.notify(magazine.getFilePath().hashCode(),
+                    notification);
 
-			EventBus.getDefault().post(new PlistUpdatedEvent());
+			EventBus.getDefault().post(new ReloadPlistEvent());
 			AssetDownloadService.startAssetDownloadService(this);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -327,7 +328,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 				DownloadStatusCode.QUEUED);
 		// magazine.clearMagazineDir();
 		magazine.makeLocalStorageDir(context);
-		EventBus.getDefault().post(new LoadPlistEvent());
+		EventBus.getDefault().post(new ReloadPlistEvent());
 
 		Intent intent = new Intent(context, MagazineDownloadService.class);
 		intent.putExtra(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());

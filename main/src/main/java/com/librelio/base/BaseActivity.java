@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.librelio.LibrelioApplication;
-import com.librelio.event.UpdateProgressBarEvent;
+import com.librelio.event.UpdateIndeterminateProgressBarEvent;
 import com.librelio.utils.StorageUtils;
 import com.niveales.wind.R;
 
@@ -193,7 +193,7 @@ public class BaseActivity extends FragmentActivity implements IBaseContext {
         EventBus.getDefault().unregister(this);
     }
 
-    public void onEventMainThread(UpdateProgressBarEvent event) {
+    public void onEventMainThread(UpdateIndeterminateProgressBarEvent event) {
         setProgressBarIndeterminateVisibility(event.isShowProgress());
     }
 

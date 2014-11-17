@@ -1,5 +1,5 @@
 package com.librelio.event;
 
-public class LoadPlistEvent {
+public class ReloadPlistEvent {
 
 }

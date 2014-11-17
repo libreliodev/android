@@ -1,25 +1,25 @@
 package com.librelio.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.http.client.HttpResponseException;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.widget.Toast;
 
-import com.librelio.event.LoadPlistEvent;
-import com.librelio.event.UpdateProgressBarEvent;
+import com.librelio.event.ReloadPlistEvent;
+import com.librelio.event.UpdateIndeterminateProgressBarEvent;
 import com.librelio.model.dictitem.PlistItem;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.niveales.wind.R;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.HttpResponseException;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import de.greenrobot.event.EventBus;
 
@@ -31,12 +31,14 @@ public class PlistDownloader {
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
     private static SimpleDateFormat updateDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
-    public static void doLoad(final Context context, final String plistName, boolean force) {
+    public static void updateFromServer(final Context context, final String plistName,
+                                        boolean force) {
 
         final PlistItem plistItem = new PlistItem(context, "", plistName);
+
         // Don't update if updates not required - i.e. waupdate=0
         if (plistItem.getUpdateFrequency() == -1) {
-            EventBus.getDefault().post(new LoadPlistEvent());
+            EventBus.getDefault().post(new ReloadPlistEvent());
             return;
         }
 
@@ -44,12 +46,11 @@ public class PlistDownloader {
 //        Only update is long enough since last update or if forced
         if (!force && System.currentTimeMillis() - lastUpdateDate.getTime() < (DateUtils.MINUTE_IN_MILLIS * plistItem
                 .getUpdateFrequency())) {
-//            Toast.makeText(context, "less than updateFrequency minutes old", Toast.LENGTH_SHORT).show();
-            EventBus.getDefault().post(new LoadPlistEvent());
+            EventBus.getDefault().post(new ReloadPlistEvent());
             return;
         }
 
-        EventBus.getDefault().post(new UpdateProgressBarEvent(true));
+        EventBus.getDefault().post(new UpdateIndeterminateProgressBarEvent(true));
         AsyncHttpClient client = new AsyncHttpClient();
         if (!force) {
             client.addHeader(IF_MODIFIED_SINCE_HEADER, updateDateFormat.format(lastUpdateDate));
@@ -61,7 +62,7 @@ public class PlistDownloader {
                 super.onSuccess(i, s);
                 if (i == 304) {
                     //no change - but this never happens - 304 means failure due to empty string
-                    EventBus.getDefault().post(new UpdateProgressBarEvent(false));
+                    EventBus.getDefault().post(new UpdateIndeterminateProgressBarEvent(false));
                     return;
                 }
                 try {
@@ -70,7 +71,7 @@ public class PlistDownloader {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                EventBus.getDefault().post(new LoadPlistEvent());
+                EventBus.getDefault().post(new ReloadPlistEvent());
             }
 
             @Override
@@ -90,7 +91,7 @@ public class PlistDownloader {
             @Override
             public void onFinish() {
                 super.onFinish();
-                EventBus.getDefault().post(new UpdateProgressBarEvent(false));
+                EventBus.getDefault().post(new UpdateIndeterminateProgressBarEvent(false));
             }
         });
     }

@@ -7,7 +7,7 @@ import android.text.format.DateUtils;
 
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
-import com.librelio.event.LoadPlistEvent;
+import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.service.MagazineDownloadService;
 import com.librelio.storage.DataBaseHelper;
@@ -165,13 +165,13 @@ public class MagazineItem extends DownloadableDictItem implements DisplayableAsG
         } catch (IOException e) {
             e.printStackTrace();
         }
-        EventBus.getDefault().post(new LoadPlistEvent());
+        EventBus.getDefault().post(new ReloadPlistEvent());
     }
 
     @Override
 	public void deleteItem() {
-		clearMagazineDir(context);
 		DownloadsManager.removeDownload(context, this);
+        clearMagazineDir(context);
 	}
 
     @Override

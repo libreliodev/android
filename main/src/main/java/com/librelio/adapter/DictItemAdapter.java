@@ -1,9 +1,7 @@
 package com.librelio.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -16,8 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.librelio.LibrelioApplication;
-import com.librelio.event.LoadPlistEvent;
-import com.librelio.model.Asset;
+import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.DownloadableDictItem;
@@ -81,7 +78,7 @@ public class DictItemAdapter extends BaseAdapter {
 		DictItemHolder holder = new DictItemHolder();
 		if (convertView == null) {
 			convertView = LayoutInflater.from(context).inflate(
-					R.layout.magazine_list_item, parent, false);
+					R.layout.item_dictitem_grid, parent, false);
 			holder.title = (TextView) convertView.findViewById(R.id.item_title);
 			holder.subtitle = (TextView) convertView
 					.findViewById(R.id.item_subtitle);
@@ -162,10 +159,9 @@ public class DictItemAdapter extends BaseAdapter {
 					@Override
 					public void onClick(View view) {
 						// FIXME Cancel download
-						magazine.clearMagazineDir(context);
 						DownloadsManager.removeDownload(context,
                                 magazine);
-						EventBus.getDefault().post(new LoadPlistEvent());
+                        magazine.clearMagazineDir(context);
 					}
 				});
 			} else if (!magazine.isDownloaded()) {
@@ -286,7 +282,6 @@ public class DictItemAdapter extends BaseAdapter {
                         productsItem.clearMagazineDir(context);
                         DownloadsManager.removeDownload(context,
                                 productsItem);
-                        EventBus.getDefault().post(new LoadPlistEvent());
                     }
                 });
 

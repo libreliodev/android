@@ -1,10 +1,10 @@
 package com.librelio.event;
 
-public class UpdateProgressBarEvent {
+public class UpdateIndeterminateProgressBarEvent {
 
     private boolean showProgress;
 
-    public UpdateProgressBarEvent(boolean showProgress) {
+    public UpdateIndeterminateProgressBarEvent(boolean showProgress) {
         this.showProgress = showProgress;
     }
 

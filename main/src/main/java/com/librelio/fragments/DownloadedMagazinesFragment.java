@@ -1,19 +1,18 @@
 package com.librelio.fragments;
 
-import java.util.List;
-
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.librelio.event.PlistUpdatedEvent;
+import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.dictitem.DownloadableDictItem;
-import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.DownloadsManager;
 import com.librelio.view.DownloadedMagazinesListView;
 import com.niveales.wind.R;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -64,7 +63,7 @@ public class DownloadedMagazinesFragment extends ListFragment {
 		EventBus.getDefault().unregister(this);
 	}
 	
-	public void onEvent(PlistUpdatedEvent event) {
+	public void onEvent(ReloadPlistEvent event) {
 		listMagazines();
 	}
 }

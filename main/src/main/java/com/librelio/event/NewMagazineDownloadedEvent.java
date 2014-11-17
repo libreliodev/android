@@ -2,11 +2,11 @@ package com.librelio.event;
 
 import com.librelio.model.dictitem.MagazineItem;
 
-public class MagazineDownloadedEvent {
+public class NewMagazineDownloadedEvent {
 
     private MagazineItem magazine;
 
-    public MagazineDownloadedEvent(MagazineItem magazine) {
+    public NewMagazineDownloadedEvent(MagazineItem magazine) {
         this.magazine = magazine;
     }
 
