@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -27,7 +26,6 @@ import com.librelio.model.dictitem.ProductsItem;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.service.MagazineDownloadService;
 import com.librelio.storage.DownloadsManager;
-import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
@@ -372,36 +370,36 @@ public class DictItemAdapter extends BaseAdapter {
             });
 		}
 
-        if (BuildConfig.DEBUG) {
-            final PopupMenu menu = new PopupMenu(context, holder.overflowButton);
-            menu.getMenu().add(0, 999, 0, "Log asset details");
-            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case 999:
-                            DownloadsManager manager = new DownloadsManager(context);
-                            ArrayList<Asset> assetsToDownload = manager
-                                    .getAssetsToDownload();
-                            for (int i = 0; i < assetsToDownload.size(); i++) {
-                                Log.d("DownloadsManager", "assetsToDownload " + i + ": " +
-                                        assetsToDownload.get(i).assetUrl);
-                            }
-                            return true;
-                    }
-                    return false;
-                }
-            });
-
-            holder.overflowButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    menu.show();
-                }
-            });
-        } else {
-            holder.overflowButton.setVisibility(View.GONE);
-        }
+//        if (BuildConfig.DEBUG) {
+//            final PopupMenu menu = new PopupMenu(context, holder.overflowButton);
+//            menu.getMenu().add(0, 999, 0, "Log asset details");
+//            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem item) {
+//                    switch (item.getItemId()) {
+//                        case 999:
+//                            DownloadsManager manager = new DownloadsManager(context);
+//                            ArrayList<Asset> assetsToDownload = manager
+//                                    .getAssetsToDownload();
+//                            for (int i = 0; i < assetsToDownload.size(); i++) {
+//                                Log.d("DownloadsManager", "assetsToDownload " + i + ": " +
+//                                        assetsToDownload.get(i).assetUrl);
+//                            }
+//                            return true;
+//                    }
+//                    return false;
+//                }
+//            });
+//
+//            holder.overflowButton.setOnClickListener(new OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    menu.show();
+//                }
+//            });
+//        } else {
+//            holder.overflowButton.setVisibility(View.GONE);
+//        }
 
 		return convertView;
 	}

@@ -119,7 +119,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/ic_more_vert_white_24dp"
-                android:background="?android:attr/selectableItemBackground"/>
+                android:background="?android:attr/selectableItemBackground"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </LinearLayout>
