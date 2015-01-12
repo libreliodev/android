@@ -16,10 +16,10 @@ import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.DictItemAdapter;
 import com.librelio.event.ReloadPlistEvent;
-import com.librelio.utils.PlistUtils;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.service.AssetDownloadService;
 import com.librelio.utils.PlistDownloader;
+import com.librelio.utils.PlistUtils;
 import com.niveales.wind.R;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import de.greenrobot.event.EventBus;
 import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.observables.AndroidObservable;
+import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -111,7 +111,7 @@ public class PlistGridFragment extends Fragment {
             }
         });
 
-        AndroidObservable.bindFragment(this, plistParserObservable)
+        AppObservable.bindFragment(this, plistParserObservable)
                 .subscribeOn(Schedulers.computation())
                 .subscribe(new Action1<ArrayList<DictItem>>() {
                     @Override

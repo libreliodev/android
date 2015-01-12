@@ -2,10 +2,9 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 20
-    buildToolsVersion "20.0.0"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.sbstrm.appirater"
         minSdkVersion 14
         targetSdkVersion 20
     }
