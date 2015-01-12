@@ -1,9 +1,4 @@
-package com.artifex.mupdfdemo;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.lang.ref.WeakReference;
+package com.librelio.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -15,23 +10,47 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.artifex.mupdfdemo.AsyncTask;
+import com.artifex.mupdfdemo.MuPDFCore;
 import com.niveales.wind.R;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.lang.ref.WeakReference;
 
 /**
  * @author Dmitry Valetin
  * 
  */
-public class PDFPreviewPagerAdapter extends BaseAdapter {
+public class PDFPreviewPagerAdapter extends RecyclerView.Adapter<PDFPreviewPagerAdapter.PDFPreviewViewHolder> {
+
+    public static class PDFPreviewViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView previewPageImageView = null;
+        TextView previewPageNumber = null;
+        LinearLayout previewPageLinearLayout = null;
+
+        public PDFPreviewViewHolder(View view) {
+            super(view);
+            this.previewPageImageView = (ImageView) view
+                    .findViewById(R.id.PreviewPageImageView);
+            this.previewPageNumber = (TextView) view
+                    .findViewById(R.id.PreviewPageNumber);
+            this.previewPageLinearLayout = (LinearLayout) view
+                    .findViewById(R.id.PreviewPageLinearLayout);
+        }
+    }
 
 	private static final String TAG = PDFPreviewPagerAdapter.class
 			.getSimpleName();
@@ -57,18 +76,25 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 				mContext.getResources(), R.drawable.darkdenim3);
 	}
 
-	@Override
-	public int getCount() {
-		int count = mCore.countSinglePages();
-		return count;
-	}
+    @Override
+    public PDFPreviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final View view = LayoutInflater.from(mContext).inflate(R.layout.preview_pager_item_layout, parent, false);
+        return new PDFPreviewViewHolder(view);
+    }
 
-	@Override
-	public Object getItem(int pPosition) {
-		return null;
-	}
+    @Override
+    public void onBindViewHolder(PDFPreviewViewHolder holder, int position) {
+        if (mPreviewSize != null) {
+            holder.previewPageImageView
+                    .setLayoutParams(new LinearLayout.LayoutParams(
+                            mPreviewSize.x, mPreviewSize.y));
+        }
+        holder.previewPageNumber.setText(String.valueOf(position + 1));
+        holder.previewPageLinearLayout.setBackgroundColor(Color.TRANSPARENT);
+        drawPageImageView(holder, position);
+    }
 
-	@Override
+    @Override
 	public long getItemId(int pPosition) {
 		if(mCore.getDisplayPages() == 1) 
 			return pPosition;
@@ -79,45 +105,12 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 				return 0;
 	}
 
-	public View getView(final int position, View convertView, ViewGroup parent) {
-		ViewHolder holder;
-		if (convertView == null) {
-			LayoutInflater inflater = (LayoutInflater) mContext
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = inflater.inflate(R.layout.preview_pager_item_layout,
-					parent, false);
-			holder = new ViewHolder(convertView);
-			convertView.setTag(holder);
-		} else {
-			holder = (ViewHolder) convertView.getTag();
-		}
-		if (mPreviewSize != null) {
-			holder.previewPageImageView
-					.setLayoutParams(new LinearLayout.LayoutParams(
-							mPreviewSize.x, mPreviewSize.y));
-		}
-		holder.previewPageNumber.setText(String.valueOf(position + 1));
-		holder.previewPageLinearLayout.setBackgroundColor(Color.TRANSPARENT);
-		drawPageImageView(holder, position);
-		return convertView;
-	}
+    @Override
+    public int getItemCount() {
+        return mCore.countSinglePages();
+    }
 
-	static class ViewHolder {
-		ImageView previewPageImageView = null;
-		TextView previewPageNumber = null;
-		LinearLayout previewPageLinearLayout = null;
-
-		ViewHolder(View view) {
-			this.previewPageImageView = (ImageView) view
-					.findViewById(R.id.PreviewPageImageView);
-			this.previewPageNumber = (TextView) view
-					.findViewById(R.id.PreviewPageNumber);
-			this.previewPageLinearLayout = (LinearLayout) view
-					.findViewById(R.id.PreviewPageLinearLayout);
-		}
-	}
-
-	private void drawPageImageView(ViewHolder holder, int position) {
+	private void drawPageImageView(PDFPreviewViewHolder holder, int position) {
 		if (cancelPotentialWork(holder, position)) {
 			final BitmapWorkerTask task = new BitmapWorkerTask(holder, position);
 			final AsyncDrawable asyncDrawable = new AsyncDrawable(
@@ -127,7 +120,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 		}
 	}
 
-	public static boolean cancelPotentialWork(ViewHolder holder, int position) {
+	public static boolean cancelPotentialWork(PDFPreviewViewHolder holder, int position) {
 		final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(holder.previewPageImageView);
 
 		if (bitmapWorkerTask != null) {
@@ -147,11 +140,11 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 
 	class BitmapWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
 
-		private final WeakReference<ViewHolder> viewHolderReference;
+		private final WeakReference<PDFPreviewViewHolder> viewHolderReference;
 		private int position;
 
-		public BitmapWorkerTask(ViewHolder holder, int position) {
-			viewHolderReference = new WeakReference<ViewHolder>(holder);
+		public BitmapWorkerTask(PDFPreviewViewHolder holder, int position) {
+			viewHolderReference = new WeakReference<PDFPreviewViewHolder>(holder);
 			this.position = position;
 		}
 
@@ -179,7 +172,7 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 			}
 
 			if (viewHolderReference != null && bitmap != null) {
-				final ViewHolder holder = viewHolderReference.get();
+				final PDFPreviewViewHolder holder = viewHolderReference.get();
 				if (holder != null) {
 					final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(holder.previewPageImageView);
 					if (this == bitmapWorkerTask && holder != null) {
@@ -240,9 +233,9 @@ public class PDFPreviewPagerAdapter extends BaseAdapter {
 	}
 
 	public void setCurrentlyViewing(int currentlyViewing) {
-		this.currentlyViewing = currentlyViewing;
-		notifyDataSetChanged();
-	}
+        this.currentlyViewing = currentlyViewing;
+        notifyDataSetChanged();
+    }
 
 	static class AsyncDrawable extends BitmapDrawable {
 		private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;

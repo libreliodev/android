@@ -11,6 +11,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.SparseArray;
@@ -21,8 +23,6 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -37,7 +37,6 @@ import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.MuPDFPageAdapter;
 import com.artifex.mupdfdemo.MuPDFPageView;
 import com.artifex.mupdfdemo.OutlineItem;
-import com.artifex.mupdfdemo.PDFPreviewPagerAdapter;
 import com.artifex.mupdfdemo.domain.OutlineActivityData;
 import com.artifex.mupdfdemo.domain.SearchTaskResult;
 import com.artifex.mupdfdemo.view.DocumentReaderView;
@@ -45,6 +44,7 @@ import com.artifex.mupdfdemo.view.ReaderView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
+import com.librelio.adapter.PDFPreviewPagerAdapter;
 import com.librelio.base.BaseActivity;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.lib.utils.PDFParser;
@@ -52,10 +52,10 @@ import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.DownloadsManager;
 import com.librelio.task.TinySafeAsyncTask;
+import com.librelio.view.RecyclerItemClickListener;
 import com.niveales.wind.R;
 
 import org.apache.commons.io.FilenameUtils;
-import org.lucasr.twowayview.TwoWayView;
 
 import java.util.ArrayList;
 
@@ -98,13 +98,15 @@ public class MuPDFActivity extends BaseActivity{
 	//private SearchTaskResult mSearchTaskResult;
 	private final Handler mHandler = new Handler();
 	private FrameLayout mPreviewBarHolder;
-	private TwoWayView mPreview;
+	private RecyclerView mPreview;
 	private PDFPreviewPagerAdapter pdfPreviewPagerAdapter;
 	private MuPDFPageAdapter mDocViewAdapter;
 	private SparseArray<LinkInfoExternal[]> linkOfDocument;
+    private LinearLayoutManager listLayoutManager;
+    private int currentlyViewing;
 
-	
-	@Override
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
@@ -315,16 +317,16 @@ public class MuPDFActivity extends BaseActivity{
 		if (savedInstanceState == null
 				|| !savedInstanceState.getBoolean("ButtonsHidden", false)) {
 			mPreview.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							showButtons();
-						}
-					});
-				}
-			}, 250);
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showButtons();
+                        }
+                    });
+                }
+            }, 250);
 		}
 
 		// Stick the document view and the buttons overlay into a parent view
@@ -445,7 +447,7 @@ public class MuPDFActivity extends BaseActivity{
 			}
 
 			// Update listView position
-			setCurrentlyViewedPreview();
+            centerPreviewAtPosition(currentlyViewing);
 			anim = new TranslateAnimation(0, 0, mPreviewBarHolder.getHeight(), 0);
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
@@ -481,12 +483,12 @@ public class MuPDFActivity extends BaseActivity{
 				}
 			});
 			mTopBarSwitcher.startAnimation(anim);
-			
+
 			// Don't show thumbnail if not requested
 			if (getIntent() != null && !getIntent().getBooleanExtra(SHOW_THUMBNAILS_EXTRA, true)) {
 				return;
 			}
-			
+
 			anim = new TranslateAnimation(0, 0, 0, this.mPreviewBarHolder.getHeight());
 			anim.setDuration(200);
 			anim.setAnimationListener(new Animation.AnimationListener() {
@@ -527,20 +529,25 @@ public class MuPDFActivity extends BaseActivity{
 		buttonsView = getLayoutInflater().inflate(R.layout.buttons,null);
 		mFilenameView = (TextView)buttonsView.findViewById(R.id.docNameText);
 		mPreviewBarHolder = (FrameLayout) buttonsView.findViewById(R.id.PreviewBarHolder);
-		mPreview = new TwoWayView(this);
-		mPreview.setOrientation(TwoWayView.Orientation.HORIZONTAL);
+		mPreview = new RecyclerView(this);
+        listLayoutManager = new LinearLayoutManager(this);
+        listLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mPreview.setLayoutManager(listLayoutManager);
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -1);
 		mPreview.setLayoutParams(lp);
 		pdfPreviewPagerAdapter = new PDFPreviewPagerAdapter(this, core);
 		mPreview.setAdapter(pdfPreviewPagerAdapter);
-		mPreview.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> pArg0, View pArg1,
-					int position, long id) {
-				hideButtons();
-				docView.setDisplayedViewIndex((int)id);
-			}
-		});
+
+        mPreview.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        hideButtons();
+                        docView.setDisplayedViewIndex(position);
+                    }
+                })
+        );
+
 		mPreviewBarHolder.addView(mPreview);
 		mSearchButton = (ImageButton)buttonsView.findViewById(R.id.searchButton);
 		mCancelButton = (ImageButton)buttonsView.findViewById(R.id.cancel);
@@ -649,30 +656,12 @@ public class MuPDFActivity extends BaseActivity{
 			i = (i * 2) - 1;
 		}
 		pdfPreviewPagerAdapter.setCurrentlyViewing(i);
-		centerPreviewAtPosition(i);
+        currentlyViewing = i;
 	}
 
 	public void centerPreviewAtPosition(int position) {
-		if (mPreview.getChildCount() > 0) {
-			View child = mPreview.getChildAt(0);
-			// assume all children the same width
-			int childMeasuredWidth = child.getMeasuredWidth();
-
-			if (childMeasuredWidth > 0) {
-				if (core.getDisplayPages() == 2) {
-					mPreview.setSelectionFromOffset(position,
-							(mPreview.getWidth() / 2) - (childMeasuredWidth));
-				} else {
-					mPreview.setSelectionFromOffset(position,
-							(mPreview.getWidth() / 2)
-									- (childMeasuredWidth / 2));
-				}
-			} else {
-				Log.e("centerOnPosition", "childMeasuredWidth = 0");
-			}
-		} else {
-			Log.e("centerOnPosition", "childcount = 0");
-		}
+        int offset = (mPreview.getWidth() / 2) - (getResources().getDimensionPixelSize(R.dimen.page_preview_size) / 2);
+        listLayoutManager.scrollToPositionWithOffset(position, offset);
 	}
 
 	private class ActivateAutoLinks extends TinySafeAsyncTask<Integer, Void, ArrayList<LinkInfoExternal>> {
