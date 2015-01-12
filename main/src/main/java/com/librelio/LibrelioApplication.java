@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
@@ -20,24 +21,13 @@ import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import com.squareup.okhttp.OkHttpClient;
 
-import org.acra.ACRA;
-import org.acra.ReportField;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
-
 import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
 
 import de.greenrobot.event.EventBus;
+import io.fabric.sdk.android.Fabric;
 
-@ReportsCrashes(formKey = "",
-        mailTo = "android@librelio.com",
-        customReportContent = { ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME,
-                ReportField.ANDROID_VERSION,
-                ReportField.PHONE_MODEL, ReportField.CUSTOM_DATA, ReportField.STACK_TRACE, ReportField.LOGCAT },
-        mode = ReportingInteractionMode.TOAST,
-        resToastText = R.string.crash_toast_text)
 public class LibrelioApplication extends Application {
 	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
 	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
@@ -54,7 +44,10 @@ public class LibrelioApplication extends Application {
     @Override
 	public void onCreate() {
         super.onCreate();
-        ACRA.init(this);
+
+        if (BuildConfig.DEBUG && BuildConfig.CRASHLYTICS_ENABLED) {
+            Fabric.with(this, new Crashlytics());
+        }
 
         baseUrl = "http://librelio-europe.s3.amazonaws.com/" + getClientName(this) + PATH_SEPARATOR + getMagazineName(this) + PATH_SEPARATOR;
 

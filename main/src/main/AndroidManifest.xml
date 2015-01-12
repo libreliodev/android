@@ -111,6 +111,12 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        // To enable Crashlytics, add your api key here and remove ext.enableCrashlytics = false
+        // from AndroidManifest.xml
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="REPLACE_WITH_CRASHLYTICS_API_KEY"/>
     </application>
 
 </manifest>

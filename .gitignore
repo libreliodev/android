@@ -43,3 +43,9 @@ mirror/
 
 # Other
 signing.properties
+
+# Crashlytics
+main/src/main/assets/crashlytics-build.properties
+main/src/main/res/values/com_crashlytics_export_strings.xml
+main/crashlytics.properties
+

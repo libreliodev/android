@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.jakewharton.hugo'
 apply plugin: 'com.raizlabs.griddle'
+apply plugin: 'io.fabric'
 
 // Use custom gradle file if it exists in script product flavor folder
 if (new File("./main/src/script/custom.gradle").exists()) {
@@ -15,12 +16,14 @@ buildscript {
     repositories {
         jcenter()
         maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.8'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'com.raizlabs:Griddle:1.0.3'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
@@ -33,6 +36,7 @@ android {
         targetSdkVersion 22
         versionCode 110
         versionName "1.1.0"
+        buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
     }
 
     buildTypes {
@@ -57,11 +61,15 @@ android {
 
         magazine {
             flavorDimension "name"
+            // Remove next line to enable Crashlytics and change false to true in second line
+            ext.enableCrashlytics = false
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
         }
 
         script {
             applicationId scriptApplicationId
             flavorDimension "name"
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "true"
         }
     }
 
@@ -71,13 +79,13 @@ android {
 }
 
 repositories {
+    maven { url 'https://maven.fabric.io/public' }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':appiraterAndroid')
-    compile 'ch.acra:acra:4.5.0'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
@@ -88,4 +96,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:0.24.0'
     compile 'com.android.support:recyclerview-v7:22.0.0'
     compile 'uk.co.chrisjenx:calligraphy:2.0.2'
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+        transitive = true;
+    }
 }
