@@ -962,7 +962,7 @@ public class BillingActivity extends BaseActivity {
 				if (TEST_MODE) {
 					productId = TEST_PRODUCT_ID;
 				}
-				if (itemToBuyId == productId) {
+				if (itemToBuyId.equals(productId)) {
 					Log.d(TAG, "let us buy a product " + itemToBuyId);
 					return billingService.getBuyIntent(3, getPackageName(),
 							productId, "inapp", null);
