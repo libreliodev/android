@@ -1,21 +1,13 @@
 package com.sbstrm.appirater;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 /*	
  * @source https://github.com/sbstrm/appirater-android
@@ -131,62 +123,45 @@ public class Appirater {
 	@SuppressLint("NewApi")
 	private static void showRateDialog(final Context mContext, final SharedPreferences.Editor editor) {
     	String appName = mContext.getString(R.string.appirator_app_title);
-        final Dialog dialog = new Dialog(mContext);
-        
-        if (android.os.Build.VERSION.RELEASE.startsWith("1.") || android.os.Build.VERSION.RELEASE.startsWith("2.0") || android.os.Build.VERSION.RELEASE.startsWith("2.1")){
-        	//No dialog title on pre-froyo devices
-        	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        }else if(mContext.getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_LOW || mContext.getResources().getDisplayMetrics().densityDpi == DisplayMetrics.DENSITY_MEDIUM){
-        	Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        	int rotation = display.getRotation();
-        	if(rotation == 90 || rotation == 270){
-        		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        	}else{
-        		dialog.setTitle(String.format(mContext.getString(R.string.rate_title), appName));
-        	}
-        }else{
-        	dialog.setTitle(String.format(mContext.getString(R.string.rate_title), appName));
-        }
 
-        LinearLayout layout = (LinearLayout)LayoutInflater.from(mContext).inflate(R.layout.appirater, null);
-        
-        TextView tv = (TextView) layout.findViewById(R.id.message);
-        tv.setText(String.format(mContext.getString(R.string.rate_message), appName));
-        
-        Button rateButton = (Button) layout.findViewById(R.id.rate);
-        rateButton.setText(String.format(mContext.getString(R.string.rate), appName));
-        rateButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                rateApp(mContext, editor);
-                dialog.dismiss();
-            }
-        });
+        new MaterialDialog.Builder(mContext)
+                .title(String.format(mContext.getString(R.string.rate_title), appName))
+                .content(String.format(mContext.getString(R.string.rate_message), appName))
+                .positiveText(String.format(mContext.getString(R.string.rate), appName))
+                .neutralText(mContext.getString(R.string.rate_later))
+                .negativeText(mContext.getString(R.string.rate_cancel))
+                .positiveColor(Color.BLACK)
+                .neutralColor(Color.BLACK)
+                .negativeColor(Color.BLACK)
+                .forceStacking(true)
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        rateApp(mContext, editor);
+                        dialog.dismiss();
+                    }
 
-        Button rateLaterButton = (Button) layout.findViewById(R.id.rateLater);
-        rateLaterButton.setText(mContext.getString(R.string.rate_later));
-        rateLaterButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-            	if (editor != null) {
-    				editor.putLong(PREF_DATE_REMINDER_PRESSED,System.currentTimeMillis());
-    				editor.commit();
-				}
-                dialog.dismiss();
-            }
-        });
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        super.onNegative(dialog);
+                        if (editor != null) {
+                            editor.putBoolean(PREF_DONT_SHOW, true);
+                            editor.commit();
+                        }
+                        dialog.dismiss();
+                    }
 
-        Button cancelButton = (Button) layout.findViewById(R.id.cancel);
-        cancelButton.setText(mContext.getString(R.string.rate_cancel));
-        cancelButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (editor != null) {
-                    editor.putBoolean(PREF_DONT_SHOW, true);
-                    editor.commit();
-                }
-                dialog.dismiss();
-            }
-        });
-
-        dialog.setContentView(layout);        
-        dialog.show();        
+                    @Override
+                    public void onNeutral(MaterialDialog dialog) {
+                        super.onNeutral(dialog);
+                        if (editor != null) {
+                            editor.putLong(PREF_DATE_REMINDER_PRESSED, System.currentTimeMillis());
+                            editor.commit();
+                        }
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 }
