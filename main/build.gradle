@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'hugo'
+apply plugin: 'io.fabric'
+// Use custom gradle file if it exists in script product flavor folder
+if (new File("./main/src/script/custom.gradle").exists()) {
+    println 'Script custom.gradle exists'
+    apply from: "../main/src/script/custom.gradle";
+} else {
+    scriptApplicationId = "no.script.available"
+}
 
 buildscript {
     repositories {
@@ -51,6 +59,9 @@ android {
 
         lintOptions {
             abortOnError false
+        script {
+            applicationId scriptApplicationId
+            flavorDimension "name"
         }
 }
 
