@@ -84,4 +84,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'io.reactivex:rxandroid:0.24.0'
     compile 'com.android.support:recyclerview-v7:22.0.0'
+    compile 'uk.co.chrisjenx:calligraphy:2.0.2'
 }

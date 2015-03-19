@@ -1,6 +1,7 @@
 package com.librelio.base;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
@@ -20,6 +21,7 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class BaseActivity extends FragmentActivity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
@@ -167,6 +169,11 @@ public class BaseActivity extends FragmentActivity implements IBaseContext {
 			});
  		AlertDialog alertDialog = alertDialogBuilder.create();
  		alertDialog.show();
+	}
+
+	@Override
+	protected void attachBaseContext(Context newBase) {
+		super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
 	}
 	
 	@Override
