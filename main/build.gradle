@@ -96,6 +96,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:0.24.0'
     compile 'com.android.support:recyclerview-v7:22.0.0'
     compile 'uk.co.chrisjenx:calligraphy:2.0.2'
+    compile 'com.anjlab.android.iab.v3:library:1.0.23@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
     }

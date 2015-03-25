@@ -27,7 +27,6 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <service android:name="com.librelio.lib.utils.BillingService" />
         <service
             android:name="com.librelio.service.MagazineDownloadService"
             android:exported="false" />
@@ -37,14 +36,6 @@
         <service
             android:name="com.librelio.products.ProductsDownloadService"
             android:exported="false" />
-
-        <receiver android:name="com.librelio.lib.utils.BillingReceiver" >
-            <intent-filter>
-                <action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
-                <action android:name="com.android.vending.billing.RESPONSE_CODE" />
-                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name="com.librelio.activity.StartupActivity"
