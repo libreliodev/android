@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.jakewharton.hugo'
+apply plugin: 'com.raizlabs.griddle'
 
 // Use custom gradle file if it exists in script product flavor folder
 if (new File("./main/src/script/custom.gradle").exists()) {
@@ -13,11 +14,13 @@ if (new File("./main/src/script/custom.gradle").exists()) {
 buildscript {
     repositories {
         jcenter()
+        maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
     }
 
     dependencies {
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.8'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+        classpath 'com.raizlabs:Griddle:1.0.3'
     }
 }
 
@@ -79,7 +82,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.google.android.gms:play-services-base:7.0.0'
+    nsMod 'com.google.android.gms:{play-services-base,play-services-analytics,play-services-gcm}:7.0.0'
     compile 'commons-io:commons-io:2.4'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'io.reactivex:rxandroid:0.24.0'
