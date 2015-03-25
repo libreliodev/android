@@ -143,7 +143,7 @@ public class MainTabsActivity extends BaseActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
+		inflater.inflate(R.menu.activity_main_tabs, menu);
 		return true;
 	}
 

@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/options_menu_reload"
-        android:icon="@drawable/ic_action_reload"
+        android:icon="@drawable/ic_refresh_white_24dp"
         android:showAsAction="always"
         android:title="@string/reload"/>
 
