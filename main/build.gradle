@@ -62,6 +62,13 @@ android {
             buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
         }
 
+        wind {
+            flavorDimension "name"
+            // Remove next line to enable Crashlytics and change false to true in second line
+            ext.enableCrashlytics = false
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
+        }
+
         script {
             //// Use custom gradle file if it exists in script product flavor folder
             if (new File("./main/src/script/custom.gradle").exists()) {
