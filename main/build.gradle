@@ -4,12 +4,8 @@ apply plugin: 'com.jakewharton.hugo'
 apply plugin: 'com.raizlabs.griddle'
 apply plugin: 'io.fabric'
 
-// Use custom gradle file if it exists in script product flavor folder
-if (new File("./main/src/script/custom.gradle").exists()) {
-    println 'Script custom.gradle exists'
-    apply from: "../main/src/script/custom.gradle";
-} else {
-    scriptApplicationId = "no.script.available"
+ext {
+    scriptApplicationId = "com.niveales.wind"
 }
 
 buildscript {
@@ -67,6 +63,14 @@ android {
         }
 
         script {
+            //// Use custom gradle file if it exists in script product flavor folder
+            if (new File("./main/src/script/custom.gradle").exists()) {
+                println 'custom.gradle script exists'
+                apply from: "../main/src/script/custom.gradle";
+            } else {
+                println 'No custom.gradle script exists'
+            }
+
             applicationId scriptApplicationId
             flavorDimension "name"
             buildConfigField "boolean", "CRASHLYTICS_ENABLED", "true"
