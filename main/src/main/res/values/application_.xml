@@ -10,5 +10,6 @@
     <bool name="enable_subscribe_in_menu">false</bool>
     <bool name="enable_app_rating">true</bool>
     <string name="gcm_project_number">1012641315687</string>
+    <string name="dfp_prefix"></string>
 
 </resources>
