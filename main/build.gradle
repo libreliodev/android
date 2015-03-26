@@ -92,10 +92,11 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     nsMod 'com.google.android.gms:{play-services-base,play-services-analytics,play-services-gcm}:7.0.0'
     compile 'commons-io:commons-io:2.4'
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    nsMod 'com.android.support:{appcompat-v7,support-annotations,recyclerview-v7}:22.0.0'
     compile 'io.reactivex:rxandroid:0.24.0'
-    compile 'com.android.support:recyclerview-v7:22.0.0'
     compile 'uk.co.chrisjenx:calligraphy:2.0.2'
+    compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
+    compile 'com.github.castorflex.smoothprogressbar:library-circular:1.1.0'
     compile 'com.anjlab.android.iab.v3:library:1.0.23@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
