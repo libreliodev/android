@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -23,7 +23,7 @@ import java.util.Locale;
 import de.greenrobot.event.EventBus;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class BaseActivity extends FragmentActivity implements IBaseContext {
+public class BaseActivity extends ActionBarActivity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
 
 	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
