@@ -254,7 +254,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 					subtitle.setText(displayable.getSubtitle());
 				}
 				if (thumbnail != null) {
-					Picasso.with(context).load(displayable.getPngUri()).fit().centerInside().placeholder(R.drawable.default_cover)
+					Picasso.with(context).load(displayable.getPngUri()).fit().centerInside().placeholder(R.drawable.generic)
 
 							.into(thumbnail);
 					thumbnail.setOnClickListener(new View.OnClickListener() {
