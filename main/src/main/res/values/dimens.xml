@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="page_preview_size">100dp</dimen>
+    <dimen name="preview_column_width">100dp</dimen>
     <dimen name="preview_image_width">80dp</dimen>
     <dimen name="preview_image_height">160dp</dimen>
     <dimen name="preview_button_text_size">16dp</dimen>

@@ -3,6 +3,9 @@ package com.librelio.fragments;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,12 +18,14 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.DictItemAdapter;
+import com.librelio.event.NewPlistDownloadedEvent;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.service.AssetDownloadService;
 import com.librelio.utils.PlistDownloader;
 import com.librelio.utils.PlistUtils;
 import com.niveales.wind.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -34,9 +39,10 @@ import rx.schedulers.Schedulers;
 
 public class PlistGridFragment extends Fragment {
 
-    private GridView grid;
+    private RecyclerView grid;
     private ArrayList<DictItem> dictItems;
     private DictItemAdapter adapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private String plistName;
 
@@ -74,14 +80,63 @@ public class PlistGridFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_plist_grid, container, false);
 
-        grid = (GridView) view.findViewById(R.id.issue_list_grid_view);
+        grid = (RecyclerView) view.findViewById(R.id.issue_list_two_way_view);
+        grid.setHasFixedSize(true);
+//        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),
+//                getResources().getInteger(R.integer.plist_grid_num_columns));
+//        grid.setLayoutManager(layoutManager);
+        final GridLayoutManager manager = (GridLayoutManager) grid.getLayoutManager();
+//        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                return adapter.isHeader(position) ? manager.getSpanCount() : 1;
+//            }
+//        });
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (position == 0) {
+                    return manager.getSpanCount();
+                } else {
+                    return 1;
+                }
+//                switch(adapter.getItemViewType(position)){
+//                    case MyAdapter.TYPE_HEADER:
+//                        return 2;
+//                    case MyAdapter.TYPE_ITEM:
+//                        return 1;
+//                    default:
+//                        return -1;
+//                }
+            }
+        });
+
+        grid.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                final Picasso picasso = Picasso.with(getActivity());
+                if (newState == RecyclerView.SCROLL_STATE_IDLE || newState == RecyclerView
+                        .SCROLL_STATE_DRAGGING) {
+                    picasso.resumeTag(getActivity());
+                } else {
+                    picasso.pauseTag(getActivity());
+                }
+            }
+        });
 
         dictItems = new ArrayList<>();
 
-        adapter = new DictItemAdapter(dictItems, getActivity());
+        adapter = new DictItemAdapter(getActivity(), dictItems);
         grid.setAdapter(adapter);
 
-        plistName = getArguments().getString(PLIST_NAME);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                reloadPlist();
+            }
+        });
 
         return view;
     }
@@ -90,12 +145,18 @@ public class PlistGridFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        plistName = getArguments().getString(PLIST_NAME);
         setHasOptionsMenu(true);
     }
 
     @DebugLog
     public void onEvent(ReloadPlistEvent event) {
         startDisplayDictItemsTaskWithDelay(0);
+    }
+
+    public void onEvent(NewPlistDownloadedEvent event) {
+//        updateInventory();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @DebugLog
@@ -120,7 +181,7 @@ public class PlistGridFragment extends Fragment {
                             dictItems.clear();
                             dictItems.addAll(newDictItems);
                             grid.invalidate();
-                            grid.invalidateViews();
+                            // FIXME Shouldn't do this ever 5 seconds
                         }
                     }
                 });
@@ -144,23 +205,11 @@ public class PlistGridFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_magazines, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.options_menu_reload:
-                // force a redownload of the plist
-                PlistDownloader.updateFromServer(getActivity(), plistName, true);
-                // Also try downloading any failed assets
-                AssetDownloadService.startAssetDownloadService(getActivity());
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    private void reloadPlist() {
+        // force a redownload of the plist
+        PlistDownloader.updateFromServer(getActivity(), plistName, true);
+        // Also try downloading any failed assets
+        AssetDownloadService.startAssetDownloadService(getActivity());
     }
 
     private void startDisplayDictItemsTaskWithDelay(int delay) {
