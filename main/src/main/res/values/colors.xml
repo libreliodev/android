@@ -12,6 +12,7 @@
     <color name="text_color">?android:attr/textColorPrimary</color>
     <color name="button_text_color">@android:color/white</color>
     <color name="button_stroke_color">@android:color/black</color>
+    <color name="startup_background_color">@android:color/white</color>
 
     <integer-array name="circular_progress_bar_colors">
         <item>@color/colorAccent</item>
