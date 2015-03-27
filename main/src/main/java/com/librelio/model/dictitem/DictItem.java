@@ -24,7 +24,7 @@ public abstract class DictItem {
     protected String pngUrl;
     private int updateFrequency = -1;
 
-    public static DictItem parse(Context context, Dict dict) {
+    public static DictItem parse(Context context, Dict dict, String pathBit) {
         DictItem.context = context;
 
         String title = dict.getString(TITLE_KEY).getValue().toString();
@@ -35,7 +35,7 @@ public abstract class DictItem {
 
         if (filePathFromPlist.contains("pdf")) {
             String subtitle = dict.getString(SUBTITLE_KEY).getValue().toString();
-            MagazineItem magazine = new MagazineItem(context, title, subtitle, filePathFromPlist);
+            MagazineItem magazine = new MagazineItem(context, title, subtitle, pathBit + filePathFromPlist);
             return magazine;
         } else if (filePathFromPlist.contains("plist")) {
         	parsedItem = new PlistItem(context, title, filePathFromPlist);

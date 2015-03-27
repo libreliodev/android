@@ -11,6 +11,8 @@ import com.longevitysoft.android.xml.plist.domain.Array;
 import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.util.ArrayList;
 
 public class PlistUtils {
@@ -18,7 +20,7 @@ public class PlistUtils {
     private static final String TAG = "PlistParserLoader";
 
     public static ArrayList<DictItem> parsePlist(Context context, String plistName) {
-    	
+
 //    	if (BuildConfig.DEBUG) {
 //    		Log.d(getClass().getSimpleName(), "parsing plist: " + plistName);
 //    	}
@@ -45,14 +47,15 @@ public class PlistUtils {
             Array arr = (Array) list.getRootElement();
             for (int i = 0; i < arr.size(); i++) {
                 Dict dict = (Dict) arr.get(i);
-                DictItem item = DictItem.parse(context, dict);
+                String pathBit = FilenameUtils.getPath(plistName);
+                DictItem item = DictItem.parse(context, dict, pathBit);
                 magazines.add(item);
             }
         } catch (Exception e) {
             Log.d(TAG, "plist = " + pList);
             e.printStackTrace();
         }
-        
+
 //    	if (BuildConfig.DEBUG) {
 //    		Log.d(getClass().getSimpleName(), "finished parsing plist: " + plistName);
 //    	}
