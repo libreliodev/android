@@ -4,6 +4,7 @@
         <item name="spbStyle">@style/SmoothProgressBar</item>
         <item name="cpbStyle">@style/CircularProgressBar</item>
         <item name="android:buttonStyle">@style/mainGridViewButtonStyle</item>
+        <item name="android:textColor">@color/text_color</item>
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

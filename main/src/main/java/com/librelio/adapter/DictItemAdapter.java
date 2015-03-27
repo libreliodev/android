@@ -106,7 +106,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //
 //        public TextView title;
 //        public TextView subtitle;
-//        public ImageView thumbnail;
+//        public ImageView image;
 //        public LinearLayout progressLayout;
 //        public TextView info;
 //        public SmoothProgressBar progressBar;
@@ -115,7 +115,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //            super(view);
 //            this.title = (TextView) view.findViewById(R.id.tag_title);
 //            this.subtitle = (TextView) view.findViewById(R.id.tag_subtitle);
-//            this.thumbnail = (ImageView) view
+//            this.image = (ImageView) view
 //                    .findViewById(R.id.item_thumbnail);
 //            this.progressLayout = (LinearLayout) view
 //                    .findViewById(R.id.item_progress_layout);
@@ -148,8 +148,8 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //                }
 //                String pngUri = displayable.getPngUri();
 //                Picasso.with(context).load(pngUri).fit().centerInside()
-//                        .into(thumbnail);
-//                thumbnail.setOnClickListener(new View.OnClickListener() {
+//                        .into(image);
+//                image.setOnClickListener(new View.OnClickListener() {
 //                    @Override
 //                    public void onClick(View v) {
 //                        displayable.onThumbnailClick(context);
@@ -179,7 +179,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //        private final Button yearly;
 		private TextView title;
 		private TextView subtitle;
-		private ImageView thumbnail;
+		private ImageView image;
 		private final ImageView newsstandThumbnail;
 		private LinearLayout progressLayout;
 		private TextView info;
@@ -198,7 +198,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			this.title = (TextView) view.findViewById(R.id.tag_title);
 			this.subtitle = (TextView) view
 					.findViewById(R.id.tag_subtitle);
-			this.thumbnail = (ImageView) view
+			this.image = (ImageView) view
 					.findViewById(R.id.tag_image);
 			this.newsstandThumbnail = (ImageView) view
 					.findViewById(R.id.tag_newsstand_cover);
@@ -249,10 +249,10 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 				if (subtitle != null) {
 					subtitle.setText(displayable.getSubtitle());
 				}
-				if (thumbnail != null) {
+				if (image != null) {
 					Picasso.with(context).load(displayable.getPngUri()).fit().centerInside().placeholder(R.drawable.generic)
-							.into(thumbnail);
-					thumbnail.setOnClickListener(new View.OnClickListener() {
+							.into(image);
+					image.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
 //							displayable.onThumbnailClick(context);
@@ -544,7 +544,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //	static class DictItemHolder {
 //		public TextView title;
 //		public TextView subtitle;
-//		public ImageView thumbnail;
+//		public ImageView image;
 //		public LinearLayout progressLayout;
 //		public TextView info;
 //		public ProgressBar progressBar;
@@ -567,7 +567,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //			holder.title = (TextView) convertView.findViewById(R.id.item_title);
 //			holder.subtitle = (TextView) convertView
 //					.findViewById(R.id.item_subtitle);
-//			holder.thumbnail = (ImageView) convertView
+//			holder.image = (ImageView) convertView
 //					.findViewById(R.id.item_thumbnail);
 //			holder.progressLayout = (LinearLayout) convertView
 //					.findViewById(R.id.item_progress_layout);
@@ -604,7 +604,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //		holder.cancelButton.setVisibility(View.GONE);
 //		if (holder.position != position) {
 //			holder.position = position;
-//			holder.thumbnail.setImageDrawable(null);
+//			holder.image.setImageDrawable(null);
 //		}
 //
 //		if (dictItems.get(position) instanceof MagazineItem) {
@@ -830,8 +830,8 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //			String pngUri = displayable.getPngUri();
 //			// Log.d("image", pngUri);
 //			Picasso.with(context).load(pngUri).fit().centerInside()
-//					.into(holder.thumbnail);
-//			holder.thumbnail.setOnClickListener(new OnClickListener() {
+//					.into(holder.image);
+//			holder.image.setOnClickListener(new OnClickListener() {
 //				@Override
 //				public void onClick(View v) {
 //					displayable.onThumbnailClick(context);

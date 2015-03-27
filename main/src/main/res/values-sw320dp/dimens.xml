@@ -2,5 +2,5 @@
 <resources>
     <dimen name="preview_column_width">180dp</dimen>
     <dimen name="preview_image_width">160dp</dimen>
-    <dimen name="preview_image_height">240dp</dimen>
+    <dimen name="preview_image_height">220dp</dimen>
 </resources>
