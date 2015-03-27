@@ -18,6 +18,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
 
@@ -153,6 +154,14 @@ public class MagazineItem extends DownloadableDictItem implements DisplayableAsG
 		}
 	}
 
+	public String getNewsstandPngUri() {
+		if (isPaid()) {
+			return getItemUrl().replace("_.pdf", "_newsstand.png");
+		} else {
+			return getItemUrl().replace(".pdf", "_newsstand.png");
+		}
+	}
+
 	@Override
 	public void onThumbnailClick(Context context) {
 		// TODO Auto-generated method stub
@@ -191,4 +200,14 @@ public class MagazineItem extends DownloadableDictItem implements DisplayableAsG
                     context, this, false);
         }
     }
+
+	public String getInAppBillingProductId() {
+		String productId = FilenameUtils.getName(getFilePath()).toLowerCase(
+				Locale.US);
+		productId = productId.substring(0, productId.indexOf("_.pdf"));
+		return productId;
+	}
+
+
+
 }

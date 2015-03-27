@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.librelio.LibrelioApplication;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.MagazineItem;
@@ -38,17 +39,17 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//		switch (viewType) {
-//			case TYPE_HEADER:
-//				final View header = LayoutInflater.from(context).inflate(R.layout
-//						.item_dictitem_grid_header, parent, false);
-//				return new DefaultViewHolder(header);
-//			case TYPE_DEFAULT:
+		switch (viewType) {
+			case TYPE_HEADER:
+				final View header = LayoutInflater.from(context).inflate(R.layout
+						.item_dictitem_grid_header, parent, false);
+				return new DefaultViewHolder(context, header);
+			case TYPE_DEFAULT:
 				final View view = LayoutInflater.from(context).inflate(R.layout
 						.item_dictitem_grid, parent, false);
-				return new DefaultViewHolder(view);
-//		}
-//		return null;
+				return new DefaultViewHolder(context, view);
+		}
+		return null;
 	}
 
 	@Override
@@ -62,14 +63,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-
-//        if (holder instanceof DefaultViewHolder) {
-//        if (getItemViewType(TYPE_HEADER))
-		((DefaultViewHolder) holder).bind(context, dictItems.get(position));
-//        } else {
-//            ((DefaultViewHolder) holder).bind(context, dictItems.get(position));
-//        }
-
+		((DefaultViewHolder) holder).bind(dictItems.get(position));
 	}
 
 	@Override
@@ -179,6 +173,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 	public static class DefaultViewHolder extends RecyclerView.ViewHolder {
 
+		private final Context context;
 		//        private final Button buy;
 //        private final Button monthly;
 //        private final Button yearly;
@@ -197,8 +192,9 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		private final FrameLayout adLayout;
 //		private PublisherAdView adView;
 
-		public DefaultViewHolder(View view) {
+		public DefaultViewHolder(Context context, View view) {
 			super(view);
+			this.context = context;
 			this.title = (TextView) view.findViewById(R.id.tag_title);
 			this.subtitle = (TextView) view
 					.findViewById(R.id.tag_subtitle);
@@ -226,7 +222,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			this.adLayout = (FrameLayout) view.findViewById(R.id.tag_ad);
 		}
 
-		public void bind(final Context context, final DictItem dictItem) {
+		public void bind(final DictItem dictItem) {
 			// reset the visibilities
 			if (title != null) {
 				title.setText("");
@@ -255,47 +251,39 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 				}
 				if (thumbnail != null) {
 					Picasso.with(context).load(displayable.getPngUri()).fit().centerInside().placeholder(R.drawable.generic)
-
 							.into(thumbnail);
 					thumbnail.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+//							displayable.onThumbnailClick(context);
+							boolean wrapInScrollView = false;
+							MaterialDialog dialog = new MaterialDialog.Builder(context)
+									.customView(R.layout.item_dictitem_pop_up_dialog, wrapInScrollView)
+									.build();
+							ImageView newsstandCover = (ImageView) dialog.getCustomView().findViewById(R.id.tag_newsstand_cover);
+							Picasso.with(context).load(magazine.getNewsstandPngUri()).fit().centerInside().placeholder(R.drawable.generic)
+									.into(newsstandCover);
+							dialog.show();
+						}
+					});
+				}
+				if (newsstandThumbnail != null) {
+					Picasso.with(context).load(magazine.getNewsstandPngUri()).fit().centerInside().placeholder(R.drawable.generic)
+							.into(newsstandThumbnail);
+					newsstandThumbnail.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
 							displayable.onThumbnailClick(context);
 						}
 					});
 				}
-//				if (newsstandThumbnail != null) {
-//					Picasso.with(context).load(displayable.getNewsstandPngUri()).fit().centerInside().placeholder(R.drawable.generic_cover)
-//							.into(newsstandThumbnail);
-//					newsstandThumbnail.setOnClickListener(new View.OnClickListener() {
-//						@Override
-//						public void onClick(View v) {
-//							displayable.onThumbnailClick(context);
-//						}
-//					});
-//				}
 			}
 			if (downloadButton != null) {
 				downloadButton.setText(R.string.download);
 			}
 
 			if (sampleButton != null) {
-				sampleButton.setText(R.string.sample);
-				sampleButton.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						if (magazine.isSampleDownloaded()) {
-							LibrelioApplication.startPDFActivity(
-									context,
-									magazine.getSamplePdfPath(),
-									magazine.getTitle(), true);
-						} else {
-							MagazineDownloadService
-									.startMagazineDownload(context,
-											magazine, true);
-						}
-					}
-				});
+				setupSampleButton(context, magazine);
 			}
 
 //			if (adLayout != null) {
@@ -467,6 +455,29 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //                info.setVisibility(View.VISIBLE);
 //            }
 //
+		}
+
+		private void setupSampleButton(final Context context, final MagazineItem magazine) {
+			if (magazine.isSampleDownloaded()) {
+                sampleButton.setText(R.string.read_sample);
+            } else {
+                sampleButton.setText(R.string.sample);
+            }
+			sampleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (magazine.isSampleDownloaded()) {
+                        LibrelioApplication.startPDFActivity(
+								context,
+								magazine.getSamplePdfPath(),
+								magazine.getTitle(), true);
+                    } else {
+                        MagazineDownloadService
+                                .startMagazineDownload(context,
+										magazine, true);
+                    }
+                }
+            });
 		}
 	}
 
