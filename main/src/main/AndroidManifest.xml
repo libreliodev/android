@@ -48,7 +48,7 @@
         </activity>
         <activity
             android:name="com.librelio.activity.MuPDFActivity"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen" >
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.librelio.activity.MainTabsActivity" />

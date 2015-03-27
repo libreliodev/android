@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.PasswordTransformationMethod;
@@ -45,7 +46,6 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.PDFPreviewPagerAdapter;
-import com.librelio.base.BaseActivity;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.lib.utils.PDFParser;
 import com.librelio.model.dictitem.MagazineItem;
@@ -60,7 +60,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.util.ArrayList;
 
 //TODO: remove preffix mXXXX from all properties this class
-public class MuPDFActivity extends BaseActivity{
+public class MuPDFActivity extends FragmentActivity {
 	private static final String TAG = "MuPDFActivity";
 
 //	private static final int SEARCH_PROGRESS_DELAY = 200;
