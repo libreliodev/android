@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.SkuDetails;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -103,8 +102,9 @@ public class LibrelioApplication extends Application {
 			public void run() {
 
 				// Precache the subscription details
-				final SkuDetails purchaseListingDetails = bp.getPurchaseListingDetails(getString(R.string.yearly_subs_code));
-				bp.getPurchaseListingDetails(getString(R.string.monthly_subs_code));
+				bp.getSubscriptionListingDetails(getString(R.string.yearly_subs_code));
+				bp.getSubscriptionListingDetails(getString(R.string.monthly_subs_code));
+				//FIXME precache all the magazine prices
 			}
 		}).start();
     }

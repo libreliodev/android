@@ -24,6 +24,7 @@ import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.service.MagazineDownloadService;
 import com.librelio.utils.CommonHelper;
+import com.librelio.utils.InAppBillingUtils;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
@@ -187,6 +188,8 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 		private final Context context;
 		private final Button unitPrice;
+		private final Button monthlySubscriptionPrice;
+		private final Button yearlySubscriptionPrice;
 		//        private final Button buy;
 //        private final Button monthly;
 //        private final Button yearly;
@@ -216,6 +219,10 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			this.newsstandThumbnail = (ImageView) view
 					.findViewById(R.id.tag_newsstand_cover);
 			this.unitPrice = (Button) view.findViewById(R.id.tag_unit_price);
+			this.monthlySubscriptionPrice = (Button) view.findViewById(R.id
+					.tag_monthly_subscription_price);
+			this.yearlySubscriptionPrice = (Button) view.findViewById(R.id
+					.tag_yearly_subscription_price);
 //            this.progressLayout = (LinearLayout) view
 //                    .findViewById(R.id.item_progress_layout);
 //            this.info = (TextView) view.findViewById(R.id.item_info);
@@ -322,16 +329,12 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 				}
 			}
 
-			if (unitPrice != null) {
-//				if (magazine.isPaid()) {
-////                    // FIXME This should probably be done in background thread because it is
-////                    // synchronous
 ////                    // FIXME Precache all the prices when plist is parsed - parse it while
 ////                    // splash screen is shown
-////                    // FIXME Precache the subscription costs when app is started
 ////                    // FIXME Change library to cache all at once
 
-				unitPrice.setText("--");
+			if (unitPrice != null) {
+				unitPrice.setText("");
 				unitPrice.setTag(magazine.getItemUrl());
 
 				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
@@ -370,173 +373,95 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //                        buy.setText(magazinePrice != null ? magazinePrice : context
 //                                .getResources()
 //                                .getString(R.string.download));
-//                    if (magazineSkuDetails != null) {
-//                        unitPrice.setText(magazineSkuDetails.priceText);
-//                        SkuDetails yearlyPrice = LibrelioApplication.get().getBillingProcessor()
-//                                .getSubscriptionListingDetails(context.getString(R.string
-//                                        .yearly_subs_code));
-//                        yearly.setText(InAppBillingUtils.getFormattedPriceForButton(yearlyPrice
-//                                .title, yearlyPrice.priceText));
-//                        SkuDetails monthlyPrice = LibrelioApplication.get().getBillingProcessor()
-//                                .getSubscriptionListingDetails(context.getString(R.string
-//                                        .monthly_subs_code));
-//                        monthly.setText(InAppBillingUtils.getFormattedPriceForButton(monthlyPrice
-//                                .title, monthlyPrice.priceText));
-//                    }
-                } else {
-//                        downloadButton.setText(context.getResources()
-//                                .getString(R.string.free_Download));
                 }
 
-//			}
+			if (monthlySubscriptionPrice != null) {
+				monthlySubscriptionPrice.setText("");
+				monthlySubscriptionPrice.setTag("monthly");
 
-//            int downloadStatus = magazine.getDownloadStatus();
-//
-//            // If downloading
-//            if (downloadStatus >= DownloadStatusCode.QUEUED
-//                    && downloadStatus < DownloadStatusCode.DOWNLOADED) {
-//                // currently downloading
-//
-//                progressLayout.setVisibility(View.VISIBLE);
-//                progressBar.setVisibility(View.VISIBLE);
-//
-//                if (downloadStatus == DownloadStatusCode.QUEUED) {
-//                    info.setVisibility(View.VISIBLE);
-//                    info.setText(context.getString(R.string.queued));
-//                }
-//
-//                if (downloadStatus > DownloadStatusCode.QUEUED
-//                        && downloadStatus < 101) {
-//                    info.setVisibility(View.VISIBLE);
-//                    info.setText(context.getResources().getString(
-//                            R.string.download_in_progress));
-//                    progressBar.setIndeterminate(false);
-//                    progressBar.setProgress(downloadStatus);
-//                } else {
-//                    progressBar.setIndeterminate(true);
-//                }
-//
-////                    cancelButton.setVisibility(View.VISIBLE);
-////                    cancelButton.setText(context.getResources().getString(
-////                            R.string.cancel));
-////                    cancelButton.setOnClickListener(new View.OnClickListener() {
-////                        @Override
-////                        public void onClick(View view) {
-////                            // FIXME Cancel download
-////                            DownloadsManager.removeDownload(context,
-////                                    magazine);
-////                            magazine.clearMagazineDir(context);
-////                        }
-////                    });
-//            } else if (!magazine.isDownloaded()) {
-////                    downloadButton.setVisibility(View.VISIBLE);
-//                if (magazine.isPaid()) {
-//                    // FIXME This should probably be done in background thread because it is
-//                    // synchronous
-//                    // FIXME Precache all the prices when plist is parsed - parse it while
-//                    // splash screen is shown
-//                    // FIXME Precache the subscription costs when app is started
-//                    // FIXME Change library to cache all at once
-//                    SkuDetails magazineSkuDetails = LibrelioApplication.get()
-//                            .getBillingProcessor()
-//                            .getPurchaseListingDetails(magazine.getInAppBillingProductId());
-////                        buy.setText(magazinePrice != null ? magazinePrice : context
-////                                .getResources()
-////                                .getString(R.string.download));
-//                    if (magazineSkuDetails != null) {
-//                        buy.setText(InAppBillingUtils.getFormattedPriceForButton
-//                                (magazineSkuDetails.title, magazineSkuDetails.priceText));
-//                        SkuDetails yearlyPrice = LibrelioApplication.get().getBillingProcessor()
-//                                .getSubscriptionListingDetails(context.getString(R.string
-//                                        .yearly_subs_code));
-//                        yearly.setText(InAppBillingUtils.getFormattedPriceForButton(yearlyPrice
-//                                .title, yearlyPrice.priceText));
-//                        SkuDetails monthlyPrice = LibrelioApplication.get().getBillingProcessor()
-//                                .getSubscriptionListingDetails(context.getString(R.string
-//                                        .monthly_subs_code));
-//                        monthly.setText(InAppBillingUtils.getFormattedPriceForButton(monthlyPrice
-//                                .title, monthlyPrice.priceText));
-//                    }
-//                } else {
-////                        downloadButton.setText(context.getResources()
-////                                .getString(R.string.free_Download));
-//                }
-//
-//
-//                if (true) {
-//                    return;
-//                }
-//
-//
-//                // Sample button
-//                if (magazine.isPaid()) {
-//                    sampleButton.setVisibility(View.VISIBLE);
-//                    if (magazine.isSampleDownloaded()) {
-//                        sampleButton.setText(context.getResources()
-//                                .getString(R.string.read_sample));
-//                    } else {
-//                        sampleButton.setText(context.getResources()
-//                                .getString(R.string.sample));
-//                    }
-//                    sampleButton
-//                            .setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    if (magazine.isSampleDownloaded()) {
-//                                        LibrelioApplication.startPDFActivity(
-//                                                context,
-//                                                magazine.getSamplePdfPath(),
-//                                                magazine.getTitle(), true);
-//                                    } else {
-//                                        MagazineDownloadService
-//                                                .startMagazineDownload(context,
-//                                                        magazine, true);
-//                                    }
-//                                }
-//                            });
-//                }
-//            } else if (magazine.isDownloaded()) {
-//                // Read case
-//                readButton.setVisibility(View.VISIBLE);
-//                readButton.setText(context.getResources().getString(
-//                        R.string.read));
-//                readButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        LibrelioApplication.startPDFActivity(context,
-//                                magazine.getItemFilePath(),
-//                                magazine.getTitle(), true);
-//                    }
-//                });
-//            }
-//
-//            int totalAssetCount = DownloadsManager.getTotalAssetCount(context,
-//                    magazine);
-//            int downloadedAssetCount = DownloadsManager.getDownloadedAssetCount(
-//                    context, magazine);
-//            int failedAssetCount = DownloadsManager.getFailedAssetCount(context,
-//                    magazine);
-//            if ((totalAssetCount > 0)
-//                    && (downloadedAssetCount > 0)
-//                    && ((downloadedAssetCount + failedAssetCount) < totalAssetCount)) {
-//                progressLayout.setVisibility(View.VISIBLE);
-//                progressBar.setVisibility(View.VISIBLE);
-//                progressBar.setIndeterminate(false);
-//                progressBar
-//                        .setProgress((int) ((downloadedAssetCount * 100.0f) / totalAssetCount));
-//                info.setVisibility(View.VISIBLE);
-//                info.setText(context.getResources().getString(
-//                        R.string.downloading_assets)
-//                        + "\n" + downloadedAssetCount + "/" + totalAssetCount);
-//            }
-//
-//            // If download failed
-//            if (downloadStatus == DownloadStatusCode.FAILED) {
-//                info.setText("Download failed");
-//                progressLayout.setVisibility(View.VISIBLE);
-//                info.setVisibility(View.VISIBLE);
-//            }
-//
+				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
+					@Override
+					public void call(Subscriber<? super SkuDetails> subscriber) {
+						SkuDetails magazineSkuDetails = LibrelioApplication.get()
+								.getBillingProcessor()
+								.getSubscriptionListingDetails(context.getString(R.string
+										.monthly_subs_code));
+						if (magazineSkuDetails != null) {
+							subscriber.onNext(magazineSkuDetails);
+							subscriber.onCompleted();
+						} else {
+							subscriber.onError(new Throwable("No sku details"));
+						}
+
+					}
+				});
+
+				skuDetailsObservable.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe(new Action1<SkuDetails>() {
+							@Override
+							public void call(SkuDetails skuDetails) {
+								//FIXME need to make sure it's still the same textview
+								if ("monthly".equals(monthlySubscriptionPrice.getTag())) {
+									monthlySubscriptionPrice.setText(InAppBillingUtils
+											.getFormattedPriceForButton(skuDetails.title, skuDetails.priceText));
+								}
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								monthlySubscriptionPrice.setText("Error");
+							}
+						});
+
+//                        buy.setText(magazinePrice != null ? magazinePrice : context
+//                                .getResources()
+//                                .getString(R.string.download));
+			}
+
+			if (yearlySubscriptionPrice != null) {
+				yearlySubscriptionPrice.setText("");
+				yearlySubscriptionPrice.setTag("yearly");
+
+				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
+					@Override
+					public void call(Subscriber<? super SkuDetails> subscriber) {
+						SkuDetails magazineSkuDetails = LibrelioApplication.get()
+								.getBillingProcessor()
+								.getSubscriptionListingDetails(context.getString(R.string
+										.yearly_subs_code));
+						if (magazineSkuDetails != null) {
+							subscriber.onNext(magazineSkuDetails);
+							subscriber.onCompleted();
+						} else {
+							subscriber.onError(new Throwable("No sku details"));
+						}
+
+					}
+				});
+
+				skuDetailsObservable.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe(new Action1<SkuDetails>() {
+							@Override
+							public void call(SkuDetails skuDetails) {
+								//FIXME need to make sure it's still the same textview
+								if ("yearly".equals(yearlySubscriptionPrice.getTag())) {
+									yearlySubscriptionPrice.setText(InAppBillingUtils
+											.getFormattedPriceForButton(skuDetails.title, skuDetails.priceText));
+								}
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								yearlySubscriptionPrice.setText("Error");
+							}
+						});
+
+//                        buy.setText(magazinePrice != null ? magazinePrice : context
+//                                .getResources()
+//                                .getString(R.string.download));
+			}
 		}
 
 		private void setupSampleButton(final Context context, final MagazineItem magazine) {
@@ -562,7 +487,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
             });
 		}
 	}
-
 }
 
 //package com.librelio.adapter;

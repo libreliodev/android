@@ -109,6 +109,7 @@
     <string name="new_issue">New issue</string>
     <string name="available">available</string>
     <string name="queued">Queued</string>
-    
+    <string name="deja_abonne">Already subscribed? Log in</string>
+
 
 </resources>
