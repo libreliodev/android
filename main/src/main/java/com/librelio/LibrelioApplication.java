@@ -67,8 +67,8 @@ public class LibrelioApplication extends Application {
             tracker.enableExceptionReporting(true);
             tracker.enableAutoActivityTracking(true);
             // Set the log level to verbose.
-            GoogleAnalytics.getInstance(this).getLogger()
-                    .setLogLevel(Logger.LogLevel.VERBOSE);
+//            GoogleAnalytics.getInstance(this).getLogger()
+//                    .setLogLevel(Logger.LogLevel.VERBOSE);
         }
         return tracker;
     }
