@@ -2,6 +2,8 @@ package com.librelio.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +14,27 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.anjlab.android.iab.v3.SkuDetails;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.librelio.LibrelioApplication;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.service.MagazineDownloadService;
+import com.librelio.utils.CommonHelper;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class DictItemAdapter extends RecyclerView.Adapter {
 
@@ -174,6 +186,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 	public static class DefaultViewHolder extends RecyclerView.ViewHolder {
 
 		private final Context context;
+		private final Button unitPrice;
 		//        private final Button buy;
 //        private final Button monthly;
 //        private final Button yearly;
@@ -190,7 +203,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		private Button deleteButton;
 		private Button cancelButton;
 		private final FrameLayout adLayout;
-//		private PublisherAdView adView;
+		private PublisherAdView adView;
 
 		public DefaultViewHolder(Context context, View view) {
 			super(view);
@@ -202,6 +215,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 					.findViewById(R.id.tag_image);
 			this.newsstandThumbnail = (ImageView) view
 					.findViewById(R.id.tag_newsstand_cover);
+			this.unitPrice = (Button) view.findViewById(R.id.tag_unit_price);
 //            this.progressLayout = (LinearLayout) view
 //                    .findViewById(R.id.item_progress_layout);
 //            this.info = (TextView) view.findViewById(R.id.item_info);
@@ -286,28 +300,96 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 				setupSampleButton(context, magazine);
 			}
 
-//			if (adLayout != null) {
-//				if (adView == null) {
-//					Log.d("adview", "is null");
-//					String string = context.getString(R.string.dfp_prefix);
-//					if (TextUtils.isEmpty(string)) {
-//
-//					} else {
-////                        adView = new PublisherAdView(context);
-////                        // TODO use source plist name here
-////                        adView.setAdUnitId(string + "femme");
-////                        int width = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen
-////                                .header_ad_width), context);
-////                        int height = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen.header_ad_height), context);
-////                        adView.setAdSizes(new AdSize(width, height));
-////                        PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
-//////                                .addTestDevice("25B0062B9CE37948460EA83FA3B82677")
-////                                .build();
-////                        adView.loadAd(adRequest);
-//					}
-//					adLayout.addView(adView);
-//				}
+			if (adLayout != null) {
+				if (adView == null) {
+					Log.d("adview", "is null");
+					String string = context.getString(R.string.dfp_prefix);
+					if (TextUtils.isEmpty(string)) {
+
+					} else {
+                        adView = new PublisherAdView(context);
+//                        // TODO use source plist name here
+                        adView.setAdUnitId(string + "femme");
+                        int width = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen
+								.header_ad_width), context);
+                        int height = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen.header_ad_height), context);
+                        adView.setAdSizes(new AdSize(width, height));
+                        PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
+                                .build();
+                        adView.loadAd(adRequest);
+					}
+					adLayout.addView(adView);
+				}
+			}
+
+			if (unitPrice != null) {
+//				if (magazine.isPaid()) {
+////                    // FIXME This should probably be done in background thread because it is
+////                    // synchronous
+////                    // FIXME Precache all the prices when plist is parsed - parse it while
+////                    // splash screen is shown
+////                    // FIXME Precache the subscription costs when app is started
+////                    // FIXME Change library to cache all at once
+
+				unitPrice.setText("--");
+				unitPrice.setTag(magazine.getItemUrl());
+
+				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
+					@Override
+					public void call(Subscriber<? super SkuDetails> subscriber) {
+						SkuDetails magazineSkuDetails = LibrelioApplication.get()
+								.getBillingProcessor()
+								.getPurchaseListingDetails(magazine.getInAppBillingProductId());
+						if (magazineSkuDetails != null) {
+							subscriber.onNext(magazineSkuDetails);
+							subscriber.onCompleted();
+						} else {
+							subscriber.onError(new Throwable("No sku details"));
+						}
+
+					}
+				});
+
+				skuDetailsObservable.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe(new Action1<SkuDetails>() {
+							@Override
+							public void call(SkuDetails skuDetails) {
+								//FIXME need to make sure it's still the same textview
+								if (magazine.getItemUrl().equals(unitPrice.getTag())) {
+									unitPrice.setText(skuDetails.priceText);
+								}
+							}
+						}, new Action1<Throwable>() {
+							@Override
+							public void call(Throwable throwable) {
+								unitPrice.setText("Error");
+							}
+						});
+
+//                        buy.setText(magazinePrice != null ? magazinePrice : context
+//                                .getResources()
+//                                .getString(R.string.download));
+//                    if (magazineSkuDetails != null) {
+//                        unitPrice.setText(magazineSkuDetails.priceText);
+//                        SkuDetails yearlyPrice = LibrelioApplication.get().getBillingProcessor()
+//                                .getSubscriptionListingDetails(context.getString(R.string
+//                                        .yearly_subs_code));
+//                        yearly.setText(InAppBillingUtils.getFormattedPriceForButton(yearlyPrice
+//                                .title, yearlyPrice.priceText));
+//                        SkuDetails monthlyPrice = LibrelioApplication.get().getBillingProcessor()
+//                                .getSubscriptionListingDetails(context.getString(R.string
+//                                        .monthly_subs_code));
+//                        monthly.setText(InAppBillingUtils.getFormattedPriceForButton(monthlyPrice
+//                                .title, monthlyPrice.priceText));
+//                    }
+                } else {
+//                        downloadButton.setText(context.getResources()
+//                                .getString(R.string.free_Download));
+                }
+
 //			}
+
 //            int downloadStatus = magazine.getDownloadStatus();
 //
 //            // If downloading

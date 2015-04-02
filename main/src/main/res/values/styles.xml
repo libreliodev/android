@@ -47,7 +47,7 @@
 
     <style name="mainGridViewButtonStyle" parent="Base.TextAppearance.AppCompat">
         <item name="android:background">@drawable/magazines_view_button_selector</item>
-        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:textColor">@color/magazine_view_button_text_color</item>
         <item name="android:textSize">@dimen/preview_button_text_size</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
