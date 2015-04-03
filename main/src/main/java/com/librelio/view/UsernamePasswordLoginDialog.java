@@ -1,16 +1,17 @@
 package com.librelio.view;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+
+import com.afollestad.materialdialogs.AlertDialogWrapper;
 import com.niveales.wind.R;
 
 public class UsernamePasswordLoginDialog {
 
-	private AlertDialog.Builder builder;
+	private AlertDialogWrapper.Builder builder;
 	private Context context;
 	private String title;
     private boolean error;
@@ -34,7 +35,7 @@ public class UsernamePasswordLoginDialog {
 	
 	private void configureDialog(){
 
-		builder = new AlertDialog.Builder(context);
+		builder = new AlertDialogWrapper.Builder(context);
 			
 		if (null != title){
 			builder.setTitle(title);
@@ -61,11 +62,12 @@ public class UsernamePasswordLoginDialog {
 		    }
 		});
 		
-		builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        onUsernamePasswordLoginListener.onCancel();
-		    }
+		builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface
+				.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				onUsernamePasswordLoginListener.onCancel();
+			}
 		});
 	} 
 	

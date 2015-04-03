@@ -1,17 +1,18 @@
 package com.librelio.view;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+
+import com.afollestad.materialdialogs.AlertDialogWrapper;
 import com.niveales.wind.R;
 
 public class SubscriberCodeDialog {
 
     private final boolean error;
-    private AlertDialog.Builder builder;
+    private AlertDialogWrapper.Builder builder;
 	private Context context;
 	private String title;
 	
@@ -32,7 +33,7 @@ public class SubscriberCodeDialog {
 	
 	private void configureDialog(){
 
-		builder = new AlertDialog.Builder(context);
+		builder = new AlertDialogWrapper.Builder(context);
 			
 		if (null != title){
 			builder.setTitle(title);
