@@ -3,7 +3,6 @@ package com.librelio.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +18,14 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.librelio.LibrelioApplication;
+import com.librelio.activity.BillingActivity;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.service.MagazineDownloadService;
 import com.librelio.utils.CommonHelper;
 import com.librelio.utils.InAppBillingUtils;
+import com.librelio.view.EventBusButton;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
@@ -44,10 +45,12 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 	private final Context context;
 	private final ArrayList<DictItem> dictItems;
+	private String plistName;
 
-	public DictItemAdapter(Context context, ArrayList<DictItem> dictItems) {
+	public DictItemAdapter(Context context, ArrayList<DictItem> dictItems, String plistName) {
 		this.context = context;
 		this.dictItems = dictItems;
+		this.plistName = plistName;
 	}
 
 	@Override
@@ -56,11 +59,11 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			case TYPE_HEADER:
 				final View header = LayoutInflater.from(context).inflate(R.layout
 						.item_dictitem_grid_header, parent, false);
-				return new DefaultViewHolder(context, header);
+				return new DefaultViewHolder(context, header, plistName);
 			case TYPE_DEFAULT:
 				final View view = LayoutInflater.from(context).inflate(R.layout
 						.item_dictitem_grid, parent, false);
-				return new DefaultViewHolder(context, view);
+				return new DefaultViewHolder(context, view, plistName);
 		}
 		return null;
 	}
@@ -90,29 +93,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //    }
 
 
-
-
-
-
-
-
-
-
 	//TODO Remove duplicated code between default and header views
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //    public static class DefaultViewHolder extends RecyclerView.ViewHolder {
@@ -190,9 +171,8 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		private final Button unitPrice;
 		private final Button monthlySubscriptionPrice;
 		private final Button yearlySubscriptionPrice;
-		//        private final Button buy;
-//        private final Button monthly;
-//        private final Button yearly;
+		private final String plistName;
+		private final View view;
 		private TextView title;
 		private TextView subtitle;
 		private ImageView image;
@@ -201,16 +181,15 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		private TextView info;
 		private SmoothProgressBar progressBar;
 		private Button sampleButton;
-		private Button readButton;
 		private Button downloadButton;
-		private Button deleteButton;
-		private Button cancelButton;
 		private final FrameLayout adLayout;
 		private PublisherAdView adView;
 
-		public DefaultViewHolder(Context context, View view) {
+		public DefaultViewHolder(Context context, View view, String plistName) {
 			super(view);
 			this.context = context;
+			this.view = view;
+			this.plistName = plistName;
 			this.title = (TextView) view.findViewById(R.id.tag_title);
 			this.subtitle = (TextView) view
 					.findViewById(R.id.tag_subtitle);
@@ -223,27 +202,18 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 					.tag_monthly_subscription_price);
 			this.yearlySubscriptionPrice = (Button) view.findViewById(R.id
 					.tag_yearly_subscription_price);
-//            this.progressLayout = (LinearLayout) view
-//                    .findViewById(R.id.item_progress_layout);
-//            this.info = (TextView) view.findViewById(R.id.item_info);
-//            this.progressBar = (SmoothProgressBar) view
-//                    .findViewById(R.id.progress_bar);
 			this.sampleButton = (Button) view.findViewById(R.id.tag_sample);
-//            this.buy = (Button) view.findViewById(R.id.button_buy_issue);
-//            this.monthly = (Button) view.findViewById(R.id.button_buy_monthly);
-//            this.yearly = (Button) view.findViewById(R.id.button_buy_yearly);
-//            this.readButton = (Button) view
-//                    .findViewById(R.id.button_read);
-			this.downloadButton = (Button) view
-					.findViewById(R.id.tag_download);
-//            this.deleteButton = (Button) view
-//                    .findViewById(R.id.button_delete);
-//            this.cancelButton = (Button) view
-//                    .findViewById(R.id.button_cancel);
+			this.downloadButton = (Button) view.findViewById(R.id.tag_download);
 			this.adLayout = (FrameLayout) view.findViewById(R.id.tag_ad);
 		}
 
 		public void bind(final DictItem dictItem) {
+
+			final MagazineItem magazine = (MagazineItem) dictItem;
+
+			// Set tag
+			view.setTag(magazine.getItemUrl());
+
 			// reset the visibilities
 			if (title != null) {
 				title.setText("");
@@ -259,8 +229,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //            deleteButton.setVisibility(View.GONE);
 //            sampleButton.setVisibility(View.GONE);
 //            cancelButton.setVisibility(View.GONE);
-
-			final MagazineItem magazine = (MagazineItem) dictItem;
 
 			if (dictItem instanceof DisplayableAsGridItem) {
 				final DisplayableAsGridItem displayable = ((DisplayableAsGridItem) dictItem);
@@ -284,6 +252,10 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 							ImageView newsstandCover = (ImageView) dialog.getCustomView().findViewById(R.id.tag_newsstand_cover);
 							Picasso.with(context).load(magazine.getNewsstandPngUri()).fit().centerInside().placeholder(R.drawable.generic)
 									.into(newsstandCover);
+							setupSampleButton(context, magazine,
+									(Button) dialog.getCustomView().findViewById(R.id.tag_sample));
+							setupDownloadButton(context, magazine,
+									(Button) dialog.getCustomView().findViewById(R.id.tag_download));
 							dialog.show();
 						}
 					});
@@ -299,31 +271,31 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 					});
 				}
 			}
+
 			if (downloadButton != null) {
-				downloadButton.setText(R.string.download);
+				setupDownloadButton(context, magazine, downloadButton);
 			}
 
 			if (sampleButton != null) {
-				setupSampleButton(context, magazine);
+				setupSampleButton(context, magazine, sampleButton);
 			}
 
 			if (adLayout != null) {
 				if (adView == null) {
-					Log.d("adview", "is null");
 					String string = context.getString(R.string.dfp_prefix);
 					if (TextUtils.isEmpty(string)) {
 
 					} else {
-                        adView = new PublisherAdView(context);
-//                        // TODO use source plist name here
-                        adView.setAdUnitId(string + "femme");
-                        int width = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen
+						adView = new PublisherAdView(context);
+						adView.setAdUnitId(string + plistName);
+						int width = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen
 								.header_ad_width), context);
-                        int height = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen.header_ad_height), context);
-                        adView.setAdSizes(new AdSize(width, height));
-                        PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
-                                .build();
-                        adView.loadAd(adRequest);
+						int height = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen.header_ad_height), context);
+
+						adView.setAdSizes(new AdSize(width, height));
+						PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
+								.build();
+						adView.loadAd(adRequest);
 					}
 					adLayout.addView(adView);
 				}
@@ -335,7 +307,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 			if (unitPrice != null) {
 				unitPrice.setText("");
-				unitPrice.setTag(magazine.getItemUrl());
 
 				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
 					@Override
@@ -359,7 +330,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 							@Override
 							public void call(SkuDetails skuDetails) {
 								//FIXME need to make sure it's still the same textview
-								if (magazine.getItemUrl().equals(unitPrice.getTag())) {
+								if (magazine.getItemUrl().equals(view.getTag())) {
 									unitPrice.setText(skuDetails.priceText);
 								}
 							}
@@ -373,11 +344,10 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //                        buy.setText(magazinePrice != null ? magazinePrice : context
 //                                .getResources()
 //                                .getString(R.string.download));
-                }
+			}
 
 			if (monthlySubscriptionPrice != null) {
 				monthlySubscriptionPrice.setText("");
-				monthlySubscriptionPrice.setTag("monthly");
 
 				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
 					@Override
@@ -401,8 +371,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 						.subscribe(new Action1<SkuDetails>() {
 							@Override
 							public void call(SkuDetails skuDetails) {
-								//FIXME need to make sure it's still the same textview
-								if ("monthly".equals(monthlySubscriptionPrice.getTag())) {
+								if (monthlySubscriptionPrice != null) {
 									monthlySubscriptionPrice.setText(InAppBillingUtils
 											.getFormattedPriceForButton(skuDetails.title, skuDetails.priceText));
 								}
@@ -421,7 +390,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 			if (yearlySubscriptionPrice != null) {
 				yearlySubscriptionPrice.setText("");
-				yearlySubscriptionPrice.setTag("yearly");
 
 				final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
 					@Override
@@ -445,8 +413,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 						.subscribe(new Action1<SkuDetails>() {
 							@Override
 							public void call(SkuDetails skuDetails) {
-								//FIXME need to make sure it's still the same textview
-								if ("yearly".equals(yearlySubscriptionPrice.getTag())) {
+								if (yearlySubscriptionPrice != null) {
 									yearlySubscriptionPrice.setText(InAppBillingUtils
 											.getFormattedPriceForButton(skuDetails.title, skuDetails.priceText));
 								}
@@ -464,29 +431,103 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			}
 		}
 
-		private void setupSampleButton(final Context context, final MagazineItem magazine) {
+		private void setupDownloadButton(final Context context, final MagazineItem magazine, final Button
+				downloadButton) {
+			if (magazine.isDownloaded()) {
+				downloadButton.setText(R.string.read);
+			} else {
+				downloadButton.setText(R.string.download);
+			}
+			downloadButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (magazine.isDownloaded()) {
+						LibrelioApplication.startPDFActivity(
+								context,
+								magazine.getItemFilePath(),
+								magazine.getTitle(), true);
+					} else {
+//						MagazineDownloadService
+//								.startMagazineDownload(context,
+//										magazine, false);
+						BillingActivity.startActivityWithMagazine(context, magazine);
+					}
+				}
+			});
+			if (downloadButton instanceof EventBusButton) {
+				((EventBusButton) downloadButton).setEventTag(magazine.getItemUrl());
+				((EventBusButton) downloadButton).setOnEventListener(new EventBusButton
+						.OnEventListener() {
+
+					@Override
+					public void onEventListener() {
+						downloadButton.setText(String.valueOf(magazine.getDownloadStatus()));
+					}
+				});
+
+			}
+
+		}
+
+		private void setupSampleButton(final Context context, final MagazineItem magazine, final Button
+				sampleButton) {
 			if (magazine.isSampleDownloaded()) {
-                sampleButton.setText(R.string.read_sample);
-            } else {
-                sampleButton.setText(R.string.sample);
-            }
+				sampleButton.setText(R.string.read_sample);
+			} else {
+				sampleButton.setText(R.string.sample);
+			}
 			sampleButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (magazine.isSampleDownloaded()) {
-                        LibrelioApplication.startPDFActivity(
+				@Override
+				public void onClick(View v) {
+					if (magazine.isSampleDownloaded()) {
+						LibrelioApplication.startPDFActivity(
 								context,
 								magazine.getSamplePdfPath(),
 								magazine.getTitle(), true);
-                    } else {
-                        MagazineDownloadService
-                                .startMagazineDownload(context,
+					} else {
+						MagazineDownloadService
+								.startMagazineDownload(context,
 										magazine, true);
-                    }
-                }
-            });
+					}
+				}
+			});
+			if (sampleButton instanceof EventBusButton) {
+				((EventBusButton) sampleButton).setEventTag(magazine.getSamplePdfUrl());
+				((EventBusButton) sampleButton).setOnEventListener(new EventBusButton
+						.OnEventListener() {
+
+					@Override
+					public void onEventListener() {
+						sampleButton.setText(String.valueOf(magazine.getDownloadStatus()));
+					}
+				});
+
+			}
+
 		}
 	}
+
+//	@Override
+//	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
+//		super.onViewAttachedToWindow(holder);
+//		Log.d("hsdiufh", "holder attached");
+//		if (((DefaultViewHolder) holder).sampleButton != null && ((DefaultViewHolder) holder)
+//				.sampleButton instanceof EventBusButton) {
+//			EventBus.getDefault().register(((DefaultViewHolder) holder).sampleButton);
+//			Log.d("hsdiufh", "button registered");
+//		}
+//	}
+//
+//	@Override
+//	public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
+//		super.onViewDetachedFromWindow(holder);
+//		Log.d("hsdiufh", "holder detached");
+//		if (((DefaultViewHolder) holder).sampleButton != null && ((DefaultViewHolder) holder)
+//				.sampleButton instanceof EventBusButton) {
+//			EventBus.getDefault().unregister(((DefaultViewHolder) holder).sampleButton);
+//			Log.d("hsdiufh", "button unregistered");
+//		}
+//	}
 }
 
 //package com.librelio.adapter;

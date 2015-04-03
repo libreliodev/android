@@ -139,6 +139,18 @@ public class BillingActivity extends BaseActivity {
 
 	private IInAppBillingService billingService;
 
+	public static void startActivityWithMagazine(Context context, MagazineItem item) {
+		Intent intent = new Intent(context,
+				BillingActivity.class);
+		intent.putExtra(BillingActivity.FILE_NAME_KEY,
+				item.getFilePath());
+		intent.putExtra(BillingActivity.TITLE_KEY,
+				item.getTitle());
+		intent.putExtra(BillingActivity.SUBTITLE_KEY,
+				item.getSubtitle());
+		context.startActivity(intent);
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
