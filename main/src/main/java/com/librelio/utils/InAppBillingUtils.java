@@ -9,7 +9,7 @@ public class InAppBillingUtils {
     public static SpannableString getFormattedPriceForButton(String title, String
             price) {
         SpannableString priceText = new SpannableString(price + "\n" + title);
-        priceText.setSpan(new RelativeSizeSpan(1.4f), 0, price.length(),
+        priceText.setSpan(new RelativeSizeSpan(0.7f), price.length() + 1, priceText.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return priceText;
     }
