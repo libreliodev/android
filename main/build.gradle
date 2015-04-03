@@ -109,7 +109,8 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.1.0'
     compile 'com.anjlab.android.iab.v3:library:1.0.23@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+    mod 'com.afollestad:material-dialogs:0.6.7.1'
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
         transitive = true;
     }
 }
