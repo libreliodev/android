@@ -219,7 +219,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 					this)
-					.setSmallIcon(R.drawable.ic_launcher)
+					.setSmallIcon(R.mipmap.ic_launcher)
 					.setContentTitle(
 							magazine.getTitle()
 									+ (isSample ? " sample" : "")
