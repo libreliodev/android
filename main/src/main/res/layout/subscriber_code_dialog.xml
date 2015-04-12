@@ -4,21 +4,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
-    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-    android:paddingRight="?android:attr/listPreferredItemPaddingRight">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/error_text"
-        android:text="@string/incorrect_code"
-        style="@style/errorText" />
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp">
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:id="@+id/subscriber_code"
         android:layout_gravity="left|center_vertical" />
 </LinearLayout>

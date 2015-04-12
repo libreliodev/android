@@ -43,7 +43,7 @@ public class SubscriberCodeDialog {
         subscriberCode = (EditText) view.findViewById(R.id.subscriber_code);
 
         if (error) {
-            view.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
+			subscriberCode.setError(context.getString(R.string.incorrect_code));
         }
 		
 		builder.setView(view);

@@ -38,13 +38,6 @@
     <!--<item name="android:windowIsTranslucent">true</item>-->
     <!--</style>-->
 
-    <style name="errorText">
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:textColor">@android:color/holo_red_light</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:visibility">gone</item>
-    </style>
-
     <style name="mainGridViewButtonStyle" parent="Base.TextAppearance.AppCompat">
         <item name="android:background">@drawable/magazines_view_button_selector</item>
         <item name="android:textColor">@color/magazine_view_button_text_color</item>

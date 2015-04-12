@@ -46,7 +46,7 @@ public class UsernamePasswordLoginDialog {
         password = (EditText) view.findViewById(R.id.password);
 
         if (error) {
-            view.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
+			password.setError(context.getString(R.string.incorrect_username_or_password));
         }
 		
 		builder.setView(view);
