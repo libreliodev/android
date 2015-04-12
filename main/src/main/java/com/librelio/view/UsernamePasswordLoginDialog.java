@@ -22,8 +22,8 @@ public class UsernamePasswordLoginDialog {
 	private OnUsernamePasswordLoginListener onUsernamePasswordLoginListener;
 
 	public interface OnUsernamePasswordLoginListener {
-		public void onEnterUsernamePasswordLogin(String username, String password);
-        public void onCancel();
+		void onEnterUsernamePasswordLogin(String username, String password);
+        void onCancel();
 	}
 
 	public UsernamePasswordLoginDialog(Context context, String title, boolean error) {

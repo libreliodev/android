@@ -20,8 +20,8 @@ public class SubscriberCodeDialog {
     private EditText subscriberCode;
 
     public interface OnSubscriberCodeListener {
-		public void onEnterValue(String value);
-        public void onCancel();
+		void onEnterValue(String value);
+        void onCancel();
 	}
 	
 	public SubscriberCodeDialog(Context context, String title, boolean error) {
