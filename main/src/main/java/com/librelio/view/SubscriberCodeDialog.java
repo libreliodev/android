@@ -1,25 +1,23 @@
 package com.librelio.view;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.text.TextUtils;
 import android.widget.EditText;
 
-import com.afollestad.materialdialogs.AlertDialogWrapper;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.niveales.wind.R;
 
 public class SubscriberCodeDialog {
 
     private final boolean error;
-    private AlertDialogWrapper.Builder builder;
 	private Context context;
 	private String title;
 	
 	private OnSubscriberCodeListener onSubscriberCodeListener;
     private EditText subscriberCode;
+	private MaterialDialog dialog;
 
-    public interface OnSubscriberCodeListener {
+	public interface OnSubscriberCodeListener {
 		void onEnterValue(String value);
         void onCancel();
 	}
@@ -32,48 +30,48 @@ public class SubscriberCodeDialog {
 	}
 	
 	private void configureDialog(){
+		dialog = new MaterialDialog.Builder(context)
+				.title(title)
+				.customView(R.layout.subscriber_code_dialog, false)
+				.autoDismiss(false)
+				.positiveText(R.string.login)
+				.negativeText(R.string.cancel)
+				.callback(new MaterialDialog.ButtonCallback() {
+					@Override
+					public void onPositive(MaterialDialog dialog) {
+						super.onPositive(dialog);
+						EditText code = (EditText) dialog.findViewById(R.id.subscriber_code);
+						if (TextUtils.isEmpty(code.getText().toString())) {
+							code.setError(context.getString(R.string
+									.subscriber_code_cannot_be_empty));
+							return;
+						}
+						onSubscriberCodeListener.onEnterValue(code.getText().toString().trim());
+						dialog.dismiss();
+					}
 
-		builder = new AlertDialogWrapper.Builder(context);
-			
-		if (null != title){
-			builder.setTitle(title);
+					@Override
+					public void onNegative(MaterialDialog dialog) {
+						super.onNegative(dialog);
+						onSubscriberCodeListener.onCancel();
+						dialog.dismiss();
+					}
+				})
+				.build();
+
+		if (error) {
+			EditText password = (EditText) dialog.findViewById(R.id.password);
+			password.setError(context.getString(R.string.incorrect_username_or_password));
 		}
-
-        View view = LayoutInflater.from(context).inflate(R.layout.subscriber_code_dialog, null, false);
-        subscriberCode = (EditText) view.findViewById(R.id.subscriber_code);
-
-        if (error) {
-			subscriberCode.setError(context.getString(R.string.incorrect_code));
-        }
-		
-		builder.setView(view);
-	
-		// Set up the buttons
-		builder.setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		    	if (null != onSubscriberCodeListener){
-		    		onSubscriberCodeListener.onEnterValue(
-		    				subscriberCode.getText().toString().trim());
-		    	}
-		    }
-		});
-		
-		builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        onSubscriberCodeListener.onCancel();
-		    }
-		});
-	} 
+	}
 	
 	public void setSubscriberCodeListener(OnSubscriberCodeListener onSubscriberCodeListener){
 		this.onSubscriberCodeListener = onSubscriberCodeListener;
 	}
 
 	public void show(){
-		if (null != builder){
-			builder.show();
+		if (null != dialog){
+			dialog.show();
 		}
 	}
 }

@@ -110,6 +110,10 @@
     <string name="available">available</string>
     <string name="queued">Queued</string>
     <string name="deja_abonne">Already subscribed? Log in</string>
+    <string name="username_cannot_be_empty">Username cannot be empty</string>
+    <string name="password_cannot_be_empty">Password cannot be empty</string>
+    <string name="download_failed">Download failed</string>
+    <string name="subscriber_code_cannot_be_empty">Subscriber code cannot be empty</string>
 
 
 </resources>
