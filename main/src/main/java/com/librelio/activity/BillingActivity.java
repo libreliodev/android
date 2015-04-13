@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,10 +30,12 @@ import com.librelio.service.MagazineDownloadService;
 import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
 import com.niveales.wind.R;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -42,10 +45,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import fr.castorflex.android.circularprogressbar.CircularProgressBar;
 
 public class BillingActivity extends BaseActivity {
     public static final String FILE_NAME_KEY = "file_name_key";
@@ -113,6 +117,8 @@ public class BillingActivity extends BaseActivity {
     private String ownedItemPurshaseData = "";
 
     private IInAppBillingService billingService;
+    private CircularProgressBar progress;
+    private View content;
 
     public static void startActivityWithMagazine(Context context, MagazineItem item) {
         Intent intent = new Intent(context,
@@ -129,7 +135,10 @@ public class BillingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.wait_bar);
+        setContentView(R.layout.billing_activity);
+
+        content = findViewById(R.id.content);
+        progress = (CircularProgressBar) findViewById(R.id.progress_bar);
 
         setResult(RESULT_CANCELED);
 
@@ -152,7 +161,8 @@ public class BillingActivity extends BaseActivity {
 
     private void setupDialogView() {
 
-        setContentView(R.layout.billing_activity);
+        hideProgressBar();
+
         buy = (Button) findViewById(R.id.billing_buy_button);
         subsMonthly = (Button) findViewById(R.id.billing_subs_monthly);
         subsYear = (Button) findViewById(R.id.billing_subs_year);
@@ -251,14 +261,14 @@ public class BillingActivity extends BaseActivity {
                 } else if (responseCode == UNAUTHORIZED_ISSUE) {
                 } else if (responseCode == UNAUTHORIZED_DEVICE) {
                 } else {
-                    String tempURL = getTempURL(httpResponse);
-                    if (tempURL != null) {
-                        MagazineDownloadService
-                                .startMagazineDownload(context, new MagazineItem(
-                                                context, title, subtitle, fileName),
-                                        true, tempURL, false);
-                        return true;
-                    }
+//                    String tempURL = getTempURL(httpResponse);
+//                    if (tempURL != null) {
+//                        MagazineDownloadService
+//                                .startMagazineDownload(context, new MagazineItem(
+//                                                context, title, subtitle, fileName),
+//                                        true, tempURL, false);
+//                        return true;
+//                    }
                 }
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "URI is malformed", e);
@@ -286,14 +296,14 @@ public class BillingActivity extends BaseActivity {
                 } else if (responseCode == UNAUTHORIZED_ISSUE) {
                 } else if (responseCode == UNAUTHORIZED_DEVICE) {
                 } else {
-                    String tempURL = getTempURL(httpResponse);
-                    if (tempURL != null) {
-                        MagazineDownloadService
-                                .startMagazineDownload(context, new MagazineItem(
-                                                context, title, subtitle, fileName),
-                                        true, tempURL, false);
-                        return true;
-                    }
+//                    String tempURL = getTempURL(httpResponse);
+//                    if (tempURL != null) {
+//                        MagazineDownloadService
+//                                .startMagazineDownload(context, new MagazineItem(
+//                                                context, title, subtitle, fileName),
+//                                        true, tempURL, false);
+//                        return true;
+//                    }
                 }
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "URI is malformed", e);
@@ -321,8 +331,7 @@ public class BillingActivity extends BaseActivity {
 
         if (prefUsername != null) {
             String prefPassword = getSavedPassword(context);
-            new DownloadUsernamePasswordLoginFromTempURLTask()
-                    .execute(
+            downloadUsernamePasswordLoginFromTempURL(
                             buildUsernamePasswordLoginQuery(context,
                                     prefUsername, prefPassword, fileName),
                             prefUsername, prefPassword);
@@ -694,13 +703,13 @@ public class BillingActivity extends BaseActivity {
         }
 
         protected void onPostExecute(HttpResponse response) {
-            startDownloadOfMagazineFromResponse(response);
+//            startDownloadOfMagazineFromResponse(response);
         }
 
         ;
     }
 
-    private void startDownloadOfMagazineFromResponse(HttpResponse response) {
+    private void startDownloadOfMagazineFromResponse(Response response) {
         String tempURL = null;
         if (null == response) {
             showAlertDialog(DOWNLOAD_ALERT);
@@ -733,39 +742,43 @@ public class BillingActivity extends BaseActivity {
         finish();
     }
 
-    private static String getTempURL(HttpResponse response) {
+    private static String getTempURL(Response response) {
         String tempURL = null;
-        Log.d(TAG, "status line: " + response.getStatusLine().toString());
-        HttpEntity entity = response.getEntity();
+//        Log.d(TAG, "status line: " + response.getStatusLine().toString());
+//        HttpEntity entity = response.getEntity();
 
-        DataInputStream bodyStream = null;
-        if (entity != null) {
-            try {
-                bodyStream = new DataInputStream(entity.getContent());
-                StringBuilder content = new StringBuilder();
-                if (null != bodyStream) {
-                    String line = null;
-                    while ((line = bodyStream.readLine()) != null) {
-                        content.append(line).append("\n");
-                    }
-                }
-                Log.d(TAG, "body: " + content.toString());
-            } catch (Exception e) {
-                Log.e(TAG, "get content failed", e);
-            } finally {
-                try {
-                    bodyStream.close();
-                } catch (Exception e) {
-                }
+//        DataInputStream bodyStream = null;
+//        if (entity != null) {
+//            try {
+//                bodyStream = new DataInputStream(entity.getContent());
+//                StringBuilder content = new StringBuilder();
+//                if (null != bodyStream) {
+//                    String line = null;
+//                    while ((line = bodyStream.readLine()) != null) {
+//                        content.append(line).append("\n");
+//                    }
+//                }
+//                Log.d(TAG, "body: " + content.toString());
+//            } catch (Exception e) {
+//                Log.e(TAG, "get content failed", e);
+//            } finally {
+//                try {
+//                    bodyStream.close();
+//                } catch (Exception e) {
+//                }
+//            }
+//        }
+        if (null != response.headers()) {
+            String location = response.header("location");
+            if (TextUtils.isEmpty(location)) {
+                tempURL = location;
             }
-        }
-        if (null != response.getAllHeaders()) {
-            for (Header h : response.getAllHeaders()) {
-                if (h.getName().equalsIgnoreCase("location")) {
-                    tempURL = h.getValue();
-                }
-                Log.d(TAG, "header: " + h.getName() + " => " + h.getValue());
-            }
+//            for (Header h : response.headers()) {
+//                if (h.getName().equalsIgnoreCase("location")) {
+//                    tempURL = h.getValue();
+//                }
+//                Log.d(TAG, "header: " + h.getName() + " => " + h.getValue());
+//            }
         }
         return tempURL;
     }
@@ -839,94 +852,104 @@ public class BillingActivity extends BaseActivity {
                                 .putString(PARAM_SUBSCRIPTION_CODE, subscrCode)
                                 .apply();
                     }
-                    startDownloadOfMagazineFromResponse(response);
+//                    startDownloadOfMagazineFromResponse(response);
                 }
             }
         }
     }
 
-    private class DownloadUsernamePasswordLoginFromTempURLTask extends
-            DownloadFromTempURLTask {
+    private void downloadUsernamePasswordLoginFromTempURL(String url, final String username,
+                                                          final String password) {
+        OkHttpClient client = new OkHttpClient();
+        client.setFollowRedirects(false);
+        client.setFollowSslRedirects(false);
 
-        private String username;
-        private String password;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-        @Override
-        protected HttpResponse doInBackground(String... params) {
-            username = params[1];
-            password = params[2];
-            return super.doInBackground(params);
-        }
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+            }
 
-        @Override
-        protected void onPostExecute(HttpResponse response) {
-            if (null != response) {
-                String responseStatus = response.getStatusLine().toString();
-                int responseCode = response.getStatusLine().getStatusCode();
-                if (responseCode == UNAUTHORIZED_USER) {
-                    getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
-                            .remove(PARAM_USERNAME).apply();
-                    getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
-                            .remove(PARAM_PASSWORD).apply();
-                    showUsernamePasswordLoginDialog(true);
-                } else if (responseCode == UNAUTHORIZED_ISSUE) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            BillingActivity.this);
-                    builder.setMessage(getString(R.string.unauthorized_issue));
-                    builder.setPositiveButton(R.string.buy,
-                            new DialogInterface.OnClickListener() {
+            @Override
+            public void onResponse(final Response response) throws IOException {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        int responseCode = response.code();
+                        if (responseCode == UNAUTHORIZED_USER) {
+                            getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
+                                    .edit()
+                                    .remove(PARAM_USERNAME).apply();
+                            getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
+                                    .edit()
+                                    .remove(PARAM_PASSWORD).apply();
+                            showUsernamePasswordLoginDialog(true);
+                        } else if (responseCode == UNAUTHORIZED_ISSUE) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(
+                                    BillingActivity.this);
+                            builder.setMessage(getString(R.string.unauthorized_issue));
+                            builder.setPositiveButton(R.string.buy,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            setupDialogView();
+                                        }
+                                    });
+                            Dialog dialog = builder.create();
+                            dialog.setOnCancelListener(new OnCancelListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
-                                    setupDialogView();
-                                }
-                            });
-                    Dialog dialog = builder.create();
-                    dialog.setOnCancelListener(new OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            finish();
-                        }
-                    });
-                    dialog.setCanceledOnTouchOutside(true);
-                    dialog.show();
-                } else if (responseCode == UNAUTHORIZED_DEVICE) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            BillingActivity.this);
-                    builder.setMessage(getString(R.string.unauthorized_device));
-                    builder.setPositiveButton(R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
+                                public void onCancel(DialogInterface dialog) {
                                     finish();
                                 }
                             });
-                    Dialog dialog = builder.create();
-                    dialog.setOnCancelListener(new OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            finish();
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                        } else if (responseCode == UNAUTHORIZED_DEVICE) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(
+                                    BillingActivity.this);
+                            builder.setMessage(getString(R.string.unauthorized_device));
+                            builder.setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            finish();
+                                        }
+                                    });
+                            Dialog dialog = builder.create();
+                            dialog.setOnCancelListener(new OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    finish();
+                                }
+                            });
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                        } else {
+                            String prefUsername = getContext().getSharedPreferences(
+                                    SUBSCRIPTION_PREF, MODE_PRIVATE).getString(PARAM_USERNAME,
+                                    null);
+                            if (prefUsername == null) {
+                                getContext().getSharedPreferences(SUBSCRIPTION_PREF,
+                                        MODE_PRIVATE).edit()
+                                        .putString(PARAM_USERNAME, username).apply();
+                                getContext().getSharedPreferences(SUBSCRIPTION_PREF,
+                                        MODE_PRIVATE).edit()
+                                        .putString(PARAM_PASSWORD, password).apply();
+                            }
+                            startDownloadOfMagazineFromResponse(response);
                         }
-                    });
-                    dialog.setCanceledOnTouchOutside(true);
-                    dialog.show();
-                } else {
-                    String prefUsername = getContext().getSharedPreferences(
-                            SUBSCRIPTION_PREF, MODE_PRIVATE).getString(
-                            PARAM_USERNAME, null);
-                    if (prefUsername == null) {
-                        getContext()
-                                .getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
-                                .putString(PARAM_USERNAME, username).apply();
-                        getContext()
-                                .getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
-                                .putString(PARAM_PASSWORD, password).apply();
+
+
                     }
-                    startDownloadOfMagazineFromResponse(response);
-                }
+                });
             }
-        }
+        });
     }
 
     private class PurchaseTask extends AsyncTask<String, String, Bundle> {
@@ -1007,7 +1030,7 @@ public class BillingActivity extends BaseActivity {
     private SubscriberCodeDialog.OnSubscriberCodeListener onSubscriberCodeListener = new SubscriberCodeDialog.OnSubscriberCodeListener() {
         @Override
         public void onEnterValue(String code) {
-            setContentView(R.layout.wait_bar);
+            showProgressBar();
             new DownloadSubsrcFromTempURLTask().execute(
                     buildSubscriptionCodeQuery(BillingActivity.this, code,
                             fileName), code);
@@ -1021,12 +1044,10 @@ public class BillingActivity extends BaseActivity {
 
     private UsernamePasswordLoginDialog.OnUsernamePasswordLoginListener onUsernamePasswordLoginListener = new UsernamePasswordLoginDialog.OnUsernamePasswordLoginListener() {
         @Override
-        public void onEnterUsernamePasswordLogin(String username,
-                                                 String password) {
-            setContentView(R.layout.wait_bar);
-            new DownloadUsernamePasswordLoginFromTempURLTask().execute(
-                    buildUsernamePasswordLoginQuery(BillingActivity.this,
-                            username, password, fileName), username, password);
+        public void onEnterUsernamePasswordLogin(String username, String password) {
+            showProgressBar();
+            downloadUsernamePasswordLoginFromTempURL(buildUsernamePasswordLoginQuery(BillingActivity.this,
+                    username, password, fileName), username, password);
         }
 
         @Override
@@ -1034,5 +1055,15 @@ public class BillingActivity extends BaseActivity {
             finish();
         }
     };
+
+    private void showProgressBar() {
+        progress.setVisibility(View.VISIBLE);
+        content.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideProgressBar() {
+        progress.setVisibility(View.INVISIBLE);
+        content.setVisibility(View.VISIBLE);
+    }
 
 }
