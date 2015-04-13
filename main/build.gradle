@@ -1,33 +1,44 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.ben-manes.versions'
-apply plugin: 'hugo'
+apply plugin: 'com.jakewharton.hugo'
+apply plugin: 'com.raizlabs.griddle'
+apply plugin: 'io.fabric'
+
+ext {
+    scriptApplicationId = "com.niveales.wind"
+}
 
 buildscript {
     repositories {
         jcenter()
+        maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.7'
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.8'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+        classpath 'com.raizlabs:Griddle:1.0.3'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId "com.niveales.wind"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 110
         versionName "1.1.0"
+        buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -46,26 +57,61 @@ android {
 
         magazine {
             flavorDimension "name"
+            // Remove next line to enable Crashlytics and change false to true in second line
+            ext.enableCrashlytics = false
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
+        }
+
+        wind {
+            flavorDimension "name"
+            // Remove next line to enable Crashlytics and change false to true in second line
+            ext.enableCrashlytics = false
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
+        }
+
+        script {
+            //// Use custom gradle file if it exists in script product flavor folder
+            if (new File("./main/src/script/custom.gradle").exists()) {
+                println 'custom.gradle script exists'
+                apply from: "../main/src/script/custom.gradle";
+            } else {
+                println 'No custom.gradle script exists'
+            }
+
+            applicationId scriptApplicationId
+            flavorDimension "name"
+            buildConfigField "boolean", "CRASHLYTICS_ENABLED", "true"
         }
     }
 
-        lintOptions {
-            abortOnError false
-        }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':appiraterAndroid')
-    compile 'ch.acra:acra:4.5.0'
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'com.squareup.okhttp:okhttp:2.2.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.2.0'
-    compile 'com.squareup.picasso:picasso:2.4.0'
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'com.squareup.okhttp:okhttp:2.3.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    nsMod 'com.google.android.gms:{play-services-base,play-services-analytics,play-services-gcm,play-services-ads}:7.0.0'
     compile 'commons-io:commons-io:2.4'
-    compile 'org.lucasr.twowayview:twowayview:0.1.4'
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    nsMod 'com.android.support:{appcompat-v7,support-annotations,recyclerview-v7}:22.0.0'
     compile 'io.reactivex:rxandroid:0.24.0'
+    compile 'uk.co.chrisjenx:calligraphy:2.0.2'
+    compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
+    compile 'com.github.castorflex.smoothprogressbar:library-circular:1.1.0'
+    compile 'com.anjlab.android.iab.v3:library:1.0.23@aar'
+    mod 'com.afollestad:material-dialogs:0.7.1.3'
+    compile 'com.rengwuxian.materialedittext:library:2.0.3'
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
+        transitive = true;
+    }
 }

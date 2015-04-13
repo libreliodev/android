@@ -1,53 +1,71 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:orientation="vertical"
-    android:padding="5dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:orientation="vertical"
+              android:padding="16dp">
 
-    <TextView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/what_do_you_want_to_buy" />
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
 
-    <Button
-        android:id="@+id/billing_subs_year"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/preview_button_text_size" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/what_do_you_want_to_buy"/>
 
-    <Button
-        android:id="@+id/billing_subs_monthly"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/preview_button_text_size" />
+        <Button
+            android:id="@+id/billing_subs_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/preview_button_text_size"/>
 
-    <Button
-        android:id="@+id/billing_buy_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/preview_button_text_size" />
+        <Button
+            android:id="@+id/billing_subs_monthly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/preview_button_text_size"/>
 
-	<Button
-        android:id="@+id/billing_subs_code_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/i_have_a_subscriber_code"
-        android:textSize="@dimen/preview_button_text_size" />
+        <Button
+            android:id="@+id/billing_buy_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/preview_button_text_size"/>
 
-    <Button
-        android:id="@+id/billing_username_password_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/i_have_a_username_password_login"
-        android:textSize="@dimen/preview_button_text_size" />
-    
-    <Button
-        android:id="@+id/billing_cancel_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/cancel"
-        android:textSize="@dimen/preview_button_text_size" />
+        <Button
+            android:id="@+id/billing_subs_code_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/i_have_a_subscriber_code"
+            android:textSize="@dimen/preview_button_text_size"/>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/billing_username_password_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/i_have_a_username_password_login"
+            android:textSize="@dimen/preview_button_text_size"/>
+
+        <Button
+            android:id="@+id/billing_cancel_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textSize="@dimen/preview_button_text_size"/>
+    </LinearLayout>
+
+    <fr.castorflex.android.circularprogressbar.CircularProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateBehavior="cycle"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>

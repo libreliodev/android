@@ -24,10 +24,9 @@
     <application
         android:name="com.librelio.LibrelioApplication"
         android:allowBackup="false"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <service android:name="com.librelio.lib.utils.BillingService" />
         <service
             android:name="com.librelio.service.MagazineDownloadService"
             android:exported="false" />
@@ -38,17 +37,9 @@
             android:name="com.librelio.products.ProductsDownloadService"
             android:exported="false" />
 
-        <receiver android:name="com.librelio.lib.utils.BillingReceiver" >
-            <intent-filter>
-                <action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
-                <action android:name="com.android.vending.billing.RESPONSE_CODE" />
-                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name="com.librelio.activity.StartupActivity"
-            android:theme="@style/Theme.Fullscreen" >
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,7 +48,7 @@
         </activity>
         <activity
             android:name="com.librelio.activity.MuPDFActivity"
-            android:theme="@style/Theme.Fullscreen" >
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.librelio.activity.MainTabsActivity" />
@@ -70,13 +61,13 @@
         <activity android:name="com.librelio.activity.DownloadMagazineActivity" />
         <activity
             android:name="com.librelio.activity.SlideShowActivity"
-            android:theme="@style/Theme.Fullscreen" />
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" />
         <activity
             android:name="com.librelio.activity.BillingActivity"
             android:theme="@style/Theme.Billing" />
         <activity
             android:name="com.librelio.activity.VideoActivity"
-            android:theme="@style/Theme.Fullscreen" />
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" />
         <activity android:name="com.librelio.base.BaseActivity" />
         <activity android:name="com.librelio.activity.WebViewActivity" />
         <activity
@@ -108,9 +99,19 @@
 
         <service android:name="com.librelio.notifications.GcmIntentService" />
 
+        <activity android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        // To enable Crashlytics, add your api key here and remove ext.enableCrashlytics = false
+        // from AndroidManifest.xml
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="REPLACE_WITH_CRASHLYTICS_API_KEY"/>
     </application>
 
 </manifest>

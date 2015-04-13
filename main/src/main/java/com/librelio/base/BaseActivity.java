@@ -1,11 +1,11 @@
 package com.librelio.base;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.librelio.LibrelioApplication;
 import com.librelio.event.UpdateIndeterminateProgressBarEvent;
@@ -20,8 +20,9 @@ import java.io.OutputStream;
 import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class BaseActivity extends FragmentActivity implements IBaseContext {
+public class BaseActivity extends ActionBarActivity implements IBaseContext {
 	private static final String TAG = "BaseActivity";
 
 	public static final String TEST_INIT_COMPLETE = "TEST_INIT_COMPLETE";
@@ -153,20 +154,24 @@ public class BaseActivity extends FragmentActivity implements IBaseContext {
 		}
 		}
 		String message = getResources().getString(msg_id);
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-		alertDialogBuilder
-			.setMessage(message)
-			.setCancelable(false)
-			.setPositiveButton(R.string.ok, new android.content.DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					if(fId!= IO_EXCEPTION){
-						finish();
+		new MaterialDialog.Builder(this)
+				.content(message)
+				.cancelable(false)
+				.positiveText(R.string.ok)
+				.callback(new MaterialDialog.ButtonCallback() {
+					@Override
+					public void onPositive(MaterialDialog dialog) {
+						super.onPositive(dialog);
+						if(fId!= IO_EXCEPTION){
+							finish();
+						}
 					}
-				}
-			});
- 		AlertDialog alertDialog = alertDialogBuilder.create();
- 		alertDialog.show();
+				}).show();
+	}
+
+	@Override
+	protected void attachBaseContext(Context newBase) {
+		super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.widget.Toast;
 
+import com.librelio.event.NewPlistDownloadedEvent;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.event.UpdateIndeterminateProgressBarEvent;
 import com.librelio.model.dictitem.PlistItem;
@@ -72,6 +73,7 @@ public class PlistDownloader {
                     e1.printStackTrace();
                 }
                 EventBus.getDefault().post(new ReloadPlistEvent());
+                EventBus.getDefault().post(new NewPlistDownloadedEvent());
             }
 
             @Override

@@ -22,6 +22,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MuPDFActivity;
+import com.librelio.event.EventBusButtonEvent;
 import com.librelio.event.NewMagazineDownloadedEvent;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
@@ -187,6 +188,9 @@ public class MagazineDownloadService extends WakefulIntentService {
 						Log.d(TAG, "DOWNLOAD CANCELLED!");
 						return;
 					}
+
+					EventBus.getDefault().post(new EventBusButtonEvent(isSample ?
+							magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
 				}
 			} finally {
 				out.close();
@@ -215,7 +219,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 					this)
-					.setSmallIcon(R.drawable.ic_launcher)
+					.setSmallIcon(R.mipmap.ic_launcher)
 					.setContentTitle(
 							magazine.getTitle()
 									+ (isSample ? " sample" : "")

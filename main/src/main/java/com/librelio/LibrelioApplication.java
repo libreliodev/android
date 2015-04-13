@@ -7,10 +7,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.storage.DataBaseHelper;
@@ -20,44 +23,49 @@ import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import com.squareup.okhttp.OkHttpClient;
 
-import org.acra.ACRA;
-import org.acra.ReportField;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
-
 import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
 
 import de.greenrobot.event.EventBus;
+import io.fabric.sdk.android.Fabric;
 
-@ReportsCrashes(formKey = "",
-        mailTo = "android@librelio.com",
-        customReportContent = { ReportField.APP_VERSION_CODE, ReportField.APP_VERSION_NAME,
-                ReportField.ANDROID_VERSION,
-                ReportField.PHONE_MODEL, ReportField.CUSTOM_DATA, ReportField.STACK_TRACE, ReportField.LOGCAT },
-        mode = ReportingInteractionMode.TOAST,
-        resToastText = R.string.crash_toast_text)
 public class LibrelioApplication extends Application {
-	public static final String SUBSCRIPTION_YEAR_KEY = "yearlysubscription";
-	public static final String SUBSCRIPTION_MONTHLY_KEY = "monthlysubscription";
 
 	private static final String TAG = "LibrelioApplication";
 	private static final String PATH_SEPARATOR = "/";
-	
-//	private static final String SERVER_URL = "http://php.netcook.org/librelio-server/downloads/android_verify.php";
 	
 	private static String baseUrl;
 	private static OkHttpClient client;
     private Tracker tracker;
 
+	private BillingProcessor bp;
+
+	@NonNull
+	public BillingProcessor getBillingProcessor() {
+		return bp;
+	}
+
+	@NonNull
+	private static LibrelioApplication instance;
+
+	public LibrelioApplication() {
+		instance = this;
+	}
+
+	public static LibrelioApplication get() {
+		return instance;
+	}
+
     @Override
 	public void onCreate() {
         super.onCreate();
-        ACRA.init(this);
+
+        if (BuildConfig.DEBUG && BuildConfig.CRASHLYTICS_ENABLED) {
+            Fabric.with(this, new Crashlytics());
+        }
 
         baseUrl = "http://librelio-europe.s3.amazonaws.com/" + getClientName(this) + PATH_SEPARATOR + getMagazineName(this) + PATH_SEPARATOR;
-
 
 //		baseUrl = "http://librelio-test.s3.amazonaws.com/" + getMagazineName(this) +
 //                PATH_SEPARATOR;
@@ -65,6 +73,40 @@ public class LibrelioApplication extends Application {
         EventBus.builder().sendNoSubscriberEvent(false).installDefaultEventBus();
 
         registerForGCM();
+
+		bp = new BillingProcessor(this, null,
+				new BillingProcessor.IBillingHandler() {
+					@Override
+					public void onProductPurchased(String s, TransactionDetails transactionDetails) {
+
+					}
+
+					@Override
+					public void onPurchaseHistoryRestored() {
+
+					}
+
+					@Override
+					public void onBillingError(int i, Throwable throwable) {
+
+					}
+
+					@Override
+					public void onBillingInitialized() {
+
+					}
+				});
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+
+				// Precache the subscription details
+				bp.getSubscriptionListingDetails(getString(R.string.yearly_subs_code));
+				bp.getSubscriptionListingDetails(getString(R.string.monthly_subs_code));
+				//FIXME precache all the magazine prices
+			}
+		}).start();
     }
 
     public synchronized Tracker getTracker() {
@@ -74,8 +116,8 @@ public class LibrelioApplication extends Application {
             tracker.enableExceptionReporting(true);
             tracker.enableAutoActivityTracking(true);
             // Set the log level to verbose.
-            GoogleAnalytics.getInstance(this).getLogger()
-                    .setLogLevel(Logger.LogLevel.VERBOSE);
+//            GoogleAnalytics.getInstance(this).getLogger()
+//                    .setLogLevel(Logger.LogLevel.VERBOSE);
         }
         return tracker;
     }

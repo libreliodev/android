@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="tag_title"/>
+    <item type="id" name="tag_subtitle"/>
+    <item type="id" name="tag_image"/>
+    <item type="id" name="tag_detail_link"/>
+    <item type="id" name="tag_icon"/>
+    <item type="id" name="tag_html"/>
+    <item type="id" name="tag_longitude"/>
+    <item type="id" name="tag_latitude"/>
+    <item type="id" name="tag_download"/>
+    <item type="id" name="tag_sample"/>
+    <item type="id" name="tag_read"/>
+    <item type="id" name="tag_delete"/>
+    <item type="id" name="tag_date"/>
+    <item type="id" name="tag_rect"/>
+    <item type="id" name="tag_search"/>
+    <item type="id" name="tag_share"/>
+    <item type="id" name="tag_class"/>
+    <item type="id" name="tag_nib"/>
+    <item type="id" name="tag_login"/>
+    <item type="id" name="tag_newsstand_cover"/>
+    <item type="id" name="tag_ad"/>
+    <item type="id" name="tag_detail"/>
+    <item type="id" name="tag_dismiss"/>
+    <item type="id" name="tag_unit_price"/>
+    <item type="id" name="tag_monthly_subscription_price"/>
+    <item type="id" name="tag_quarterly_subscription_price"/>
+    <item type="id" name="tag_half_yearly_subscription_price"/>
+    <item type="id" name="tag_yearly_subscription_price"/>
+    <item type="id" name="tag_nothing"/>
+
+</resources>
+
+    <!-- From https://github.com/libreliodev/iOS/blob/master/Classes/WAParserProtocol.h -->
+
+    <!--  DataColZero=0,
+      DataColTitle=1,
+      DataColSubTitle=2,
+      DataColImage=3,
+      DataColDetailLink=4,
+      DataColIcon=5,
+      DataColHTML=6,
+      DataColLongitude=7,
+      DataColLatitude=8,
+      DataColDownload=9,
+      DataColSample=10,
+      DataColRead=11,
+      DataColDelete=12,
+      DataColDate=13,
+      DataColRect=14,
+      DataColSearch=15,
+      DataColShare=16,
+      DataColClass=17,
+      DataColNib=18,
+      DataColLogin =19,
+      DataColNewsstandCover = 20,
+      DataColAd=24,
+      DataColDetail=25,
+      DataColDismiss=26,
+      DataColUnitPrice = 30,
+      DataColMonthlySubscriptionPrice=31,
+      DataColQuarterlySubscriptionPrice=32,
+      DataColHalfYearlySubscriptionPrice=33,
+      DataColYearlySubscriptionPrice=34,
+      DataColNothing=999,
+        -->

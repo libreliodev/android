@@ -39,7 +39,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/searchButton"
                 android:contentDescription="@string/search_document"
-                android:src="@drawable/ic_action_list_2" />
+                android:src="@drawable/ic_list_white_24dp" />
 
             <!--
             <ImageButton

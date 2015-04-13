@@ -13,7 +13,6 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.librelio.activity.BillingActivity;
 import com.librelio.activity.MainTabsActivity;
-import com.librelio.model.dictitem.MagazineItem;
 import com.niveales.wind.R;
 
 public class GcmIntentService extends IntentService {
@@ -76,7 +75,7 @@ public class GcmIntentService extends IntentService {
 
 						NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 								this)
-								.setSmallIcon(R.drawable.ic_launcher)
+								.setSmallIcon(R.mipmap.ic_launcher)
 								.setContentTitle(
 										title + " "
 												+ getString(R.string.available));
@@ -118,7 +117,7 @@ public class GcmIntentService extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.ic_launcher)
+        .setSmallIcon(R.mipmap.ic_launcher)
         .setContentTitle(msg);
 
         mBuilder.setContentIntent(contentIntent);

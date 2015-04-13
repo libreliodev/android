@@ -33,7 +33,7 @@
             android:layout_height="@dimen/preview_image_height" >
 
             <ImageView
-                android:id="@+id/item_thumbnail"
+                android:id="@id/tag_image"
                 android:layout_width="@dimen/preview_image_width"
                 android:layout_height="@dimen/preview_image_height" />
 

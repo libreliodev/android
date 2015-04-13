@@ -1,12 +1,12 @@
 package com.librelio.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.util.DisplayMetrics;
+
 import java.util.List;
 
-import android.os.AsyncTask;
-
-/**
- *
- */
 public class CommonHelper {
 
 	/**
@@ -74,7 +74,7 @@ public class CommonHelper {
 	public static double maxValue(double value1, double value2) {
 		return value1 > value2 ? value1: value2;
 	}
-	
+
 	/**
 	 * Cancels asynchronous tasks immediately.
 	 * @param tasks array of asynchronous tasks
@@ -85,5 +85,34 @@ public class CommonHelper {
 				if (null != task) task.cancel(true);
 			}
 		}
+	}
+
+	/**
+	 * This method converts dp unit to equivalent pixels, depending on device density.
+	 *
+	 * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+	 * @param context Context to get resources and device specific display metrics
+	 * @return A float value to represent px equivalent to dp depending on device density
+	 */
+	public static float convertDpToPixel(float dp, Context context) {
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float px = dp * (metrics.densityDpi / 160f);
+		return px;
+	}
+
+	/**
+	 * This method converts device specific pixels to density independent pixels.
+	 *
+	 * @param px A value in px (pixels) unit. Which we need to convert into db
+	 * @param context Context to get resources and device specific display metrics
+	 * @return A float value to represent dp equivalent to px value
+	 */
+	public static float convertPixelsToDp(float px, Context context) {
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float dp = px / (metrics.densityDpi / 160f);
+		return dp;
+//		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, px, context.getResources().getDisplayMetrics());
 	}
 }

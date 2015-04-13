@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="canvas">#FF404040</color>
+    <color name="colorPrimary">#212121</color>
+    <color name="colorPrimaryDark">@android:color/black</color>
+    <color name="colorAccent">#ff0000</color>
+
     <color name="bar">#C0202020</color>
-    <color name="error_message">#ffc00000</color>
     <color name="thumbnail_selected_background">#bba8a8a8</color>
     <color name="transparent_gray">#aa000000</color>
+
+    <color name="text_color">@android:color/white</color>
+    <color name="button_stroke_color">#000</color>
+    <color name="button_stroke_color_focused">#a000</color>
+    <color name="button_stroke_color_pressed">#7000</color>
+    <color name="startup_background_color">@android:color/white</color>
+
+    <integer-array name="circular_progress_bar_colors">
+        <item>@color/colorAccent</item>
+    </integer-array>
 
 </resources>

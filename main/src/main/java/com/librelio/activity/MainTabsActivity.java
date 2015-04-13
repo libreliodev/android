@@ -1,15 +1,7 @@
 package com.librelio.activity;
 
-import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,12 +12,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Window;
 
 import com.librelio.base.BaseActivity;
 import com.librelio.model.dictitem.DictItem;
@@ -39,6 +32,11 @@ import com.longevitysoft.android.xml.plist.domain.Dict;
 import com.longevitysoft.android.xml.plist.domain.PList;
 import com.niveales.wind.R;
 import com.sbstrm.appirater.Appirater;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MainTabsActivity extends BaseActivity {
 
@@ -66,7 +64,6 @@ public class MainTabsActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_main_tabs);
 
 		parseTabsPlist();
@@ -75,7 +72,7 @@ public class MainTabsActivity extends BaseActivity {
 
 		pager.setAdapter(new MainTabsAdapter(getSupportFragmentManager(), tabs));
 
-		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
 			public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -83,17 +80,17 @@ public class MainTabsActivity extends BaseActivity {
 			}
 
 			@Override
-			public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
 			}
 
 			@Override
-			public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+			public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
 			}
 		};
 
 		for (final DictItem item : tabs) {
-			getActionBar().addTab(
-					getActionBar().newTab().setText(item.getTitle())
+			getSupportActionBar().addTab(
+					getSupportActionBar().newTab().setText(item.getTitle())
 							.setTabListener(tabListener));
 		}
 
@@ -103,7 +100,7 @@ public class MainTabsActivity extends BaseActivity {
 			@Override
 			public void onPageSelected(int position) {
 				super.onPageSelected(position);
-				getActionBar().setSelectedNavigationItem(position);
+				getSupportActionBar().setSelectedNavigationItem(position);
 			}
 		});
 
@@ -143,7 +140,7 @@ public class MainTabsActivity extends BaseActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.options_menu, menu);
+		inflater.inflate(R.menu.activity_main_tabs, menu);
 		return true;
 	}
 
@@ -205,7 +202,7 @@ public class MainTabsActivity extends BaseActivity {
 			Array arr = (Array) list.getRootElement();
 			for (int i = 0; i < arr.size(); i++) {
 				Dict dict = (Dict) arr.get(i);
-				DictItem item = DictItem.parse(this, dict);
+				DictItem item = DictItem.parse(this, dict, "");
 				tabs.add(item);
 			}
 		} catch (Exception e) {

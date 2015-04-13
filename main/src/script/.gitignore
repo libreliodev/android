@@ -1,0 +1,5 @@
+# Ignore all files within this folder when contains copied files when building custom version with script
+
+*
+
+!.gitignore
