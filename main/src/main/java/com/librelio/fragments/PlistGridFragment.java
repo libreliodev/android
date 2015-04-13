@@ -7,12 +7,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -58,9 +54,9 @@ public class PlistGridFragment extends Fragment {
                     @Override
                     public void run() {
                         parsePlist();
-                        adapter.notifyDataSetChanged();
+//                        adapter.notifyDataSetChanged();
                         // Repeat every 5 seconds
-                        startDisplayDictItemsTaskWithDelay(5000);
+//                        startDisplayDictItemsTaskWithDelay(5000);
                     }
                 });
             }
@@ -126,7 +122,7 @@ public class PlistGridFragment extends Fragment {
 
         dictItems = new ArrayList<>();
 
-        adapter = new DictItemAdapter(getActivity(), dictItems);
+        adapter = new DictItemAdapter(getActivity(), dictItems, plistName);
         grid.setAdapter(adapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
@@ -165,9 +161,9 @@ public class PlistGridFragment extends Fragment {
                 .OnSubscribe<ArrayList<DictItem>>() {
             @Override
             public void call(Subscriber<? super ArrayList<DictItem>> subscriber) {
-                ArrayList<DictItem> dictItems = PlistUtils.parsePlist(getActivity(),
+                ArrayList<DictItem> newDictItems = PlistUtils.parsePlist(getActivity(),
                         plistName);
-                subscriber.onNext(dictItems);
+                subscriber.onNext(newDictItems);
                 subscriber.onCompleted();
             }
         });
@@ -178,10 +174,15 @@ public class PlistGridFragment extends Fragment {
                     @Override
                     public void call(ArrayList<DictItem> newDictItems) {
                         if (dictItems != null && grid != null) {
-                            dictItems.clear();
-                            dictItems.addAll(newDictItems);
-                            grid.invalidate();
+                            // FIXME Need to actually make sure the list of dictItems has changed
+                            // rather than just check the size doesn't match
+//                            if (dictItems.size() != newDictItems.size()) {
+                                dictItems.clear();
+                                dictItems.addAll(newDictItems);
+                                grid.invalidate();
+//                            }
                             // FIXME Shouldn't do this ever 5 seconds
+                            // UPDATE : Don't need to!
                         }
                     }
                 });
