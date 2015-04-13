@@ -19,6 +19,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.BillingActivity;
+import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
@@ -173,6 +174,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		private final Button yearlySubscriptionPrice;
 		private final String plistName;
 		private final View view;
+		private final Button loginButton;
 		private TextView title;
 		private TextView subtitle;
 		private ImageView image;
@@ -205,6 +207,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			this.sampleButton = (Button) view.findViewById(R.id.tag_sample);
 			this.downloadButton = (Button) view.findViewById(R.id.tag_download);
 			this.adLayout = (FrameLayout) view.findViewById(R.id.tag_ad);
+			this.loginButton = (Button) view.findViewById(R.id.tag_login);
 		}
 
 		public void bind(final DictItem dictItem) {
@@ -429,6 +432,16 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //                                .getResources()
 //                                .getString(R.string.download));
 			}
+
+			if (loginButton != null) {
+				loginButton.setText(R.string.deja_abonne);
+				loginButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+					}
+				});
+			}
 		}
 
 		private void setupDownloadButton(final Context context, final MagazineItem magazine, final Button
@@ -461,7 +474,16 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 					@Override
 					public void onEventListener() {
-						downloadButton.setText(String.valueOf(magazine.getDownloadStatus()));
+						if (magazine.getDownloadStatus() == DownloadStatusCode.QUEUED) {
+							downloadButton.setText(context.getString(R.string.queued));
+						} else if (magazine.getDownloadStatus() == DownloadStatusCode.FAILED) {
+							downloadButton.setText(context.getString(R.string.download_failed));
+						} else if (magazine.getDownloadStatus() == DownloadStatusCode.DOWNLOADED) {
+							downloadButton.setText(context.getString(R.string.read));
+						} else {
+							downloadButton.setText(String.valueOf(magazine.getDownloadStatus() +
+									"%"));
+						}
 					}
 				});
 
@@ -498,7 +520,16 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 					@Override
 					public void onEventListener() {
-						sampleButton.setText(String.valueOf(magazine.getDownloadStatus()));
+						if (magazine.getDownloadStatus() == DownloadStatusCode.QUEUED) {
+							sampleButton.setText(context.getString(R.string.queued));
+						} else if (magazine.getDownloadStatus() == DownloadStatusCode.FAILED) {
+							sampleButton.setText(context.getString(R.string.download_failed));
+						} else if (magazine.getDownloadStatus() == DownloadStatusCode.DOWNLOADED) {
+							sampleButton.setText(context.getString(R.string.read));
+						} else {
+							sampleButton.setText(String.valueOf(magazine.getDownloadStatus() +
+									"%"));
+						}
 					}
 				});
 
