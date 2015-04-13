@@ -61,4 +61,9 @@
         <item name="cpb_sweep_speed">@string/cpb_default_sweep_speed</item>
         <item name="cpb_rotation_speed">@string/cpb_default_rotation_speed</item>
     </style>
+
+    <style name="deletebutton" parent="mainGridViewButtonStyle">
+        <item name="android:background">@drawable/downloaded_magazines_item_selector</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 </resources>
