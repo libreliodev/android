@@ -464,6 +464,9 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 //								.startMagazineDownload(context,
 //										magazine, false);
 						BillingActivity.startActivityWithMagazine(context, magazine);
+						if (downloadButton instanceof EventBusButton) {
+							downloadButton.setText(R.string.queued);
+						}
 					}
 				}
 			});
@@ -507,6 +510,9 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 								magazine.getSamplePdfPath(),
 								magazine.getTitle(), true);
 					} else {
+						if (sampleButton instanceof EventBusButton) {
+							sampleButton.setText(R.string.queued);
+						}
 						MagazineDownloadService
 								.startMagazineDownload(context,
 										magazine, true);
