@@ -36,8 +36,6 @@ import com.niveales.wind.R;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -123,10 +121,6 @@ public class MagazineDownloadService extends WakefulIntentService {
 		}
 		Log.d(TAG, "isSample: " + isSample + "\nfileUrl: " + fileUrl
 				+ "\nfilePath: " + filePath);
-        Tracker tracker = ((LibrelioApplication)getApplication()).getTracker();
-        tracker.setScreenName(
-                "Downloading/" + FilenameUtils.getBaseName(filePath));
-        tracker.send(new HitBuilders.AppViewBuilder().build());
 		
 		String tempFilePath = filePath + TEMP_FILE_SUFFIX;
 		
@@ -201,6 +195,14 @@ public class MagazineDownloadService extends WakefulIntentService {
 			}
 
 			Log.d(TAG, "Downloaded " + magazine.getFilePath());
+
+			Tracker tracker = ((LibrelioApplication)getApplication()).getTracker();
+			tracker.send(new HitBuilders.AppViewBuilder().build());
+
+			tracker.send(new HitBuilders.EventBuilder().setCategory("Downloader")
+					.setAction("Download succeeded")
+					.setLabel(magazine.getFilePath())
+					.setValue(1).build());
 			
 			File tempFile = new File(filePath + TEMP_FILE_SUFFIX);
 			tempFile.renameTo(new File(filePath));
