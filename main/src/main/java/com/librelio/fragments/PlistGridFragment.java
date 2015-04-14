@@ -147,12 +147,16 @@ public class PlistGridFragment extends Fragment {
 
     @DebugLog
     public void onEvent(ReloadPlistEvent event) {
-        startDisplayDictItemsTaskWithDelay(0);
+        if (plistName.equals(event.getPlistName())) {
+            startDisplayDictItemsTaskWithDelay(0);
+        }
     }
 
     public void onEvent(NewPlistDownloadedEvent event) {
+        if (plistName.equals(event.getPlistName())) {
 //        updateInventory();
-        swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @DebugLog
@@ -177,9 +181,9 @@ public class PlistGridFragment extends Fragment {
                             // FIXME Need to actually make sure the list of dictItems has changed
                             // rather than just check the size doesn't match
 //                            if (dictItems.size() != newDictItems.size()) {
-                                dictItems.clear();
-                                dictItems.addAll(newDictItems);
-                                grid.invalidate();
+                            dictItems.clear();
+                            dictItems.addAll(newDictItems);
+                            grid.invalidate();
 //                            }
                             // FIXME Shouldn't do this ever 5 seconds
                             // UPDATE : Don't need to!

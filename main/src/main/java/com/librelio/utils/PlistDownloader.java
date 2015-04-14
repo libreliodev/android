@@ -39,7 +39,7 @@ public class PlistDownloader {
 
         // Don't update if updates not required - i.e. waupdate=0
         if (plistItem.getUpdateFrequency() == -1) {
-            EventBus.getDefault().post(new ReloadPlistEvent());
+            EventBus.getDefault().post(new ReloadPlistEvent(plistName));
             return;
         }
 
@@ -47,7 +47,7 @@ public class PlistDownloader {
 //        Only update is long enough since last update or if forced
         if (!force && System.currentTimeMillis() - lastUpdateDate.getTime() < (DateUtils.MINUTE_IN_MILLIS * plistItem
                 .getUpdateFrequency())) {
-            EventBus.getDefault().post(new ReloadPlistEvent());
+            EventBus.getDefault().post(new ReloadPlistEvent(plistName));
             return;
         }
 
@@ -72,8 +72,8 @@ public class PlistDownloader {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                EventBus.getDefault().post(new ReloadPlistEvent());
-                EventBus.getDefault().post(new NewPlistDownloadedEvent());
+                EventBus.getDefault().post(new ReloadPlistEvent(plistName));
+                EventBus.getDefault().post(new NewPlistDownloadedEvent(plistName));
             }
 
             @Override
