@@ -1,7 +1,6 @@
 package com.librelio.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -44,25 +43,6 @@ public class PlistGridFragment extends Fragment {
 
     private static final String PLIST_NAME = "plist_name";
 
-    private Handler handler = new Handler();
-
-    private Runnable displayDictItemsTask = new Runnable() {
-        @Override
-        public void run() {
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        parsePlist();
-//                        adapter.notifyDataSetChanged();
-                        // Repeat every 5 seconds
-//                        startDisplayDictItemsTaskWithDelay(5000);
-                    }
-                });
-            }
-        }
-    };
-
     public static PlistGridFragment newInstance(String plistName) {
         PlistGridFragment f = new PlistGridFragment();
         Bundle a = new Bundle();
@@ -78,16 +58,7 @@ public class PlistGridFragment extends Fragment {
 
         grid = (RecyclerView) view.findViewById(R.id.issue_list_two_way_view);
         grid.setHasFixedSize(true);
-//        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),
-//                getResources().getInteger(R.integer.plist_grid_num_columns));
-//        grid.setLayoutManager(layoutManager);
         final GridLayoutManager manager = (GridLayoutManager) grid.getLayoutManager();
-//        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//            @Override
-//            public int getSpanSize(int position) {
-//                return adapter.isHeader(position) ? manager.getSpanCount() : 1;
-//            }
-//        });
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -96,14 +67,6 @@ public class PlistGridFragment extends Fragment {
                 } else {
                     return 1;
                 }
-//                switch(adapter.getItemViewType(position)){
-//                    case MyAdapter.TYPE_HEADER:
-//                        return 2;
-//                    case MyAdapter.TYPE_ITEM:
-//                        return 1;
-//                    default:
-//                        return -1;
-//                }
             }
         });
 
@@ -148,7 +111,7 @@ public class PlistGridFragment extends Fragment {
     @DebugLog
     public void onEvent(ReloadPlistEvent event) {
         if (plistName.equals(event.getPlistName())) {
-            startDisplayDictItemsTaskWithDelay(0);
+            parsePlist();
         }
     }
 
@@ -183,7 +146,8 @@ public class PlistGridFragment extends Fragment {
 //                            if (dictItems.size() != newDictItems.size()) {
                             dictItems.clear();
                             dictItems.addAll(newDictItems);
-                            grid.invalidate();
+//                            grid.invalidate();
+                            grid.getAdapter().notifyDataSetChanged();
 //                            }
                             // FIXME Shouldn't do this ever 5 seconds
                             // UPDATE : Don't need to!
@@ -199,14 +163,12 @@ public class PlistGridFragment extends Fragment {
         tracker.setScreenName("Library/Magazines");
         tracker.send(new HitBuilders.AppViewBuilder().build());
         EventBus.getDefault().register(this);
-        startDisplayDictItemsTaskWithDelay(0);
-        PlistDownloader.updateFromServer(getActivity(), plistName, false);
+        reloadPlist();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        handler.removeCallbacks(displayDictItemsTask);
         EventBus.getDefault().unregister(this);
     }
 
@@ -215,10 +177,5 @@ public class PlistGridFragment extends Fragment {
         PlistDownloader.updateFromServer(getActivity(), plistName, true);
         // Also try downloading any failed assets
         AssetDownloadService.startAssetDownloadService(getActivity());
-    }
-
-    private void startDisplayDictItemsTaskWithDelay(int delay) {
-        handler.removeCallbacks(displayDictItemsTask);
-        handler.postDelayed(displayDictItemsTask, delay);
     }
 }
