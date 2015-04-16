@@ -226,14 +226,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 			if (subtitle != null) {
 				subtitle.setText("");
 			}
-//            progressLayout.setVisibility(View.GONE);
-//            progressBar.setVisibility(View.GONE);
-//            info.setVisibility(View.GONE);
-//            readButton.setVisibility(View.GONE);
-//            downloadButton.setVisibility(View.GONE);
-//            deleteButton.setVisibility(View.GONE);
-//            sampleButton.setVisibility(View.GONE);
-//            cancelButton.setVisibility(View.GONE);
 
 			if (dictItem instanceof DisplayableAsGridItem) {
 				final DisplayableAsGridItem displayable = ((DisplayableAsGridItem) dictItem);
