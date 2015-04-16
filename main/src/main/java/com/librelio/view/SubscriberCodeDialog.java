@@ -60,8 +60,8 @@ public class SubscriberCodeDialog {
 				.build();
 
 		if (error) {
-			EditText password = (EditText) dialog.findViewById(R.id.password);
-			password.setError(context.getString(R.string.incorrect_username_or_password));
+			EditText subscriberCode = (EditText) dialog.findViewById(R.id.subscriber_code);
+			subscriberCode.setError(context.getString(R.string.incorrect_code));
 		}
 	}
 	
