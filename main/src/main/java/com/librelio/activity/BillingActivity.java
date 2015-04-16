@@ -602,8 +602,27 @@ public class BillingActivity extends BaseActivity {
 
     protected void onDownloadAction(String dataResponse,
                                     String signatureResponse) {
-        new DownloadFromTempURLTask().execute(buildVerifyQuery(dataResponse,
-                signatureResponse));
+        String url = buildVerifyQuery(dataResponse, signatureResponse);
+
+        OkHttpClient client = new OkHttpClient();
+        client.setFollowRedirects(false);
+        client.setFollowSslRedirects(false);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                startDownloadOfMagazineFromResponse(response);
+            }
+        });
     }
 
     private void purchaseItem() {
@@ -695,35 +714,6 @@ public class BillingActivity extends BaseActivity {
         return query.append(command).toString();
     }
 
-    private class DownloadFromTempURLTask extends
-            AsyncTask<String, Void, HttpResponse> {
-        @Override
-        protected HttpResponse doInBackground(String... params) {
-
-            HttpClient httpclient = new DefaultHttpClient();
-            String verifyQuery = params[0];
-            Log.d(TAG, "Verify query = " + verifyQuery);
-            try {
-                HttpGet httpget = new HttpGet(verifyQuery);
-                HttpClientParams.setRedirecting(httpclient.getParams(), false);
-                return httpclient.execute(httpget);
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "URI is malformed", e);
-            } catch (ClientProtocolException e) {
-                Log.e(TAG, "Download failed", e);
-            } catch (IOException e) {
-                Log.e(TAG, "Download failed", e);
-            }
-            return null;
-        }
-
-        protected void onPostExecute(HttpResponse response) {
-//            startDownloadOfMagazineFromResponse(response);
-        }
-
-        ;
-    }
-
     private void startDownloadOfMagazineFromResponse(Response response) {
         String tempURL = null;
         if (null == response) {
@@ -734,8 +724,6 @@ public class BillingActivity extends BaseActivity {
 
         tempURL = getTempURL(response);
         if (tempURL == null) {
-            // Toast.makeText(getContext(), "Download failed",
-            // Toast.LENGTH_SHORT).show();
             showAlertDialog(DOWNLOAD_ALERT);
             return;
         }
@@ -758,44 +746,13 @@ public class BillingActivity extends BaseActivity {
     }
 
     private static String getTempURL(Response response) {
-        String tempURL = null;
-//        Log.d(TAG, "status line: " + response.getStatusLine().toString());
-//        HttpEntity entity = response.getEntity();
-
-//        DataInputStream bodyStream = null;
-//        if (entity != null) {
-//            try {
-//                bodyStream = new DataInputStream(entity.getContent());
-//                StringBuilder content = new StringBuilder();
-//                if (null != bodyStream) {
-//                    String line = null;
-//                    while ((line = bodyStream.readLine()) != null) {
-//                        content.append(line).append("\n");
-//                    }
-//                }
-//                Log.d(TAG, "body: " + content.toString());
-//            } catch (Exception e) {
-//                Log.e(TAG, "get content failed", e);
-//            } finally {
-//                try {
-//                    bodyStream.close();
-//                } catch (Exception e) {
-//                }
-//            }
-//        }
         if (null != response.headers()) {
             String location = response.header("location");
             if (TextUtils.isEmpty(location)) {
-                tempURL = location;
+                return location;
             }
-//            for (Header h : response.headers()) {
-//                if (h.getName().equalsIgnoreCase("location")) {
-//                    tempURL = h.getValue();
-//                }
-//                Log.d(TAG, "header: " + h.getName() + " => " + h.getValue());
-//            }
         }
-        return tempURL;
+        return null;
     }
 
     private void downloadSubscriberCodeLoginFromTempURL(String url, final String subscriberCode) {
