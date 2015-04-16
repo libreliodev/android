@@ -1,6 +1,5 @@
 package com.librelio.activity;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -22,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.AlertDialogWrapper;
 import com.android.vending.billing.IInAppBillingService;
 import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
@@ -94,6 +94,8 @@ public class BillingActivity extends BaseActivity {
     private static final int BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3;
     private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
     private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
+    private static final String SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG
+            = "show_username_password_subscription_dialog";
 
     private String fileName;
     private String title;
@@ -121,6 +123,18 @@ public class BillingActivity extends BaseActivity {
     private View content;
 
     public static void startActivityWithMagazine(Context context, MagazineItem item) {
+        Intent intent = getIntent(context, item);
+        context.startActivity(intent);
+    }
+
+    public static void startActivityWithUsernamePasswordSubscriptionDialog(Context context,
+                                                                           MagazineItem item) {
+        Intent intent = getIntent(context, item);
+        intent.setAction(SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG);
+        context.startActivity(intent);
+    }
+
+    private static Intent getIntent(Context context, MagazineItem item) {
         Intent intent = new Intent(context,
                 BillingActivity.class);
         intent.putExtra(BillingActivity.FILE_NAME_KEY,
@@ -129,8 +143,9 @@ public class BillingActivity extends BaseActivity {
                 item.getTitle());
         intent.putExtra(BillingActivity.SUBTITLE_KEY,
                 item.getSubtitle());
-        context.startActivity(intent);
+        return intent;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -321,9 +336,8 @@ public class BillingActivity extends BaseActivity {
         String prefSubscrCode = getSavedSubscriberCode(context);
 
         if (prefSubscrCode != null) {
-            new DownloadSubsrcFromTempURLTask().execute(
-                    buildSubscriptionCodeQuery(context, prefSubscrCode,
-                            fileName), prefSubscrCode);
+            downloadSubscriberCodeLoginFromTempURL(buildSubscriptionCodeQuery(context,
+                    prefSubscrCode, fileName), prefSubscrCode);
             return true;
         }
 
@@ -332,9 +346,9 @@ public class BillingActivity extends BaseActivity {
         if (prefUsername != null) {
             String prefPassword = getSavedPassword(context);
             downloadUsernamePasswordLoginFromTempURL(
-                            buildUsernamePasswordLoginQuery(context,
-                                    prefUsername, prefPassword, fileName),
-                            prefUsername, prefPassword);
+                    buildUsernamePasswordLoginQuery(context,
+                            prefUsername, prefPassword, fileName),
+                    prefUsername, prefPassword);
             return true;
         }
         return false;
@@ -508,6 +522,7 @@ public class BillingActivity extends BaseActivity {
                     }
                     if (!checkForValidSubscription(BillingActivity.this,
                             fileName)) {
+//                        if (getIn)
                         setupDialogView();
                     }
                     super.onPostExecute(skuDetails);
@@ -783,79 +798,111 @@ public class BillingActivity extends BaseActivity {
         return tempURL;
     }
 
-    private class DownloadSubsrcFromTempURLTask extends DownloadFromTempURLTask {
+    private void downloadSubscriberCodeLoginFromTempURL(String url, final String subscriberCode) {
+        OkHttpClient client = new OkHttpClient();
+        client.setFollowRedirects(false);
+        client.setFollowSslRedirects(false);
 
-        private String subscrCode;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-        @Override
-        protected HttpResponse doInBackground(String... params) {
-            subscrCode = params[1];
-            return super.doInBackground(params);
-        }
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+            }
 
-        @Override
-        protected void onPostExecute(HttpResponse response) {
-            if (null != response) {
-                int responseCode = response.getStatusLine().getStatusCode();
-                if (responseCode == UNAUTHORIZED_CODE) {
-                    getContext()
-                            .getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
-                            .remove(PARAM_SUBSCRIPTION_CODE).apply();
-                    showSubscriberCodeDialog(true);
-                } else if (responseCode == UNAUTHORIZED_ISSUE) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            BillingActivity.this);
-                    builder.setMessage(getString(R.string.unauthorized_issue));
-                    builder.setPositiveButton(R.string.buy,
-                            new DialogInterface.OnClickListener() {
+            @Override
+            public void onResponse(final Response response) throws IOException {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        int responseCode = response.code();
+                        if (responseCode == UNAUTHORIZED_USER) {
+                            getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
+                                    .remove(PARAM_SUBSCRIPTION_CODE).apply();
+                            showSubscriberCodeDialog(true);
+                        } else if (responseCode == UNAUTHORIZED_ISSUE) {
+                            AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(
+                                    BillingActivity.this);
+                            builder.setMessage(getString(R.string.unauthorized_issue));
+                            builder.setPositiveButton(R.string.buy,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            setupDialogView();
+                                        }
+                                    });
+                            Dialog dialog = builder.create();
+                            dialog.setOnCancelListener(new OnCancelListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
-                                    setupDialogView();
-                                }
-                            });
-                    Dialog dialog = builder.create();
-                    dialog.setOnCancelListener(new OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            finish();
-                        }
-                    });
-                    dialog.setCanceledOnTouchOutside(true);
-                    dialog.show();
-                } else if (responseCode == UNAUTHORIZED_DEVICE) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            BillingActivity.this);
-                    builder.setMessage(getString(R.string.unauthorized_device));
-                    builder.setPositiveButton(R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int which) {
+                                public void onCancel(DialogInterface dialog) {
                                     finish();
                                 }
                             });
-                    Dialog dialog = builder.create();
-                    dialog.setOnCancelListener(new OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            finish();
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                        } else if (responseCode == UNAUTHORIZED_DEVICE) {
+                            AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(
+                                    BillingActivity.this);
+                            builder.setMessage(getString(R.string.unauthorized_device));
+                            builder.setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            finish();
+                                        }
+                                    });
+                            Dialog dialog = builder.create();
+                            dialog.setOnCancelListener(new OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    finish();
+                                }
+                            });
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                        } else if (responseCode == 500) {
+                            // Server error
+                            getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
+                                    .remove(PARAM_SUBSCRIPTION_CODE).apply();
+                            AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(
+                                    BillingActivity.this);
+                            builder.setMessage(getString(R.string.server_error));
+                            builder.setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            setupDialogView();
+                                        }
+                                    });
+                            Dialog dialog = builder.create();
+                            dialog.setOnCancelListener(new OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    finish();
+                                }
+                            });
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                        } else {
+                            String prefSubscrCode = getSavedSubscriberCode(BillingActivity.this);
+                            if (prefSubscrCode == null) {
+                                getContext()
+                                        .getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
+                                        .putString(PARAM_SUBSCRIPTION_CODE, subscriberCode)
+                                        .apply();
+                            }
+                            startDownloadOfMagazineFromResponse(response);
                         }
-                    });
-                    dialog.setCanceledOnTouchOutside(true);
-                    dialog.show();
-                } else {
-                    String prefSubscrCode = getSavedSubscriberCode(BillingActivity.this);
-                    if (prefSubscrCode == null) {
-                        getContext()
-                                .getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
-                                .putString(PARAM_SUBSCRIPTION_CODE, subscrCode)
-                                .apply();
                     }
-//                    startDownloadOfMagazineFromResponse(response);
-                }
+                });
             }
-        }
+        });
     }
 
     private void downloadUsernamePasswordLoginFromTempURL(String url, final String username,
@@ -889,7 +936,7 @@ public class BillingActivity extends BaseActivity {
                                     .remove(PARAM_PASSWORD).apply();
                             showUsernamePasswordLoginDialog(true);
                         } else if (responseCode == UNAUTHORIZED_ISSUE) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(
+                            AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(
                                     BillingActivity.this);
                             builder.setMessage(getString(R.string.unauthorized_issue));
                             builder.setPositiveButton(R.string.buy,
@@ -910,7 +957,7 @@ public class BillingActivity extends BaseActivity {
                             dialog.setCanceledOnTouchOutside(true);
                             dialog.show();
                         } else if (responseCode == UNAUTHORIZED_DEVICE) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(
+                            AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(
                                     BillingActivity.this);
                             builder.setMessage(getString(R.string.unauthorized_device));
                             builder.setPositiveButton(R.string.ok,
@@ -919,6 +966,34 @@ public class BillingActivity extends BaseActivity {
                                         public void onClick(DialogInterface dialog,
                                                             int which) {
                                             finish();
+                                        }
+                                    });
+                            Dialog dialog = builder.create();
+                            dialog.setOnCancelListener(new OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    finish();
+                                }
+                            });
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                        } else if (responseCode == 500) {
+                            // Server error
+                            getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
+                                    .edit()
+                                    .remove(PARAM_USERNAME).apply();
+                            getContext().getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
+                                    .edit()
+                                    .remove(PARAM_PASSWORD).apply();
+                            AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(
+                                    BillingActivity.this);
+                            builder.setMessage(getString(R.string.server_error));
+                            builder.setPositiveButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            setupDialogView();
                                         }
                                     });
                             Dialog dialog = builder.create();
@@ -1031,9 +1106,8 @@ public class BillingActivity extends BaseActivity {
         @Override
         public void onEnterValue(String code) {
             showProgressBar();
-            new DownloadSubsrcFromTempURLTask().execute(
-                    buildSubscriptionCodeQuery(BillingActivity.this, code,
-                            fileName), code);
+            downloadSubscriberCodeLoginFromTempURL(buildSubscriptionCodeQuery
+                    (BillingActivity.this, code, fileName), code);
         }
 
         @Override
@@ -1046,8 +1120,8 @@ public class BillingActivity extends BaseActivity {
         @Override
         public void onEnterUsernamePasswordLogin(String username, String password) {
             showProgressBar();
-            downloadUsernamePasswordLoginFromTempURL(buildUsernamePasswordLoginQuery(BillingActivity.this,
-                    username, password, fileName), username, password);
+            downloadUsernamePasswordLoginFromTempURL(buildUsernamePasswordLoginQuery
+                    (BillingActivity.this, username, password, fileName), username, password);
         }
 
         @Override

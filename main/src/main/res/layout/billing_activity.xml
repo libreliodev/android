@@ -13,11 +13,11 @@
         android:orientation="vertical"
         android:visibility="invisible">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/what_do_you_want_to_buy"/>
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:text="@string/what_do_you_want_to_buy"/>-->
 
         <Button
             android:id="@+id/billing_subs_year"
