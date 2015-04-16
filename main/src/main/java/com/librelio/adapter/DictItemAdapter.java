@@ -30,6 +30,8 @@ import com.librelio.view.EventBusButton;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.util.ArrayList;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
@@ -290,7 +292,8 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 					} else {
 						adView = new PublisherAdView(context);
-						adView.setAdUnitId(string + plistName);
+						String baseName = FilenameUtils.getBaseName(plistName);
+						adView.setAdUnitId(string + baseName);
 						int width = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen
 								.header_ad_width), context);
 						int height = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen.header_ad_height), context);
