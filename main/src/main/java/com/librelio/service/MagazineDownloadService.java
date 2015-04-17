@@ -145,7 +145,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 			long totalSize = response.body().contentLength();
 
-			if (response.code() == 200) {
+			if (response.code() != 200) {
+				throw new IOException(String.valueOf(response.code()));
 			}
 
 			RandomAccessFile out = new RandomAccessFile(tempFilePath, "rw");
