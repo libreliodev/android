@@ -60,7 +60,7 @@ public class DownloadMagazineActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_magazines);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String title = getIntent().getExtras().getString(BillingActivity.TITLE_KEY);
         String subtitle = getIntent().getExtras().getString(BillingActivity.SUBTITLE_KEY);
