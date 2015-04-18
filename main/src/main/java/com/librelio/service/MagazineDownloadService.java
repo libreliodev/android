@@ -264,6 +264,9 @@ public class MagazineDownloadService extends WakefulIntentService {
 		} catch (IOException e) {
 			e.printStackTrace();
 			manager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.FAILED);
+			EventBus.getDefault().post(new ReloadPlistEvent());
+			EventBus.getDefault().post(new EventBusButtonEvent(isSample ?
+					magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
 			Log.d(TAG, "failed to download " + magazine.getFilePath());
 		}
 	}
@@ -330,12 +333,14 @@ public class MagazineDownloadService extends WakefulIntentService {
 		DownloadsManager downloadsManager = new DownloadsManager(context);
 		DownloadsManager.removeDownload(context, magazine);
 		downloadsManager.addDownload(magazine,
-                DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
+				DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
 		downloadsManager.setDownloadStatus(magazine.getFilePath(),
 				DownloadStatusCode.QUEUED);
 		// magazine.clearMagazineDir();
 		magazine.makeLocalStorageDir(context);
 		EventBus.getDefault().post(new ReloadPlistEvent());
+		EventBus.getDefault().post(new EventBusButtonEvent(isSample ?
+				magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
 
 		Intent intent = new Intent(context, MagazineDownloadService.class);
 		intent.putExtra(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());
