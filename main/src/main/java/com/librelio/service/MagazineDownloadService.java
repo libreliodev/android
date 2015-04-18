@@ -58,7 +58,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 	private static final String EXTRA_TEMP_URL_KEY = "temp_url_key";
 
-	private static final String EXTRA_IS_TEMP = "is_temp";
+	private static final String EXTRA_IS_TEMP_URL = "is_temp";
 
 	public MagazineDownloadService() {
 		super("magazinedownload");
@@ -88,7 +88,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 //	}
 
 	private void downloadMagazine(Intent intent) {
-		MagazineItem magazine = null;
+		MagazineItem magazine;
 		// TODO Fix this properly - why isn't the magazine in the database
 		try {
 			magazine = manager.findByFilePath(
@@ -101,7 +101,6 @@ public class MagazineDownloadService extends WakefulIntentService {
 			    h.post(new Runnable() {
 			        @Override
 			        public void run() {
-
 						Toast.makeText(MagazineDownloadService.this, "Magazine not found - please try again", Toast.LENGTH_SHORT).show();
 			        }
 			    });
@@ -110,16 +109,16 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 		String fileUrl = magazine.getItemUrl();
 		String filePath = magazine.getItemFilePath();
-		boolean isSample = intent.getBooleanExtra(EXTRA_IS_SAMPLE, false);
-		if (isSample) {
+		boolean isDownloadingSample = intent.getBooleanExtra(EXTRA_IS_SAMPLE, false);
+		if (isDownloadingSample) {
 			// If sample
 			fileUrl = magazine.getSamplePdfUrl();
 			filePath = magazine.getSamplePdfPath();
-		} else if (intent.getBooleanExtra(EXTRA_IS_TEMP, false)) {
+		} else if (intent.getBooleanExtra(EXTRA_IS_TEMP_URL, false)) {
 			// If temp url
 			fileUrl = intent.getStringExtra(EXTRA_TEMP_URL_KEY);
 		}
-		Log.d(TAG, "isSample: " + isSample + "\nfileUrl: " + fileUrl
+		Log.d(TAG, "isDownloadingSample: " + isDownloadingSample + "\nfileUrl: " + fileUrl
 				+ "\nfilePath: " + filePath);
 		
 		String tempFilePath = filePath + TEMP_FILE_SUFFIX;
@@ -131,8 +130,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 		// FIXME Download never resumes because the magazine directory is deleted just before starting download
 		if (currentFile.exists()) {
 			// Add Range header to restart download
-			requestBuilder.addHeader("Range", "bytes=" + currentFile.length()
-					+ "-");
+			requestBuilder.addHeader("Range", "bytes=" + currentFile.length() + "-");
 			
 			 if (BuildConfig.DEBUG) {
 			 Log.v(TAG, "File is not complete, resuming download.");
@@ -140,6 +138,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 //			 totalSize);
 			 }
 		}
+
 		try {
 			Response response = LibrelioApplication.getOkHttpClient().newCall(requestBuilder.build()).execute();
 
@@ -184,7 +183,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 						return;
 					}
 
-					EventBus.getDefault().post(new EventBusButtonEvent(isSample ?
+					EventBus.getDefault().post(new EventBusButtonEvent(isDownloadingSample ?
 							magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
 				}
 			} finally {
@@ -225,7 +224,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 					.setSmallIcon(R.mipmap.ic_launcher)
 					.setContentTitle(
 							magazine.getTitle()
-									+ (isSample ? " sample" : "")
+									+ (isDownloadingSample ? " sample" : "")
 									+ " downloaded")
 					.setContentText("Click to read");
 
@@ -242,7 +241,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 			Intent resultIntent = new Intent(this, MuPDFActivity.class);
 			resultIntent.setAction(Intent.ACTION_VIEW);
-			resultIntent.setData(Uri.parse(isSample ? magazine
+			resultIntent.setData(Uri.parse(isDownloadingSample ? magazine
 					.getSamplePdfPath() : magazine.getItemFilePath()));
 			resultIntent.putExtra(DataBaseHelper.FIELD_TITLE,
 					magazine.getTitle());
@@ -265,7 +264,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 			e.printStackTrace();
 			manager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.FAILED);
 			EventBus.getDefault().post(new ReloadPlistEvent());
-			EventBus.getDefault().post(new EventBusButtonEvent(isSample ?
+			EventBus.getDefault().post(new EventBusButtonEvent(isDownloadingSample ?
 					magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
 			Log.d(TAG, "failed to download " + magazine.getFilePath());
 		}
@@ -328,7 +327,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 	}
 
 	public static void startMagazineDownload(Context context,
-			MagazineItem magazine, boolean isTemp, String tempUrlKey, boolean isSample) {
+			MagazineItem magazine, boolean isTempUrl, String tempUrlKey, boolean isDownloadingSample) {
 
 		DownloadsManager downloadsManager = new DownloadsManager(context);
 		DownloadsManager.removeDownload(context, magazine);
@@ -339,14 +338,14 @@ public class MagazineDownloadService extends WakefulIntentService {
 		// magazine.clearMagazineDir();
 		magazine.makeLocalStorageDir(context);
 		EventBus.getDefault().post(new ReloadPlistEvent());
-		EventBus.getDefault().post(new EventBusButtonEvent(isSample ?
+		EventBus.getDefault().post(new EventBusButtonEvent(isDownloadingSample ?
 				magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
 
 		Intent intent = new Intent(context, MagazineDownloadService.class);
 		intent.putExtra(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());
-		intent.putExtra(EXTRA_IS_TEMP, isTemp);
+		intent.putExtra(EXTRA_IS_TEMP_URL, isTempUrl);
 		intent.putExtra(EXTRA_TEMP_URL_KEY, tempUrlKey);
-		intent.putExtra(EXTRA_IS_SAMPLE, isSample);
+		intent.putExtra(EXTRA_IS_SAMPLE, isDownloadingSample);
 		MagazineDownloadService.sendWakefulWork(context, intent);
 	}
 
