@@ -48,17 +48,7 @@ public class ProductsItem extends DownloadableDictItem {
     }
 
     @Override
-    public void onDownloadButtonClick(Context context) {
-
-    }
-
-    @Override
     public String getPngUri() {
         return null;
-    }
-
-    @Override
-    public void onThumbnailClick(Context context) {
-
     }
 }

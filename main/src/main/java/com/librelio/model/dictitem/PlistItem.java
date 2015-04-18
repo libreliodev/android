@@ -69,11 +69,6 @@ public class PlistItem extends DictItem implements DisplayableAsTab, Displayable
 	}
 
 	@Override
-	public void onThumbnailClick(Context context) {
-		
-	}
-
-	@Override
 	public String getItemUrl() {
 		return itemUrl;
 	}

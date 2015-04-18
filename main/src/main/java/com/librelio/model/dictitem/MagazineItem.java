@@ -1,15 +1,12 @@
 package com.librelio.model.dictitem;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.text.format.DateUtils;
 
 import com.librelio.LibrelioApplication;
-import com.librelio.activity.BillingActivity;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.interfaces.DisplayableAsGridItem;
-import com.librelio.service.MagazineDownloadService;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.DownloadsManager;
 
@@ -162,12 +159,6 @@ public class MagazineItem extends DownloadableDictItem implements DisplayableAsG
 		}
 	}
 
-	@Override
-	public void onThumbnailClick(Context context) {
-		// TODO Auto-generated method stub
-
-	}
-
     public void clearMagazineDir(Context context) {
         try {
             FileUtils.deleteDirectory(new File(getItemStorageDir(context)));
@@ -183,31 +174,10 @@ public class MagazineItem extends DownloadableDictItem implements DisplayableAsG
         clearMagazineDir(context);
 	}
 
-    @Override
-    public void onDownloadButtonClick(Context context) {
-        if (isPaid()) {
-            Intent intent = new Intent(context,
-                    BillingActivity.class);
-            intent.putExtra(BillingActivity.FILE_NAME_KEY,
-                    getFilePath());
-            intent.putExtra(BillingActivity.TITLE_KEY,
-                    getTitle());
-            intent.putExtra(BillingActivity.SUBTITLE_KEY,
-                    getSubtitle());
-            context.startActivity(intent);
-        } else {
-            MagazineDownloadService.startMagazineDownload(
-                    context, this, false);
-        }
-    }
-
 	public String getInAppBillingProductId() {
 		String productId = FilenameUtils.getName(getFilePath()).toLowerCase(
 				Locale.US);
 		productId = productId.substring(0, productId.indexOf("_.pdf"));
 		return productId;
 	}
-
-
-
 }

@@ -1,7 +1,5 @@
 package com.librelio.model.dictitem;
 
-import android.content.Context;
-
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.storage.DownloadsManager;
 
@@ -20,7 +18,4 @@ public abstract class DownloadableDictItem extends DictItem implements Displayab
     public abstract String getDownloadDate();
 
     public abstract void deleteItem();
-
-    public abstract void onDownloadButtonClick(Context context);
-
 }

@@ -59,85 +59,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		return dictItems.size();
 	}
 
-//    public void setProducts(Inventory.Products products) {
-//        this.products = products;
-//        notifyDataSetChanged();
-//    }
-
-
-	//TODO Remove duplicated code between default and header views
-
-
-//    public static class DefaultViewHolder extends RecyclerView.ViewHolder {
-//
-//        public TextView title;
-//        public TextView subtitle;
-//        public ImageView image;
-//        public LinearLayout progressLayout;
-//        public TextView info;
-//        public SmoothProgressBar progressBar;
-//
-//        public DefaultViewHolder(View view) {
-//            super(view);
-//            this.title = (TextView) view.findViewById(R.id.tag_title);
-//            this.subtitle = (TextView) view.findViewById(R.id.tag_subtitle);
-//            this.image = (ImageView) view
-//                    .findViewById(R.id.item_thumbnail);
-//            this.progressLayout = (LinearLayout) view
-//                    .findViewById(R.id.item_progress_layout);
-//            this.info = (TextView) view.findViewById(R.id.item_info);
-//            this.progressBar = (SmoothProgressBar) view
-//                    .findViewById(R.id.progress_bar);
-//        }
-//
-//        public void bind(final Context context, final DictItem dictItem) {
-//             reset the visibilities
-//            if (title != null) {
-//                title.setText("");
-//            }
-//            if (subtitle != null) {
-//                subtitle.setText("");
-//            }
-//            progressLayout.setVisibility(View.GONE);
-//            progressBar.setVisibility(View.GONE);
-//            info.setVisibility(View.GONE);
-//
-//            final MagazineItem magazine = (MagazineItem) dictItem;
-//
-//            if (dictItem instanceof DisplayableAsGridItem) {
-//                final DisplayableAsGridItem displayable = ((DisplayableAsGridItem) dictItem);
-//                if (title != null) {
-//                    title.setText(displayable.getTitle());
-//                }
-//                if (subtitle != null) {
-//                    subtitle.setText(displayable.getSubtitle());
-//                }
-//                String pngUri = displayable.getPngUri();
-//                Picasso.with(context).load(pngUri).fit().centerInside()
-//                        .into(image);
-//                image.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        displayable.onThumbnailClick(context);
-//
-//                    }
-//                });
-//            }
-//
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (magazine.isDownloaded()) {
-//                        LibrelioApplication.startPDFActivity(context, magazine, true);
-//                    } else {
-//                        BillingActivity.startActivityWithMagazine(context, (MagazineItem)
-// dictItem);
-//                    }
-//                }
-//            });
-//        }
-//    }
-
 	public static class DefaultViewHolder extends RecyclerView.ViewHolder {
 
 		private final Context context;
@@ -162,31 +83,6 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		}
 	}
 }
-
-
-
-//	@Override
-//	public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
-//		super.onViewAttachedToWindow(holder);
-//		Log.d("hsdiufh", "holder attached");
-//		if (((DefaultViewHolder) holder).sampleButton != null && ((DefaultViewHolder) holder)
-//				.sampleButton instanceof EventBusButton) {
-//			EventBus.getDefault().register(((DefaultViewHolder) holder).sampleButton);
-//			Log.d("hsdiufh", "button registered");
-//		}
-//	}
-//
-//	@Override
-//	public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
-//		super.onViewDetachedFromWindow(holder);
-//		Log.d("hsdiufh", "holder detached");
-//		if (((DefaultViewHolder) holder).sampleButton != null && ((DefaultViewHolder) holder)
-//				.sampleButton instanceof EventBusButton) {
-//			EventBus.getDefault().unregister(((DefaultViewHolder) holder).sampleButton);
-//			Log.d("hsdiufh", "button unregistered");
-//		}
-//	}
-//}
 
 //package com.librelio.adapter;
 //
