@@ -21,8 +21,12 @@ import com.librelio.utils.GooglePlayServicesUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
@@ -136,8 +140,49 @@ public class LibrelioApplication extends Application {
 											// up.
 			}
 			client.setSslSocketFactory(sslContext.getSocketFactory());
+			client.setFollowRedirects(false);
+			client.setFollowSslRedirects(false);
+//			client.interceptors().add(new LoggingInterceptor());
+			client.networkInterceptors().add(new UserAgentInterceptor("Android"));
 		}
 		return client;
+	}
+
+	static class LoggingInterceptor implements Interceptor {
+		@Override public Response intercept(Chain chain) throws IOException {
+			Request request = chain.request();
+
+			long t1 = System.nanoTime();
+			Log.d("logging", String.format("Sending request %s on %s%n%s",
+					request.url(), chain.connection(), request.headers()));
+
+			Response response = chain.proceed(request);
+
+			long t2 = System.nanoTime();
+			Log.d("logging", String.format("Received response for %s in %.1fms%n%s",
+					response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+
+			return response;
+		}
+	}
+
+	static class UserAgentInterceptor implements Interceptor {
+
+		private final String userAgent;
+
+		public UserAgentInterceptor(String userAgent) {
+			this.userAgent = userAgent;
+		}
+
+		@Override
+		public Response intercept(Chain chain) throws IOException {
+			Request originalRequest = chain.request();
+			Request requestWithUserAgent = originalRequest.newBuilder()
+					.removeHeader("User-Agent")
+					.addHeader("User-Agent", userAgent)
+					.build();
+			return chain.proceed(requestWithUserAgent);
+		}
 	}
 
 	private void registerForGCM() {

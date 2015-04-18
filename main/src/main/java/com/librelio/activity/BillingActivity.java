@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,7 +30,6 @@ import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
 import com.niveales.wind.R;
 import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -604,18 +602,19 @@ public class BillingActivity extends BaseActivity {
                                     String signatureResponse) {
         String url = buildVerifyQuery(dataResponse, signatureResponse);
 
-        OkHttpClient client = new OkHttpClient();
-        client.setFollowRedirects(false);
-        client.setFollowSslRedirects(false);
-
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
-        client.newCall(request).enqueue(new Callback() {
+        LibrelioApplication.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                }
+            });
             }
 
             @Override
@@ -630,13 +629,11 @@ public class BillingActivity extends BaseActivity {
     }
 
     private void purchaseMonthlySub() {
-        new PurchaseTask().execute(LibrelioApplication
-                .getMonthlySubsCode(getContext()));
+        new PurchaseTask().execute(LibrelioApplication.getMonthlySubsCode(getContext()));
     }
 
     private void purchaseYearlySub() {
-        new PurchaseTask().execute(LibrelioApplication
-                .getYearlySubsCode(getContext()));
+        new PurchaseTask().execute(LibrelioApplication.getYearlySubsCode(getContext()));
     }
 
     private boolean isNetworkConnected() {
@@ -647,8 +644,7 @@ public class BillingActivity extends BaseActivity {
         return this;
     }
 
-    private String buildVerifyQuery(String dataResponse,
-                                    String signatureResponse) {
+    private String buildVerifyQuery(String dataResponse, String signatureResponse) {
 
         StringBuilder query = new StringBuilder(
                 LibrelioApplication.getServerUrl(getContext()));
@@ -658,10 +654,8 @@ public class BillingActivity extends BaseActivity {
                 .replace(PARAM_PRODUCT_ID, Uri.encode(productId))
                 .replace(PARAM_DATA, Uri.encode(dataResponse))
                 .replace(PARAM_SIGNATURE, Uri.encode(signatureResponse))
-                .replace(
-                        PARAM_URLSTRING,
-                        Uri.encode(LibrelioApplication.getUrlString(
-                                getContext(), fileName)));
+                .replace(PARAM_URLSTRING,
+                        Uri.encode(LibrelioApplication.getUrlString(getContext(), fileName)));
 
         return query.append(command).toString();
     }
@@ -669,48 +663,30 @@ public class BillingActivity extends BaseActivity {
     private static String buildSubscriptionCodeQuery(Context context,
                                                      String code, String fileName) {
 
-        StringBuilder query = new StringBuilder(
-                LibrelioApplication.getServerUrl(context));
+        StringBuilder query = new StringBuilder(LibrelioApplication.getServerUrl(context));
 
-        String command = context
-                .getString(R.string.command_pswd)
+        String command = context.getString(R.string.command_pswd)
                 .replace(PARAM_CODE, Uri.encode(code))
-                .replace(PARAM_URLSTRING,
-                        Uri.encode(LibrelioApplication.getUrlString(fileName)))
-                .replace(PARAM_CLIENT,
-                        Uri.encode(LibrelioApplication.getClientName(context)))
-                .replace(
-                        PARAM_APP,
-                        Uri.encode(LibrelioApplication.getMagazineName(context)))
-                .replace(PARAM_DEVICEID,
-                        LibrelioApplication.getAndroidId(context));
-
+                .replace(PARAM_URLSTRING, Uri.encode(LibrelioApplication.getUrlString(fileName)))
+                .replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(context)))
+                .replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(context)))
+                .replace(PARAM_DEVICEID, LibrelioApplication.getAndroidId(context));
         return query.append(command).toString();
     }
 
-    private static String buildUsernamePasswordLoginQuery(Context context,
-                                                          String username, String password,
-                                                          String fileName) {
+    private static String buildUsernamePasswordLoginQuery(Context context, String username,
+                                                          String password, String fileName) {
 
-        StringBuilder query = new StringBuilder(
-                LibrelioApplication.getServerUrl(context));
+        StringBuilder query = new StringBuilder(LibrelioApplication.getServerUrl(context));
 
-        String command = context
-                .getString(R.string.command_username_pswd)
-                .replace(PARAM_URLSTRING,
-                        Uri.encode(LibrelioApplication.getUrlString(fileName)))
+        String command = context.getString(R.string.command_username_pswd)
+                .replace(PARAM_URLSTRING, Uri.encode(LibrelioApplication.getUrlString(fileName)))
                 .replace(PARAM_USERNAME, Uri.encode(username))
                 .replace(PARAM_PASSWORD, Uri.encode(password))
-                .replace(PARAM_CLIENT,
-                        Uri.encode(LibrelioApplication.getClientName(context)))
-                .replace(
-                        PARAM_APP,
-                        Uri.encode(LibrelioApplication.getMagazineName(context)))
-                .replace(PARAM_SERVICE,
-                        Uri.encode(LibrelioApplication.getServiceName(context)))
-                .replace(PARAM_DEVICEID,
-                        LibrelioApplication.getAndroidId(context));
-
+                .replace(PARAM_CLIENT, Uri.encode(LibrelioApplication.getClientName(context)))
+                .replace(PARAM_APP, Uri.encode(LibrelioApplication.getMagazineName(context)))
+                .replace(PARAM_SERVICE, Uri.encode(LibrelioApplication.getServiceName(context)))
+                .replace(PARAM_DEVICEID, LibrelioApplication.getAndroidId(context));
         return query.append(command).toString();
     }
 
@@ -730,13 +706,13 @@ public class BillingActivity extends BaseActivity {
         if (getIntent().getExtras() != null) {
             MagazineDownloadService.startMagazineDownload(this, new MagazineItem(
                     this, title, subtitle, fileName), true, tempURL, false);
-            Intent intent = new Intent(getContext(),
-                    DownloadMagazineActivity.class);
-            intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);
-            intent.putExtra(BillingActivity.SUBTITLE_KEY, subtitle);
-            intent.putExtra(BillingActivity.TITLE_KEY, title);
-            startActivity(intent);
-            setResult(RESULT_OK);
+//            Intent intent = new Intent(getContext(),
+//                    DownloadMagazineActivity.class);
+//            intent.putExtra(BillingActivity.FILE_NAME_KEY, fileName);
+//            intent.putExtra(BillingActivity.SUBTITLE_KEY, subtitle);
+//            intent.putExtra(BillingActivity.TITLE_KEY, title);
+//            startActivity(intent);
+//            setResult(RESULT_OK);
             finish();
         } else {
             Toast.makeText(this, "Purchase successful", Toast.LENGTH_LONG)
@@ -748,26 +724,25 @@ public class BillingActivity extends BaseActivity {
     private static String getTempURL(Response response) {
         if (null != response.headers()) {
             String location = response.header("location");
-            if (TextUtils.isEmpty(location)) {
-                return location;
-            }
+            return location;
         }
         return null;
     }
 
     private void downloadSubscriberCodeLoginFromTempURL(String url, final String subscriberCode) {
-        OkHttpClient client = new OkHttpClient();
-        client.setFollowRedirects(false);
-        client.setFollowSslRedirects(false);
-
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
-        client.newCall(request).enqueue(new Callback() {
+        LibrelioApplication.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -864,18 +839,20 @@ public class BillingActivity extends BaseActivity {
 
     private void downloadUsernamePasswordLoginFromTempURL(String url, final String username,
                                                           final String password) {
-        OkHttpClient client = new OkHttpClient();
-        client.setFollowRedirects(false);
-        client.setFollowSslRedirects(false);
 
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
-        client.newCall(request).enqueue(new Callback() {
+        LibrelioApplication.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+                }
+            });
             }
 
             @Override
