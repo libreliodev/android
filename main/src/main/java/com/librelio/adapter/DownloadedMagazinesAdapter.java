@@ -1,16 +1,13 @@
-package com.librelio.view;
+package com.librelio.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.librelio.model.dictitem.DownloadableDictItem;
@@ -21,59 +18,13 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadedMagazinesListView extends ListView {
-
-	private Context context;
-	private MagazinesAdapter magazinesAdapter;
-
-	public DownloadedMagazinesListView(Context context, AttributeSet attrs,
-			int defStyle) {
-		super(context, attrs, defStyle);
-		this.context = context;
-		setOnItemClickListener();
-
-		magazinesAdapter = new MagazinesAdapter(context);
-		setAdapter(magazinesAdapter);
-	}
-
-	private void setOnItemClickListener() {
-//		setOnItemClickListener(new OnItemClickListener() {
-//			@Override
-//			public void onItemClick(AdapterView<?> parent, View view,
-//					int position, long id) {
-//
-//				MagazineItem downloadedMagazine = magazinesAdapter
-//						.getItem(position);
-//				LibrelioApplication.startPDFActivity(
-//						context,
-//						downloadedMagazine.isSample() ? downloadedMagazine
-//								.getSamplePdfPath() : downloadedMagazine
-//								.getItemFilePath(), downloadedMagazine
-//								.getTitle(), true);
-//			}
-//		});
-	}
-
-	public DownloadedMagazinesListView(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
-	}
-
-	public DownloadedMagazinesListView(Context context) {
-		this(context, null, 0);
-	}
-
-	public void setMagazines(Activity activity, List<DownloadableDictItem> downloads) {
-		magazinesAdapter.setDownloads(activity, downloads);
-	}
-}
-
-class MagazinesAdapter extends ArrayAdapter<DownloadableDictItem> {
+public class DownloadedMagazinesAdapter extends ArrayAdapter<DownloadableDictItem> {
 
 	private Context context;
 	private List<DownloadableDictItem> downloads;
 	private String samplePostfix;
 
-	public MagazinesAdapter(Context context) {
+	public DownloadedMagazinesAdapter(Context context) {
 		super(context, R.layout.row_downloaded_magazines, 0);
 		this.context = context;
 		downloads = new ArrayList<>();
@@ -83,8 +34,7 @@ class MagazinesAdapter extends ArrayAdapter<DownloadableDictItem> {
 				.toString();
 	}
 
-	public void setDownloads(Activity activity,
-			final List<DownloadableDictItem> newDownloads) {
+	public void setDownloads(Activity activity, final List<DownloadableDictItem> newDownloads) {
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -117,13 +67,13 @@ class MagazinesAdapter extends ArrayAdapter<DownloadableDictItem> {
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 
-		final ViewHolder holder;
+		final DownloadedMagazinesAdapter.ViewHolder holder;
 		if (position < this.downloads.size()) {
 			final DownloadableDictItem downloadedItem = this.downloads.get(position);
 
 			if ((convertView == null) || (null == convertView.getTag())) {
 
-				holder = new ViewHolder();
+				holder = new DownloadedMagazinesAdapter.ViewHolder();
 
 				LayoutInflater inflater = LayoutInflater.from(context);
 				convertView = inflater.inflate(
@@ -153,7 +103,7 @@ class MagazinesAdapter extends ArrayAdapter<DownloadableDictItem> {
 
 				convertView.setTag(holder);
 			} else {
-				holder = (ViewHolder) convertView.getTag();
+				holder = (DownloadedMagazinesAdapter.ViewHolder) convertView.getTag();
 			}
 
             if (downloadedItem instanceof MagazineItem) {
@@ -167,7 +117,7 @@ class MagazinesAdapter extends ArrayAdapter<DownloadableDictItem> {
                     downloadedItem.getDownloadDate());
 
 			holder.deleteButton.setText(getContext().getString(R.string.delete));
-			holder.deleteButton.setOnClickListener(new OnClickListener() {
+			holder.deleteButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
