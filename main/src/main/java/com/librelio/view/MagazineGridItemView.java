@@ -35,6 +35,10 @@ import rx.schedulers.Schedulers;
 
 public class MagazineGridItemView extends FrameLayout {
 
+    public static final int STANDARD = 0;
+    public static final int HEADER = 1;
+    public static final int DIALOG = 2;
+
     private final Context context;
     private final String plistName;
     private MagazineItem magazine;
@@ -52,13 +56,15 @@ public class MagazineGridItemView extends FrameLayout {
     private final FrameLayout adLayout;
     private PublisherAdView adView;
 
-    public MagazineGridItemView(Context context, boolean isHeader, String plistName) {
+    public MagazineGridItemView(Context context, int type, String plistName) {
         super(context);
         this.context = context;
         this.plistName = plistName;
 
-        if (isHeader) {
+        if (type == HEADER) {
             inflate(context, R.layout.item_dictitem_grid_header, this);
+        } else if (type == DIALOG) {
+            inflate(context, R.layout.item_dictitem_pop_up_dialog, this);
         } else {
             inflate(context, R.layout.item_dictitem_grid, this);
         }
@@ -76,8 +82,8 @@ public class MagazineGridItemView extends FrameLayout {
         this.loginButton = (Button) findViewById(R.id.tag_login);
     }
 
-    public void onEvent(ReloadPlistEvent event) {
-
+    public void onEventMainThread(ReloadPlistEvent event) {
+        updateMagazineDetails();
     }
 
     public void setMagazine(MagazineItem magazine) {
@@ -95,18 +101,13 @@ public class MagazineGridItemView extends FrameLayout {
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//							displayable.onThumbnailClick(context);
+                    MagazineGridItemView customView = new MagazineGridItemView(context, DIALOG,
+                            plistName);
+                    customView.setMagazine(magazine);
                     boolean wrapInScrollView = false;
                     MaterialDialog dialog = new MaterialDialog.Builder(context)
-                            .customView(R.layout.item_dictitem_pop_up_dialog, wrapInScrollView)
+                            .customView(customView, wrapInScrollView)
                             .build();
-                    ImageView newsstandCover = (ImageView) dialog.getCustomView().findViewById(R.id.tag_newsstand_cover);
-                    Picasso.with(context).load(magazine.getNewsstandPngUri()).fit().centerInside().placeholder(R.drawable.generic)
-                            .into(newsstandCover);
-//                    setupSampleButton(context, magazine,
-//                            (Button) dialog.getCustomView().findViewById(R.id.tag_sample));
-//                    setupDownloadButton(context, magazine,
-//                            (Button) dialog.getCustomView().findViewById(R.id.tag_download));
                     dialog.show();
                 }
             });
@@ -118,7 +119,6 @@ public class MagazineGridItemView extends FrameLayout {
             newsstandThumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    magazine.onThumbnailClick(context);
                 }
             });
         }
@@ -155,161 +155,157 @@ public class MagazineGridItemView extends FrameLayout {
         }
 
         if (unitPrice != null) {
-                unitPrice.setVisibility(View.INVISIBLE);
+            unitPrice.setVisibility(View.INVISIBLE);
 
-            if (magazine.isDownloaded()) {
-                return;
-            }
+            if (!magazine.isDownloaded()) {
+                unitPrice.setText("");
 
-            unitPrice.setText("");
+                final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
 
-            final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
-                @Override
-                public void call(Subscriber<? super SkuDetails> subscriber) {
-                    SkuDetails magazineSkuDetails = LibrelioApplication.get()
-                            .getBillingProcessor()
-                            .getPurchaseListingDetails(magazine.getInAppBillingProductId());
-                    if (magazineSkuDetails != null) {
-                        subscriber.onNext(magazineSkuDetails);
-                        subscriber.onCompleted();
-                    } else {
-                        subscriber.onError(new Throwable("No sku details"));
+                    @Override
+                    public void call(Subscriber<? super SkuDetails> subscriber) {
+                        SkuDetails magazineSkuDetails = LibrelioApplication.get()
+                                .getBillingProcessor()
+                                .getPurchaseListingDetails(magazine.getInAppBillingProductId());
+                        if (magazineSkuDetails != null) {
+                            subscriber.onNext(magazineSkuDetails);
+                            subscriber.onCompleted();
+                        } else {
+                            subscriber.onError(new Throwable("No sku details"));
+                        }
+
                     }
+                });
 
-                }
-            });
-
-            skuDetailsObservable.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<SkuDetails>() {
-                        @Override
-                        public void call(SkuDetails skuDetails) {
-                            if (magazine.getItemUrl().equals(getTag())) {
-                                unitPrice.setVisibility(View.VISIBLE);
-                                unitPrice.setText(skuDetails.priceText);
+                skuDetailsObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<SkuDetails>() {
+                            @Override
+                            public void call(SkuDetails skuDetails) {
+                                if (magazine.getItemUrl().equals(getTag())) {
+                                    unitPrice.setVisibility(View.VISIBLE);
+                                    unitPrice.setText(skuDetails.priceText);
+                                }
                             }
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            unitPrice.setText(" --- ");
-                        }
-                    });
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                unitPrice.setText(" --- ");
+                            }
+                        });
+            }
         }
 
         if (monthlySubscriptionPrice != null) {
             if (magazine.isDownloaded()) {
                 monthlySubscriptionPrice.setVisibility(View.INVISIBLE);
-                return;
-            }
+            } else {
 
-            monthlySubscriptionPrice.setText("");
+                monthlySubscriptionPrice.setText("");
 
-            final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
-                @Override
-                public void call(Subscriber<? super SkuDetails> subscriber) {
-                    SkuDetails magazineSkuDetails = LibrelioApplication.get()
-                            .getBillingProcessor()
-                            .getSubscriptionListingDetails(context.getString(R.string
-                                    .monthly_subs_code));
-                    if (magazineSkuDetails != null) {
-                        subscriber.onNext(magazineSkuDetails);
-                        subscriber.onCompleted();
-                    } else {
-                        subscriber.onError(new Throwable("No sku details"));
+                final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
+
+                    @Override
+                    public void call(Subscriber<? super SkuDetails> subscriber) {
+                        SkuDetails magazineSkuDetails = LibrelioApplication.get()
+                                .getBillingProcessor()
+                                .getSubscriptionListingDetails(context.getString(R.string
+                                        .monthly_subs_code));
+                        if (magazineSkuDetails != null) {
+                            subscriber.onNext(magazineSkuDetails);
+                            subscriber.onCompleted();
+                        } else {
+                            subscriber.onError(new Throwable("No sku details"));
+                        }
+
                     }
+                });
 
-                }
-            });
-
-            skuDetailsObservable.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<SkuDetails>() {
-                        @Override
-                        public void call(SkuDetails skuDetails) {
-                            if (monthlySubscriptionPrice != null) {
-                                yearlySubscriptionPrice.setVisibility(View.VISIBLE);
-                                monthlySubscriptionPrice.setText(InAppBillingUtils
-                                        .getFormattedPriceForButton(skuDetails.title,
-                                                skuDetails.priceText));
+                skuDetailsObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<SkuDetails>() {
+                            @Override
+                            public void call(SkuDetails skuDetails) {
+                                if (monthlySubscriptionPrice != null) {
+                                    yearlySubscriptionPrice.setVisibility(View.VISIBLE);
+                                    monthlySubscriptionPrice.setText(InAppBillingUtils
+                                            .getFormattedPriceForButton(skuDetails.title,
+                                                    skuDetails.priceText));
+                                }
                             }
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            monthlySubscriptionPrice.setText(" --- ");
-                        }
-                    });
-
-//                        buy.setText(magazinePrice != null ? magazinePrice : context
-//                                .getResources()
-//                                .getString(R.string.download));
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                monthlySubscriptionPrice.setText(" --- ");
+                            }
+                        });
+            }
         }
 
         if (yearlySubscriptionPrice != null) {
             if (magazine.isDownloaded()) {
                 yearlySubscriptionPrice.setVisibility(View.INVISIBLE);
-                return;
-            }
+            } else {
+                yearlySubscriptionPrice.setText("");
 
-            yearlySubscriptionPrice.setText("");
+                final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
 
-            final Observable<SkuDetails> skuDetailsObservable = Observable.create(new Observable.OnSubscribe<SkuDetails>() {
-                @Override
-                public void call(Subscriber<? super SkuDetails> subscriber) {
-                    SkuDetails magazineSkuDetails = LibrelioApplication.get()
-                            .getBillingProcessor()
-                            .getSubscriptionListingDetails(context.getString(R.string
-                                    .yearly_subs_code));
-                    if (magazineSkuDetails != null) {
-                        subscriber.onNext(magazineSkuDetails);
-                        subscriber.onCompleted();
-                    } else {
-                        subscriber.onError(new Throwable("No sku details"));
+                    @Override
+                    public void call(Subscriber<? super SkuDetails> subscriber) {
+                        SkuDetails magazineSkuDetails = LibrelioApplication.get()
+                                .getBillingProcessor()
+                                .getSubscriptionListingDetails(context.getString(R.string
+                                        .yearly_subs_code));
+                        if (magazineSkuDetails != null) {
+                            subscriber.onNext(magazineSkuDetails);
+                            subscriber.onCompleted();
+                        } else {
+                            subscriber.onError(new Throwable("No sku details"));
+                        }
+
                     }
+                });
 
-                }
-            });
-
-            skuDetailsObservable.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<SkuDetails>() {
-                        @Override
-                        public void call(SkuDetails skuDetails) {
-                            if (yearlySubscriptionPrice != null) {
-                                yearlySubscriptionPrice.setVisibility(View.VISIBLE);
-                                yearlySubscriptionPrice.setText(InAppBillingUtils
-                                        .getFormattedPriceForButton(skuDetails.title, skuDetails.priceText));
+                skuDetailsObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<SkuDetails>() {
+                            @Override
+                            public void call(SkuDetails skuDetails) {
+                                if (yearlySubscriptionPrice != null) {
+                                    yearlySubscriptionPrice.setVisibility(View.VISIBLE);
+                                    yearlySubscriptionPrice.setText(InAppBillingUtils
+                                            .getFormattedPriceForButton(skuDetails.title, skuDetails
+                                                    .priceText));
+                                }
                             }
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            yearlySubscriptionPrice.setText(" --- ");
-                        }
-                    });
-
-//                        buy.setText(magazinePrice != null ? magazinePrice : context
-//                                .getResources()
-//                                .getString(R.string.download));
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                yearlySubscriptionPrice.setText(" --- ");
+                            }
+                        });
+            }
         }
 
         if (loginButton != null) {
-//            if (isLoggedIn) {
-//                loginButton.setVisibility(View.INVISIBLE);
-//                return;
-//            }
+            if (!TextUtils.isEmpty(BillingActivity.getSavedUsername(context))) {
+                loginButton.setVisibility(View.INVISIBLE);
+            } else {
+                loginButton.setVisibility(View.VISIBLE);
+                loginButton.setText(R.string.deja_abonne);
+                loginButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-            loginButton.setVisibility(View.VISIBLE);
-            loginButton.setText(R.string.deja_abonne);
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
+                    }
+                });
+            }
         }
 
+        updateMagazineDetails();
+    }
+
+    private void updateMagazineDetails() {
         if (downloadButton != null) {
             setupDownloadButton();
         }
@@ -415,8 +411,7 @@ public class MagazineGridItemView extends FrameLayout {
             sampleButton.setText(context.getString(R.string.download_failed));
         } else if (magazine.getDownloadStatus() >= 0
                 && magazine.getDownloadStatus() <= 100) {
-            sampleButton.setText(String.valueOf(magazine.getDownloadStatus() +
-                    "%"));
+            sampleButton.setText(String.valueOf(magazine.getDownloadStatus() + "%"));
         } else {
             sampleButton.setText(context.getString(R.string.sample));
         }

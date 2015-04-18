@@ -357,7 +357,7 @@ public class BillingActivity extends BaseActivity {
                 .getString(PARAM_SUBSCRIPTION_CODE, null);
     }
 
-    private static String getSavedUsername(Context context) {
+    public static String getSavedUsername(Context context) {
         return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
                 .getString(PARAM_USERNAME, null);
     }

@@ -29,12 +29,12 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		switch (viewType) {
 			case TYPE_HEADER:
-				final MagazineGridItemView header = new MagazineGridItemView(context, true,
-						plistName);
+				final MagazineGridItemView header =
+						new MagazineGridItemView(context, MagazineGridItemView.HEADER, plistName);
 				return new DefaultViewHolder(context, header, plistName);
 			case TYPE_DEFAULT:
-				final MagazineGridItemView view = new MagazineGridItemView(context, false,
-						plistName);
+				final MagazineGridItemView view =
+						new MagazineGridItemView(context, MagazineGridItemView.STANDARD, plistName);
 				return new DefaultViewHolder(context, view, plistName);
 		}
 		return null;
