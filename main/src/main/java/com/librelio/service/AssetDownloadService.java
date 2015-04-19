@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 
@@ -46,10 +45,8 @@ public class AssetDownloadService extends WakefulIntentService {
 	}
 
 	private void downloadPendingAssets() {
-		ArrayList<Asset> assetsToDownload = new ArrayList<Asset>();
-		assetsToDownload = manager.getAssetsToDownload();
 
-		for (Asset asset : assetsToDownload) {
+		for (Asset asset : manager.getAssetsToDownload()) {
 			try {
 				download(asset);
 			} catch (FileAlreadyExistException ignored) {

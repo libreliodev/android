@@ -208,13 +208,11 @@ public class MagazineDownloadService extends WakefulIntentService {
 			tempFile.renameTo(new File(filePath));
 
 			DownloadsManager.removeDownload(this, magazine);
-			manager.addDownload(magazine,
-                    DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
+			manager.addDownload(magazine, DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
 			
 			addAssetsToDatabase(this, magazine);
 			
-			manager.setDownloadStatus(magazine.getFilePath(),
-					DownloadStatusCode.DOWNLOADED);
+			manager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.DOWNLOADED);
 
 			EventBus.getDefault().post(new ReloadPlistEvent());
 			EventBus.getDefault().post(new NewMagazineDownloadedEvent(magazine));
@@ -331,10 +329,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 		DownloadsManager downloadsManager = new DownloadsManager(context);
 		DownloadsManager.removeDownload(context, magazine);
-		downloadsManager.addDownload(magazine,
-				DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
-		downloadsManager.setDownloadStatus(magazine.getFilePath(),
-				DownloadStatusCode.QUEUED);
+		downloadsManager.addDownload(magazine, DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
+		downloadsManager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.QUEUED);
 		// magazine.clearMagazineDir();
 		magazine.makeLocalStorageDir(context);
 		EventBus.getDefault().post(new ReloadPlistEvent());

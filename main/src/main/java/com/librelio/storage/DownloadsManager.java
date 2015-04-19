@@ -12,7 +12,6 @@ import com.librelio.base.BaseManager;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.model.Asset;
-import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.DownloadableDictItem;
 import com.librelio.model.dictitem.MagazineItem;
@@ -181,33 +180,33 @@ public class DownloadsManager extends BaseManager {
 		return false;
 	}
 
-	public synchronized ArrayList<MagazineItem> getMagazinesToDownload() {
-		ArrayList<MagazineItem> magazinesToDownload = new ArrayList<MagazineItem>();
-		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
-				.getWritableDatabase();
-		Cursor cursor = db.query(
-				DataBaseHelper.TABLE_DOWNLOADED_ITEMS,
-				null,
-				DataBaseHelper.FIELD_DOWNLOAD_STATUS + ">= ? AND "
-						+ DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS
-						+ "< ?AND " + DataBaseHelper.FIELD_RETRY_COUNT + "<10",
-				new String[] { String.valueOf(DownloadStatusCode.QUEUED),
-						String.valueOf(DownloadStatusCode.DOWNLOADED),
-						String.valueOf(NUMBER_OF_RETRY_ATTEMPTS) }, null, null,
-				null);
-		if (cursor.moveToFirst()) {
-			while (!cursor.isAfterLast()) {
-				MagazineItem magazine = new MagazineItem(getContext(), cursor);
-				magazinesToDownload.add(magazine);
-				setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.QUEUED);
-				cursor.moveToNext();
-			}
-		}
-		cursor.close();
-		return magazinesToDownload;
-	}
+//	public synchronized ArrayList<MagazineItem> getMagazinesToDownload() {
+//		ArrayList<MagazineItem> magazinesToDownload = new ArrayList<MagazineItem>();
+//		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
+//				.getWritableDatabase();
+//		Cursor cursor = db.query(
+//				DataBaseHelper.TABLE_DOWNLOADED_ITEMS,
+//				null,
+//				DataBaseHelper.FIELD_DOWNLOAD_STATUS + ">= ? AND "
+//						+ DataBaseHelper.FIELD_ASSET_DOWNLOAD_STATUS
+//						+ "< ?AND " + DataBaseHelper.FIELD_RETRY_COUNT + "<10",
+//				new String[] { String.valueOf(DownloadStatusCode.QUEUED),
+//						String.valueOf(DownloadStatusCode.DOWNLOADED),
+//						String.valueOf(NUMBER_OF_RETRY_ATTEMPTS) }, null, null,
+//				null);
+//		if (cursor.moveToFirst()) {
+//			while (!cursor.isAfterLast()) {
+//				MagazineItem magazine = new MagazineItem(getContext(), cursor);
+//				magazinesToDownload.add(magazine);
+//				setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.QUEUED);
+//				cursor.moveToNext();
+//			}
+//		}
+//		cursor.close();
+//		return magazinesToDownload;
+//	}
 
-	public synchronized void setDownloadStatus(String filePath, int status) {
+	public synchronized void setDownloadStatus(String filePath, long status) {
 		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
 				.getWritableDatabase();
 		ContentValues cv = new ContentValues();
