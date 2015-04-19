@@ -26,6 +26,8 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -64,6 +66,8 @@ public class LibrelioApplication extends Application {
     @Override
 	public void onCreate() {
         super.onCreate();
+
+		JodaTimeAndroid.init(this);
 
         if (BuildConfig.DEBUG && BuildConfig.CRASHLYTICS_ENABLED) {
             Fabric.with(this, new Crashlytics());

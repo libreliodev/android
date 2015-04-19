@@ -41,6 +41,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -143,12 +146,9 @@ public class BillingActivity extends BaseActivity {
     private static Intent getIntent(Context context, MagazineItem item) {
         Intent intent = new Intent(context,
                 BillingActivity.class);
-        intent.putExtra(BillingActivity.FILE_NAME_KEY,
-                item.getFilePath());
-        intent.putExtra(BillingActivity.TITLE_KEY,
-                item.getTitle());
-        intent.putExtra(BillingActivity.SUBTITLE_KEY,
-                item.getSubtitle());
+        intent.putExtra(FILE_NAME_KEY, item.getFilePath());
+        intent.putExtra(TITLE_KEY, item.getTitle());
+        intent.putExtra(SUBTITLE_KEY, item.getSubtitle());
         return intent;
     }
 
@@ -182,6 +182,22 @@ public class BillingActivity extends BaseActivity {
 
     private void setupDialogView() {
 
+        boolean includeSubscriptions = false;
+
+        String baseName = FilenameUtils.getBaseName(fileName);
+
+        String baseNameWithoutLastUnderscore = baseName.substring(0, baseName.length() - 1);
+
+        if (baseNameWithoutLastUnderscore.contains("_")) {
+            String dateString = baseNameWithoutLastUnderscore
+                    .substring(baseNameWithoutLastUnderscore.indexOf("_") + 1);
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
+            DateTime date = DateTime.parse(dateString, formatter);
+            if (date.isAfter(DateTime.now().minusMonths(1))) {
+                includeSubscriptions = true;
+            }
+        }
+
         hideProgressBar();
 
         buy = (Button) findViewById(R.id.billing_buy_button);
@@ -210,7 +226,7 @@ public class BillingActivity extends BaseActivity {
             });
         }
 
-        if (yearlySubPrice == null) {
+        if (yearlySubPrice == null || !includeSubscriptions) {
             subsYear.setVisibility(View.GONE);
         } else {
             subsYear.setText(yearlySubTitle + ": " + yearlySubPrice);
@@ -223,7 +239,7 @@ public class BillingActivity extends BaseActivity {
             });
         }
 
-        if (monthlySubPrice == null) {
+        if (monthlySubPrice == null || !includeSubscriptions) {
             subsMonthly.setVisibility(View.GONE);
         } else {
             subsMonthly.setText(monthlySubTitle + ": " + monthlySubPrice);
