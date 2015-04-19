@@ -22,7 +22,7 @@ import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.service.MagazineDownloadService;
 import com.librelio.utils.CommonHelper;
-import com.librelio.utils.InAppBillingUtils;
+import com.librelio.utils.PurchaseUtils;
 import com.niveales.wind.R;
 import com.squareup.picasso.Picasso;
 
@@ -236,7 +236,7 @@ public class MagazineGridItemView extends FrameLayout {
                             public void call(SkuDetails skuDetails) {
                                 if (monthlySubscriptionPrice != null) {
                                     yearlySubscriptionPrice.setVisibility(View.VISIBLE);
-                                    monthlySubscriptionPrice.setText(InAppBillingUtils
+                                    monthlySubscriptionPrice.setText(PurchaseUtils
                                             .getFormattedPriceForButton(skuDetails.title,
                                                     skuDetails.priceText));
                                     monthlySubscriptionPrice.setOnClickListener(new OnClickListener() {
@@ -292,7 +292,7 @@ public class MagazineGridItemView extends FrameLayout {
                             public void call(SkuDetails skuDetails) {
                                 if (yearlySubscriptionPrice != null) {
                                     yearlySubscriptionPrice.setVisibility(View.VISIBLE);
-                                    yearlySubscriptionPrice.setText(InAppBillingUtils
+                                    yearlySubscriptionPrice.setText(PurchaseUtils
                                             .getFormattedPriceForButton(skuDetails.title, skuDetails
                                                     .priceText));
                                     yearlySubscriptionPrice.setOnClickListener(new OnClickListener() {
@@ -316,7 +316,7 @@ public class MagazineGridItemView extends FrameLayout {
         }
 
         if (loginButton != null) {
-            if (!TextUtils.isEmpty(BillingActivity.getSavedUsername(context))) {
+            if (!TextUtils.isEmpty(PurchaseUtils.getSavedUsername(context))) {
                 loginButton.setVisibility(View.INVISIBLE);
             } else {
                 loginButton.setVisibility(View.VISIBLE);

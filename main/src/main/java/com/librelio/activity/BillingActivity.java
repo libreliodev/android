@@ -26,6 +26,7 @@ import com.librelio.LibrelioApplication;
 import com.librelio.base.BaseActivity;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.service.MagazineDownloadService;
+import com.librelio.utils.PurchaseUtils;
 import com.librelio.view.SubscriberCodeDialog;
 import com.librelio.view.UsernamePasswordLoginDialog;
 import com.niveales.wind.R;
@@ -72,8 +73,8 @@ public class BillingActivity extends BaseActivity {
     private static final String PARAM_SIGNATURE = "@signature";
     private static final String PARAM_URLSTRING = "@urlstring";
 
-    private static final String PARAM_USERNAME = "@username";
-    private static final String PARAM_PASSWORD = "@password";
+    public static final String PARAM_USERNAME = "@username";
+    public static final String PARAM_PASSWORD = "@password";
     private static final String PARAM_CODE = "@code";
     private static final String PARAM_CLIENT = "@client";
     private static final String PARAM_APP = "@app";
@@ -264,7 +265,7 @@ public class BillingActivity extends BaseActivity {
     public static boolean backgroundCheckForValidSubscriptionFailFast(
             Context context, String fileName, String title, String subtitle) {
 
-        String prefSubscrCode = getSavedSubscriberCode(context);
+        String prefSubscrCode = PurchaseUtils.getSavedSubscriberCode(context);
 
         if (prefSubscrCode != null) {
             String subscriptionCodeQuery = buildSubscriptionCodeQuery(context,
@@ -298,10 +299,10 @@ public class BillingActivity extends BaseActivity {
             return false;
         }
 
-        String prefUsername = getSavedUsername(context);
+        String prefUsername = PurchaseUtils.getSavedUsername(context);
 
         if (prefUsername != null) {
-            String prefPassword = getSavedPassword(context);
+            String prefPassword = PurchaseUtils.getSavedPassword(context);
             String usernamePasswordLoginQuery = buildUsernamePasswordLoginQuery(
                     context, prefUsername, prefPassword, fileName);
             HttpClient httpclient = new DefaultHttpClient();
@@ -336,7 +337,7 @@ public class BillingActivity extends BaseActivity {
     }
 
     private boolean checkForValidSubscription(Context context, String fileName) {
-        String prefSubscrCode = getSavedSubscriberCode(context);
+        String prefSubscrCode = PurchaseUtils.getSavedSubscriberCode(context);
 
         if (prefSubscrCode != null) {
             downloadSubscriberCodeLoginFromTempURL(buildSubscriptionCodeQuery(context,
@@ -344,10 +345,10 @@ public class BillingActivity extends BaseActivity {
             return true;
         }
 
-        String prefUsername = getSavedUsername(context);
+        String prefUsername = PurchaseUtils.getSavedUsername(context);
 
         if (prefUsername != null) {
-            String prefPassword = getSavedPassword(context);
+            String prefPassword = PurchaseUtils.getSavedPassword(context);
             downloadUsernamePasswordLoginFromTempURL(
                     buildUsernamePasswordLoginQuery(context,
                             prefUsername, prefPassword, fileName),
@@ -355,21 +356,6 @@ public class BillingActivity extends BaseActivity {
             return true;
         }
         return false;
-    }
-
-    private static String getSavedSubscriberCode(Context context) {
-        return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
-                .getString(PARAM_SUBSCRIPTION_CODE, null);
-    }
-
-    public static String getSavedUsername(Context context) {
-        return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
-                .getString(PARAM_USERNAME, null);
-    }
-
-    private static String getSavedPassword(Context context) {
-        return context.getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE)
-                .getString(PARAM_PASSWORD, null);
     }
 
     private void showSubscriberCodeDialog(boolean error) {
@@ -836,7 +822,8 @@ public class BillingActivity extends BaseActivity {
                             dialog.setCanceledOnTouchOutside(true);
                             dialog.show();
                         } else {
-                            String prefSubscrCode = getSavedSubscriberCode(BillingActivity.this);
+                            String prefSubscrCode = PurchaseUtils.getSavedSubscriberCode
+                                    (BillingActivity.this);
                             if (prefSubscrCode == null) {
                                 getContext()
                                         .getSharedPreferences(SUBSCRIPTION_PREF, MODE_PRIVATE).edit()
