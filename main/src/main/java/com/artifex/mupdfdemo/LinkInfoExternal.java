@@ -23,6 +23,11 @@ public class LinkInfoExternal extends LinkInfo {
 				&& Uri.parse(url).getQueryParameter("waplay").equals("auto");
 	}
 
+	public boolean isToggleFullscreenAllowed() {
+		return Uri.parse(url).getQueryParameter("watoggle") != null
+				&& !Uri.parse(url).getQueryParameter("watoggle").equals("no");
+	}
+
 	public boolean isFullScreen() {
 		Uri uri = Uri.parse(url);
 		if(uri.isHierarchical())

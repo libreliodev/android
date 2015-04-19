@@ -3,10 +3,6 @@
  */
 package com.artifex.mupdfdemo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -34,13 +30,16 @@ import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.librelio.activity.SlideShowActivity;
 import com.librelio.activity.VideoActivity;
 import com.librelio.view.ImageLayout;
 import com.niveales.wind.R;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * The class for display all pdf's media-resources
@@ -180,8 +179,10 @@ public class MediaHolder extends FrameLayout implements Callback, OnBufferingUpd
 	        	autoPlayFlagMP = false;
 	        	//initMediaPlayer(true);
         	}else if (linkInfo.isImageFormat()){
-        		onPlaySlideOutside(basePath,
-        				imageLayout.getCurrentPosition());
+				if (linkInfo.isToggleFullscreenAllowed()) {
+					onPlaySlideOutside(basePath,
+							imageLayout.getCurrentPosition());
+				}
         	}
             return true;
         }
