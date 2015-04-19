@@ -32,6 +32,7 @@ public class UsernamePasswordLoginDialog {
 		dialog = new MaterialDialog.Builder(context)
 				.title(title)
 				.customView(R.layout.username_password_login_dialog, false)
+				.cancelable(false)
 				.autoDismiss(false)
 				.positiveText(R.string.login)
 				.negativeText(R.string.cancel)

@@ -33,6 +33,7 @@ public class SubscriberCodeDialog {
 		dialog = new MaterialDialog.Builder(context)
 				.title(title)
 				.customView(R.layout.subscriber_code_dialog, false)
+				.cancelable(false)
 				.autoDismiss(false)
 				.positiveText(R.string.login)
 				.negativeText(R.string.cancel)

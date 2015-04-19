@@ -92,8 +92,15 @@ public class BillingActivity extends BaseActivity {
     private static final int BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3;
     private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
     private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
-    private static final String SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG
+
+    public static final String SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG
             = "show_username_password_subscription_dialog";
+    public static final String SHOW_MONTHLY_SUBSCRIPTION_DIALOG
+            = "show_monthly_subscription_dialog";
+    public static final String SHOW_YEARLY_SUBSCRIPTION_DIALOG
+            = "show_yearly_subscription_dialog";
+    public static final String SHOW_INDIVIDUAL_PURCHASE_DIALOG
+            = "show_individual_purchase_dialog";
 
     private String fileName;
     private String title;
@@ -125,10 +132,10 @@ public class BillingActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
-    public static void startActivityWithUsernamePasswordSubscriptionDialog(Context context,
+    public static void startActivityWithDialog(Context context, String dialogType,
                                                                            MagazineItem item) {
         Intent intent = getIntent(context, item);
-        intent.setAction(SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG);
+        intent.setAction(dialogType);
         context.startActivity(intent);
     }
 
@@ -204,7 +211,6 @@ public class BillingActivity extends BaseActivity {
 
         if (yearlySubPrice == null) {
             subsYear.setVisibility(View.GONE);
-            ;
         } else {
             subsYear.setText(yearlySubTitle + ": " + yearlySubPrice);
             subsYear.setOnClickListener(new OnClickListener() {
@@ -218,7 +224,6 @@ public class BillingActivity extends BaseActivity {
 
         if (monthlySubPrice == null) {
             subsMonthly.setVisibility(View.GONE);
-            ;
         } else {
             subsMonthly.setText(monthlySubTitle + ": " + monthlySubPrice);
             subsMonthly.setOnClickListener(new OnClickListener() {
@@ -520,8 +525,17 @@ public class BillingActivity extends BaseActivity {
                     }
                     if (!checkForValidSubscription(BillingActivity.this,
                             fileName)) {
-//                        if (getIn)
-                        setupDialogView();
+                        if (SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG.equals(getIntent().getAction())) {
+                            showUsernamePasswordLoginDialog(false);
+                        } else if (SHOW_MONTHLY_SUBSCRIPTION_DIALOG.equals(getIntent().getAction())) {
+                            purchaseMonthlySub();
+                        } else if (SHOW_YEARLY_SUBSCRIPTION_DIALOG.equals(getIntent().getAction())) {
+                            purchaseYearlySub();
+                        } else if (SHOW_INDIVIDUAL_PURCHASE_DIALOG.equals(getIntent().getAction())) {
+                            purchaseItem();
+                        } else {
+                            setupDialogView();
+                        }
                     }
                     super.onPostExecute(skuDetails);
                 }

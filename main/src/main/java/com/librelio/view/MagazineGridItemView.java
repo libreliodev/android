@@ -183,12 +183,22 @@ public class MagazineGridItemView extends FrameLayout {
                                 if (magazine.getItemUrl().equals(getTag())) {
                                     unitPrice.setVisibility(View.VISIBLE);
                                     unitPrice.setText(skuDetails.priceText);
+                                    unitPrice.setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            BillingActivity.startActivityWithDialog(context,
+                                                    BillingActivity
+                                                            .SHOW_INDIVIDUAL_PURCHASE_DIALOG,
+                                                    magazine);
+                                        }
+                                    });
                                 }
                             }
                         }, new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
                                 unitPrice.setText(" --- ");
+                                unitPrice.setOnClickListener(null);
                             }
                         });
             }
@@ -229,6 +239,17 @@ public class MagazineGridItemView extends FrameLayout {
                                     monthlySubscriptionPrice.setText(InAppBillingUtils
                                             .getFormattedPriceForButton(skuDetails.title,
                                                     skuDetails.priceText));
+                                    monthlySubscriptionPrice.setOnClickListener(new OnClickListener() {
+
+                                        @Override
+                                        public void onClick(View v) {
+                                            BillingActivity.startActivityWithDialog(context,
+                                                    BillingActivity
+                                                            .SHOW_MONTHLY_SUBSCRIPTION_DIALOG,
+                                                    magazine);
+                                        }
+                                    });
+
                                 }
                             }
                         }, new Action1<Throwable>() {
@@ -274,6 +295,15 @@ public class MagazineGridItemView extends FrameLayout {
                                     yearlySubscriptionPrice.setText(InAppBillingUtils
                                             .getFormattedPriceForButton(skuDetails.title, skuDetails
                                                     .priceText));
+                                    yearlySubscriptionPrice.setOnClickListener(new OnClickListener() {
+
+                                        @Override
+                                        public void onClick(View v) {
+                                            BillingActivity.startActivityWithDialog(context,
+                                                    BillingActivity.SHOW_YEARLY_SUBSCRIPTION_DIALOG,
+                                                    magazine);
+                                        }
+                                    });
                                 }
                             }
                         }, new Action1<Throwable>() {
@@ -294,7 +324,8 @@ public class MagazineGridItemView extends FrameLayout {
                 loginButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        BillingActivity.startActivityWithDialog(context, BillingActivity
+                                        .SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG, magazine);
                     }
                 });
             }
@@ -326,9 +357,6 @@ public class MagazineGridItemView extends FrameLayout {
                             magazine.getItemFilePath(),
                             magazine.getTitle(), true);
                 } else {
-//						MagazineDownloadService
-//								.startMagazineDownload(context,
-//										magazine, false);
                     BillingActivity.startActivityWithMagazine(context, magazine);
                     downloadButton.setText("...");
                 }
