@@ -22,7 +22,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MuPDFActivity;
-import com.librelio.event.EventBusButtonEvent;
+import com.librelio.event.DownloadStatusUpdateEvent;
 import com.librelio.event.NewMagazineDownloadedEvent;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
@@ -172,7 +172,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 						break;
 					}
 					out.write(buffer, 0, bytesRead);
-					manager.setDownloadStatus(magazine.getFilePath(),
+					manager.setDownloadStatus(magazine,
 							((bytesCount * 100) / totalSize));
 					bytesCount += bytesRead;
 					
@@ -184,8 +184,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 						return;
 					}
 
-					EventBus.getDefault().post(new EventBusButtonEvent(isDownloadingSample ?
-							magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
+					EventBus.getDefault().post(new DownloadStatusUpdateEvent());
 				}
 			} finally {
 				out.close();
@@ -213,7 +212,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 			
 			addAssetsToDatabase(this, magazine);
 			
-			manager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.DOWNLOADED);
+			manager.setDownloadStatus(magazine, DownloadStatusCode.DOWNLOADED);
 
 			EventBus.getDefault().post(new ReloadPlistEvent());
 			EventBus.getDefault().post(new NewMagazineDownloadedEvent(magazine));
@@ -261,10 +260,9 @@ public class MagazineDownloadService extends WakefulIntentService {
 			AssetDownloadService.startAssetDownloadService(this);
 		} catch (IOException e) {
 			e.printStackTrace();
-			manager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.FAILED);
+			manager.setDownloadStatus(magazine, DownloadStatusCode.FAILED);
 			EventBus.getDefault().post(new ReloadPlistEvent());
-			EventBus.getDefault().post(new EventBusButtonEvent(isDownloadingSample ?
-					magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
+			EventBus.getDefault().post(new DownloadStatusUpdateEvent());
 			Log.d(TAG, "failed to download " + magazine.getFilePath());
 		}
 	}
@@ -330,13 +328,12 @@ public class MagazineDownloadService extends WakefulIntentService {
 
 		DownloadsManager downloadsManager = new DownloadsManager(context);
 		DownloadsManager.removeDownload(context, magazine);
-		downloadsManager.addDownload(magazine, DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
-		downloadsManager.setDownloadStatus(magazine.getFilePath(), DownloadStatusCode.QUEUED);
+		downloadsManager.addDownload(magazine, DataBaseHelper.TABLE_DOWNLOADED_ITEMS, isDownloadingSample);
+		downloadsManager.setDownloadStatus(magazine, DownloadStatusCode.QUEUED);
 		// magazine.clearMagazineDir();
 		magazine.makeLocalStorageDir(context);
 		EventBus.getDefault().post(new ReloadPlistEvent());
-		EventBus.getDefault().post(new EventBusButtonEvent(isDownloadingSample ?
-				magazine.getSamplePdfUrl() : magazine.getItemUrl(), ""));
+		EventBus.getDefault().post(new DownloadStatusUpdateEvent());
 
 		Intent intent = new Intent(context, MagazineDownloadService.class);
 		intent.putExtra(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.util.Pair;
 import android.util.Log;
 
 import com.librelio.base.BaseManager;
@@ -63,6 +64,7 @@ public class DownloadsManager extends BaseManager {
 		cv.put(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());
 		cv.put(DataBaseHelper.FIELD_TITLE, magazine.getTitle());
 		cv.put(DataBaseHelper.FIELD_SUBTITLE, magazine.getSubtitle());
+		cv.put(DataBaseHelper.FIELD_IS_SAMPLE, withSample);
 		db.insert(tableName, null, cv);
 
 		EventBus.getDefault().post(new ReloadPlistEvent());
@@ -206,30 +208,34 @@ public class DownloadsManager extends BaseManager {
 //		return magazinesToDownload;
 //	}
 
-	public synchronized void setDownloadStatus(String filePath, long status) {
+	public synchronized void setDownloadStatus(MagazineItem magazine, long status) {
 		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
 				.getWritableDatabase();
 		ContentValues cv = new ContentValues();
 		cv.put(DataBaseHelper.FIELD_DOWNLOAD_STATUS, status);
 		db.update(DataBaseHelper.TABLE_DOWNLOADED_ITEMS, cv,
 				DataBaseHelper.FIELD_FILE_PATH + "=?",
-				new String[] { filePath });
+				new String[] { magazine.getFilePath() });
 	}
 
-	public synchronized int getDownloadStatus(String filePath) {
+	public synchronized Pair<Integer, Boolean> getDownloadStatus(String filePath) {
 		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
 				.getWritableDatabase();
 		Cursor c = db.query(DataBaseHelper.TABLE_DOWNLOADED_ITEMS,
-				new String[] { DataBaseHelper.FIELD_DOWNLOAD_STATUS },
+				new String[]{DataBaseHelper.FIELD_DOWNLOAD_STATUS,
+						DataBaseHelper.FIELD_IS_SAMPLE},
 				DataBaseHelper.FIELD_FILE_PATH + "=?",
-				new String[] { filePath }, null, null, null);
+				new String[]{filePath}, null, null, null);
 		int downloadStatus = Integer.MAX_VALUE;
+		boolean isSample = false;
 		if (c.moveToFirst()) {
 			downloadStatus = c.getInt(c
 					.getColumnIndex(DataBaseHelper.FIELD_DOWNLOAD_STATUS));
+			isSample = c.getInt(c.getColumnIndex
+					(DataBaseHelper.FIELD_IS_SAMPLE)) == 1 ? true : false;
 		}
-		c.close();
-		return downloadStatus;
+		c.close();;
+		return new Pair<>(downloadStatus, isSample);
 	}
 
 	public synchronized void addAsset(DownloadableDictItem magazine, String assetFile,

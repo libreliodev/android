@@ -1,5 +1,7 @@
 package com.librelio.model.dictitem;
 
+import android.support.v4.util.Pair;
+
 import com.librelio.model.interfaces.DisplayableAsGridItem;
 import com.librelio.storage.DownloadsManager;
 
@@ -7,7 +9,7 @@ public abstract class DownloadableDictItem extends DictItem implements Displayab
 
 //    protected int downloadStatus = DownloadStatusCode.NOT_DOWNLOADED;
 
-    public int getDownloadStatus() {
+    public Pair<Integer, Boolean> getDownloadStatus() {
         return new DownloadsManager(context).getDownloadStatus(getFilePath());
     }
 
