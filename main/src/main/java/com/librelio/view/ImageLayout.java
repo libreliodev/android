@@ -1,7 +1,5 @@
 package com.librelio.view;
 
-import java.io.File;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -24,6 +22,12 @@ import android.widget.TextView;
 
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
+
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ImageLayout extends RelativeLayout {
 
@@ -232,28 +236,38 @@ public class ImageLayout extends RelativeLayout {
 	}
 
 	private class SlidesInfo {
-		public final String assetDir;
+		public String assetDir;
 		public int count;
 		public String preffix;
 		public String suffix;
+		List<String> images = new ArrayList<>();
 
 		public SlidesInfo(String basePath) {
-				File file = new File(basePath);
-				this.assetDir = file.getParent();
-				String fileName = file.getName();
+			File file = new File(basePath);
+			this.assetDir = file.getParent();
+			String fileName = file.getName();
+			String baseName = FilenameUtils.getBaseName(fileName);
+			if (!baseName.contains("_")) {
+				this.count = 1;
+				images.add(this.assetDir + "/" + fileName);
+				return;
+			}
 			try {
-				this.count = Integer
-						.valueOf(fileName.split("_")[1].split("\\.")[0]);
 				this.preffix = fileName.split("_")[0];
 				this.suffix = fileName.split("_")[1].split("\\.")[1];
+				this.count = Integer
+						.valueOf(fileName.split("_")[1].split("\\.")[0]);
+				for (int i = 1; i < count; i++) {
+					images.add(this.assetDir + "/" + this.preffix + "_"
+							+ String.valueOf(i) + "." + this.suffix);
+				}
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
 		}
 
 		public String getFullPathToImage(int position) {
-			return this.assetDir + "/" + this.preffix + "_"
-					+ String.valueOf(position) + "." + this.suffix;
+			return images.get(position - 1);
 		}
 
 		@Override
