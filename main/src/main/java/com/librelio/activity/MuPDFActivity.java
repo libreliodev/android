@@ -709,16 +709,31 @@ public class MuPDFActivity extends FragmentActivity {
 			}
 			docView.post(new Runnable() {
 				public void run() {
+					int orientation = getResources().getConfiguration().orientation;
 					for(LinkInfoExternal link : autoLinks){
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
 							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);
-							pageView.addMediaHolder(mediaHolder, link.url);
-							pageView.addView(mediaHolder);
-							mediaHolder.setVisibility(View.VISIBLE);
-							mediaHolder.requestLayout();
+							if (link.isLandscapeOnly()) {
+								if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+									addMediaHolder(link, mediaHolder);
+								}
+							} else if (link.isPortraitOnly()) {
+								if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+									addMediaHolder(link, mediaHolder);
+								}
+							} else {
+								addMediaHolder(link, mediaHolder);
+							}
 						}
 					}
+				}
+
+				private void addMediaHolder(LinkInfoExternal link, MediaHolder mediaHolder) {
+					pageView.addMediaHolder(mediaHolder, link.url);
+					pageView.addView(mediaHolder);
+					mediaHolder.setVisibility(View.VISIBLE);
+					mediaHolder.requestLayout();
 				}
 			});
 		}

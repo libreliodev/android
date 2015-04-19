@@ -1,7 +1,6 @@
 package com.artifex.mupdfdemo;
 
 import android.net.Uri;
-import android.util.Log;
 
 public class LinkInfoExternal extends LinkInfo {
 	final public String url;
@@ -26,10 +25,25 @@ public class LinkInfoExternal extends LinkInfo {
 
 	public boolean isFullScreen() {
 		Uri uri = Uri.parse(url);
-		// Suppress UnsupoprtedOperationException 
 		if(uri.isHierarchical())
 			return uri.getQueryParameter("warect") != null 
 				&& uri.getQueryParameter("warect").equals("full");
+		return false;
+	}
+
+	public boolean isLandscapeOnly() {
+		Uri uri = Uri.parse(url);
+		if(uri.isHierarchical())
+			return uri.getQueryParameter("waorientation") != null
+					&& uri.getQueryParameter("waorientation").equals("landscape");
+		return false;
+	}
+
+	public boolean isPortraitOnly() {
+		Uri uri = Uri.parse(url);
+		if(uri.isHierarchical())
+			return uri.getQueryParameter("waorientation") != null
+					&& uri.getQueryParameter("waorientation").equals("portrait");
 		return false;
 	}
 
@@ -59,18 +73,5 @@ public class LinkInfoExternal extends LinkInfo {
 	public boolean isPdf() {
 		final String path = Uri.parse(url).getPath();
 		return path != null && path.endsWith("pdf");
-	}
-
-	@Override
-	public String toString() {
-		return "LinkInfo ["
-				+ "isVideoFormat=" + isVideoFormat() 
-				+ ", isImageFormat=" + isImageFormat() 
-				+ ", hasVideoData=" + hasVideoData() 
-				+ ", isExternal=" + isExternal() 
-				+ ", isFullScreen=" + isFullScreen() 
-				+ ", isAutoPlay=" + isAutoPlay() 
-				+ ", uri=" + url
-				+ "]";
 	}
 }
