@@ -158,7 +158,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 			// Log.v(TAG, "current file length " + out.length());
 			// }
 
-			int bytesCount = 0, bytesRead = 0;
+			long bytesCount = 0;
+			int bytesRead = 0;
 
 			try {
 
@@ -172,7 +173,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 					}
 					out.write(buffer, 0, bytesRead);
 					manager.setDownloadStatus(magazine.getFilePath(),
-							(int) ((bytesCount * 100) / totalSize));
+							((bytesCount * 100) / totalSize));
 					bytesCount += bytesRead;
 					
 					// check if download exists in database - if not, cancel download
