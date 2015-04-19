@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/PreviewPageLinearLayout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingBottom="10dp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="10dp" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/PreviewPageLinearLayout"
+              android:layout_width="wrap_content"
+              android:layout_height="@dimen/preview_bar_height"
+              android:orientation="vertical"
+              android:paddingBottom="0dp"
+              android:paddingLeft="8dp"
+              android:paddingRight="8dp"
+              android:paddingTop="0dp"
+              android:gravity="center">
 
     <ImageView
         android:id="@+id/PreviewPageImageView"
-        android:layout_width="@dimen/page_preview_size"
-        android:layout_height="@dimen/page_preview_size"
+        android:layout_width="@dimen/page_preview_size_width"
+        android:layout_height="@dimen/page_preview_size_height"
         android:layout_gravity="fill_horizontal"
         android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/PreviewPageNumber"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Small Text"
+        android:layout_height="32dp"
+        android:gravity="center"
+        tools:text="1"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"/>
 
 </LinearLayout>

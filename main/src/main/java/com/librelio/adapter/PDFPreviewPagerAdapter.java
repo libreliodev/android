@@ -7,7 +7,6 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
@@ -74,6 +73,12 @@ public class PDFPreviewPagerAdapter extends RecyclerView.Adapter<PDFPreviewPager
 
 		mLoadingBitmap = BitmapFactory.decodeResource(
 				mContext.getResources(), R.drawable.darkdenim3);
+
+		mPreviewSize = new Point();
+		mPreviewSize.x = mContext.getResources()
+				.getDimensionPixelSize(R.dimen.page_preview_size_width);
+		mPreviewSize.y = mContext.getResources()
+				.getDimensionPixelSize(R.dimen.page_preview_size_height);
 	}
 
     @Override
@@ -84,11 +89,6 @@ public class PDFPreviewPagerAdapter extends RecyclerView.Adapter<PDFPreviewPager
 
     @Override
     public void onBindViewHolder(PDFPreviewViewHolder holder, int position) {
-        if (mPreviewSize != null) {
-            holder.previewPageImageView
-                    .setLayoutParams(new LinearLayout.LayoutParams(
-                            mPreviewSize.x, mPreviewSize.y));
-        }
         holder.previewPageNumber.setText(String.valueOf(position + 1));
         holder.previewPageLinearLayout.setBackgroundColor(Color.TRANSPARENT);
         drawPageImageView(holder, position);
@@ -150,17 +150,7 @@ public class PDFPreviewPagerAdapter extends RecyclerView.Adapter<PDFPreviewPager
 
 		@Override
 		protected Bitmap doInBackground(Integer... params) {
-			if (mPreviewSize == null) {
-				mPreviewSize = new Point();
-				int padding = mContext.getResources().getDimensionPixelSize(
-						R.dimen.page_preview_size);
-				PointF mPageSize = mCore.getSinglePageSize(0);
-				float scale = mPageSize.y / mPageSize.x;
-				mPreviewSize.x = (int) ((float) padding / scale);
-				mPreviewSize.y = padding;
-			}
-			Bitmap lq = null;
-			lq = getCachedBitmap(position);
+			Bitmap lq = getCachedBitmap(position);
 			mBitmapCache.put(position, lq);
 			return lq;
 		}

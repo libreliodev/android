@@ -20,6 +20,7 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
@@ -326,7 +327,7 @@ public class MuPDFActivity extends FragmentActivity {
                         }
                     });
                 }
-            }, 250);
+            }, 100);
 		}
 
 		// Stick the document view and the buttons overlay into a parent view
@@ -533,7 +534,8 @@ public class MuPDFActivity extends FragmentActivity {
         listLayoutManager = new LinearLayoutManager(this);
         listLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mPreview.setLayoutManager(listLayoutManager);
-		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -1);
+		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams
+				.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		mPreview.setLayoutParams(lp);
 		pdfPreviewPagerAdapter = new PDFPreviewPagerAdapter(this, core);
 		mPreview.setAdapter(pdfPreviewPagerAdapter);
@@ -660,7 +662,8 @@ public class MuPDFActivity extends FragmentActivity {
 	}
 
 	public void centerPreviewAtPosition(int position) {
-        int offset = (mPreview.getWidth() / 2) - (getResources().getDimensionPixelSize(R.dimen.page_preview_size) / 2);
+        int offset = (mPreview.getWidth() / 2) -
+				(getResources().getDimensionPixelSize(R.dimen.page_preview_size_width) / 2);
         listLayoutManager.scrollToPositionWithOffset(position, offset);
 	}
 
