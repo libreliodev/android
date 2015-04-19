@@ -714,17 +714,16 @@ public class MuPDFActivity extends FragmentActivity {
 			}
 			docView.post(new Runnable() {
 				public void run() {
-					int orientation = getResources().getConfiguration().orientation;
 					for(LinkInfoExternal link : autoLinks){
 						if (pageView != null && null != core) {
 							String basePath = core.getFileDirectory();
 							MediaHolder mediaHolder = new MediaHolder(getContext(), link, basePath);
 							if (link.isLandscapeOnly()) {
-								if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+								if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
 									addMediaHolder(link, mediaHolder);
 								}
 							} else if (link.isPortraitOnly()) {
-								if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+								if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
 									addMediaHolder(link, mediaHolder);
 								}
 							} else {
