@@ -72,8 +72,10 @@ public class MuPDFActivity extends FragmentActivity {
     private static final int START_OUTLINE_ACTIVITY = 101;
 
 	public static final String SHOW_THUMBNAILS_EXTRA = "show_thumbnails";
+	public static final String PREF_SAVED_ORIENTATION = "orientation";
+	public static final String PREF_BUTTONS_HIDDEN = "ButtonsHidden";
 
-    private MuPDFCore core;
+	private MuPDFCore core;
 	private String fileName;
 	private int mOrientation;
 
@@ -302,7 +304,7 @@ public class MuPDFActivity extends FragmentActivity {
 
 		// Reinstate last state if it was recorded
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-		int orientation = prefs.getInt("orientation", mOrientation);
+		int orientation = prefs.getInt(PREF_SAVED_ORIENTATION, mOrientation);
 		int pageNum = prefs.getInt("page"+fileName, 0);
 		if(orientation == mOrientation)
 			docView.setDisplayedViewIndex(pageNum);
@@ -316,7 +318,7 @@ public class MuPDFActivity extends FragmentActivity {
 
 		// Give preview thumbnails time to appear before showing bottom bar
 		if (savedInstanceState == null
-				|| !savedInstanceState.getBoolean("ButtonsHidden", false)) {
+				|| !savedInstanceState.getBoolean(PREF_BUTTONS_HIDDEN, false)) {
 			mPreview.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -378,15 +380,15 @@ public class MuPDFActivity extends FragmentActivity {
 			SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("page"+fileName, docView.getDisplayedViewIndex());
-			edit.putInt("orientation", mOrientation);
+			edit.putInt(PREF_SAVED_ORIENTATION, mOrientation);
 			edit.commit();
 		}
 
 		if (!buttonsVisible)
-			outState.putBoolean("ButtonsHidden", true);
+			outState.putBoolean(PREF_BUTTONS_HIDDEN, true);
 
-		if (mTopBarIsSearch)
-			outState.putBoolean("SearchMode", true);
+//		if (mTopBarIsSearch)
+//			outState.putBoolean("SearchMode", true);
 	}
 
 	@Override
@@ -399,7 +401,7 @@ public class MuPDFActivity extends FragmentActivity {
 			SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("page"+fileName, docView.getDisplayedViewIndex());
-			edit.putInt("orientation", mOrientation);
+			edit.putInt(PREF_SAVED_ORIENTATION, mOrientation);
 			edit.commit();
 		}
 	}
