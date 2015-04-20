@@ -88,6 +88,7 @@ public class PlistDownloader {
                 }
                 Toast.makeText(context, context.getResources().getString(R.string.connection_failed),
                         Toast.LENGTH_LONG).show();
+                EventBus.getDefault().post(new ReloadPlistEvent(plistName));
             }
 
             @Override
