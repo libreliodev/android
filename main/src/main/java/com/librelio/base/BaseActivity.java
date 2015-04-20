@@ -8,7 +8,6 @@ import android.util.Log;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.librelio.LibrelioApplication;
-import com.librelio.event.UpdateIndeterminateProgressBarEvent;
 import com.librelio.utils.StorageUtils;
 import com.niveales.wind.R;
 
@@ -197,9 +196,4 @@ public class BaseActivity extends ActionBarActivity implements IBaseContext {
         super.onPause();
         EventBus.getDefault().unregister(this);
     }
-
-    public void onEventMainThread(UpdateIndeterminateProgressBarEvent event) {
-        setProgressBarIndeterminateVisibility(event.isShowProgress());
-    }
-
 }

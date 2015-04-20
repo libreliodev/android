@@ -13,8 +13,8 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.adapter.DictItemAdapter;
-import com.librelio.event.NewPlistDownloadedEvent;
 import com.librelio.event.ReloadPlistEvent;
+import com.librelio.event.ShowProgressBarEvent;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.service.AssetDownloadService;
 import com.librelio.utils.PlistDownloader;
@@ -115,10 +115,10 @@ public class PlistGridFragment extends Fragment {
         }
     }
 
-    public void onEvent(NewPlistDownloadedEvent event) {
+    public void onEvent(ShowProgressBarEvent event) {
         if (plistName.equals(event.getPlistName())) {
 //        updateInventory();
-            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setRefreshing(event.isShowProgress());
         }
     }
 

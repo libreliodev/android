@@ -23,7 +23,6 @@ import com.google.android.gms.analytics.Tracker;
 import com.librelio.LibrelioApplication;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.event.DownloadStatusUpdateEvent;
-import com.librelio.event.NewMagazineDownloadedEvent;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.lib.utils.PDFParser;
@@ -215,7 +214,6 @@ public class MagazineDownloadService extends WakefulIntentService {
 			manager.setDownloadStatus(magazine, DownloadStatusCode.DOWNLOADED);
 
 			EventBus.getDefault().post(new ReloadPlistEvent());
-			EventBus.getDefault().post(new NewMagazineDownloadedEvent(magazine));
 
 			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 					this)
