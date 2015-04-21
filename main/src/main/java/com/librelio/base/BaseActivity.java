@@ -196,4 +196,8 @@ public class BaseActivity extends ActionBarActivity implements IBaseContext {
         super.onPause();
         EventBus.getDefault().unregister(this);
     }
+
+	public void onEvent(Object fakeEvent) {
+		// Nasty fake event to stop EventBus crash
+	}
 }
