@@ -37,14 +37,6 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
-    <!--<style name="MyAppCompatDialogTheme" parent="AppTheme">-->
-    <!--<item name="android:windowIsFloating">false</item>-->
-    <!--<item name="android:windowContentOverlay">@null</item>-->
-    <!--<item name="android:windowSoftInputMode">stateAlwaysHidden</item>-->
-    <!--<item name="android:windowActionModeOverlay">true</item>-->
-    <!--<item name="android:windowIsTranslucent">true</item>-->
-    <!--</style>-->
-
     <style name="mainGridViewButtonStyle" parent="Base.TextAppearance.AppCompat">
         <item name="android:background">@drawable/magazines_view_button_selector</item>
         <item name="android:textColor">@color/magazine_view_button_text_color</item>

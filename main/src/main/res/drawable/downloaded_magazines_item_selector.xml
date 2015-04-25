@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true" android:drawable="@android:color/holo_blue_dark" />
-    <item android:state_focused="true" android:drawable="@android:color/transparent" />
+
+    <item android:drawable="@drawable/magazines_view_button_focused" android:state_focused="true"/>
+    <item android:drawable="@drawable/magazines_view_button_pressed" android:state_pressed="true"/>
+    <item android:drawable="@drawable/magazines_view_button"/>
+
 </selector>
