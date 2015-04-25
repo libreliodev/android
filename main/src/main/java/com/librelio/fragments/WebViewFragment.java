@@ -55,7 +55,7 @@ public class WebViewFragment extends Fragment {
 				false);
 
 		mWebView = (WebView) view.findViewById(R.id.web_view);
-		progressBar = getView().findViewById(R.id.progress_bar);
+		progressBar = view.findViewById(R.id.progress_bar);
 		mIsWebViewAvailable = true;
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setUseWideViewPort(true);
