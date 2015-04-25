@@ -103,12 +103,12 @@ public class MagazineGridItemView extends FrameLayout {
                 public void onClick(View v) {
                     MagazineGridItemView customView = new MagazineGridItemView(context, DIALOG,
                             plistName);
-                    customView.setMagazine(magazine);
                     boolean wrapInScrollView = false;
                     MaterialDialog dialog = new MaterialDialog.Builder(context)
                             .customView(customView, wrapInScrollView)
                             .build();
                     dialog.show();
+                    customView.setMagazine(magazine);
                 }
             });
         }
@@ -348,26 +348,6 @@ public class MagazineGridItemView extends FrameLayout {
 
     private void setupDownloadButton() {
 
-        setupDownloadedButtonText();
-
-        downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (magazine.isDownloaded()) {
-                    LibrelioApplication.startPDFActivity(
-                            context,
-                            magazine.getItemFilePath(),
-                            magazine.getTitle(), true);
-                } else {
-                    BillingActivity.startActivityWithMagazine(context, magazine);
-                    downloadButton.setText("...");
-                }
-            }
-        });
-    }
-
-    private void setupDownloadedButtonText() {
-        downloadButton.setText(context.getString(R.string.download));
         Pair<Integer, Boolean> downloadStatus = magazine.getDownloadStatus();
 
         Boolean isSampleDownloading = downloadStatus.second;
@@ -375,18 +355,66 @@ public class MagazineGridItemView extends FrameLayout {
 
         if (magazine.isDownloaded()) {
             downloadButton.setText(context.getString(R.string.read));
-        } else {
-            if (!isSampleDownloading) { // is not a sample
-                if (downloadStatusCode == DownloadStatusCode.QUEUED) {
-                    downloadButton.setText(context.getString(R.string.queued));
-                } else if (downloadStatusCode == DownloadStatusCode.FAILED) {
-                    downloadButton.setText(context.getString(R.string.download_failed));
-                } else if (downloadStatusCode > DownloadStatusCode.QUEUED
-                        && downloadStatusCode < DownloadStatusCode.DOWNLOADED) {
-                    downloadButton.setText(String.valueOf(downloadStatusCode + "%"));
-                }
+        } else if (!isSampleDownloading) { // is a sample downloading
+            if (downloadStatusCode == DownloadStatusCode.QUEUED) {
+                downloadButton.setText(context.getString(R.string.queued));
+            } else if (downloadStatusCode == DownloadStatusCode.FAILED) {
+                downloadButton.setText(context.getString(R.string.download_failed));
+            } else if (downloadStatusCode > DownloadStatusCode.QUEUED
+                    && downloadStatusCode < DownloadStatusCode.DOWNLOADED) {
+                downloadButton.setText(String.valueOf(downloadStatusCode + "%"));
+            } else {
+                downloadButton.setText(R.string.download);
             }
         }
+
+        if (magazine.isDownloaded()) {
+            downloadButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LibrelioApplication.startPDFActivity(context, magazine.getItemFilePath(),
+                            magazine.getTitle(), true);
+                }
+            });
+        } else if (!isSampleDownloading) { // is a sample downloading
+            if (downloadStatusCode >= DownloadStatusCode.QUEUED
+                    && downloadStatusCode < DownloadStatusCode.DOWNLOADED) {
+                downloadButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new MaterialDialog.Builder(context)
+                                .title(R.string.cancel_download_question)
+                                .positiveText(R.string.cancel)
+                                .positiveColor(Color.BLACK)
+                                .negativeText(R.string.continue_download)
+                                .negativeColor(Color.BLACK)
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        // FIXME Cancel download
+                                        DownloadsManager.removeDownload(context, magazine);
+                                        magazine.clearMagazineDir(context);
+                                        EventBus.getDefault().post(new DownloadStatusUpdateEvent());
+                                    }
+                                }).show();
+                    }
+                });
+            } else {
+                // not downloaded or download failed
+                downloadButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startPaidDownload();
+                    }
+                });
+            }
+        }
+    }
+
+    private void startPaidDownload() {
+        BillingActivity.startActivityWithMagazine(context, magazine);
+        downloadButton.setText("...");
     }
 
     private void setupSampleButton() {
@@ -436,7 +464,7 @@ public class MagazineGridItemView extends FrameLayout {
                     @Override
                     public void onClick(View v) {
                         new MaterialDialog.Builder(context)
-                                .title("Cancel download?")
+                                .title(R.string.cancel_download_question)
                                 .positiveText(R.string.cancel)
                                 .positiveColor(Color.BLACK)
                                 .negativeText(R.string.continue_download)
@@ -448,6 +476,7 @@ public class MagazineGridItemView extends FrameLayout {
                                         // FIXME Cancel download
                                         DownloadsManager.removeDownload(context, magazine);
                                         magazine.clearMagazineDir(context);
+                                        EventBus.getDefault().post(new DownloadStatusUpdateEvent());
                                     }
                                 }).show();
                     }
@@ -487,7 +516,7 @@ public class MagazineGridItemView extends FrameLayout {
 
     @Override
     protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
         EventBus.getDefault().unregister(this);
+        super.onDetachedFromWindow();
     }
 }

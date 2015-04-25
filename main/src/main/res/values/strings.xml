@@ -115,6 +115,7 @@
     <string name="password_cannot_be_empty">Password cannot be empty</string>
     <string name="download_failed">Download failed</string>
     <string name="subscriber_code_cannot_be_empty">Subscriber code cannot be empty</string>
+    <string name="cancel_download_question">Cancel download?</string>
 
 
 </resources>
