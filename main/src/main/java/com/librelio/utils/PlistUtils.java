@@ -21,10 +21,6 @@ public class PlistUtils {
 
     public static ArrayList<DictItem> parsePlist(Context context, String plistName) {
 
-//    	if (BuildConfig.DEBUG) {
-//    		Log.d(getClass().getSimpleName(), "parsing plist: " + plistName);
-//    	}
-
         PlistItem plistItem = new PlistItem(context, "", plistName);
 
         ArrayList<DictItem> magazines = new ArrayList<DictItem>();

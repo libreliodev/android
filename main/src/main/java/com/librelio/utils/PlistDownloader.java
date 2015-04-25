@@ -100,14 +100,12 @@ public class PlistDownloader {
 
     private static void saveUpdateDate(Context context, String plistName) {
         Date date = Calendar.getInstance().getTime();
-//		Log.d(TAG, "saveUpdateDate, date : "+updateDateFormat.format(date));
         getPreferences(context).edit().putLong(LAST_UPDATE_PREFERENCES_KEY + plistName,
                 date.getTime()).commit();
     }
 
     private static Date getLastUpdateDate(Context context, String plistName) {
         Date date = new Date(getPreferences(context).getLong(LAST_UPDATE_PREFERENCES_KEY + plistName, 0));
-//		Log.d(TAG, "getLastUpdateDate, date : "+date);
         return date;
     }
 
