@@ -27,7 +27,7 @@ android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
     defaultConfig {
-        applicationId "com.niveales.wind"
+        applicationId "com.developer.wind"
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 110
@@ -64,6 +64,7 @@ android {
 
         wind {
             flavorDimension "name"
+            applicationId "com.niveales.wind"
             // Remove next line to enable Crashlytics and change false to true in second line
             ext.enableCrashlytics = false
             buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
