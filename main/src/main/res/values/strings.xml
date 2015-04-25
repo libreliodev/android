@@ -53,6 +53,7 @@
     <string name="caching_operation_in_progress">Caching operation in progress</string>
     <string name="what_do_you_want_to_buy">What do you want to buy?</string>
     <string name="cancel">Cancel</string>
+    <string name="continue_download">Continue</string>
     <string name="done">Done</string>
     <string name="the_order_failed">The order failed</string>
     <string name="buy_and_download">Buy and download</string>

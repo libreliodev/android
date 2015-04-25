@@ -1,6 +1,7 @@
 package com.librelio.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.librelio.event.ReloadPlistEvent;
 import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.service.MagazineDownloadService;
+import com.librelio.storage.DownloadsManager;
 import com.librelio.utils.CommonHelper;
 import com.librelio.utils.PurchaseUtils;
 import com.niveales.wind.R;
@@ -364,71 +366,108 @@ public class MagazineGridItemView extends FrameLayout {
         });
     }
 
-    private void setupSampleButton() {
-        if (magazine.isDownloaded()) {
-            sampleButton.setVisibility(View.INVISIBLE);
-            return;
-        }
-
-        sampleButton.setVisibility(View.VISIBLE);
-
-        setupSampleButtonText();
-        sampleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (magazine.isSampleDownloaded()) {
-                    LibrelioApplication.startPDFActivity(
-                            context,
-                            magazine.getSamplePdfPath(),
-                            magazine.getTitle(), true);
-                } else {
-                    MagazineDownloadService
-                            .startMagazineDownload(context,
-                                    magazine, true);
-                }
-            }
-        });
-    }
-
-    private void setupSampleButtonText() {
-        sampleButton.setText(context.getString(R.string.sample));
-        Pair<Integer, Boolean> downloadStatus = magazine.getDownloadStatus();
-        if (magazine.isSampleDownloaded()) {
-            sampleButton.setText(context.getString(R.string.read_sample));
-        } else if (downloadStatus.second) { // is a sample
-            if (downloadStatus.first == DownloadStatusCode.QUEUED) {
-                sampleButton.setText(context.getString(R.string.queued));
-            } else if (downloadStatus.first == DownloadStatusCode.FAILED) {
-                sampleButton.setText(context.getString(R.string.download_failed));
-            } else if (downloadStatus.first >= 0
-                    && downloadStatus.first <= 100) {
-                sampleButton.setText(String.valueOf(downloadStatus.first + "%"));
-            }
-        }
-
-        if (!downloadStatus.second
-                && downloadStatus.first >= DownloadStatusCode.QUEUED
-                && downloadStatus.first <= DownloadStatusCode.DOWNLOADED) {
-            sampleButton.setVisibility(View.INVISIBLE);
-        } else {
-            sampleButton.setVisibility(View.VISIBLE);
-        }
-    }
-
     private void setupDownloadedButtonText() {
         downloadButton.setText(context.getString(R.string.download));
         Pair<Integer, Boolean> downloadStatus = magazine.getDownloadStatus();
+
+        Boolean isSampleDownloading = downloadStatus.second;
+        Integer downloadStatusCode = downloadStatus.first;
+
         if (magazine.isDownloaded()) {
             downloadButton.setText(context.getString(R.string.read));
-        } else if (!downloadStatus.second) { // is not a sample
-            if (downloadStatus.first == DownloadStatusCode.QUEUED) {
-                downloadButton.setText(context.getString(R.string.queued));
-            } else if (downloadStatus.first == DownloadStatusCode.FAILED) {
-                downloadButton.setText(context.getString(R.string.download_failed));
-            } else if (downloadStatus.first >= 0
-                    && downloadStatus.first <= 100) {
-                downloadButton.setText(String.valueOf(downloadStatus.first + "%"));
+        } else {
+            if (!isSampleDownloading) { // is not a sample
+                if (downloadStatusCode == DownloadStatusCode.QUEUED) {
+                    downloadButton.setText(context.getString(R.string.queued));
+                } else if (downloadStatusCode == DownloadStatusCode.FAILED) {
+                    downloadButton.setText(context.getString(R.string.download_failed));
+                } else if (downloadStatusCode > DownloadStatusCode.QUEUED
+                        && downloadStatusCode < DownloadStatusCode.DOWNLOADED) {
+                    downloadButton.setText(String.valueOf(downloadStatusCode + "%"));
+                }
             }
+        }
+    }
+
+    private void setupSampleButton() {
+
+        Pair<Integer, Boolean> downloadStatus = magazine.getDownloadStatus();
+
+        Boolean isSampleDownloading = downloadStatus.second;
+        Integer downloadStatusCode = downloadStatus.first;
+
+        if (magazine.isDownloaded() ||
+                (!isSampleDownloading && downloadStatusCode >= DownloadStatusCode.QUEUED &&
+                        downloadStatusCode <= DownloadStatusCode.DOWNLOADED)) {
+            // if magazine is downloaded or downloading
+            sampleButton.setVisibility(View.INVISIBLE);
+            return;
+        } else {
+            sampleButton.setVisibility(View.VISIBLE);
+        }
+
+        if (magazine.isSampleDownloaded()) {
+            sampleButton.setText(context.getString(R.string.read_sample));
+        } else if (isSampleDownloading) { // is a sample downloading
+            if (downloadStatusCode == DownloadStatusCode.QUEUED) {
+                sampleButton.setText(context.getString(R.string.queued));
+            } else if (downloadStatusCode == DownloadStatusCode.FAILED) {
+                sampleButton.setText(context.getString(R.string.download_failed));
+            } else if (downloadStatusCode > DownloadStatusCode.QUEUED
+                    && downloadStatusCode < DownloadStatusCode.DOWNLOADED) {
+                sampleButton.setText(String.valueOf(downloadStatusCode + "%"));
+            }
+        } else {
+            sampleButton.setText(R.string.sample);
+        }
+
+        if (magazine.isSampleDownloaded()) {
+            sampleButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LibrelioApplication.startPDFActivity(context,
+                            magazine.getSamplePdfPath(), magazine.getTitle(), true);
+                }
+            });
+        } else if (isSampleDownloading) { // is a sample downloading
+            if (downloadStatusCode >= DownloadStatusCode.QUEUED
+                    && downloadStatusCode < DownloadStatusCode.DOWNLOADED) {
+                sampleButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new MaterialDialog.Builder(context)
+                                .title("Cancel download?")
+                                .positiveText(R.string.cancel)
+                                .positiveColor(Color.BLACK)
+                                .negativeText(R.string.continue_download)
+                                .negativeColor(Color.BLACK)
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        // FIXME Cancel download
+                                        DownloadsManager.removeDownload(context, magazine);
+                                        magazine.clearMagazineDir(context);
+                                    }
+                                }).show();
+                    }
+                });
+            } else {
+                // if download failed
+                sampleButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MagazineDownloadService.startMagazineDownload(context, magazine, true);
+                    }
+                });
+            }
+        } else {
+            sampleButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MagazineDownloadService.startMagazineDownload(context, magazine, true);
+                }
+            });
         }
     }
 
