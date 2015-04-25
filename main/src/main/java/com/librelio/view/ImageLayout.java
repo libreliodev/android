@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -185,6 +187,7 @@ public class ImageLayout extends RelativeLayout {
 		currentImageViewPosition = position;
 		int actualPosition = slidesInfo.count - position;
 		String path = slidesInfo.getFullPathToImage(actualPosition);
+		// TODO replace with Picasso image loading
 		new GetBitmapAsyncTask(false) {
 			@Override
 			protected void onPostExecute(Bitmap bmp) {
@@ -210,23 +213,19 @@ public class ImageLayout extends RelativeLayout {
 		final ImageView imageView = (ImageView) view
 				.findViewById(R.id.slideshow_item_image);
         final TextView text = (TextView) view.findViewById(R.id.slideshow_item_text);
-		new GetBitmapAsyncTask(true) {
+		Picasso.with(context).load(new File (slidesInfo.getFullPathToImage(1)))
+				.fit().centerInside().into(imageView, new Callback() {
 			@Override
-			protected void onPostExecute(Bitmap bmp) {
-				if (isCancelled()) {
-					return;
-				}
+			public void onSuccess() {
 				view.setBackgroundColor(backgroundColor);
-                if (bmp == null) {
-                	Log.w("ImageLayout", "Single Image Bitmap null");
-                    imageView.setVisibility(View.GONE);
-                    text.setVisibility(View.VISIBLE);
-                } else {
-				    imageView.setImageBitmap(bmp);
-                }
-				super.onPostExecute(bmp);
+				text.setVisibility(View.VISIBLE);
 			}
-		}.execute(slidesInfo.getFullPathToImage(1));
+
+			@Override
+			public void onError() {
+				imageView.setVisibility(View.GONE);
+			}
+		});
 	}
 
 	@Override
@@ -257,7 +256,7 @@ public class ImageLayout extends RelativeLayout {
 				this.suffix = fileName.split("_")[1].split("\\.")[1];
 				this.count = Integer
 						.valueOf(fileName.split("_")[1].split("\\.")[0]);
-				for (int i = 1; i < count; i++) {
+				for (int i = 1; i <= count; i++) {
 					images.add(this.assetDir + "/" + this.preffix + "_"
 							+ String.valueOf(i) + "." + this.suffix);
 				}
@@ -279,12 +278,12 @@ public class ImageLayout extends RelativeLayout {
 	}
 
 	private class GetBitmapAsyncTask extends AsyncTask<String, Void, Bitmap> {
-		
+
 		private boolean showProgressBar = false;
 
 		public GetBitmapAsyncTask(boolean showProgressBar) {
 			this.showProgressBar = showProgressBar;
-			
+
 		}
 		@Override
 		protected void onPreExecute() {
@@ -350,22 +349,18 @@ public class ImageLayout extends RelativeLayout {
 			final FrameLayout background = (FrameLayout) view
 					.findViewById(R.id.slide_show_frame);
             background.setBackgroundColor(backgroundColor);
-			new GetBitmapAsyncTask(true) {
+			Picasso.with(context).load(new File(path))
+					.fit().centerInside().into(img, new Callback() {
 				@Override
-				protected void onPostExecute(Bitmap bmp) {
-					if (isCancelled()) {
-						return;
-					}
-                    if (bmp == null) {
-                    	Log.w("ImageLayout", "ViewPager Image Bitmap null");
-                        img.setVisibility(View.GONE);
-                        text.setVisibility(View.VISIBLE);
-                    } else {
-					    img.setImageBitmap(bmp);
-                    }
-					super.onPostExecute(bmp);
+				public void onSuccess() {
+
 				}
-			}.execute(path);
+
+				@Override
+				public void onError() {
+					img.setVisibility(View.GONE);
+				}
+			});
 			container.addView(view);
 			return view;
 		}
