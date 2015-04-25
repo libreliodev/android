@@ -18,9 +18,8 @@ import com.niveales.wind.R;
 
 /**
  * A fragment that displays a WebView.
- * <p/>
- * The WebView is automically paused or resumed when the Fragment is paused or
- * resumed.
+ *
+ * The WebView is automatically paused or resumed when the Fragment is paused or resumed.
  */
 public class WebViewFragment extends Fragment {
 	private WebView mWebView;
@@ -28,6 +27,7 @@ public class WebViewFragment extends Fragment {
 	private String url;
 
 	private static final String URL = "url";
+	private View progressBar;
 
 	public WebViewFragment() {
 	}
@@ -55,6 +55,7 @@ public class WebViewFragment extends Fragment {
 				false);
 
 		mWebView = (WebView) view.findViewById(R.id.web_view);
+		progressBar = getView().findViewById(R.id.progress_bar);
 		mIsWebViewAvailable = true;
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setUseWideViewPort(true);
@@ -67,9 +68,11 @@ public class WebViewFragment extends Fragment {
 			@Override
 			public void onPageFinished(WebView view, String url) {
 				super.onPageFinished(view, url);
-				getView().findViewById(R.id.progress_bar).setVisibility(
-						View.GONE);
-				mWebView.setVisibility(View.VISIBLE);
+				// Check webview still exists
+				if (view != null) {
+					progressBar.setVisibility(View.GONE);
+					mWebView.setVisibility(View.VISIBLE);
+				}
 				// ((ViewAnimator)getView().findViewById(R.id.view_animator)).setDisplayedChild(1);
 				// mWebView.setWebViewClient(null);
 			}
@@ -98,9 +101,7 @@ public class WebViewFragment extends Fragment {
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			mWebView.onPause();
-		}
+		mWebView.onPause();
 	}
 
 	/**
@@ -108,9 +109,7 @@ public class WebViewFragment extends Fragment {
 	 */
 	@Override
 	public void onResume() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			mWebView.onResume();
-		}
+		mWebView.onResume();
 		super.onResume();
 	}
 
@@ -154,8 +153,7 @@ public class WebViewFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.options_menu_browser:
-			Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-					Uri.parse(url));
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(browserIntent);
 			break;
 		}
