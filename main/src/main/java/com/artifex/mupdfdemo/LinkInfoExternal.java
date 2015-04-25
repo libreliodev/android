@@ -24,8 +24,11 @@ public class LinkInfoExternal extends LinkInfo {
 	}
 
 	public boolean isToggleFullscreenAllowed() {
-		return Uri.parse(url).getQueryParameter("watoggle") != null
-				&& !Uri.parse(url).getQueryParameter("watoggle").equals("no");
+		if (Uri.parse(url).getQueryParameter("watoggle") == null) {
+			// by default allow toggle
+			return true;
+		}
+		return !Uri.parse(url).getQueryParameter("watoggle").equals("no");
 	}
 
 	public boolean isFullScreen() {
