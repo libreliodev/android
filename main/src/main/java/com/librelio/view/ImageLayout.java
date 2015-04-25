@@ -212,18 +212,19 @@ public class ImageLayout extends RelativeLayout {
 		final View view = viewStub.inflate();
 		final ImageView imageView = (ImageView) view
 				.findViewById(R.id.slideshow_item_image);
-        final TextView text = (TextView) view.findViewById(R.id.slideshow_item_text);
+        final TextView assetDownloadingText = (TextView) view.findViewById(R.id.slideshow_item_text);
 		Picasso.with(context).load(new File (slidesInfo.getFullPathToImage(1)))
 				.fit().centerInside().into(imageView, new Callback() {
 			@Override
 			public void onSuccess() {
 				view.setBackgroundColor(backgroundColor);
-				text.setVisibility(View.VISIBLE);
+				assetDownloadingText.setVisibility(View.GONE);
 			}
 
 			@Override
 			public void onError() {
 				imageView.setVisibility(View.GONE);
+				assetDownloadingText.setVisibility(View.VISIBLE);
 			}
 		});
 	}
@@ -345,7 +346,7 @@ public class ImageLayout extends RelativeLayout {
 
 			final ImageView img = (ImageView) view
 					.findViewById(R.id.slideshow_item_image);
-            final TextView text = (TextView) view.findViewById(R.id.slideshow_item_text);
+            final TextView assetDownloadingText = (TextView) view.findViewById(R.id.slideshow_item_text);
 			final FrameLayout background = (FrameLayout) view
 					.findViewById(R.id.slide_show_frame);
             background.setBackgroundColor(backgroundColor);
@@ -353,12 +354,13 @@ public class ImageLayout extends RelativeLayout {
 					.fit().centerInside().into(img, new Callback() {
 				@Override
 				public void onSuccess() {
-
+					img.setVisibility(View.GONE);
 				}
 
 				@Override
 				public void onError() {
 					img.setVisibility(View.GONE);
+					assetDownloadingText.setVisibility(View.VISIBLE);
 				}
 			});
 			container.addView(view);
