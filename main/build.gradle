@@ -30,8 +30,8 @@ android {
         applicationId "com.developer.wind"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 110
-        versionName "1.1.0"
+        versionCode 200
+        versionName "2.0.0"
         buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
     }
 
