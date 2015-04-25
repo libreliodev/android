@@ -13,6 +13,7 @@ import com.librelio.base.BaseManager;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.exception.MagazineNotFoundInDatabaseException;
 import com.librelio.model.Asset;
+import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.DownloadableDictItem;
 import com.librelio.model.dictitem.MagazineItem;
@@ -226,7 +227,9 @@ public class DownloadsManager extends BaseManager {
 						DataBaseHelper.FIELD_IS_SAMPLE},
 				DataBaseHelper.FIELD_FILE_PATH + "=?",
 				new String[]{filePath}, null, null, null);
-		int downloadStatus = Integer.MAX_VALUE;
+
+		// Set default values if magazine not in database
+		int downloadStatus = DownloadStatusCode.NOT_DOWNLOADED;
 		boolean isSample = false;
 		if (c.moveToFirst()) {
 			downloadStatus = c.getInt(c
