@@ -98,19 +98,21 @@ public class MagazineGridItemView extends FrameLayout {
             Picasso.with(context).load(magazine.getPngUri()).fit().centerInside().placeholder(R.drawable
                     .generic)
                     .into(image);
-            image.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MagazineGridItemView customView = new MagazineGridItemView(context, DIALOG,
-                            plistName);
-                    boolean wrapInScrollView = false;
-                    MaterialDialog dialog = new MaterialDialog.Builder(context)
-                            .customView(customView, wrapInScrollView)
-                            .build();
-                    dialog.show();
-                    customView.setMagazine(magazine);
-                }
-            });
+            if (context.getResources().getBoolean(R.bool.enable_image_click_dialogs)) {
+                image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MagazineGridItemView customView = new MagazineGridItemView(context, DIALOG,
+                                plistName);
+                        boolean wrapInScrollView = false;
+                        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                .customView(customView, wrapInScrollView)
+                                .build();
+                        dialog.show();
+                        customView.setMagazine(magazine);
+                    }
+                });
+            }
         }
 
         if (newsstandThumbnail != null) {

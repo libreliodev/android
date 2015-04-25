@@ -12,5 +12,6 @@
     <string name="gcm_project_number">1012641315687</string>
     <string name="dfp_prefix"></string>
     <bool name="enable_list_header">false</bool>
+    <bool name="enable_image_click_dialogs">false</bool>
 
 </resources>
