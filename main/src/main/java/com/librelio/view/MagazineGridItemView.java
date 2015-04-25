@@ -404,6 +404,13 @@ public class MagazineGridItemView extends FrameLayout {
                     }
                 });
             }
+        } else {
+            downloadButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startPaidDownload();
+                }
+            });
         }
     }
 
