@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.view.MagazineGridItemView;
+import com.niveales.wind.R;
 
 import java.util.ArrayList;
 
@@ -18,11 +19,13 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 	private final Context context;
 	private final ArrayList<DictItem> dictItems;
 	private String plistName;
+	private final boolean enableListHeader;
 
 	public DictItemAdapter(Context context, ArrayList<DictItem> dictItems, String plistName) {
 		this.context = context;
 		this.dictItems = dictItems;
 		this.plistName = plistName;
+		enableListHeader = context.getResources().getBoolean(R.bool.enable_list_header);
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public int getItemViewType(int position) {
-		if (position == 0) {
+		if (enableListHeader && position == 0) {
 			return TYPE_HEADER;
 		} else {
 			return TYPE_DEFAULT;

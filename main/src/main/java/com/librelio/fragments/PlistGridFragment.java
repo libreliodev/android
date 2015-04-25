@@ -63,7 +63,8 @@ public class PlistGridFragment extends Fragment {
             @Override
             public int getSpanSize(int position) {
                 if (position == 0) {
-                    return manager.getSpanCount();
+                    return getResources().getBoolean(R.bool.enable_list_header) ?
+                            manager.getSpanCount() : 1;
                 } else {
                     return 1;
                 }
