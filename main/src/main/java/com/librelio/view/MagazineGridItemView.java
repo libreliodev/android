@@ -118,11 +118,6 @@ public class MagazineGridItemView extends FrameLayout {
         if (newsstandThumbnail != null) {
             Picasso.with(context).load(magazine.getNewsstandPngUri()).fit().centerInside().placeholder(R.drawable.generic)
                     .into(newsstandThumbnail);
-            newsstandThumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            });
         }
 
         if (title != null) {
@@ -143,13 +138,11 @@ public class MagazineGridItemView extends FrameLayout {
                     String baseName = FilenameUtils.getBaseName(plistName);
                     adView.setAdUnitId(string + baseName);
                     int width = (int) CommonHelper.convertPixelsToDp(context.getResources()
-                            .getDimension(R.dimen
-                                    .header_ad_width), context);
+                            .getDimension(R.dimen.header_ad_width), context);
                     int height = (int) CommonHelper.convertPixelsToDp(context.getResources().getDimension(R.dimen.header_ad_height), context);
 
                     adView.setAdSizes(new AdSize(width, height));
-                    PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
-                            .build();
+                    PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
                     adView.loadAd(adRequest);
                 }
                 adLayout.addView(adView);
