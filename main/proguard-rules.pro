@@ -16,9 +16,8 @@
 #   public *;
 #}
 
--keepclassmembers public class * extends com.skocken.efficientadapter.lib.viewholder.AbsViewHolder {
-    public <init>(...);
-}
+# Use unique member names to make stack trace reading easier
+-useuniqueclassmembernames
 
 # Google Play Services
 
@@ -48,3 +47,36 @@
 # Two way view
 
 -keep class org.lucasr.twowayview.** { *; }
+
+# OkHttp
+
+-dontwarn com.squareup.okhttp.internal.huc.**
+
+# Okio
+
+-dontwarn okio.**
+
+# Internal code
+
+-keep public interface com.librelio.view.SubscriberCodeDialog$OnSubscriberCodeListener {*;}
+
+-keep public interface com.librelio.view.UsernamePasswordLoginDialog$OnUsernamePasswordLoginListener {*;}
+
+-keep public class com.librelio.activity.BillingActivity { *; }
+-keepclassmembers public class com.librelio.activity.BillingActivity { *; }
+
+# RxJava
+
+-dontwarn rx.**
+
+# Remove logging calls
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+
+-dontwarn com.librelio.**
