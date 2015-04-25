@@ -191,10 +191,12 @@ public class BillingActivity extends BaseActivity {
         if (baseNameWithoutLastUnderscore.contains("_")) {
             String dateString = baseNameWithoutLastUnderscore
                     .substring(baseNameWithoutLastUnderscore.indexOf("_") + 1);
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
-            DateTime date = DateTime.parse(dateString, formatter);
-            if (date.isAfter(DateTime.now().minusMonths(1))) {
-                includeSubscriptions = true;
+            if (dateString.length() == 6) {
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
+                DateTime date = DateTime.parse(dateString, formatter);
+                if (date.isAfter(DateTime.now().minusMonths(1))) {
+                    includeSubscriptions = true;
+                }
             }
         }
 
