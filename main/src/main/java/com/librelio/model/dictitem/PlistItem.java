@@ -22,22 +22,22 @@ public class PlistItem extends DictItem implements DisplayableAsTab, Displayable
         this.context = context;
         this.filePath = fullFilePath;
 
-        valuesInit(fullFilePath);
+        valuesInit();
     }
 
-    private void valuesInit(String fullFileName) {
+    void valuesInit() {
 
         String actualFileName;
         Pattern actualFileNamePattern = Pattern.compile("(?=.*\\?)[^\\?]+");
-        Matcher actualFileNameMatcher = actualFileNamePattern.matcher(fullFileName);
+        Matcher actualFileNameMatcher = actualFileNamePattern.matcher(filePath);
         if (actualFileNameMatcher.find()) {
             actualFileName = actualFileNameMatcher.group();
         } else {
-            actualFileName = fullFileName;
+            actualFileName = filePath;
         }
 
         Pattern updateFrequencyPattern = Pattern.compile("waupdate=([0-9]+)");
-        Matcher updateFrequencyMatcher = updateFrequencyPattern.matcher(fullFileName);
+        Matcher updateFrequencyMatcher = updateFrequencyPattern.matcher(filePath);
         if (updateFrequencyMatcher.find()) {
             updateFrequency = Integer.parseInt(updateFrequencyMatcher.group(1));
         }

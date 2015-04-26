@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.event.ShowProgressBarEvent;
 import com.librelio.model.dictitem.PlistItem;
+import com.librelio.model.dictitem.UpdatesPlistItem;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.niveales.wind.R;
@@ -32,12 +33,17 @@ public class PlistDownloader {
     private static SimpleDateFormat updateDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
     public static void updateFromServer(final Context context, final String plistName,
-                                        boolean force) {
+                                        boolean force, boolean downloadUpdateFile) {
 
-        final PlistItem plistItem = new PlistItem(context, "", plistName);
+        final PlistItem plistItem;
+        if (downloadUpdateFile) {
+            plistItem = new UpdatesPlistItem(context, "", plistName);
+        } else {
+            plistItem = new PlistItem(context, "", plistName);
+        }
 
         // Don't update if updates not required - i.e. waupdate=0
-        if (plistItem.getUpdateFrequency() == -1) {
+        if (!force && plistItem.getUpdateFrequency() == -1) {
             EventBus.getDefault().post(new ReloadPlistEvent(plistName));
             return;
         }

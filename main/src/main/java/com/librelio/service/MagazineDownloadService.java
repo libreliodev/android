@@ -30,6 +30,7 @@ import com.librelio.model.DownloadStatusCode;
 import com.librelio.model.dictitem.MagazineItem;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.storage.DownloadsManager;
+import com.librelio.utils.PlistDownloader;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
 import com.squareup.okhttp.Request;
@@ -106,25 +107,29 @@ public class MagazineDownloadService extends WakefulIntentService {
 			return;
 		}
 
-		String fileUrl = magazine.getItemUrl();
-		String filePath = magazine.getItemFilePath();
+		String itemUrl = magazine.getItemUrl();
+		String itemFilePath = magazine.getItemFilePath();
 		boolean isDownloadingSample = intent.getBooleanExtra(EXTRA_IS_SAMPLE, false);
 		if (isDownloadingSample) {
 			// If sample
-			fileUrl = magazine.getSamplePdfUrl();
-			filePath = magazine.getSamplePdfPath();
+			itemUrl = magazine.getSampleItemUrl();
+			itemFilePath = magazine.getSamplePdfPath();
 		} else if (intent.getBooleanExtra(EXTRA_IS_TEMP_URL, false)) {
 			// If temp url
-			fileUrl = intent.getStringExtra(EXTRA_TEMP_URL_KEY);
+			itemUrl = intent.getStringExtra(EXTRA_TEMP_URL_KEY);
 		}
-		Log.d(TAG, "isDownloadingSample: " + isDownloadingSample + "\nfileUrl: " + fileUrl
-				+ "\nfilePath: " + filePath);
+		Log.d(TAG, "isDownloadingSample: " + isDownloadingSample + "\nitemUrl: " + itemUrl
+				+ "\nitemFilePath: " + itemFilePath);
+
+		// Start downloading plist update file in background
+		PlistDownloader.updateFromServer(this, isDownloadingSample ? magazine.getSampleFilePath() :
+				magazine.getFilePath(), true, true);
 		
-		String tempFilePath = filePath + TEMP_FILE_SUFFIX;
+		String tempItemFilePath = itemFilePath + TEMP_FILE_SUFFIX;
 		
-		Request.Builder requestBuilder = new Request.Builder().url(fileUrl);
+		Request.Builder requestBuilder = new Request.Builder().url(itemUrl);
 		
-		File currentFile = new File(tempFilePath);
+		File currentFile = new File(tempItemFilePath);
 		
 		// FIXME Download never resumes because the magazine directory is deleted just before starting download
 		if (currentFile.exists()) {
@@ -147,7 +152,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 				throw new IOException(String.valueOf(response.code()));
 			}
 
-			RandomAccessFile out = new RandomAccessFile(tempFilePath, "rw");
+			RandomAccessFile out = new RandomAccessFile(tempItemFilePath, "rw");
 
 			byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -203,8 +208,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 					.setLabel(magazine.getFilePath())
 					.setValue(1).build());
 			
-			File tempFile = new File(filePath + TEMP_FILE_SUFFIX);
-			tempFile.renameTo(new File(filePath));
+			File tempFile = new File(itemFilePath + TEMP_FILE_SUFFIX);
+			tempFile.renameTo(new File(itemFilePath));
 
 			DownloadsManager.removeDownload(this, magazine);
 			manager.addDownload(magazine, DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);

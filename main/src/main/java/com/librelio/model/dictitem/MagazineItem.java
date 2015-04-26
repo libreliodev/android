@@ -89,12 +89,16 @@ public class MagazineItem extends DownloadableDictItem implements DisplayableAsG
 						filePath.length()).replace("_.", ".");
 	}
 
-	public String getSamplePdfUrl() {
+	public String getSampleItemUrl() {
 		return getItemUrl().replace("_.", ".");
 	}
 
 	public String getItemFilePath() {
 		return getItemStorageDir(context) + FilenameUtils.getName(filePath);
+	}
+
+	public String getSampleFilePath() {
+		return filePath.replace("_.", ".");
 	}
 
 	@Override

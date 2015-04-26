@@ -175,7 +175,7 @@ public class PlistGridFragment extends Fragment {
 
     private void reloadPlist() {
         // force a redownload of the plist
-        PlistDownloader.updateFromServer(getActivity(), plistName, true);
+        PlistDownloader.updateFromServer(getActivity(), plistName, true, false);
         // Also try downloading any failed assets
         AssetDownloadService.startAssetDownloadService(getActivity());
     }
