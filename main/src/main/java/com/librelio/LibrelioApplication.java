@@ -69,7 +69,7 @@ public class LibrelioApplication extends Application {
 
 		JodaTimeAndroid.init(this);
 
-        if (BuildConfig.DEBUG && BuildConfig.CRASHLYTICS_ENABLED) {
+        if (!BuildConfig.DEBUG && BuildConfig.CRASHLYTICS_ENABLED) {
             Fabric.with(this, new Crashlytics());
         }
 
