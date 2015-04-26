@@ -94,4 +94,8 @@ public class StartupActivity extends AbstractLockRotationActivity {
 			interstitial.show();
 		}
 	}
+
+	public void onEvent(Object fakeEvent) {
+		// Nasty fake event to stop EventBus crash
+	}
 }
