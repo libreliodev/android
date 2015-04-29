@@ -7,7 +7,7 @@ public class UpdatesPlistItem extends PlistItem {
         super(context, title, fullFilePath);
 
         // FIXME valuesInit being run twice
-        fullFilePath = fullFilePath.replace(".pdf", "_updates.plist");
+        this.filePath = fullFilePath.replace(".pdf", "_updates.plist");
         valuesInit();
     }
 }
