@@ -58,14 +58,14 @@ public class DownloadsManager extends BaseManager {
 	}
 
 	public synchronized void addDownload(DictItem magazine, String tableName,
-                                         boolean withSample) {
+                                         boolean isSample) {
 		SQLiteDatabase db = DataBaseHelper.getInstance(getContext())
 				.getWritableDatabase();
 		ContentValues cv = new ContentValues();
 		cv.put(DataBaseHelper.FIELD_FILE_PATH, magazine.getFilePath());
 		cv.put(DataBaseHelper.FIELD_TITLE, magazine.getTitle());
 		cv.put(DataBaseHelper.FIELD_SUBTITLE, magazine.getSubtitle());
-		cv.put(DataBaseHelper.FIELD_IS_SAMPLE, withSample);
+		cv.put(DataBaseHelper.FIELD_IS_SAMPLE, isSample);
 		db.insert(tableName, null, cv);
 
 		EventBus.getDefault().post(new ReloadPlistEvent());

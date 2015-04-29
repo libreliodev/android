@@ -212,6 +212,8 @@ public class MagazineDownloadService extends WakefulIntentService {
 			tempFile.renameTo(new File(itemFilePath));
 
 			DownloadsManager.removeDownload(this, magazine);
+
+			// why is this always true rather than isDownloadingSample?
 			manager.addDownload(magazine, DataBaseHelper.TABLE_DOWNLOADED_ITEMS, true);
 			
 			addAssetsToDatabase(this, magazine);
@@ -281,7 +283,7 @@ public class MagazineDownloadService extends WakefulIntentService {
 		//
 		String filePath = magazine.isSample() ? magazine.getSamplePdfPath()
 				: magazine.getItemFilePath();
-		PDFParser linkGetter = new PDFParser(filePath);
+		PDFParser linkGetter = new PDFParser(this, filePath);
 		SparseArray<LinkInfoExternal[]> linkBuf = linkGetter.getLinkInfo();
 		if (linkBuf == null) {
 			Log.d(TAG, "There is no links");

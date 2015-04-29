@@ -110,13 +110,13 @@ public class PlistGridFragment extends Fragment {
     }
 
     @DebugLog
-    public void onEvent(ReloadPlistEvent event) {
+    public void onEventMainThread(ReloadPlistEvent event) {
         if (plistName.equals(event.getPlistName())) {
             parsePlist();
         }
     }
 
-    public void onEvent(ShowProgressBarEvent event) {
+    public void onEventMainThread(ShowProgressBarEvent event) {
         if (plistName.equals(event.getPlistName())) {
 //        updateInventory();
             swipeRefreshLayout.setRefreshing(event.isShowProgress());

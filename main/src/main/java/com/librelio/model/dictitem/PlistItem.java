@@ -17,10 +17,10 @@ public class PlistItem extends DictItem implements DisplayableAsTab, Displayable
     private int updateFrequency = -1;
 	private String itemUrl;
 
-    public PlistItem(Context context, String title, String fullFilePath) {
+    public PlistItem(Context context, String title, String filePath) {
         this.title = title;
         this.context = context;
-        this.filePath = fullFilePath;
+        this.filePath = filePath;
 
         valuesInit();
     }

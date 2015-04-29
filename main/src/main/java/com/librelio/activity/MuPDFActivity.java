@@ -617,7 +617,7 @@ public class MuPDFActivity extends FragmentActivity {
 					? path
 					: path.substring(lastSlashPos+1));
 		Log.d(TAG, "Trying to open " + path);
-		PDFParser linkGetter = new PDFParser(path);
+		PDFParser linkGetter = new PDFParser(this, path);
 		linkOfDocument = linkGetter.getLinkInfo();
 
 		try {

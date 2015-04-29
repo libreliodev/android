@@ -3,14 +3,16 @@
  */
 package com.librelio.lib.utils;
 
-import java.util.ArrayList;
-
+import android.content.Context;
 import android.net.Uri;
 import android.util.SparseArray;
 
 import com.artifex.mupdfdemo.LinkInfo;
 import com.artifex.mupdfdemo.LinkInfoExternal;
 import com.artifex.mupdfdemo.MuPDFCore;
+import com.librelio.utils.PlistUtils;
+
+import java.util.ArrayList;
 
 /**
  * @author Dmitry Valetin
@@ -20,13 +22,17 @@ public class PDFParser {
 	private MuPDFCore mCore;
 	private SparseArray<LinkInfoExternal []> mLinkInfo = new SparseArray<LinkInfoExternal []>();
 	private SparseArray<ArrayList<String>> mLinkUrls = new SparseArray<ArrayList<String>>();
-	
+	private Context context;
+	private String pathToPDF;
+
 	/**
 	 * 
 	 * @param pathToPDF - path within filesystem to PDF file
 	 * @throws IllegalStateException - if some error occurs
 	 */
-	public PDFParser(String pathToPDF) throws IllegalStateException {
+	public PDFParser(Context context, String pathToPDF) throws IllegalStateException {
+		this.context = context;
+		this.pathToPDF = pathToPDF;
 		try {
 			mCore = new MuPDFCore(pathToPDF);
 			parseLinkInfo();

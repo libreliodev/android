@@ -5,16 +5,17 @@ import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.widget.Toast;
 
+import com.librelio.LibrelioApplication;
 import com.librelio.event.ReloadPlistEvent;
 import com.librelio.event.ShowProgressBarEvent;
 import com.librelio.model.dictitem.PlistItem;
 import com.librelio.model.dictitem.UpdatesPlistItem;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.niveales.wind.R;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.HttpResponseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,23 +58,25 @@ public class PlistDownloader {
         }
 
         EventBus.getDefault().post(new ShowProgressBarEvent(plistName, true));
-        AsyncHttpClient client = new AsyncHttpClient();
-        if (!force) {
-            client.addHeader(IF_MODIFIED_SINCE_HEADER, updateDateFormat.format(lastUpdateDate));
-        }
-        client.get(plistItem.getItemUrl(), new AsyncHttpResponseHandler() {
 
+        Request.Builder builder = new Request.Builder().url(plistItem.getItemUrl());
+
+        if (!force) {
+            builder.addHeader(IF_MODIFIED_SINCE_HEADER, updateDateFormat.format(lastUpdateDate));
+        }
+
+        LibrelioApplication.getOkHttpClient().newCall(builder.build()).enqueue(new Callback() {
             @Override
-            public void onSuccess(int i, String s) {
-                super.onSuccess(i, s);
-                if (i == 304) {
-                    //no change - but this never happens - 304 means failure due to empty string
-                    EventBus.getDefault().post(new ShowProgressBarEvent(plistName,
-                            false));
+            public void onResponse(Response response) throws IOException {
+                EventBus.getDefault().post(new ShowProgressBarEvent(plistName, false));
+                if (response.code() == 304) {
+                    // no change - empty string so don't change
                     return;
                 }
                 try {
-                    FileUtils.writeStringToFile(new File(StorageUtils.getStoragePath(context) + plistItem.getItemFileName()), s);
+                    String string = response.body().string();
+                    FileUtils.writeStringToFile(new File(StorageUtils.getStoragePath(context)
+                                    + plistItem.getItemFileName()), string);
                     saveUpdateDate(context, plistName);
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -82,23 +85,10 @@ public class PlistDownloader {
             }
 
             @Override
-            public void onFailure(Throwable throwable, String s) {
-                super.onFailure(throwable, s);
-                if (throwable instanceof HttpResponseException) {
-                    int statusCode = ((HttpResponseException) throwable).getStatusCode();
-                    if (statusCode == 304) {
-                        // not modified - no problem
-                        return;
-                    }
-                }
+            public void onFailure(Request request, IOException e) {
                 Toast.makeText(context, context.getResources().getString(R.string.connection_failed),
                         Toast.LENGTH_LONG).show();
                 EventBus.getDefault().post(new ReloadPlistEvent(plistName));
-            }
-
-            @Override
-            public void onFinish() {
-                super.onFinish();
                 EventBus.getDefault().post(new ShowProgressBarEvent(plistName, false));
             }
         });
