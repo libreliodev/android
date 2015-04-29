@@ -94,7 +94,7 @@ public class PlistGridFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                reloadPlist();
+                reloadPlist(true);
             }
         });
 
@@ -164,7 +164,7 @@ public class PlistGridFragment extends Fragment {
         tracker.setScreenName("Library/Magazines");
         tracker.send(new HitBuilders.AppViewBuilder().build());
         EventBus.getDefault().register(this);
-        reloadPlist();
+        reloadPlist(false);
     }
 
     @Override
@@ -173,9 +173,9 @@ public class PlistGridFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    private void reloadPlist() {
+    private void reloadPlist(boolean force) {
         // force a redownload of the plist
-        PlistDownloader.updateFromServer(getActivity(), plistName, true, false);
+        PlistDownloader.updateFromServer(getActivity(), plistName, force, false);
         // Also try downloading any failed assets
         AssetDownloadService.startAssetDownloadService(getActivity());
     }
