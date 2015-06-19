@@ -16,7 +16,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.9'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'com.raizlabs:Griddle:1.0.3'
         classpath 'io.fabric.tools:gradle:1.+'
@@ -104,21 +104,21 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':appiraterAndroid')
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.4.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    nsMod 'com.google.android.gms:{play-services-base,play-services-analytics,play-services-gcm,play-services-ads}:7.0.0'
+    nsMod 'com.google.android.gms:{play-services-base,play-services-analytics,play-services-gcm,play-services-ads}:7.5.0'
     compile 'commons-io:commons-io:2.4'
-    nsMod 'com.android.support:{appcompat-v7,support-annotations,recyclerview-v7}:22.0.0'
+    nsMod 'com.android.support:{appcompat-v7,support-annotations,recyclerview-v7}:22.2.0'
     compile 'io.reactivex:rxandroid:0.24.0'
-    compile 'uk.co.chrisjenx:calligraphy:2.0.2'
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.1.0'
-    compile 'com.anjlab.android.iab.v3:library:1.0.24@aar'
-    mod 'com.afollestad:material-dialogs:0.7.2.3'
-    compile 'com.rengwuxian.materialedittext:library:2.0.3'
-    compile 'net.danlew:android.joda:2.7.2'
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.3@aar') {
+    compile 'com.anjlab.android.iab.v3:library:1.0.26@aar'
+    mod 'com.afollestad:material-dialogs:0.7.6.0'
+    compile 'com.rengwuxian.materialedittext:library:2.1.4'
+    compile 'net.danlew:android.joda:2.8.1'
+    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
         transitive = true;
     }
 }
