@@ -52,18 +52,18 @@ android {
     productFlavors {
 
         magazines {
-            flavorDimension "type"
+            dimension "type"
         }
 
         magazine {
-            flavorDimension "name"
+            dimension "name"
             // Remove next line to enable Crashlytics and change false to true in second line
             ext.enableCrashlytics = false
             buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
         }
 
         wind {
-            flavorDimension "name"
+            dimension "name"
             applicationId "com.niveales.wind"
             // Remove next line to enable Crashlytics and change false to true in second line
             ext.enableCrashlytics = false
@@ -80,7 +80,7 @@ android {
             }
 
             applicationId scriptApplicationId
-            flavorDimension "name"
+            dimension "name"
             buildConfigField "boolean", "CRASHLYTICS_ENABLED", "true"
         }
     }
