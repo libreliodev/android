@@ -107,6 +107,7 @@ public class PlistGridFragment extends Fragment {
 
         plistName = getArguments().getString(PLIST_NAME);
         setHasOptionsMenu(true);
+        parsePlist();
     }
 
     @DebugLog
