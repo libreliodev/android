@@ -56,7 +56,8 @@
         <activity
             android:name="com.librelio.activity.OutlineActivity"
             android:label="@string/outline_title" />
-        <activity android:name="com.librelio.activity.MainTabsActivity" />
+        <activity android:name="com.librelio.activity.MainTabsActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name="com.librelio.activity.MagazinesActivity" />
         <!--<activity android:name="com.librelio.activity.DownloadMagazineActivity" />-->
         <activity

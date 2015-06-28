@@ -9,12 +9,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,6 +55,7 @@ public class MainTabsActivity extends BaseActivity {
 	private static final String TAG = "MainTabsActivity";
 	ViewPager pager;
 	private ArrayList<DictItem> tabs = new ArrayList<DictItem>();
+	private TabLayout tabLayout;
 
 	public static Intent getIntent(Context context) {
 		Intent intent = new Intent(context, MainTabsActivity.class);
@@ -68,41 +69,16 @@ public class MainTabsActivity extends BaseActivity {
 
 		parseTabsPlist();
 
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+
 		pager = (ViewPager) findViewById(R.id.view_pager);
-
 		pager.setAdapter(new MainTabsAdapter(getSupportFragmentManager(), tabs));
-
-		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-			public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-				pager.setCurrentItem(tab.getPosition());
-			}
-
-			@Override
-			public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-			}
-
-			@Override
-			public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-			}
-		};
-
-		for (final DictItem item : tabs) {
-			getSupportActionBar().addTab(
-					getSupportActionBar().newTab().setText(item.getTitle())
-							.setTabListener(tabListener));
-		}
-
 		pager.setOffscreenPageLimit(4);
 
-		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			@Override
-			public void onPageSelected(int position) {
-				super.onPageSelected(position);
-				getSupportActionBar().setSelectedNavigationItem(position);
-			}
-		});
+		tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+		tabLayout.setupWithViewPager(pager);
+		tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
 		if (getResources().getBoolean(R.bool.enable_app_rating)) {
 			Appirater.appLaunched(this);
@@ -117,7 +93,6 @@ public class MainTabsActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		setProgressBarIndeterminateVisibility(false);
 	}
 
 	@Override
@@ -259,7 +234,7 @@ public class MainTabsActivity extends BaseActivity {
 		}
 	}
 
-	private Dialog createDialog(int titleId, int messageId) {
+	public Dialog createDialog(int titleId, int messageId) {
 		String helpUrl = replaceLanguageAndRegion(getString(R.string.help_url));
 		final Uri helpUri = Uri.parse(helpUrl);
 
