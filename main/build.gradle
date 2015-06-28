@@ -3,6 +3,7 @@ apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.jakewharton.hugo'
 apply plugin: 'com.raizlabs.griddle'
 apply plugin: 'io.fabric'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 ext {
     scriptApplicationId = "com.niveales.wind"
@@ -20,6 +21,7 @@ buildscript {
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'com.raizlabs:Griddle:1.0.3'
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.1.1'
     }
 }
 
