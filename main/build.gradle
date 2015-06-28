@@ -97,7 +97,6 @@ android {
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
@@ -115,7 +114,6 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.1.0'
     compile 'com.anjlab.android.iab.v3:library:1.0.26@aar'
-    mod 'com.afollestad:material-dialogs:0.7.6.0'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'net.danlew:android.joda:2.8.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
