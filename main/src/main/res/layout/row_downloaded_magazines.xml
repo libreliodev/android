@@ -9,7 +9,6 @@
         android:id="@+id/downloaded_magazines_item_image"
         android:layout_width="@dimen/downloaded_preview_image_width"
         android:layout_height="@dimen/downloaded_preview_image_height"
-        android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"/>
 
     <LinearLayout

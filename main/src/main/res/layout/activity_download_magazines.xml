@@ -72,7 +72,6 @@
             android:text="@string/cancel"
             android:textColor="@android:color/white"
             android:textSize="@dimen/preview_button_text_size"
-            android:layout_below="@id/download_progress"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="32dp"
             android:layout_marginLeft="16dp"
