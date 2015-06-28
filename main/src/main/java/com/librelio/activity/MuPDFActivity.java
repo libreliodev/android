@@ -381,7 +381,7 @@ public class MuPDFActivity extends FragmentActivity {
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("page"+fileName, docView.getDisplayedViewIndex());
 			edit.putInt(PREF_SAVED_ORIENTATION, mOrientation);
-			edit.commit();
+			edit.apply();
 		}
 
 		if (!buttonsVisible)
@@ -402,7 +402,7 @@ public class MuPDFActivity extends FragmentActivity {
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("page"+fileName, docView.getDisplayedViewIndex());
 			edit.putInt(PREF_SAVED_ORIENTATION, mOrientation);
-			edit.commit();
+			edit.apply();
 		}
 	}
 	

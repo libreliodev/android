@@ -10,6 +10,7 @@ public abstract class AbstractLockRotationActivity extends BaseActivity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//noinspection ResourceType
 		setRequestedOrientation(
 				SystemHelper.getScreenOrientation(this));
 	}	

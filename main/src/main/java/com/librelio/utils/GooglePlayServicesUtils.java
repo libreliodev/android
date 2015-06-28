@@ -1,7 +1,5 @@
 package com.librelio.utils;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -18,6 +16,8 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.niveales.wind.R;
+
+import java.io.IOException;
 
 public class GooglePlayServicesUtils {
 
@@ -131,7 +131,7 @@ public class GooglePlayServicesUtils {
 	    SharedPreferences.Editor editor = prefs.edit();
 	    editor.putString(PROPERTY_REG_ID, regId);
 	    editor.putInt(PROPERTY_APP_VERSION, appVersion);
-	    editor.commit();
+	    editor.apply();
 	}
 	
 	private static void sendRegistrationIdToBackend(final Context context, final String regid) {

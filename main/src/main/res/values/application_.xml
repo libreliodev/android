@@ -6,7 +6,7 @@
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
     <string name="code_service">S3</string>
     <string name="user_service"></string>
-    <string name="google_analytics">UA-1732003-23</string>
+    <string name="google_analytics" tools:ignore="TypographyDashes">UA-1732003-23</string>
     <bool name="enable_subscribe_in_menu">false</bool>
     <bool name="enable_app_rating">true</bool>
     <string name="gcm_project_number">1012641315687</string>
