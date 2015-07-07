@@ -78,7 +78,7 @@ android {
                 println 'custom.gradle script exists'
                 apply from: "../main/src/script/custom.gradle";
             } else {
-                println 'No custom.gradle script exists'
+                throw new GradleException('No custom.gradle script exists')
             }
 
             applicationId scriptApplicationId
