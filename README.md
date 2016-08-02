@@ -11,7 +11,7 @@ Examples of customized apps published on the app stores are available on www.lib
 This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 This project is Copyright 2012-2014 Librelio, except included libraries:
-- Copyright 2006-2012 Artifex Software, Inc for the MuPDF library
+- Copyright 2006-2015 Artifex Software, Inc for the MuPDF library
 - Copyright Free Beachler (http://www.freebeachler.com) for the Android P-List Parser library
 - Copyright (c) 2011 Mats Hofman for the Android RSS reader library
 - Copyright 2011-2013 sbstrm. Copyright 2014 drewjw81 for the Appirater Android library
