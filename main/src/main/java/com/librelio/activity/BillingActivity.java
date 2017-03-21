@@ -115,14 +115,7 @@ public class BillingActivity extends BaseActivity {
     private String yearlySubTitle;
     private String monthlySubPrice;
     private String monthlySubTitle;
-
-    private Button buy;
-    private Button cancel;
-    private Button subsYear;
-    private Button subsMonthly;
-    private Button subsCode;
-    private Button usernamePasswordLogin;
-
+    
     private String ownedItemSignature = "";
     private String ownedItemPurchaseData = "";
 
@@ -200,13 +193,12 @@ public class BillingActivity extends BaseActivity {
         }
 
         hideProgressBar();
-
-        buy = (Button) findViewById(R.id.billing_buy_button);
-        subsMonthly = (Button) findViewById(R.id.billing_subs_monthly);
-        subsYear = (Button) findViewById(R.id.billing_subs_year);
-        subsCode = (Button) findViewById(R.id.billing_subs_code_button);
-        usernamePasswordLogin = (Button) findViewById(R.id.billing_username_password_login_button);
-        cancel = (Button) findViewById(R.id.billing_cancel_button);
+        Button buy = (Button) findViewById(R.id.billing_buy_button);
+        Button subsMonthly = (Button) findViewById(R.id.billing_subs_monthly);
+        Button subsYear = (Button) findViewById(R.id.billing_subs_year);
+        Button subsCode = (Button) findViewById(R.id.billing_subs_code_button);
+        Button usernamePasswordLogin = (Button) findViewById(R.id.billing_username_password_login_button);
+        Button cancel = (Button) findViewById(R.id.billing_cancel_button);
         cancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
