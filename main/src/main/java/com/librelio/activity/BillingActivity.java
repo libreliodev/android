@@ -116,6 +116,7 @@ public class BillingActivity extends BaseActivity {
     private String monthlySubPrice;
     private String monthlySubTitle;
     
+
     private String ownedItemSignature = "";
     private String ownedItemPurchaseData = "";
 
@@ -401,7 +402,7 @@ public class BillingActivity extends BaseActivity {
                 protected Bundle doInBackground(String... params) {
                     Bundle skuDetails = null;
                     try {
-                        ArrayList<String> skuList = new ArrayList<String>();
+                        ArrayList<String> skuList = new ArrayList<>();
                         skuList.add(productId);
 
                         // Add subscription codes
