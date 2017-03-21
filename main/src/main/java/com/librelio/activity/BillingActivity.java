@@ -57,7 +57,6 @@ public class BillingActivity extends BaseActivity {
     public static final String FILE_NAME_KEY = "file_name_key";
     public static final String TITLE_KEY = "title_key";
     public static final String SUBTITLE_KEY = "subtitle_key";
-    public static final String IS_SAMPLE_KEY = "is_sample_key";
     private static final String TAG = "BillingActivity";
 
     // Only for test. Must always be FALSE!
@@ -125,7 +124,7 @@ public class BillingActivity extends BaseActivity {
     private Button usernamePasswordLogin;
 
     private String ownedItemSignature = "";
-    private String ownedItemPurshaseData = "";
+    private String ownedItemPurchaseData = "";
 
     private IInAppBillingService billingService;
     private CircularProgressBar progress;
@@ -557,12 +556,12 @@ public class BillingActivity extends BaseActivity {
                             + purchaseDataList);
                     Log.d(TAG, "[getPurchases] signatureList: " + signatureList);
                     if (purchaseDataList != null) {
-                        ownedItemPurshaseData = purchaseDataList.get(idx);
+                        ownedItemPurchaseData = purchaseDataList.get(idx);
                     }
                     if (signatureList != null) {
                         ownedItemSignature = signatureList.get(idx);
                     }
-                    onDownloadAction(ownedItemPurshaseData, ownedItemSignature);
+                    onDownloadAction(ownedItemPurchaseData, ownedItemSignature);
                     return;
                 }
             }.execute();
@@ -1028,10 +1027,10 @@ public class BillingActivity extends BaseActivity {
             }
             if (response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
                 Log.d(TAG, productId + " ITEM_ALREADY_OWNED ");
-                if (ownedItemPurshaseData != null & ownedItemSignature != null) {
-                    if ((!ownedItemPurshaseData.equals(""))
+                if (ownedItemPurchaseData != null & ownedItemSignature != null) {
+                    if ((!ownedItemPurchaseData.equals(""))
                             & (!ownedItemSignature.equals(""))) {
-                        onDownloadAction(ownedItemPurshaseData,
+                        onDownloadAction(ownedItemPurchaseData,
                                 ownedItemSignature);
                     }
                 }
