@@ -96,14 +96,10 @@ public class BillingActivity extends BaseActivity {
     private static final int BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 5;
     private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
 
-    public static final String SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG
-            = "show_username_password_subscription_dialog";
-    public static final String SHOW_MONTHLY_SUBSCRIPTION_DIALOG
-            = "show_monthly_subscription_dialog";
-    public static final String SHOW_YEARLY_SUBSCRIPTION_DIALOG
-            = "show_yearly_subscription_dialog";
-    public static final String SHOW_INDIVIDUAL_PURCHASE_DIALOG
-            = "show_individual_purchase_dialog";
+    public static final String SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG = "show_username_password_subscription_dialog";
+    public static final String SHOW_MONTHLY_SUBSCRIPTION_DIALOG = "show_monthly_subscription_dialog";
+    public static final String SHOW_YEARLY_SUBSCRIPTION_DIALOG = "show_yearly_subscription_dialog";
+    public static final String SHOW_INDIVIDUAL_PURCHASE_DIALOG = "show_individual_purchase_dialog";
 
     private String fileName;
     private String title;
@@ -129,16 +125,14 @@ public class BillingActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
-    public static void startActivityWithDialog(Context context, String dialogType,
-                                                                           MagazineItem item) {
+    public static void startActivityWithDialog(Context context, String dialogType, MagazineItem item) {
         Intent intent = getIntent(context, item);
         intent.setAction(dialogType);
         context.startActivity(intent);
     }
 
     private static Intent getIntent(Context context, MagazineItem item) {
-        Intent intent = new Intent(context,
-                BillingActivity.class);
+        Intent intent = new Intent(context, BillingActivity.class);
         intent.putExtra(FILE_NAME_KEY, item.getFilePath());
         intent.putExtra(TITLE_KEY, item.getTitle());
         intent.putExtra(SUBTITLE_KEY, item.getSubtitle());
@@ -182,8 +176,7 @@ public class BillingActivity extends BaseActivity {
         String baseNameWithoutLastUnderscore = baseName.substring(0, baseName.length() - 1);
 
         if (baseNameWithoutLastUnderscore.contains("_")) {
-            String dateString = baseNameWithoutLastUnderscore
-                    .substring(baseNameWithoutLastUnderscore.indexOf("_") + 1);
+            String dateString = baseNameWithoutLastUnderscore.substring(baseNameWithoutLastUnderscore.indexOf("_") + 1);
             if (dateString.length() == 6) {
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
                 DateTime date = DateTime.parse(dateString, formatter);
@@ -406,36 +399,30 @@ public class BillingActivity extends BaseActivity {
                         skuList.add(productId);
 
                         // Add subscription codes
-                        skuList.add(LibrelioApplication
-                                .getYearlySubsCode(getContext()));
-                        skuList.add(LibrelioApplication
-                                .getMonthlySubsCode(getContext()));
+                        skuList.add(LibrelioApplication.getYearlySubsCode(getContext()));
+                        skuList.add(LibrelioApplication.getMonthlySubsCode(getContext()));
 
                         Bundle querySkus = new Bundle();
                         querySkus.putStringArrayList("ITEM_ID_LIST", skuList);
 
                         // Retrieve relevant in app items
-                        skuDetails = billingService.getSkuDetails(3,
-                                getPackageName(), "inapp", querySkus);
-                        ArrayList<String> details = skuDetails
-                                .getStringArrayList("DETAILS_LIST");
+                        skuDetails = billingService.getSkuDetails(3, getPackageName(), "inapp", querySkus);
+                        ArrayList<String> details = skuDetails.getStringArrayList("DETAILS_LIST");
 
                         // Retrieve relevant subscriptions
-                        skuDetails = billingService.getSkuDetails(3,
-                                getPackageName(), "subs", querySkus);
-                        ArrayList<String> subsDetails = skuDetails
-                                .getStringArrayList("DETAILS_LIST");
+                        skuDetails = billingService.getSkuDetails(3, getPackageName(), "subs", querySkus);
+                        ArrayList<String> subsDetails = skuDetails.getStringArrayList("DETAILS_LIST");
 
                         // Combine in app and subscriptions
-                        details.addAll(subsDetails);
+                        if (null != subsDetails) {
+                            details.addAll(subsDetails);
+                        }
                         skuDetails.putStringArrayList("DETAILS_LIST", details);
 
                         // Retrieve owned in app items
-                        ownedItems = billingService.getPurchases(3,
-                                getPackageName(), "inapp", null);
+                        ownedItems = billingService.getPurchases(3, getPackageName(), "inapp", null);
                         // Retrieve owned AND current subscriptions
-                        ownedSubs = billingService.getPurchases(3,
-                                getPackageName(), "subs", null);
+                        ownedSubs = billingService.getPurchases(3, getPackageName(), "subs", null);
 
                     } catch (RemoteException e) {
                         Log.d(TAG, "InAppBillingService failed", e);
@@ -448,14 +435,12 @@ public class BillingActivity extends BaseActivity {
                 protected void onPostExecute(Bundle skuDetails) {
                     // If item was purchase then download begin without open
                     // billing activity
-                    int getPurchaseResponse = ownedItems
-                            .getInt("RESPONSE_CODE");
+                    int getPurchaseResponse = ownedItems.getInt("RESPONSE_CODE");
                     if (TEST_MODE) {
                         getPurchaseResponse = -1;
                     }
                     if (getPurchaseResponse == 0) {
-                        ArrayList<String> ownedSkus = ownedItems
-                                .getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+                        ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
                         for (String s : ownedSkus) {
                             Log.d(TAG, productId + " already purchased? " + s);
                         }
@@ -463,24 +448,17 @@ public class BillingActivity extends BaseActivity {
                             prepareDownloadWithOwnedItem(ownedItems, productId);
                             return;
                         }
-                        ownedSkus = ownedSubs
-                                .getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+                        ownedSkus = ownedSubs.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
                         for (String s : ownedSkus) {
                             Log.d(TAG, productId + " already purchased? " + s);
                         }
 
-                        if (ownedSkus.contains(LibrelioApplication
-                                .getYearlySubsCode(getContext()))) {
-                            prepareDownloadWithOwnedItem(ownedSubs,
-                                    LibrelioApplication
-                                            .getYearlySubsCode(getContext()));
+                        if (ownedSkus.contains(LibrelioApplication.getYearlySubsCode(getContext()))) {
+                            prepareDownloadWithOwnedItem(ownedSubs, LibrelioApplication.getYearlySubsCode(getContext()));
                             return;
                         }
-                        if (ownedSkus.contains(LibrelioApplication
-                                .getMonthlySubsCode(getContext()))) {
-                            prepareDownloadWithOwnedItem(ownedSubs,
-                                    LibrelioApplication
-                                            .getMonthlySubsCode(getContext()));
+                        if (ownedSkus.contains(LibrelioApplication.getMonthlySubsCode(getContext()))) {
+                            prepareDownloadWithOwnedItem(ownedSubs, LibrelioApplication.getMonthlySubsCode(getContext()));
                             return;
                         }
                     }
@@ -488,8 +466,7 @@ public class BillingActivity extends BaseActivity {
                     int response = skuDetails.getInt("RESPONSE_CODE");
                     if (response == 0) {
                         Log.d(TAG, "response code was success");
-                        ArrayList<String> details = skuDetails
-                                .getStringArrayList("DETAILS_LIST");
+                        ArrayList<String> details = skuDetails.getStringArrayList("DETAILS_LIST");
                         for (String detail : details) {
                             Log.d(TAG, "response = " + detail);
                             JSONObject object = null;
@@ -507,20 +484,17 @@ public class BillingActivity extends BaseActivity {
                             if (sku.equals(productId)) {
                                 productPrice = price;
                                 productTitle = title;
-                            } else if (sku.equals(LibrelioApplication
-                                    .getYearlySubsCode(getContext()))) {
+                            } else if (sku.equals(LibrelioApplication.getYearlySubsCode(getContext()))) {
                                 yearlySubPrice = price;
                                 yearlySubTitle = title;
 
-                            } else if (sku.equals(LibrelioApplication
-                                    .getMonthlySubsCode(getContext()))) {
+                            } else if (sku.equals(LibrelioApplication.getMonthlySubsCode(getContext()))) {
                                 monthlySubPrice = price;
                                 monthlySubTitle = title;
                             }
                         }
                     }
-                    if (!checkForValidSubscription(BillingActivity.this,
-                            fileName)) {
+                    if (!checkForValidSubscription(BillingActivity.this, fileName)) {
                         if (SHOW_USERNAME_PASSWORD_SUBSCRIPTION_DIALOG.equals(getIntent().getAction())) {
                             showUsernamePasswordLoginDialog(false);
                         } else if (SHOW_MONTHLY_SUBSCRIPTION_DIALOG.equals(getIntent().getAction())) {
@@ -536,17 +510,12 @@ public class BillingActivity extends BaseActivity {
                     super.onPostExecute(skuDetails);
                 }
 
-                protected void prepareDownloadWithOwnedItem(Bundle ownedBundle,
-                                                            String subsoritemID) {
-                    ArrayList<String> ownedSkus = ownedBundle
-                            .getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+                protected void prepareDownloadWithOwnedItem(Bundle ownedBundle, String subsoritemID) {
+                    ArrayList<String> ownedSkus = ownedBundle.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
                     int idx = ownedSkus.indexOf(subsoritemID);
-                    ArrayList<String> purchaseDataList = ownedBundle
-                            .getStringArrayList("INAPP_PURCHASE_DATA_LIST");
-                    ArrayList<String> signatureList = ownedBundle
-                            .getStringArrayList("INAPP_DATA_SIGNATURE_LIST");
-                    Log.d(TAG, "[getPurchases] purchaseDataList: "
-                            + purchaseDataList);
+                    ArrayList<String> purchaseDataList = ownedBundle.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
+                    ArrayList<String> signatureList = ownedBundle.getStringArrayList("INAPP_DATA_SIGNATURE_LIST");
+                    Log.d(TAG, "[getPurchases] purchaseDataList: " + purchaseDataList);
                     Log.d(TAG, "[getPurchases] signatureList: " + signatureList);
                     if (purchaseDataList != null) {
                         ownedItemPurchaseData = purchaseDataList.get(idx);
@@ -564,11 +533,8 @@ public class BillingActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, requestCode + " " + resultCode);
-        Log.d(TAG, "data = "
-                + data.getExtras().getString("INAPP_PURCHASE_DATA"));
-        Log.d(TAG,
-                "signature = "
-                        + data.getExtras().getString("INAPP_DATA_SIGNATURE"));
+        Log.d(TAG, "data = " + data.getExtras().getString("INAPP_PURCHASE_DATA"));
+        Log.d(TAG, "signature = " + data.getExtras().getString("INAPP_DATA_SIGNATURE"));
 
         if (requestCode == CALLBACK_CODE) {
             String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
@@ -577,17 +543,13 @@ public class BillingActivity extends BaseActivity {
                 try {
                     JSONObject jo = new JSONObject(purchaseData);
                     String sku = jo.getString("productId");
-                    String dataResponse = data.getExtras().getString(
-                            "INAPP_PURCHASE_DATA");
-                    String signatureResponse = data.getExtras().getString(
-                            "INAPP_DATA_SIGNATURE");
-                    Log.d(TAG, "You have bought the " + sku
-                            + ". Excellent choice, adventurer!");
+                    String dataResponse = data.getExtras().getString("INAPP_PURCHASE_DATA");
+                    String signatureResponse = data.getExtras().getString("INAPP_DATA_SIGNATURE");
+                    Log.d(TAG, "You have bought the " + sku + ". Excellent choice, adventurer!");
                     if (getIntent().getExtras() != null) {
                         onDownloadAction(dataResponse, signatureResponse);
                     } else {
-                        Toast.makeText(this, "Purchase successful",
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Purchase successful", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "Failed to parse purchase data.", e);
@@ -608,13 +570,10 @@ public class BillingActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    protected void onDownloadAction(String dataResponse,
-                                    String signatureResponse) {
+    protected void onDownloadAction(String dataResponse, String signatureResponse) {
         String url = buildVerifyQuery(dataResponse, signatureResponse);
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+        Request request = new Request.Builder().url(url).build();
 
         LibrelioApplication.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
