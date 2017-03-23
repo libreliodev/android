@@ -42,7 +42,7 @@ public class WebViewActivity extends BaseActivity {
 		
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setContentView(R.layout.activity_webview);
 
