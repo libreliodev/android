@@ -5,7 +5,7 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 ext {
-    scriptApplicationId = "com.niveales.wind"
+    scriptApplicationId = "com.niveales.grandsreportages"
 }
 
 buildscript {
@@ -27,10 +27,10 @@ android {
     buildToolsVersion '23.0.2'
     useLibrary  'org.apache.http.legacy'
     defaultConfig {
-        applicationId "com.developer.wind"
+        applicationId "com.niveales.grandsreportages"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 200
+        versionCode 202
         versionName "2.0.0"
         buildConfigField "boolean", "CRASHLYTICS_ENABLED", "false"
     }

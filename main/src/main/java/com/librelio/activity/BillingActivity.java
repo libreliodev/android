@@ -48,8 +48,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Arrays;
 
 import fr.castorflex.android.circularprogressbar.CircularProgressBar;
 
@@ -168,8 +170,9 @@ public class BillingActivity extends BaseActivity {
     }
 
     private void setupDialogView() {
-
         boolean includeSubscriptions = false;
+        boolean forceSubscriptionDisplay = getResources().getBoolean(R.bool.always_enable_subscriptions);
+        includeSubscriptions = (forceSubscriptionDisplay) ? true : includeSubscriptions;
 
         String baseName = FilenameUtils.getBaseName(fileName);
 
@@ -399,7 +402,12 @@ public class BillingActivity extends BaseActivity {
                         skuList.add(productId);
 
                         // Add subscription codes
-                        skuList.add(LibrelioApplication.getYearlySubsCode(getContext()));
+                        String[] yearlySubsCode = LibrelioApplication.getYearlySubsCode(getContext(), true);
+                        for(String yearlySubCode : yearlySubsCode) {
+                            if (!yearlySubCode.equals("")) {
+                                skuList.add(yearlySubCode);
+                            }
+                        }
                         skuList.add(LibrelioApplication.getMonthlySubsCode(getContext()));
 
                         Bundle querySkus = new Bundle();
@@ -452,11 +460,14 @@ public class BillingActivity extends BaseActivity {
                         for (String s : ownedSkus) {
                             Log.d(TAG, productId + " already purchased? " + s);
                         }
-
-                        if (ownedSkus.contains(LibrelioApplication.getYearlySubsCode(getContext()))) {
-                            prepareDownloadWithOwnedItem(ownedSubs, LibrelioApplication.getYearlySubsCode(getContext()));
-                            return;
+                        String[] yearlySubsCode = LibrelioApplication.getYearlySubsCode(getContext());
+                        for(String yearlySubCode : yearlySubsCode) {
+                            if (ownedSkus.contains(yearlySubCode) && !yearlySubCode.equals("")) {
+                                prepareDownloadWithOwnedItem(ownedSubs, yearlySubCode);
+                                return;
+                            }
                         }
+
                         if (ownedSkus.contains(LibrelioApplication.getMonthlySubsCode(getContext()))) {
                             prepareDownloadWithOwnedItem(ownedSubs, LibrelioApplication.getMonthlySubsCode(getContext()));
                             return;
@@ -484,7 +495,7 @@ public class BillingActivity extends BaseActivity {
                             if (sku.equals(productId)) {
                                 productPrice = price;
                                 productTitle = title;
-                            } else if (sku.equals(LibrelioApplication.getYearlySubsCode(getContext()))) {
+                            } else if (Arrays.asList(LibrelioApplication.getYearlySubsCode(getContext(), true)).contains(sku) && !sku.equals("")) {
                                 yearlySubPrice = price;
                                 yearlySubTitle = title;
 
@@ -602,7 +613,7 @@ public class BillingActivity extends BaseActivity {
     }
 
     private void purchaseYearlySub() {
-        new PurchaseTask().execute(LibrelioApplication.getYearlySubsCode(getContext()));
+        new PurchaseTask().execute(LibrelioApplication.getYearlySubCode(getContext()));
     }
 
     private boolean isNetworkConnected() {

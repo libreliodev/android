@@ -1,1 +1,1 @@
-project.ext { scriptApplicationId = "com.editor.project" }
+project.ext { scriptApplicationId = "com.niveales.grandsreportages" }

@@ -74,8 +74,8 @@ public class DictItemAdapter extends RecyclerView.Adapter {
 		}
 
 		public void bind(final DictItem dictItem) {
+            view.setMagazine((MagazineItem) dictItem);
 
-			view.setMagazine((MagazineItem) dictItem);
 
 
 ////                    // FIXME Precache all the prices when plist is parsed - parse it while

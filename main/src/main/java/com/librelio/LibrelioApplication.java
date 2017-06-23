@@ -18,6 +18,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.librelio.activity.MuPDFActivity;
 import com.librelio.storage.DataBaseHelper;
 import com.librelio.utils.GooglePlayServicesUtils;
+import com.librelio.utils.SubscriptionUtils;
 import com.librelio.utils.SystemHelper;
 import com.niveales.wind.BuildConfig;
 import com.niveales.wind.R;
@@ -30,6 +31,7 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 
 import javax.net.ssl.SSLContext;
 
@@ -267,13 +269,53 @@ public class LibrelioApplication extends Application {
 		return LibrelioApplication.getClientName(context) + PATH_SEPARATOR 
 		+ LibrelioApplication.getMagazineName(context) + PATH_SEPARATOR + fileName;
 	}
+	public static String[] getYearlySubsCode(Context context){
+		return LibrelioApplication.getYearlySubsCode(context, false);
+	}
 
-	public static String getYearlySubsCode(Context context){
-		return context.getResources().getString(R.string.yearly_subs_code);
+	public static String[] getYearlySubsCode(Context context, boolean returnOnlyActiveSubs){
+		ArrayList<String> yearly_subs_code_array =  new ArrayList<>();
+		//yearly_subs_code_array[0] = context.getResources().getString(R.string.yearly_subs_code);
+		//yearly_subs_code_array[1] = context.getResources().getString(R.string.previous_yearly_subs_code);
+		yearly_subs_code_array.add(SubscriptionUtils.getSubscriptionsCode(context, "yearly_subs_code"));
+		if (yearly_subs_code_array.isEmpty()) {
+			yearly_subs_code_array.add(context.getResources().getString(R.string.yearly_subs_code));
+		}
+		if (!returnOnlyActiveSubs) {
+			yearly_subs_code_array.add(SubscriptionUtils.getSubscriptionsCode(context, "previous_yearly_subs_code"));
+		}
+		return yearly_subs_code_array.toArray(new String[0]);
+	}
+
+	public static String getActiveYearlySubsCode(Context context){
+
+		String yearly_subs_code = "";
+		//yearly_subs_code_array[0] = context.getResources().getString(R.string.yearly_subs_code);
+		//yearly_subs_code_array[1] = context.getResources().getString(R.string.previous_yearly_subs_code);
+		yearly_subs_code = SubscriptionUtils.getSubscriptionsCode(context, "yearly_subs_code");
+		if (yearly_subs_code.length() == 0) {
+			yearly_subs_code = context.getResources().getString(R.string.yearly_subs_code);
+		}
+		return yearly_subs_code;
+	}
+
+	public static String getYearlySubCode(Context context){
+		String yearlySubCode;
+		yearlySubCode = SubscriptionUtils.getSubscriptionsCode(context, "yearly_subs_code");
+		if (yearlySubCode.length() == 0) {
+			yearlySubCode = context.getResources().getString(R.string.yearly_subs_code);
+		}
+		return yearlySubCode;
 	}
 
 	public static String getMonthlySubsCode(Context context){
-		return context.getResources().getString(R.string.monthly_subs_code);
+		//return context.getResources().getString(R.string.monthly_subs_code);
+		String monthlySubCode;
+		monthlySubCode = SubscriptionUtils.getSubscriptionsCode(context, "monthly_subs_code");
+		if (monthlySubCode.length() == 0) {
+			monthlySubCode = context.getResources().getString(R.string.monthly_subs_code);
+		}
+		return monthlySubCode;
 	}
 	
 	public static boolean isEnableCodeSubs(Context context){

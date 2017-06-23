@@ -2,16 +2,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes|MissingTranslation">
 
     <string name="app_name">Wind</string>
-    <string name="yearly_subs_code">yearlysubscription</string>
+    <string name="yearly_subs_code">yearlysubscription3</string>
+    <string name="previous_yearly_subs_code">yearlysubscription2</string>
     <string name="monthly_subs_code">monthlysubscriptiontest</string>
     <string name="code_service">S3</string>
     <string name="user_service"></string>
     <string name="google_analytics" tools:ignore="TypographyDashes">UA-1732003-23</string>
-    <bool name="enable_subscribe_in_menu">false</bool>
+    <bool name="enable_subscribe_in_menu">true</bool>
     <bool name="enable_app_rating">true</bool>
     <string name="gcm_project_number">1012641315687</string>
-    <string name="dfp_prefix"></string>
+    <string name="dfp_prefix">/166877488/niveales_vertical/niveales_vertical_</string>
     <bool name="enable_list_header">false</bool>
     <bool name="enable_image_click_dialogs">false</bool>
+    <bool name="always_enable_subscriptions">true</bool>
 
 </resources>

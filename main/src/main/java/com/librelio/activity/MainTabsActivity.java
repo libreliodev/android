@@ -24,6 +24,7 @@ import com.librelio.base.BaseActivity;
 import com.librelio.model.dictitem.DictItem;
 import com.librelio.model.interfaces.DisplayableAsTab;
 import com.librelio.service.AssetDownloadService;
+import com.librelio.utils.PlistDownloader;
 import com.librelio.utils.StorageUtils;
 import com.longevitysoft.android.xml.plist.PListXMLHandler;
 import com.longevitysoft.android.xml.plist.PListXMLParser;
@@ -88,6 +89,13 @@ public class MainTabsActivity extends BaseActivity {
 
 		registerReceiver(subscriptionYear, subsFilter);
 		registerReceiver(subscriptionMonthly, subsFilter);
+
+		preLoadPListFiles();
+	}
+
+	private void preLoadPListFiles() {
+		String subscriptionSCodesPlistURL = "subscriptions_codes.plist?waupdate=30";
+		PlistDownloader.updateFromServer(this, subscriptionSCodesPlistURL, true, false);
 	}
 
 	@Override
