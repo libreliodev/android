@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="open_failed">Can\'t open magazine</string>
+    <string name="search_backwards">Search back</string>
+    <string name="search_forwards">Search forward</string>
+    <string name="search_document">Search in document</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="text_not_found">Not found</string>
+    <string name="items_you_own">Items you own</string>
+    <string name="recent_transactions">Recent activity</string>
+    <string name="edit_payload">Edit Payload</string>
+    <string name="items_for_sale">Items for sale</string>
+    <string name="searching_">Searching&#8230;</string>
+    <string name="link_control">Link highlight</string>
+    <string name="exit">Exit</string>
+    <string name="reload">Reload</string>
+    <string name="info">Info</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="subscription_monthly">Subscribe month</string>
+    <string name="subscription_yearly">Subscribe year</string>
+    <string name="android_purchased">Purchase finished</string>
+    <string name="android_canceled">Purchase cancelled</string>
+    <string name="android_refunded">Purchase refunded</string>
+    <string name="android_item_unavailable">Product unavailable</string>
+    <string name="cannot_connect_title">Can\'t connect</string>
+    <string name="cannot_connect_message">Can\'t connect to Google Play server</string>
+    <string name="billing_not_supported_message">Google Play not supported on your device</string>
+    <string name="subscriptions_not_supported_title">Subscriptions not supported</string>
+    <string name="subscriptions_not_supported_message">Subscriptions not supported on your device</string>
+    <string name="billing_not_supported_title">Billing not supported.</string>
+    <string name="edit_subscriptions">Edit Subscriptions</string>
+    <string name="help_url" formatted="false">http://market.android.com/support/bin/answer.py?answer=1050566&amp;hl=%lang%&amp;dl=%region%</string>
+	    <string name="restoring_transactions">Restoring transactions</string>
+    <string name="learn_more">Learn more</string>
+    <string name="buy">Buy</string>
+    <string name="select_item">Select item</string><string name="edit_payload_title">Edit the developer payload associated with this purchase</string><string name="edit_payload_accept">Set</string><string name="edit_payload_clear">No Payload</string>
+    
+    <string name="purchise">Purchase</string>
+    <string name="outline_title">Outline</string>
+    <string name="delete">Delete</string>
+    <string name="subscribe_year">Subscribe year</string>
+    <string name="no_further_occurences_found">No more found</string>
+    
+    <string name="connection_failed">Connection failed!</string>
+
+    
+    <string name="server_error">Bad response from server.</string>
+    <string name="connecting">Connecting...</string>
+    <string name="download_failed_please_check_your_connection">Download failed, please check your connection</string>
+    <string name="please_check_your_connection">Please check your connection</string>
+    <string name="download_in_progress">Download in progress</string>
+    <string name="downloading_assets">Downloading assets</string>
+    <string name="caching_operation_in_progress">Caching operation in progress</string>
+    <string name="what_do_you_want_to_buy">What do you want to buy?</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_download">Continue</string>
+    <string name="done">Done</string>
+    <string name="the_order_failed">The order failed</string>
+    <string name="buy_and_download">Buy and download</string>
+    <string name="try_again">Try again</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="downloaded_title">Downloaded:</string>
+    <string name="free_Download">Free Download</string>
+    <string name="download">Download ...</string>
+    <string name="free_sample">Free sample</string>
+    <string name="sample">Sample</string>
+    <string name="read">Read</string>
+    <string name="magazines">Magazines</string>
+    <string name="do_you_really_want_to_quit_this_app">Do you really want to quit this app?</string>
+    <string name="yes">Yes</string>
+    <string name="i_have_a_subscriber_code">I have a subscriber code</string>
+    <string name="i_have_a_username_password_login">I have a username and password</string>
+    <string name="i_have_a_promo_code">I have a promo code</string>
+    <string name="restore_my_purchases">Restore my purchases</string>
+    <string name="restore_completed">Restore completed</string>
+    <string name="free_subscription">Free subscription</string>
+    <string name="subscriber_code">Subscriber Code</string>
+    <string name="please_enter_your_code">Please enter your code</string>
+    <string name="please_enter_your_username_password_login">Please login</string>
+    <string name="invalid_code">Invalid Code</string>
+    <string name="share_on_facebook">Share on Facebook</string>
+    <string name="share_on_twitter">Share on Twitter</string>
+    <string name="share_by_mail">Share by Mail</string>
+    <string name="languages">Languages</string>  
+    <string name="month">month</string>
+    <string name="months">months</string>
+    <string name="year">year</string>
+    <string name="week">week</string>
+    <string name="ok">OK</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    
+    <string name="send_log">Send log</string>
+    <string name="download_service_already_running">Download service already running</string>
+    <string name="loading">Loading...</string>
+    <string name="no_space_on_device">Not enough space in your internal storage</string>
+    <string name="browser">Open in browser</string>
+    <string name="asset_downloading">Asset\nDownloading…</string>
+    <string name="read_sample">Read Sample</string>
+    <string name="crash_toast_text">Application crashed. Please send bug report by email.</string>
+    <string name="incorrect_code">Incorrect code</string>
+    <string name="incorrect_username_or_password">Incorrect username or password</string>
+    <string name="unauthorized_issue">Your subscription does not allow you to download this issue</string>
+    <string name="unauthorized_device">This issue has been downloaded on too many devices. Please contact license@librelio.com for more info</string>
+    <string name="no_downloaded_magazines">No downloaded magazines.</string>
+    
+    <string name="new_issue">New issue</string>
+    <string name="available">available</string>
+    <string name="queued">Queued</string>
+    <string name="deja_abonne">Already subscribed? Log in</string>
+    <string name="username_cannot_be_empty">Username cannot be empty</string>
+    <string name="password_cannot_be_empty">Password cannot be empty</string>
+    <string name="download_failed">Download failed</string>
+    <string name="subscriber_code_cannot_be_empty">Subscriber code cannot be empty</string>
+    <string name="cancel_download_question">Cancel download?</string>
+
+
+</resources>
