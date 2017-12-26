@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="open_failed">Не могу открыть журнал</string>
+    <string name="search_backwards">Искать назад</string>
+    <string name="search_forwards">Искать вперед</string>
+    <string name="search_document">Искать по документу</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="text_not_found">Не найдено</string>
+    <string name="items_you_own">Ваши товары</string>
+    <string name="recent_transactions">Недавние действия</string>
+    <string name="edit_payload">Редактировать содержимое</string>
+    <string name="items_for_sale">Товары для продажи</string>
+    <string name="searching_">Поиск&#8230;</string>
+    <string name="link_control">Выделить ссылку</string>
+    <string name="exit">Выйти</string>
+    <string name="reload">Перегрузить</string>
+    <string name="info">Сведения</string>
+    <string name="subscribe">Подписаться</string>
+    <string name="subscription_monthly">Месячная подписка</string>
+    <string name="subscription_yearly">Годовая подписка</string>
+    <string name="android_purchased">Покупка завершена</string>
+    <string name="android_canceled">Покупка отменена</string>
+    <string name="android_refunded">Покупка возвращена</string>
+    <string name="android_item_unavailable">Товар не доступен</string>
+    <string name="cannot_connect_title">Не могу подключиться</string>
+    <string name="cannot_connect_message">Не могу подключиться к серверу Google Play</string>
+    <string name="billing_not_supported_message">Ваше устройство не поддерживает Google Play</string>
+    <string name="subscriptions_not_supported_title">Подписки не поддерживаются</string>
+    <string name="subscriptions_not_supported_message">Ваше устройство не поддерживает подписки</string>
+    <string name="billing_not_supported_title">Оплата не поддерживается.</string>
+    <string name="edit_subscriptions">Изменить подписки</string>
+    <string name="help_url" formatted="false">http://market.android.com/support/bin/answer.py?answer=1050566&amp;hl=%lang%&amp;dl=%region%</string>
+	<string name="restoring_transactions">Восстановить транзакции</string>
+    <string name="learn_more">Узнать больше</string>
+    <string name="buy">Купить</string>
+    <string name="select_item">Выбрать товар</string>
+    <string name="edit_payload_title">Редактировать содержимое, связанное с этой покупкой</string>
+    <string name="edit_payload_accept">Установить</string>
+    <string name="edit_payload_clear">Нет содержимого</string>
+    
+    <string name="purchise">Покупки</string>
+    <string name="outline_title">Название</string>
+    <string name="delete">Удалить</string>
+    <string name="subscribe_year">Годовая подписка</string>
+    <string name="no_further_occurences_found">Больше не найдено</string>
+    
+    <string name="connection_failed">Соединение не удалось!</string>
+
+    
+    <string name="server_error">Неправильный ответ сервера.</string>
+    <string name="connecting">Соединение...</string>
+    <string name="download_failed_please_check_your_connection">Загрузка не удалась. Пожалуйста, проверьте интернет-соединение</string>
+    <string name="please_check_your_connection">Пожалуйста, проверьте интернет-соединение</string>
+    <string name="download_in_progress">Загрузка в процессе</string>
+    <string name="downloading_assets">Загрузка содержимого</string>
+    <string name="caching_operation_in_progress">Операция кэширования в процессе</string>
+    <string name="what_do_you_want_to_buy">Что Вы хотите купить?</string>
+    <string name="cancel">Отменить</string>
+    <string name="continue_download">Продолжить</string>
+    <string name="done">Готово</string>
+    <string name="the_order_failed">Не удалось сделать заказ</string>
+    <string name="buy_and_download">Купить и скачать</string>
+    <string name="try_again">Попробовать снова</string>
+    <string name="downloads">Загрузки</string>
+    <string name="downloaded">Загружено</string>
+    <string name="downloaded_title">Загружено:</string>
+    <string name="free_Download">Бесплатная загрузка</string>
+    <string name="download">Загрузка ...</string>
+    <string name="free_sample">Бесплатный пример</string>
+    <string name="sample">Пример</string>
+    <string name="read">Читать</string>
+    <string name="magazines">Журналы</string>
+    <string name="do_you_really_want_to_quit_this_app">Вы действительно хотите закрыть приложение?</string>
+    <string name="yes">Да</string>
+    <string name="i_have_a_subscriber_code">У меня есть код подписки</string>
+    <string name="i_have_a_username_password_login">У меня есть имя пользователя и пароль</string>
+    <string name="i_have_a_promo_code">У меня есть промокод</string>
+    <string name="restore_my_purchases">Восстановить мои покупки</string>
+    <string name="restore_completed">Восстановить завершенные</string>
+    <string name="free_subscription">Бесплатная подписка</string>
+    <string name="subscriber_code">Код подписки</string>
+    <string name="please_enter_your_code">Пожалуйста, введите код</string>
+    <string name="please_enter_your_username_password_login">Пожалуйста, войдите</string>
+    <string name="invalid_code">Неправильный код</string>
+    <string name="share_on_facebook">Поделиться через Facebook</string>
+    <string name="share_on_twitter">Поделиться через Twitter</string>
+    <string name="share_by_mail">Поделиться через электронную почту</string>
+    <string name="languages">Языки</string>
+    <string name="month">месяц</string>
+    <string name="months">месяцев</string>
+    <string name="year">год</string>
+    <string name="week">неделя</string>
+    <string name="ok">OK</string>
+    <string name="dismiss">Отклонить</string>
+    <string name="login">Войти</string>
+    <string name="username">Имя пользователя</string>
+    <string name="password">Пароль</string>
+    
+    <string name="send_log">Отправить журнал работы</string>
+    <string name="download_service_already_running">Служба загрузки уже запущена</string>
+    <string name="loading">Загрузка...</string>
+    <string name="no_space_on_device">Недостаточно места во внутреннем хранилище</string>
+    <string name="browser">Открыть в браузере</string>
+    <string name="asset_downloading">Содержимое\nЗагрузка…</string>
+    <string name="read_sample">Читать пример</string>
+    <string name="crash_toast_text">Сбой приложения. Пожалуйста, отправьте отчет об ошибке на электронную почту разработчика.</string>
+    <string name="incorrect_code">Неправильный код</string>
+    <string name="incorrect_username_or_password">Неправильное имя пользователя или пароль</string>
+    <string name="unauthorized_issue">Ваша подписка не позволяет скачивать этот выпуск</string>
+    <string name="unauthorized_device">Этот выпуск был загружен на слишком большое количество устройств. Пожалуйста, свяжитесь с license@librelio.com для более подробной информации</string>
+    <string name="no_downloaded_magazines">Нет загруженных журналов.</string>
+    
+    <string name="new_issue">Новый выпуск</string>
+    <string name="available">доступно</string>
+    <string name="queued">В очереди</string>
+    <string name="deja_abonne">Уже подписались? Войдите</string>
+    <string name="username_cannot_be_empty">Имя пользователя не может быть пустым</string>
+    <string name="password_cannot_be_empty">Пароль не может быть пустым</string>
+    <string name="download_failed">Загрузка не удалась</string>
+    <string name="subscriber_code_cannot_be_empty">Код подписки не может быть пустым</string>
+    <string name="cancel_download_question">Отменить загрузку?</string>
+
+
+</resources>
