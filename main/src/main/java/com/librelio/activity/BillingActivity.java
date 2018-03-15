@@ -164,7 +164,9 @@ public class BillingActivity extends BaseActivity {
                 subtitle = getIntent().getExtras().getString(SUBTITLE_KEY);
                 // Using Locale.US to avoid different results in different locales
                 productId = FilenameUtils.getName(fileName).toLowerCase(Locale.US);
-                productId = productId.substring(0, productId.indexOf("_.pdf"));
+                if (productId.length() > 0 && productId.contains("_.pdf")) {
+                    productId = productId.substring(0, productId.indexOf("_.pdf"));
+                }
             }
         }
     }

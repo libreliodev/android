@@ -2,6 +2,7 @@ package com.librelio.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Looper;
 import android.text.format.DateUtils;
 import android.widget.Toast;
 
@@ -86,6 +87,7 @@ public class PlistDownloader {
 
             @Override
             public void onFailure(Request request, IOException e) {
+                Looper.prepare();
                 Toast.makeText(context, context.getResources().getString(R.string.connection_failed),
                         Toast.LENGTH_LONG).show();
                 EventBus.getDefault().post(new ReloadPlistEvent(plistName));
