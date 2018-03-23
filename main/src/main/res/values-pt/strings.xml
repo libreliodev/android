@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="open_failed">Não é possível abrir a Revista</string>
+    <string name="search_backwards">Procurar para trás</string>
+    <string name="search_forwards">Procurar para frente</string>
+    <string name="search_document">Procure no documento</string>
+    <string name="enter_password">Entre com sua senha</string>
+    <string name="text_not_found">Não encontrado</string>
+    <string name="items_you_own">Seus itens</string>
+    <string name="recent_transactions">Transições recentes</string>
+    <string name="edit_payload">Editar pagamento</string>
+    <string name="items_for_sale">Item á venda</string>
+    <string name="searching_">Procurando&#8230;</string>
+    <string name="link_control">Link destacado</string>
+    <string name="exit">Sair</string>
+    <string name="reload">Recarregar</string>
+    <string name="info">Informação</string>
+    <string name="subscribe">Inscrever-se</string>
+    <string name="subscription_monthly">Inscrever-se por mês</string>
+    <string name="subscription_yearly">Inscrever-se por ano</string>
+    <string name="android_purchased">Compra finalizada</string>
+    <string name="android_canceled">Compra cancelada</string>
+    <string name="android_refunded">Compra reembolsada</string>
+    <string name="android_item_unavailable">Produto inválido</string>
+    <string name="cannot_connect_title">Não é possível conectar</string>
+    <string name="cannot_connect_message">Não é possível conectar ao Google Play server</string>
+    <string name="billing_not_supported_message">Google Play não é suportado no seu aparelho</string>
+    <string name="subscriptions_not_supported_title">Inscrições não suportada</string>
+    <string name="subscriptions_not_supported_message">Inscrições não suportada em seu dispositivo</string>
+    <string name="billing_not_supported_title">Compra não suportada.</string>
+    <string name="edit_subscriptions">Editar inscrições</string>
+    <string name="help_url" formatted="false">http://market.android.com/support/bin/answer.py?answer=1050566&amp;hl=%lang%&amp;dl=%region%</string>
+    <string name="restoring_transactions">Restaurando transições</string>
+    <string name="learn_more">Saber mais</string>
+    <string name="buy">Comprar</string>
+    <string name="select_item">Selecionar item</string><string name="edit_payload_title">Edite o pagamento associado a essa compra</string><string name="edit_payload_accept">Colocar</string><string name="edit_payload_clear">Nenhum pagamento</string>
+
+    <string name="purchise">Adquirir</string>
+    <string name="outline_title">Perfilar</string>
+    <string name="delete">Deletar</string>
+    <string name="subscribe_year">Inscrição ao ano</string>
+    <string name="no_further_occurences_found">Não foi encontrado mais</string>
+
+    <string name="connection_failed">Falha na conexão!</string>
+
+
+    <string name="server_error">Erro no servidor.</string>
+    <string name="connecting">Conectando...</string>
+    <string name="download_failed_please_check_your_connection">Download falhou. Por favor, confira sua conexão</string>
+    <string name="please_check_your_connection">Por favor, confira sua conexão</string>
+    <string name="download_in_progress">Download em progresso</string>
+    <string name="downloading_assets">Download iniciado</string>
+    <string name="caching_operation_in_progress">Pagamento em processo</string>
+    <string name="what_do_you_want_to_buy">O que você quer comprar ?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="continue_download">Continuar</string>
+    <string name="done">Concluído</string>
+    <string name="the_order_failed">Falha no pedido</string>
+    <string name="buy_and_download">Compre e baixe</string>
+    <string name="try_again">Tente novamente</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloaded">Baixado</string>
+    <string name="downloaded_title">Baixado:</string>
+    <string name="free_Download">Download grátis</string>
+    <string name="download">Baixando ...</string>
+    <string name="free_sample">Amostra gratuita</string>
+    <string name="sample">Amostra</string>
+    <string name="read">Ler</string>
+    <string name="magazines">Revistas</string>
+    <string name="do_you_really_want_to_quit_this_app">Você realmente quer sair desse aplicativo?</string>
+    <string name="yes">Sim</string>
+    <string name="i_have_a_subscriber_code">Eu tenho um código de assinante</string>
+    <string name="i_have_a_username_password_login">Eu tenho um usuário e senha</string>
+    <string name="i_have_a_promo_code">Eu tenho um código promocional</string>
+    <string name="restore_my_purchases">Restaurar minhas compras</string>
+    <string name="restore_completed">Restauração completa</string>
+    <string name="free_subscription">Inscrição gratuita</string>
+    <string name="subscriber_code">Código do assinante</string>
+    <string name="please_enter_your_code">Por favor, coloque seu código</string>
+    <string name="please_enter_your_username_password_login">Por favor, faça o login</string>
+    <string name="invalid_code">Código Inválido</string>
+    <string name="share_on_facebook">Compartilhar no Facebook</string>
+    <string name="share_on_twitter">Compartilhar no Twitter</string>
+    <string name="share_by_mail">Compartilhar pelo e-mail</string>
+    <string name="languages">Idiomas</string>
+    <string name="month">mês</string>
+    <string name="months">meses</string>
+    <string name="year">ano</string>
+    <string name="week">semana</string>
+    <string name="ok">OK</string>
+    <string name="dismiss">Descartar</string>
+    <string name="login">Login</string>
+    <string name="username">Usuário</string>
+    <string name="password">Senha</string>
+
+    <string name="send_log">Enviar log</string>
+    <string name="download_service_already_running">Serviço de download pronto para iniciar</string>
+    <string name="loading">Carregando...</string>
+    <string name="no_space_on_device">Não tem espaço no armazenamento interno</string>
+    <string name="browser">Abrir no navegador</string>
+    <string name="asset_downloading">Iniciado\nBaixando…</string>
+    <string name="read_sample">Ler amostra</string>
+    <string name="crash_toast_text">O aplicativo parou. Por favor, mande o relatório do bug por e-mail</string>
+    <string name="incorrect_code">Código incorreto</string>
+    <string name="incorrect_username_or_password">Usuário ou senha incorreta</string>
+    <string name="unauthorized_issue">Sua inscrição não permite o download dessa publicação</string>
+    <string name="unauthorized_device">Esta publicação já foi baixada em muitos dispositivos. Por favor, entre em contato com license@librelio.com para mais informações.</string>
+    <string name="no_downloaded_magazines">Nenhuma revista baixada.</string>
+
+    <string name="new_issue">Nova publicação</string>
+    <string name="available">disponível</string>
+    <string name="queued">Aguarde</string>
+    <string name="deja_abonne">Pronto para inscrever-se? Faça o Login</string>
+    <string name="username_cannot_be_empty">Usuário não pode está vazio</string>
+    <string name="password_cannot_be_empty">Senha não pode está vazio</string>
+    <string name="download_failed">O download falhou</string>
+    <string name="subscriber_code_cannot_be_empty">Código do assinante não pode está vazio</string>
+    <string name="cancel_download_question">Cancelar o download?</string>
+
+
+</resources>
